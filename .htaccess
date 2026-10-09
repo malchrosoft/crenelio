@@ -1,0 +1,28 @@
+# OVH Hosting Root .htaccess
+# Place this in the www/ directory on your OVH hosting.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Route /api/* requests to the PHP front controller.
+    # Everything under /api is handled by api/index.php
+    RewriteRule ^api/? api/index.php [QSA,L]
+
+    # Serve static assets from the build output (JS, CSS, images).
+    # Vite outputs to api/public/assets/ during build.
+    RewriteRule ^assets/? api/public/assets/ [QSA,L]
+
+    # SPA fallback: all other routes serve index.html (React handles routing).
+    # Skip this for actual files/directories that exist.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.html [QSA,L]
+</IfModule>
+
+# Security: hide sensitive files
+<FilesMatch "^\.(env|git|htaccess|ovhconfig)$">
+    Require all denied
+</FilesMatch>
+
+# Disable directory listing
+Options -Indexes

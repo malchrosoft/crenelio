@@ -1,0 +1,19 @@
+# API directory .htaccess — prevents direct access to PHP config files
+# and ensures all API traffic goes through index.php.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Route everything in /api/ to index.php (front controller)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# Block direct access to config and sensitive directories
+<FilesMatch "^(config|\.env)$">
+    Require all denied
+</FilesMatch>
+
+# Disable directory listing
+Options -Indexes

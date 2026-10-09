@@ -1,0 +1,25 @@
+; OVHcloud Shared Hosting Configuration
+; This file configures PHP version and environment for OVH web hosting.
+; Place this at the root of your hosting (www/ directory).
+
+; PHP version — 8.2 is widely available on OVH shared hosting.
+; Available: 5.6, 7.0, 7.1, 7.2, 7.3, 7.4, 8.0, 8.1, 8.2, 8.3
+app.engine=php
+app.engine.version=8.2
+
+; Run PHP as PHP-FPM (fastcgi) for better performance.
+http.engine=php
+
+; Environment: production or development.
+; Set to development while debugging, then switch to production.
+environment=production
+
+; Force HTTPS — OVH provides a free Let's Encrypt SSL certificate.
+; Uncomment to enforce HTTPS redirects:
+; https.force=1
+
+; Container mode — shared hosting uses dedicated.
+container=shared
+
+; Cloudflare-style cache (disable during development).
+; cache.enabled=true
