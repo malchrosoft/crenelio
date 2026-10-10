@@ -111,3 +111,19 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Suppression protégée :**
   - Bouton « Supprimer » permettant la suppression définitive uniquement si aucun rendez-vous n'est associé en base de données.
   - Gestion sécurisée de la contrainte d'intégrité référentielle avec message explicite invitant à la désactivation si des rendez-vous passés ou futurs existent.
+
+---
+
+### 12. Sécurité & Authentification Renforcée Espace Pro (2FA Email OTP & Appareil de confiance 10 jours)
+- **Objectif :**
+  - Sécuriser l'accès à l'espace de gestion artisan sans complexité excessive ni dépendance externe lourde (standard conforme aux recommandations ANSSI / OWASP pour mono-utilisateur).
+- **Fonctionnement :**
+  - **Étape 1 :** Vérification du mot de passe administrateur (hachage Bcrypt).
+  - **Étape 2 — Appareil de confiance (10 jours) :**
+    - Un jeton d'autorisation signé cryptographiquement (`device_token`) est stocké côté client (`localStorage` / cookie sécurisé).
+    - Si le jeton est valide et date de **moins de 10 jours**, la connexion est instantanée sans friction.
+  - **Étape 3 — Code OTP temporaire (si nouvel appareil ou expiration > 10 jours) :**
+    - Génération d'un code numérique aléatoire à 6 chiffres cryptographiquement sécurisé (`random_int(100000, 999999)`).
+    - Validité stricte de **15 minutes** et limitation à 3 tentatives infructueuses.
+    - Envoi immédiat par email à l'adresse de contact du professionnel (`pro_email`).
+    - Dès validation du code à 6 chiffres, l'appareil est autorisé pour un nouveau cycle de **10 jours**.

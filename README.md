@@ -35,9 +35,9 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 - **Pied de page & Mentions légales** : informations légales obligatoires et modale dédiée pré-configurée.
 
 ### Espace Professionnel / Administration
-- **Authentification par mot de passe sécurisé** (hachage Bcrypt).
+- **Authentification sécurisée & 2FA** : mot de passe fort (hachage Bcrypt) et double authentification par code OTP temporaire à 6 chiffres par email (valide 15 min), avec mémorisation des appareils de confiance pendant 10 jours.
 - **Planning des interventions** : suivi des rendez-vous par statut (`confirmed`, `completed`, `cancelled`, `pending`) avec coordonnées client et notes d'accès.
-- **Gestion du catalogue de prestations** : ajout, modification, prix et durée en minutes.
+- **Gestion du catalogue de prestations** : ajout, édition inline, descriptif d'intervention, prix, durée et suppression protégée.
 - **Configuration dynamique en base de données** : nom d'entreprise, coordonnées de contact, zone de chalandise, coordonnées GPS et zoom par défaut de la carte.
 
 ---
