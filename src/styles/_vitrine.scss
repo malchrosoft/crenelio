@@ -709,9 +709,49 @@
     flex-wrap: wrap;
     gap: 8px;
 
+    .footer-bottom__left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
     .footer-bottom__copy {
       font-size: 0.85rem;
       color: $gray-500;
+    }
+
+    .footer-bottom__powered {
+      font-size: 0.8rem;
+      color: $gray-500;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .footer-bottom__project-link {
+      color: $primary-light;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
+
+      &:hover {
+        color: white;
+        text-decoration: underline;
+      }
+    }
+
+    .footer-bottom__slogan {
+      color: $gray-500;
+      font-style: italic;
+
+      @include mobile {
+        display: block;
+        width: 100%;
+      }
     }
 
     .footer-bottom__actions {
