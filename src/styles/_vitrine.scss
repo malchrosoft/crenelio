@@ -870,6 +870,38 @@
       line-height: 1.7;
       font-style: normal;
     }
+
+    &--opensource {
+      background: $gray-50;
+      padding: 16px;
+      border-radius: $radius;
+      border: 1px solid $gray-200;
+
+      .legal-opensource-link {
+        color: $primary;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 600;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      .legal-license-info {
+        font-size: 0.85rem;
+        color: $gray-500;
+        margin-top: 8px;
+
+        a {
+          color: $primary;
+          text-decoration: none;
+          &:hover { text-decoration: underline; }
+        }
+      }
+    }
   }
 }
 

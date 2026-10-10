@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { AppConfig } from '../../types';
+import { GithubLogoIcon } from '@phosphor-icons/react';
+import { AppConfig } from '../types';
 
 interface LegalModalProps {
   config: AppConfig;
@@ -108,6 +109,34 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
               sont utilisées exclusivement pour la gestion des interventions et ne sont jamais transmises
               à des tiers. Conformément au RGPD, vous pouvez exercer vos droits d'accès et de suppression
               en contactant directement {config.pro_name || companyName}.
+            </p>
+          </div>
+
+          <div className="legal-section legal-section--opensource">
+            <h3>Logiciel libre &amp; Crédits</h3>
+            <p>
+              Ce service est propulsé par{' '}
+              <a
+                href="https://github.com/malchrosoft/crenelio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="legal-opensource-link"
+              >
+                <GithubLogoIcon size={16} weight="fill" aria-hidden="true" />
+                <strong>Crénelio</strong>
+              </a>
+              , une application web open source et auto-hébergée de prise de rendez-vous pour artisans à domicile.
+            </p>
+            <p className="legal-license-info">
+              Licence logicielle :{' '}
+              <a
+                href="https://www.gnu.org/licenses/agpl-3.0.fr.html"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GNU Affero General Public License v3.0 (AGPL-3.0)
+              </a>
+              . Le code source est public, vérifiable et librement distribuable.
             </p>
           </div>
         </div>
