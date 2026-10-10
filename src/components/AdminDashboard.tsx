@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import clsx from 'clsx';
 import { ClockIcon, CurrencyEurIcon } from '@phosphor-icons/react';
 import { api } from '../api';
 import { Appointment, Service, AppConfig } from '../types';
@@ -165,13 +166,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
       {/* Tabs */}
       <div className="admin-tabs">
         <button
-          className={`btn ${activeTab === 'appointments' ? 'btn-primary' : 'btn-secondary'}`}
+          className={clsx('btn', {
+            'btn-primary': activeTab === 'appointments',
+            'btn-secondary': activeTab !== 'appointments',
+          })}
           onClick={() => setActiveTab('appointments')}
         >
           Planning des rendez-vous ({appointments.length})
         </button>
         <button
-          className={`btn ${activeTab === 'services' ? 'btn-primary' : 'btn-secondary'}`}
+          className={clsx('btn', {
+            'btn-primary': activeTab === 'services',
+            'btn-secondary': activeTab !== 'services',
+          })}
           onClick={() => setActiveTab('services')}
         >
           Prestations ({services.length})
@@ -244,7 +251,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
             {services.map((s) => (
               <div
                 key={s.id}
-                className={`service-card ${!s.is_active ? 'admin-service-card-inactive' : ''}`}
+                className={clsx('service-card', {
+                  'admin-service-card-inactive': !s.is_active,
+                })}
               >
                 <div>
                   <div className="service-name">{s.name}</div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import clsx from 'clsx';
 import { ClockIcon, CurrencyEurIcon } from '@phosphor-icons/react';
 import { Service } from '../types';
 
@@ -31,7 +32,7 @@ export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
           return (
             <div
               key={service.id}
-              className={`service-card ${isSelected ? 'selected' : ''}`}
+              className={clsx('service-card', { selected: isSelected })}
               onClick={() => onSelect(service)}
             >
               <div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import clsx from 'clsx';
 import { CalendarCheckIcon } from '@phosphor-icons/react';
 import { AppConfig, Service } from '../types';
 import HeroSection from '../components/vitrine/HeroSection';
@@ -47,7 +48,10 @@ const VitrinePage: React.FC<VitrinePageProps> = ({ config, services }) => {
     <div className="vitrine-page">
       {/* Header sticky conditionnel (apparaît quand le bouton du hero disparaît) */}
       <header
-        className={`vitrine-header ${isHeaderVisible ? 'vitrine-header--visible' : 'vitrine-header--hidden'}`}
+        className={clsx('vitrine-header', {
+          'vitrine-header--visible': isHeaderVisible,
+          'vitrine-header--hidden': !isHeaderVisible,
+        })}
         aria-hidden={!isHeaderVisible}
       >
         <Link to="/" className="vitrine-header__brand" aria-label="Retour à l'accueil">

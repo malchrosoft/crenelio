@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import clsx from 'clsx';
 import {
   format,
   addMonths,
@@ -85,9 +86,10 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
               key={day.toISOString()}
               type="button"
               disabled={isDisabled}
-              className={`calendar-day-btn ${isSelected ? 'selected' : ''} ${
-                isToday ? 'today' : ''
-              }`}
+              className={clsx('calendar-day-btn', {
+                selected: isSelected,
+                today: isToday,
+              })}
               onClick={() => {
                 if (!isDisabled) {
                   onSelectDate(format(day, 'yyyy-MM-dd'));

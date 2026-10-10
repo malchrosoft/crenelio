@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import clsx from 'clsx';
 import { CalendarCheckIcon, LockKeyIcon, ArrowLeftIcon, UserIcon } from '@phosphor-icons/react';
 import { api } from '../api';
 import { Service, Slot, Appointment, BookingPayload, AppConfig } from '../types';
@@ -110,15 +111,29 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
             {/* Stepper */}
             {step < 4 && (
               <div className="stepper">
-                <div className={`step-item ${step === 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`}>
+                <div
+                  className={clsx('step-item', {
+                    active: step === 1,
+                    completed: step > 1,
+                  })}
+                >
                   <div className="step-number">{step > 1 ? '✓' : '1'}</div>
                   <span>Prestation</span>
                 </div>
-                <div className={`step-item ${step === 2 ? 'active' : ''} ${step > 2 ? 'completed' : ''}`}>
+                <div
+                  className={clsx('step-item', {
+                    active: step === 2,
+                    completed: step > 2,
+                  })}
+                >
                   <div className="step-number">{step > 2 ? '✓' : '2'}</div>
                   <span>Date &amp; Heure</span>
                 </div>
-                <div className={`step-item ${step === 3 ? 'active' : ''}`}>
+                <div
+                  className={clsx('step-item', {
+                    active: step === 3,
+                  })}
+                >
                   <div className="step-number">3</div>
                   <span>Coordonnées</span>
                 </div>

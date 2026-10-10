@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import clsx from 'clsx';
 import CalendarPicker from './CalendarPicker';
 import { api } from '../api';
 import { Service, Slot } from '../types';
@@ -107,7 +108,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
                   <button
                     key={slot.start_datetime}
                     type="button"
-                    className={`slot-btn ${isSelected ? 'selected' : ''}`}
+                    className={clsx('slot-btn', { selected: isSelected })}
                     onClick={() => onSelectSlot(slot)}
                   >
                     {slot.start} – {slot.end}

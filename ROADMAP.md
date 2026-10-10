@@ -89,21 +89,18 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 9. Modernisation du Build Sass (Migration Legacy JS API)
-- **Problématique :**
-  - Avertissement au build Vite : `Deprecation Warning [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.`.
-- **Actions prévues :**
-  - Configurer `vite.config.ts` avec `css.preprocessorOptions.scss.api: 'modern-compiler'` (ou `'modern'`) pour adopter la nouvelle API de Dart Sass.
-  - Vérifier la compatibilité des imports `@use` et l'absence totale de warnings à la compilation.
+### 9. Modernisation du Build Sass (Migration Legacy JS API) — ✅ Terminée
+- **Résolution du warning de dépréciation :**
+  - Ajout de `css.preprocessorOptions.scss.api: 'modern-compiler'` dans `vite.config.js`.
+  - Élimination complète du warning Dart Sass `[legacy-js-api]` lors du build.
 
 ---
 
-### 10. Gestion Propre des Classes Conditionnelles (`clsx`)
-- **Problématique :**
-  - Concaténation manuelle de chaînes de classes (ex: `` `btn ${active ? 'btn-primary' : 'btn-secondary'}` `` ou template strings imbriqués) sujette aux espaces superflus et moins lisible.
-- **Actions prévues :**
-  - Installer la dépendance légère `clsx`.
-  - Harmoniser les composants (`Stepper`, `BookingPage`, `SlotPicker`, `AdminDashboard`, `VitrinePage`, etc.) pour construire les `className` de manière déclarative et robuste.
+### 10. Gestion Propre des Classes Conditionnelles (`clsx`) — ✅ Terminée
+- **Installation et intégration :**
+  - Dépendance `clsx` installée.
+  - Refactorisation de tous les `className` conditionnels avec `clsx()` dans `VitrinePage`, `BookingPage`, `ServiceSelector`, `CalendarPicker`, `SlotPicker`, `BookingConfirmation` et `AdminDashboard`.
+
 
 
 

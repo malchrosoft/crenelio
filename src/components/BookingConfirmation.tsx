@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import clsx from 'clsx';
 import { Appointment } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -44,9 +45,10 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
     <div className="card confirmation-card">
       <div className="confirmation-header">
         <div
-          className={`confirmation-badge-icon ${
-            isCancelled ? 'confirmation-badge-icon--danger' : 'confirmation-badge-icon--success'
-          }`}
+          className={clsx('confirmation-badge-icon', {
+            'confirmation-badge-icon--danger': isCancelled,
+            'confirmation-badge-icon--success': !isCancelled,
+          })}
         >
           {isCancelled ? '✕' : '✓'}
         </div>
@@ -62,9 +64,10 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
 
       {cancelMessage && (
         <div
-          className={`confirmation-message ${
-            isCancelled ? 'confirmation-message--danger' : 'confirmation-message--success'
-          }`}
+          className={clsx('confirmation-message', {
+            'confirmation-message--danger': isCancelled,
+            'confirmation-message--success': !isCancelled,
+          })}
         >
           {cancelMessage}
         </div>
