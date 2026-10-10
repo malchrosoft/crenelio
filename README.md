@@ -14,18 +14,25 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 
 ## Fonctionnalités
 
-### Parcours Client (Prise de rendez-vous en 3 étapes)
-- **Choix de la prestation** : sélection avec durée, tarif indicatif et descriptif détaillé.
-- **Calendrier & créneaux en direct** : calcul dynamique des disponibilités en temps réel basé sur les horaires d'ouverture habituels, la durée de la prestation, le temps de battement/trajet (`buffer_minutes`), le préavis minimum et les congés/indisponibilités.
-- **Autocomplétion d'adresse BAN (Base Adresse Nationale)** :
-  - Recherche prédictive en direct via l'API officielle `api-adresse.data.gouv.fr`.
-  - Remplissage automatique des champs (adresse, code postal, ville).
-  - Détection et enregistrement des coordonnées GPS précises (`[latitude, longitude]`).
-- **Cartographie OpenStreetMap intégrée** :
-  - Intégration cartographique légère avec **Pigeon Maps** (sans clé API tierce).
-  - Centrage initial par défaut sur la commune d'activité de l'artisan (ex: Clamart `[48.8000, 2.2625]`), paramétrable dans la base de données.
-  - Positionnement interactif d'un marqueur sur le lieu exact de l'intervention.
+### Parcours Client & Présentation
+- **Page vitrine artisan (Homepage `/`)** :
+  - Mise en valeur des prestations, de l'artisan, de ses engagements et de ses coordonnées.
+  - Header adaptatif sticky (apparition dynamique après défilement du call-to-action principal).
+  - Zone d'intervention interactive avec carte OpenStreetMap et tracés polygonaux GeoJSON officiels des communes couvertes.
+  - Cartes de prestations avec accès direct au créneau correspondant (`/booking?service=:id`).
+- **Réservation en ligne en 3 étapes (`/booking`)** :
+  - **Choix de la prestation** : sélection avec durée, tarif indicatif et descriptif détaillé.
+  - **Calendrier & créneaux en direct** : calcul dynamique des disponibilités en temps réel basé sur les horaires d'ouverture habituels, la durée de la prestation, le temps de battement/trajet (`buffer_minutes`), le préavis minimum et les congés/indisponibilités.
+  - **Autocomplétion d'adresse BAN (Base Adresse Nationale)** :
+    - Recherche prédictive en direct via l'API officielle `api-adresse.data.gouv.fr`.
+    - Remplissage automatique des champs (adresse, code postal, ville).
+    - Détection et enregistrement des coordonnées GPS précises (`[latitude, longitude]`).
+  - **Cartographie OpenStreetMap intégrée** :
+    - Intégration cartographique légère avec **Pigeon Maps** (sans clé API tierce).
+    - Centrage initial par défaut sur la commune d'activité de l'artisan (ex: Clamart `[48.8000, 2.2625]`), paramétrable dans la base de données.
+    - Positionnement interactif d'un marqueur sur le lieu exact de l'intervention.
 - **Confirmation & suivi** : récapitulatif complet de l'intervention avec token unique d'annulation/suivi.
+- **Pied de page & Mentions légales** : informations légales obligatoires et modale dédiée pré-configurée.
 
 ### Espace Professionnel / Administration
 - **Authentification par mot de passe sécurisé** (hachage Bcrypt).
@@ -39,10 +46,10 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 
 | Couche | Technologies |
 |---|---|
-| **Frontend** | React 18, TypeScript, Vite 5, Sass (SCSS BEM/modulaire), Pigeon Maps, Date-fns |
+| **Frontend** | React 18, TypeScript, Vite 5, React Router 7, Sass (SCSS BEM/modulaire), @phosphor-icons/react, Pigeon Maps, Date-fns |
 | **Backend** | PHP 8.2 natif (Architecture MVC propre, PDO requêtes préparées, sans dépendance lourde) |
 | **Base de données** | MySQL 8.0+ / MariaDB (InnoDB, UTF-8 mb4) |
-| **Géocodage & Cartes**| Base Adresse Nationale (BAN data.gouv.fr) + OpenStreetMap via Pigeon Maps |
+| **Géocodage & Cartes**| Base Adresse Nationale (BAN data.gouv.fr) + OpenStreetMap via Pigeon Maps (avec GeoJSON des communes) |
 | **Hébergement cible** | OVHcloud Hébergement Web mutualisé (Perso / Pro / Performance) ou serveur dédié |
 
 ---
