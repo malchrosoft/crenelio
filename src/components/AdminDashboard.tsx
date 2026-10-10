@@ -22,6 +22,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
   const [activeTab, setActiveTab] = useState<'appointments' | 'services' | 'settings'>('appointments');
 
   // Nouvelle prestation
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newServiceName, setNewServiceName] = useState('');
   const [newServiceDescription, setNewServiceDescription] = useState('');
   const [newServiceDuration, setNewServiceDuration] = useState('60');
@@ -42,6 +43,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
       loadData();
     }
   }, [isAuthenticated]);
+
+  // Fermeture de la pop-up sur Echap
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isAddModalOpen) {
+        setIsAddModalOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [isAddModalOpen]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -98,10 +110,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
       });
       setNewServiceName('');
       setNewServiceDescription('');
+      setNewServiceDuration('60');
+      setNewServicePrice('50.00');
+      setIsAddModalOpen(false);
       const updated = await api.listServices(true);
       setServices(updated);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Erreur');
+      alert(err instanceof Error ? err.message : 'Erreur lors de la création');
     }
   }
 
@@ -309,7 +324,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
         </div>
       ) : (
         <div>
-          <h3 className="admin-section-title">Prestations</h3>
+          <div className="admin-section-header">
+            <h3 className="admin-section-title">Prestations ({services.length})</h3>
+            <button
+              className="btn btn-primary admin-btn-sm"
+              onClick={() => setIsAddModalOpen(true)}
+            >
+              + Ajouter une prestation
+            </button>
+          </div>
           <div className="services-grid admin-services-grid">
             {services.map((s) => (
               <div
@@ -433,60 +456,96 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
             ))}
           </div>
 
-          <h3 className="admin-section-title">Ajouter une nouvelle prestation</h3>
-          <form
-            onSubmit={handleAddService}
-            className="admin-new-service-form"
-          >
-            <div className="field-name">
-              <label className="form-label">Nom de la prestation</label>
-              <input
-                type="text"
-                className="form-input"
-                required
-                value={newServiceName}
-                onChange={(e) => setNewServiceName(e.target.value)}
-                placeholder="Ex: Remplacement robinet"
-              />
+          {/* ── Pop-up / Modal d'ajout de prestation ── */}
+          {isAddModalOpen && (
+            <div
+              className="admin-modal-overlay"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="add-service-modal-title"
+              onClick={() => setIsAddModalOpen(false)}
+            >
+              <div
+                className="admin-modal"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="admin-modal__header">
+                  <h3 className="admin-modal__title" id="add-service-modal-title">
+                    Ajouter une nouvelle prestation
+                  </h3>
+                  <button
+                    className="admin-modal__close"
+                    onClick={() => setIsAddModalOpen(false)}
+                    aria-label="Fermer"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <form onSubmit={handleAddService} className="admin-modal__body">
+                  <div className="form-group">
+                    <label className="form-label">Nom de la prestation</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      required
+                      value={newServiceName}
+                      onChange={(e) => setNewServiceName(e.target.value)}
+                      placeholder="Ex: Remplacement robinet"
+                      autoFocus
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Description (optionnel)</label>
+                    <textarea
+                      className="form-textarea"
+                      rows={3}
+                      value={newServiceDescription}
+                      onChange={(e) => setNewServiceDescription(e.target.value)}
+                      placeholder="Détails sur l'intervention…"
+                    />
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label">Durée (minutes)</label>
+                      <input
+                        type="number"
+                        className="form-input"
+                        required
+                        min="15"
+                        step="15"
+                        value={newServiceDuration}
+                        onChange={(e) => setNewServiceDuration(e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Prix (€)</label>
+                      <input
+                        type="number"
+                        className="form-input"
+                        required
+                        min="0"
+                        step="0.5"
+                        value={newServicePrice}
+                        onChange={(e) => setNewServicePrice(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="admin-modal__actions">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setIsAddModalOpen(false)}
+                    >
+                      Annuler
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      Créer la prestation
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-            <div className="field-description">
-              <label className="form-label">Description (optionnel)</label>
-              <textarea
-                className="form-textarea"
-                rows={2}
-                value={newServiceDescription}
-                onChange={(e) => setNewServiceDescription(e.target.value)}
-                placeholder="Détails sur l'intervention…"
-              />
-            </div>
-            <div className="field-number">
-              <label className="form-label">Durée (minutes)</label>
-              <input
-                type="number"
-                className="form-input"
-                required
-                min="15"
-                step="15"
-                value={newServiceDuration}
-                onChange={(e) => setNewServiceDuration(e.target.value)}
-              />
-            </div>
-            <div className="field-number">
-              <label className="form-label">Prix (€)</label>
-              <input
-                type="number"
-                className="form-input"
-                required
-                min="0"
-                step="0.5"
-                value={newServicePrice}
-                onChange={(e) => setNewServicePrice(e.target.value)}
-              />
-            </div>
-            <button type="submit" className="btn btn-primary">
-              + Ajouter
-            </button>
-          </form>
+          )}
         </div>
       )}
     </div>

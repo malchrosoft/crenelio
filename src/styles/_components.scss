@@ -742,6 +742,16 @@
   }
 }
 
+.admin-section-header {
+  @include flex-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .admin-section-title {
+    margin-bottom: 0;
+  }
+}
+
 .admin-service-error {
   margin-top: 10px;
   padding: 8px 10px;
@@ -751,25 +761,73 @@
   font-size: 0.8rem;
 }
 
-.admin-new-service-form {
-  background: $gray-50;
-  padding: 16px;
-  border-radius: $radius;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: flex-end;
+/* Modale Pop-up Espace Pro */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 200;
+  @include flex-center;
+  padding: 20px;
+  backdrop-filter: blur(2px);
 
-  .field-name {
-    flex: 2 1 200px;
+  @media (prefers-reduced-motion: reduce) {
+    backdrop-filter: none;
+  }
+}
+
+.admin-modal {
+  background: white;
+  border-radius: $radius-lg;
+  max-width: 540px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: $shadow-lg;
+
+  .admin-modal__header {
+    @include flex-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid $gray-200;
   }
 
-  .field-description {
-    flex: 3 1 100%;
+  .admin-modal__title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: $gray-900;
+    margin: 0;
   }
 
-  .field-number {
-    flex: 1 1 100px;
+  .admin-modal__close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: $gray-100;
+    color: $gray-600;
+    font-size: 1rem;
+    @include flex-center;
+    cursor: pointer;
+    border: none;
+    transition: $transition-fast;
+
+    &:hover {
+      background: $gray-200;
+      color: $gray-900;
+    }
+  }
+
+  .admin-modal__body {
+    padding: 20px 24px;
+  }
+
+  .admin-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid $gray-100;
   }
 }
 
