@@ -70,6 +70,18 @@
     color: $gray-900;
     margin-bottom: 16px;
   }
+
+  .card-subtitle {
+    color: $gray-500;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+  }
+
+  .card-actions {
+    margin-top: 28px;
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 
 /* Grille des prestations */
@@ -125,6 +137,7 @@
 .badge {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   padding: 4px 10px;
   border-radius: $radius-full;
   font-size: 0.8rem;
@@ -379,6 +392,24 @@
     background: $primary-light;
     color: $primary;
   }
+
+  .suggestion-main {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .suggestion-context {
+    font-size: 0.8rem;
+    color: $gray-500;
+    margin-left: 22px;
+  }
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: $gray-400;
+  margin-top: 4px;
 }
 
 /* Wrapper Carte */

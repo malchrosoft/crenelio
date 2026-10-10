@@ -19,7 +19,22 @@ INSERT INTO `config` (`config_key`, `config_value`) VALUES
 ('default_latitude',    '48.8000'), -- Clamart par défaut
 ('default_longitude',   '2.2625'),  -- Clamart par défaut
 ('default_zoom',        '12'),
-('admin_password_hash', '$2y$10$wO8l9Ea6vQ6C2u4K8j7mQeeFm1lVqB.qWc1VzW2Z2i1pW7uH3sUGe'); -- 'admin123'
+('admin_password_hash', '$2y$10$wO8l9Ea6vQ6C2u4K8j7mQeeFm1lVqB.qWc1VzW2Z2i1pW7uH3sUGe'), -- 'admin123'
+-- Vitrine
+('vitrine_tagline',      'Votre artisan de confiance, à domicile'),
+('vitrine_about',        'Artisan qualifié et expérimenté, j\'interviens rapidement chez vous pour tous vos travaux. Devis gratuit, travail soigné et garanti.'),
+('vitrine_photo_url',    ''),
+('vitrine_engagement_1', '🕐 Ponctualité garantie'),
+('vitrine_engagement_2', '🛡️ Travail soigné et garanti'),
+('vitrine_engagement_3', '📍 Intervention à domicile'),
+('vitrine_engagement_4', '💬 Devis gratuit et sans engagement'),
+-- Mentions légales
+('legal_raison_sociale', ''),
+('legal_siret',          ''),
+('legal_naf',            ''),
+('legal_assurance',      ''),
+('legal_adresse',        ''),
+('legal_hebergeur',      'OVHcloud, 2 rue Kellermann, 59100 Roubaix – France');
 
 -- 2. Horaires d'ouverture hebdomadaires habituels (1=Lundi .. 7=Dimanche)
 INSERT INTO `schedules` (`day_of_week`, `is_active`, `morning_start`, `morning_end`, `afternoon_start`, `afternoon_end`) VALUES

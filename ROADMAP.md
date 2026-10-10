@@ -28,12 +28,13 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 3. Page Vitrine par Défaut (Homepage Artisan)
+### 3. Page Vitrine par Défaut (Homepage Artisan) — ✅ Terminée
 - **Page d'accueil de présentation :**
-  - Affichage d'une page vitrine professionnelle mettant en valeur l'artisan (présentation de l'activité, zone d'intervention avec carte interactive, avis/engagements, coordonnées).
-  - Bouton d'action proéminent (Call-to-Action) : *"Prendre rendez-vous en ligne"* qui mène vers le tunnel de réservation en 3 étapes.
-- **Routage :**
-  - Vue vitrine par défaut avec switch/lien transparent vers le stepper de réservation.
+  - Affichage d'une page vitrine professionnelle mettant en valeur l'artisan (présentation de l'activité, coordonnées, engagements, contact direct).
+  - Zone d'intervention interactive sous le Hero avec carte Pigeon Maps, marqueur centré et tracé polygonal des communes couvertes (GeoJSON officiel).
+  - Header sticky adaptatif apparaissant dès que le bouton d'action du Hero sort du viewport.
+  - Cartes de prestations avec alignement strict en bas de carte (durée, tarif, CTA direct).
+  - Routage React Router avec navigation `/` (vitrine), `/booking` (tunnel de réservation) et pré-sélection d'une prestation via `/booking?service=:id`.
 
 ---
 
@@ -68,10 +69,21 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 7. Footer Complet & Mentions Légales Pré-configurables
+### 7. Footer Complet & Mentions Légales Pré-configurables — ✅ Terminée
 - **Pied de page riche :**
-  - Coordonnées de contact rapides (téléphone, email, horaires, zone couverte).
-  - Lien d'accès discret à l'espace Pro.
+  - Navigation, coordonnées de contact rapides (téléphone, email), rappel de la zone d'intervention.
+  - Lien d'accès discret vers l'espace Pro.
 - **Mentions légales & Informations d'entreprise :**
-  - Champs pré-configurables dans l'admin : Raison sociale, SIRET, code NAF/APE, numéro d'assurance décennale / RC Pro, hébergeur.
-  - Page modale ou dédiée pour l'affichage des mentions légales et conditions d'intervention.
+  - Champs configurables dans `config` : Raison sociale, SIRET, code NAF/APE, numéro d'assurance décennale / RC Pro, adresse, hébergeur.
+  - Modale dédiée accessible depuis le footer affichant les mentions légales complètes et les règles de traitement des données.
+
+---
+
+### 8. Dette Technique & Harmonisation des Styles SCSS (En cours)
+- **Éradication des styles inline résiduels :**
+  - Nettoyer les `style={{ ... }}` subsistants dans le tunnel de prise de rdv et l'espace admin (`BookingForm.tsx`, `SlotPicker.tsx`, `BookingConfirmation.tsx`, `AdminDashboard.tsx`, `LegalModal.tsx`).
+- **Conformité aux conventions SCSS :**
+  - Définir des classes sémantiques ou de composant dans `_components.scss` (ex: `.booking-error-box`, `.booking-form-actions`, `.slot-picker-empty`, `.confirmation-badge`).
+  - Proscrire les micro-classes utilitaires ad hoc qui reproduisent le style inline.
+  - Utiliser systématiquement les variables de `_variables.scss` (`$primary`, `$gray-500`, `$danger-light`, etc.) sans jamais coder de couleurs hexadécimales en dur.
+

@@ -1,4 +1,5 @@
 import React from 'react';
+import { ClockIcon, CurrencyEurIcon } from '@phosphor-icons/react';
 import { Service } from '../types';
 
 interface ServiceSelectorProps {
@@ -17,7 +18,7 @@ export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
   return (
     <div className="card">
       <h2 className="card-title">1. Choisissez votre prestation</h2>
-      <p style={{ color: 'var(--gray-500)', marginBottom: 20, fontSize: '0.95rem' }}>
+      <p className="card-subtitle">
         Sélectionnez la nature de l'intervention à votre domicile.
       </p>
 
@@ -38,15 +39,21 @@ export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
                 <div className="service-desc">{service.description}</div>
               </div>
               <div className="service-meta">
-                <span className="badge badge-duration">⏱ {service.duration_minutes} min</span>
-                <span className="badge badge-price">💶 {priceLabel}</span>
+                <span className="badge badge-duration">
+                  <ClockIcon size={15} weight="fill" aria-hidden="true" />
+                  {service.duration_minutes} min
+                </span>
+                <span className="badge badge-price">
+                  <CurrencyEurIcon size={15} weight="fill" aria-hidden="true" />
+                  {priceLabel}
+                </span>
               </div>
             </div>
           );
         })}
       </div>
 
-      <div style={{ marginTop: 28, display: 'flex', justifyContent: 'flex-end' }}>
+      <div className="card-actions">
         <button
           className="btn btn-primary"
           disabled={!selectedService}

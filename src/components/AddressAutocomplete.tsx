@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { MapPinIcon } from '@phosphor-icons/react';
 import { AddressResult } from '../types';
 
 interface BANFeature {
@@ -118,9 +119,12 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               className="suggestion-item"
               onClick={() => handleSelect(item)}
             >
-              📍 <strong>{item.properties.label}</strong>
+              <div className="suggestion-main">
+                <MapPinIcon size={16} weight="fill" aria-hidden="true" />
+                <strong>{item.properties.label}</strong>
+              </div>
               {item.properties.context && (
-                <div style={{ fontSize: '0.8rem', color: 'var(--gray-500)' }}>
+                <div className="suggestion-context">
                   {item.properties.context}
                 </div>
               )}
@@ -129,7 +133,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         </div>
       )}
       {isLoading && (
-        <div style={{ fontSize: '0.75rem', color: 'var(--gray-400)', marginTop: 4 }}>
+        <div className="form-hint">
           Recherche de l'adresse en cours...
         </div>
       )}

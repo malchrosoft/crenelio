@@ -83,6 +83,21 @@ export interface AppConfig {
   default_latitude?: string;
   default_longitude?: string;
   default_zoom?: string;
+  // Vitrine
+  vitrine_tagline?: string;
+  vitrine_about?: string;
+  vitrine_photo_url?: string;
+  vitrine_engagement_1?: string;
+  vitrine_engagement_2?: string;
+  vitrine_engagement_3?: string;
+  vitrine_engagement_4?: string;
+  // Mentions légales
+  legal_raison_sociale?: string;
+  legal_siret?: string;
+  legal_naf?: string;
+  legal_assurance?: string;
+  legal_adresse?: string;
+  legal_hebergeur?: string;
   [key: string]: string | undefined;
 }
 

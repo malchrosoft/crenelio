@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ClockIcon, CurrencyEurIcon } from '@phosphor-icons/react';
 import { api } from '../api';
 import { Appointment, Service, AppConfig } from '../types';
 import { format } from 'date-fns';
@@ -270,8 +271,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                   <div className="service-desc">{s.description}</div>
                 </div>
                 <div className="service-meta">
-                  <span className="badge badge-duration">⏱ {s.duration_minutes} min</span>
-                  <span className="badge badge-price">💶 {s.price} €</span>
+                  <span className="badge badge-duration">
+                    <ClockIcon size={14} weight="fill" aria-hidden="true" />
+                    {s.duration_minutes} min
+                  </span>
+                  <span className="badge badge-price">
+                    <CurrencyEurIcon size={14} weight="fill" aria-hidden="true" />
+                    {s.price} €
+                  </span>
                   <button
                     className="btn btn-secondary"
                     style={{ padding: '4px 10px', fontSize: '0.75rem' }}

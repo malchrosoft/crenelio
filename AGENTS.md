@@ -87,6 +87,13 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
   - `_mixins.scss` (breakpoints responsive `mobile`, `tablet`, helpers flex)
   - `_base.scss` (reset, layout global, typographie)
   - `_components.scss` (stepper, cartes prestations, calendrier, slots, formulaires, badges)
+  - `_vitrine.scss` (page vitrine artisan, responsive, animations)
+- **Règle absolue sur les styles :**
+  - **Bannir formellement les styles inline (`style={{ ... }}`)**.
+  - **Éviter de contourner le style inline avec des micro-classes atomiques / utilitaires ad hoc (ex: `text-95`, `mb-5`, `p-3`)** qui reviennent exactement au même. Définir de vraies **classes sémantiques BEM / de composant** dans les fichiers SCSS dédiés (`_components.scss`, `_vitrine.scss`, etc.) en réutilisant les variables SCSS (`$primary`, `$gray-500`, etc.).
+  - Les styles ou micro-utilitaires ne sont tolérés que dans des **composants de base** réutilisables (design system).
+  - Ne jamais coder en dur des valeurs hexadécimales de couleurs dans le SCSS : toujours utiliser les constantes/variables de `_variables.scss`.
+- **Icônes :** Utiliser la librairie `@phosphor-icons/react` avec le style `weight="fill"`. Pour une identification immédiate et sans ambiguïté, **toujours utiliser les imports suffixés par `Icon`** (ex : `CalendarCheckIcon`, `MapPinIcon`, `ClockIcon`, `PhoneIcon`, `LockKeyIcon`).
 - **Autocomplétion d'adresses :** `AddressAutocomplete.tsx` appelle l'API publique de la Base Adresse Nationale (`https://api-adresse.data.gouv.fr/search/?q=...`) avec debounce.
 - **Cartographie :** `InterventionMap.tsx` s'appuie sur `pigeon-maps` et OpenStreetMap. Le centrage initial et le niveau de zoom proviennent de la table `config` (fallback par défaut : Clamart `[48.8000, 2.2625]`, zoom `12`).
 
