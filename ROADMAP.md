@@ -87,4 +87,23 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - Remplacement systématique des couleurs hexadécimales en dur par les constantes SCSS de `_variables.scss` (`$primary`, `$primary-light`, `$danger-light`, `$success-light`, `$warning-light`, etc.).
   - Cohérence des boutons vitrine et correction du lien Espace Pro vers `/booking?view=admin`.
 
+---
+
+### 9. Modernisation du Build Sass (Migration Legacy JS API)
+- **Problématique :**
+  - Avertissement au build Vite : `Deprecation Warning [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.`.
+- **Actions prévues :**
+  - Configurer `vite.config.ts` avec `css.preprocessorOptions.scss.api: 'modern-compiler'` (ou `'modern'`) pour adopter la nouvelle API de Dart Sass.
+  - Vérifier la compatibilité des imports `@use` et l'absence totale de warnings à la compilation.
+
+---
+
+### 10. Gestion Propre des Classes Conditionnelles (`clsx`)
+- **Problématique :**
+  - Concaténation manuelle de chaînes de classes (ex: `` `btn ${active ? 'btn-primary' : 'btn-secondary'}` `` ou template strings imbriqués) sujette aux espaces superflus et moins lisible.
+- **Actions prévues :**
+  - Installer la dépendance légère `clsx`.
+  - Harmoniser les composants (`Stepper`, `BookingPage`, `SlotPicker`, `AdminDashboard`, `VitrinePage`, etc.) pour construire les `className` de manière déclarative et robuste.
+
+
 
