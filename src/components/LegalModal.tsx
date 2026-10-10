@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { GithubLogoIcon } from '@phosphor-icons/react';
+import { GithubLogoIcon, TranslateIcon } from '@phosphor-icons/react';
 import { AppConfig } from '../types';
+import legalCreditsI18n from '../data/legalCreditsI18n.json';
+
+type LangKey = keyof typeof legalCreditsI18n;
 
 interface LegalModalProps {
   config: AppConfig;
@@ -12,6 +15,8 @@ interface LegalModalProps {
  * Accessible : focus piégé, fermeture sur Echap et clic overlay.
  */
 const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
+  const [selectedLang, setSelectedLang] = useState<LangKey>('fr');
+
   // Fermeture sur Echap
   React.useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -112,10 +117,35 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
             </p>
           </div>
 
-          <div className="legal-section legal-section--opensource">
-            <h3>Logiciel libre &amp; Crédits</h3>
+          <div
+            className="legal-section legal-section--opensource"
+            dir={legalCreditsI18n[selectedLang]?.dir || 'ltr'}
+          >
+            <div className="legal-opensource-header">
+              <h3>{legalCreditsI18n[selectedLang]?.title || legalCreditsI18n.fr.title}</h3>
+              <div className="legal-lang-selector" dir="ltr">
+                <TranslateIcon size={16} weight="fill" aria-hidden="true" />
+                <label htmlFor="legal-credits-lang" className="legal-lang-label">
+                  Langue :
+                </label>
+                <select
+                  id="legal-credits-lang"
+                  className="legal-lang-select"
+                  value={selectedLang}
+                  onChange={(e) => setSelectedLang(e.target.value as LangKey)}
+                  aria-label="Sélectionner la langue des crédits open source"
+                >
+                  {(Object.keys(legalCreditsI18n) as LangKey[]).map((langKey) => (
+                    <option key={langKey} value={langKey}>
+                      {legalCreditsI18n[langKey].lang}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <p>
-              Ce service est propulsé par{' '}
+              {legalCreditsI18n[selectedLang]?.poweredBy || legalCreditsI18n.fr.poweredBy}{' '}
               <a
                 href="https://github.com/malchrosoft/crenelio"
                 target="_blank"
@@ -125,18 +155,20 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
                 <GithubLogoIcon size={16} weight="fill" aria-hidden="true" />
                 <strong>Crénelio</strong>
               </a>
-              , une application web open source et auto-hébergée de prise de rendez-vous pour artisans à domicile.
+              {' '}
+              {legalCreditsI18n[selectedLang]?.description || legalCreditsI18n.fr.description}
             </p>
+
             <p className="legal-license-info">
-              Licence logicielle :{' '}
+              {legalCreditsI18n[selectedLang]?.licensePrefix || legalCreditsI18n.fr.licensePrefix}{' '}
               <a
                 href="https://www.gnu.org/licenses/agpl-3.0.fr.html"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                GNU Affero General Public License v3.0 (AGPL-3.0)
+                {legalCreditsI18n[selectedLang]?.licenseName || legalCreditsI18n.fr.licenseName}
               </a>
-              . Le code source est public, vérifiable et librement distribuable.
+              . {legalCreditsI18n[selectedLang]?.licenseSuffix || legalCreditsI18n.fr.licenseSuffix}
             </p>
           </div>
         </div>

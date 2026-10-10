@@ -1,0 +1,122 @@
+{
+  "fr": {
+    "lang": "Français",
+    "dir": "ltr",
+    "title": "Logiciel libre & Crédits",
+    "poweredBy": "Ce service est propulsé par",
+    "description": "une application web open source et auto-hébergée de prise de rendez-vous pour artisans à domicile.",
+    "licensePrefix": "Licence logicielle :",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "Le code source est public, vérifiable et librement distribuable."
+  },
+  "en": {
+    "lang": "English",
+    "dir": "ltr",
+    "title": "Open Source & Credits",
+    "poweredBy": "This service is powered by",
+    "description": "an open-source, self-hosted web app for booking home service appointments with local pros.",
+    "licensePrefix": "Software license:",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "The source code is public, auditable and freely distributable."
+  },
+  "es": {
+    "lang": "Español",
+    "dir": "ltr",
+    "title": "Software Libre y Créditos",
+    "poweredBy": "Este servicio funciona con",
+    "description": "una aplicación web de código abierto y autoalojada para concertar citas a domicilio con profesionales locales.",
+    "licensePrefix": "Licencia de software:",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "El código fuente es público, verificable y de libre distribución."
+  },
+  "pt": {
+    "lang": "Português",
+    "dir": "ltr",
+    "title": "Software Livre & Créditos",
+    "poweredBy": "Este serviço é desenvolvido com",
+    "description": "uma aplicação web de código aberto e auto-hospedada para agendamento de atendimentos ao domicílio.",
+    "licensePrefix": "Licença de software:",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "O código-fonte é público, verificável e livremente distribuível."
+  },
+  "it": {
+    "lang": "Italiano",
+    "dir": "ltr",
+    "title": "Software Libero e Crediti",
+    "poweredBy": "Questo servizio è supportato da",
+    "description": "un'applicazione web open source e self-hosted per prenotare appuntamenti a domicilio con professionisti.",
+    "licensePrefix": "Licenza software:",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "Il codice sorgente è pubblico, verificabile e liberamente distribuibile."
+  },
+  "ar": {
+    "lang": "العربية",
+    "dir": "rtl",
+    "title": "البرمجيات الحرة وحقوق النشر",
+    "poweredBy": "هذه الخدمة مشغلة بواسطة",
+    "description": "تطبيق ويب مفتوح المصدر ومستضاف ذاتياً لحجز المواعيد المنزلية مع الحرفيين المحليين.",
+    "licensePrefix": "ترخيص البرنامج:",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "الكود المصدري عام وقابل للتدقيق ومتاح للتوزيع بحرية."
+  },
+  "tr": {
+    "lang": "Türkçe",
+    "dir": "ltr",
+    "title": "Açık Kaynak & Krediler",
+    "poweredBy": "Bu hizmet",
+    "description": "yerel profesyonellerle ev randevuları ayarlamak için açık kaynaklı ve kendi sunucunuzda barındırılan bir web uygulaması olan Crénelio tarafından desteklenmektedir.",
+    "licensePrefix": "Yazılım lisansı:",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "Kaynak kod herkese açık, denetlenebilir ve serbestçe dağıtılabilir."
+  },
+  "hy": {
+    "lang": "Հայերեն",
+    "dir": "ltr",
+    "title": "Ազատ ծրագրակազմ և հեղինակներ",
+    "poweredBy": "Այս ծառայությունն աշխատում է",
+    "description": "բաց կոդով և ինքնուրույն հոսթինգով վեբ հավելվածի միջոցով՝ մասնագետների տնային այցերի ամրագրման համար:",
+    "licensePrefix": "Ծրագրային ապահովման արտոնագիր՝",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "Սկզբնական կոդը հրապարակային է, ստուգելի և ազատ տարածելի:"
+  },
+  "ro": {
+    "lang": "Română",
+    "dir": "ltr",
+    "title": "Software Liber & Credite",
+    "poweredBy": "Acest serviciu este susținut de",
+    "description": "o aplicație web open source și auto-găzduită pentru programarea intervențiilor la domiciliu cu meșteri locali.",
+    "licensePrefix": "Licență software:",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "Codul sursă este public, verificabil și liber distribuibil."
+  },
+  "zh": {
+    "lang": "中文",
+    "dir": "ltr",
+    "title": "开源软件与致谢",
+    "poweredBy": "本服务由",
+    "description": "提供支持，这是一个专为本地手艺人与上门服务打造的开源、自托管预约系统。",
+    "licensePrefix": "软件许可证：",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "源代码公开透明、可审计且可自由分发。"
+  },
+  "ko": {
+    "lang": "한국어",
+    "dir": "ltr",
+    "title": "오픈 소스 및 크레딧",
+    "poweredBy": "이 서비스는",
+    "description": "를 기반으로 운영되며, 로컬 기술자와의 방문 예약 및 관리를 위한 오픈 소스 자체 호스팅 웹 애플리케이션입니다.",
+    "licensePrefix": "소프트웨어 라이선스:",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "소스 코드는 공개되어 있으며 누구나 검증하고 자유롭게 배포할 수 있습니다."
+  },
+  "ja": {
+    "lang": "日本語",
+    "dir": "ltr",
+    "title": "オープンソースとクレジット",
+    "poweredBy": "このサービスは",
+    "description": "によって提供されています。地域の職人や訪問サービス向けのオープンソース＆セルフホスト型オンライン予約アプリです。",
+    "licensePrefix": "ソフトウェアライセンス：",
+    "licenseName": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+    "licenseSuffix": "ソースコードは公開されており、検証可能で自由に配布できます。"
+  }
+}
