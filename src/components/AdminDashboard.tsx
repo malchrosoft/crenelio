@@ -232,9 +232,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
           </div>
         </div>
         <div className="admin-header-actions">
-          <button className="btn btn-secondary" onClick={onBackToClient}>
-            Voir l'espace client
-          </button>
           <button className="btn btn-secondary" onClick={() => setIsAuthenticated(false)}>
             Déconnexion
           </button>
