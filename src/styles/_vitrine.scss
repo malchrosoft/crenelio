@@ -736,7 +736,14 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      vertical-align: middle;
       transition: color 0.15s;
+
+      svg {
+        display: inline-block;
+        vertical-align: middle;
+        flex-shrink: 0;
+      }
 
       &:hover {
         color: white;
@@ -928,6 +935,13 @@
         align-items: center;
         gap: 4px;
         font-weight: 600;
+        vertical-align: middle;
+
+        svg {
+          display: inline-block;
+          vertical-align: middle;
+          flex-shrink: 0;
+        }
 
         &:hover {
           text-decoration: underline;
