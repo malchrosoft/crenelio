@@ -101,6 +101,13 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - Dépendance `clsx` installée.
   - Refactorisation de tous les `className` conditionnels avec `clsx()` dans `VitrinePage`, `BookingPage`, `ServiceSelector`, `CalendarPicker`, `SlotPicker`, `BookingConfirmation` et `AdminDashboard`.
 
+---
 
-
-
+### 11. Gestion des Prestations Espace Pro (Création, Édition, Suppression protégée) — ✅ Terminée
+- **Formulaire d'ajout :**
+  - Ajout du champ `description` pour détailler le contenu de la prestation lors de sa création.
+- **Édition inline :**
+  - Bouton « Modifier » sur chaque prestation pour ajuster en direct le nom, la description, la durée et le prix avec boutons « Enregistrer » et « Annuler ».
+- **Suppression protégée :**
+  - Bouton « Supprimer » permettant la suppression définitive uniquement si aucun rendez-vous n'est associé en base de données.
+  - Gestion sécurisée de la contrainte d'intégrité référentielle avec message explicite invitant à la désactivation si des rendez-vous passés ou futurs existent.

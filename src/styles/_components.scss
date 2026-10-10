@@ -698,13 +698,57 @@
   margin-bottom: 28px;
 }
 
-.admin-service-card-inactive {
-  opacity: 0.6;
+.admin-service-card {
+  &--inactive {
+    opacity: 0.6;
+  }
 }
 
-.admin-btn-toggle {
+.admin-btn-sm {
   padding: 4px 10px;
   font-size: 0.75rem;
+}
+
+.btn-danger {
+  background: $danger-light;
+  color: $danger;
+
+  &:hover:not(:disabled) {
+    background: $danger;
+    color: white;
+  }
+}
+
+.service-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.service-card__edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+
+  .service-card__edit-row {
+    display: flex;
+    gap: 10px;
+
+    .field-number {
+      flex: 1;
+    }
+  }
+}
+
+.admin-service-error {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: $danger-light;
+  color: $danger;
+  border-radius: $radius-sm;
+  font-size: 0.8rem;
 }
 
 .admin-new-service-form {
@@ -718,6 +762,10 @@
 
   .field-name {
     flex: 2 1 200px;
+  }
+
+  .field-description {
+    flex: 3 1 100%;
   }
 
   .field-number {
