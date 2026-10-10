@@ -19,7 +19,7 @@ INSERT INTO `config` (`config_key`, `config_value`) VALUES
 ('default_latitude',    '48.8000'), -- Clamart par défaut
 ('default_longitude',   '2.2625'),  -- Clamart par défaut
 ('default_zoom',        '12'),
-('admin_password_hash', '$2y$10$wO8l9Ea6vQ6C2u4K8j7mQeeFm1lVqB.qWc1VzW2Z2i1pW7uH3sUGe'), -- 'admin123'
+('admin_password_hash', '$2y$10$qyk0/fef0o7Ic3vocJBAXOp18E.2J0UaQhC62vS98B9fAlfK7aCQi'), -- 'admin123'
 -- Vitrine
 ('vitrine_tagline',      'Votre artisan de confiance, à domicile'),
 ('vitrine_about',        'Artisan qualifié et expérimenté, j\'interviens rapidement chez vous pour tous vos travaux. Devis gratuit, travail soigné et garanti.'),
