@@ -41,28 +41,19 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   }
 
   return (
-    <div className="card" style={{ maxWidth: 680, margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: 24 }}>
+    <div className="card confirmation-card">
+      <div className="confirmation-header">
         <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: '50%',
-            background: isCancelled ? 'var(--danger-light)' : 'var(--success-light)',
-            color: isCancelled ? 'var(--danger)' : 'var(--success)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.75rem',
-            margin: '0 auto 16px',
-          }}
+          className={`confirmation-badge-icon ${
+            isCancelled ? 'confirmation-badge-icon--danger' : 'confirmation-badge-icon--success'
+          }`}
         >
           {isCancelled ? '✕' : '✓'}
         </div>
-        <h2 style={{ fontSize: '1.4rem', color: 'var(--gray-900)' }}>
+        <h2 className="confirmation-title">
           {isCancelled ? 'Rendez-vous annulé' : 'Rendez-vous confirmé !'}
         </h2>
-        <p style={{ color: 'var(--gray-500)', fontSize: '0.95rem', marginTop: 4 }}>
+        <p className="confirmation-subtitle">
           {isCancelled
             ? 'Ce créneau a été libéré dans le planning de l’artisan.'
             : 'Un e-mail récapitulatif a été envoyé avec toutes les informations nécessaires.'}
@@ -71,15 +62,9 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
 
       {cancelMessage && (
         <div
-          style={{
-            background: isCancelled ? 'var(--danger-light)' : 'var(--success-light)',
-            color: isCancelled ? 'var(--danger)' : 'var(--success)',
-            padding: 12,
-            borderRadius: 8,
-            marginBottom: 20,
-            fontSize: '0.9rem',
-            textAlign: 'center',
-          }}
+          className={`confirmation-message ${
+            isCancelled ? 'confirmation-message--danger' : 'confirmation-message--success'
+          }`}
         >
           {cancelMessage}
         </div>
@@ -96,7 +81,7 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         </div>
         <div className="summary-row">
           <span className="summary-label">Date :</span>
-          <span className="summary-value" style={{ textTransform: 'capitalize' }}>
+          <span className="summary-value summary-value--capitalized">
             {formattedDate}
           </span>
         </div>
@@ -124,20 +109,11 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         )}
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
-          marginTop: 24,
-          alignItems: 'center',
-        }}
-      >
+      <div className="confirmation-actions">
         {!isCancelled && (
           <button
             type="button"
-            className="btn btn-secondary"
-            style={{ color: 'var(--danger)' }}
+            className="btn btn-secondary btn-cancel"
             onClick={handleCancel}
             disabled={cancelling}
           >
@@ -146,9 +122,8 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         )}
         <button
           type="button"
-          className="btn btn-primary"
+          className="btn btn-primary btn-new-booking"
           onClick={onNewBooking}
-          style={{ width: '100%', maxWidth: 320 }}
         >
           Réserver un autre créneau
         </button>

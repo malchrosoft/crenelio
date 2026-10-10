@@ -79,11 +79,12 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 8. Dette Technique & Harmonisation des Styles SCSS (En cours)
+### 8. Dette Technique & Harmonisation des Styles SCSS — ✅ Terminée
 - **Éradication des styles inline résiduels :**
-  - Nettoyer les `style={{ ... }}` subsistants dans le tunnel de prise de rdv et l'espace admin (`BookingForm.tsx`, `SlotPicker.tsx`, `BookingConfirmation.tsx`, `AdminDashboard.tsx`, `LegalModal.tsx`).
+  - Tous les `style={{ ... }}` ont été supprimés de l'ensemble des composants (`BookingForm.tsx`, `SlotPicker.tsx`, `BookingConfirmation.tsx`, `AdminDashboard.tsx`, `LegalModal.tsx`).
 - **Conformité aux conventions SCSS :**
-  - Définir des classes sémantiques ou de composant dans `_components.scss` (ex: `.booking-error-box`, `.booking-form-actions`, `.slot-picker-empty`, `.confirmation-badge`).
-  - Proscrire les micro-classes utilitaires ad hoc qui reproduisent le style inline.
-  - Utiliser systématiquement les variables de `_variables.scss` (`$primary`, `$gray-500`, `$danger-light`, etc.) sans jamais coder de couleurs hexadécimales en dur.
+  - Classes sémantiques de composant créées dans `_components.scss` (`.form-actions-between`, `.form-alert-error`, `.form-gps-status`, `.slots-loading`, `.slots-error`, `.slots-empty`, `.confirmation-card`, `.confirmation-badge-icon`, `.admin-login-card`, etc.).
+  - Remplacement systématique des couleurs hexadécimales en dur par les constantes SCSS de `_variables.scss` (`$primary`, `$primary-light`, `$danger-light`, `$success-light`, `$warning-light`, etc.).
+  - Cohérence des boutons vitrine et correction du lien Espace Pro vers `/booking?view=admin`.
+
 

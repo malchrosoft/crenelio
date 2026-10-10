@@ -149,8 +149,8 @@
   }
 
   &-price {
-    background: #dbeafe;
-    color: #1e40af;
+    background: $primary-light;
+    color: $primary-hover;
   }
 }
 
@@ -250,6 +250,26 @@
 .slots-container {
   display: flex;
   flex-direction: column;
+
+  .slots-loading {
+    padding: 24px 0;
+    color: $gray-500;
+  }
+
+  .slots-error {
+    color: $danger;
+    font-size: 0.9rem;
+  }
+
+  .slots-empty {
+    background: $gray-50;
+    border: 1px dashed $gray-300;
+    border-radius: $radius;
+    padding: 24px;
+    text-align: center;
+    color: $gray-500;
+    font-size: 0.9rem;
+  }
 }
 
 .slots-grid {
@@ -481,8 +501,232 @@
   font-weight: 600;
   text-transform: uppercase;
 
-  &.status-confirmed { background: #dcfce7; color: #15803d; }
-  &.status-completed { background: #e0e7ff; color: #4338ca; }
-  &.status-cancelled { background: #fee2e2; color: #b91c1c; }
-  &.status-pending   { background: #fef3c7; color: #b45309; }
+  &.status-confirmed { background: $success-light; color: $success; }
+  &.status-completed { background: $primary-light; color: $primary; }
+  &.status-cancelled { background: $danger-light; color: $danger; }
+  &.status-pending   { background: $warning-light; color: $warning; }
+}
+
+/* Formulaires & Alertes */
+.form-actions-between {
+  margin-top: 28px;
+  @include flex-between;
+  align-items: center;
+}
+
+.form-alert-error {
+  background: $danger-light;
+  color: $danger;
+  padding: 12px;
+  border-radius: $radius-sm;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+.form-gps-status {
+  font-size: 0.8rem;
+  color: $success;
+  margin-top: 4px;
+}
+
+/* Confirmation de réservation */
+.confirmation-card {
+  max-width: 680px;
+  margin: 0 auto;
+
+  .confirmation-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .confirmation-badge-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    @include flex-center;
+    font-size: 1.75rem;
+    margin: 0 auto 16px;
+
+    &--success {
+      background: $success-light;
+      color: $success;
+    }
+
+    &--danger {
+      background: $danger-light;
+      color: $danger;
+    }
+  }
+
+  .confirmation-title {
+    font-size: 1.4rem;
+    color: $gray-900;
+  }
+
+  .confirmation-subtitle {
+    color: $gray-500;
+    font-size: 0.95rem;
+    margin-top: 4px;
+  }
+
+  .confirmation-message {
+    padding: 12px;
+    border-radius: $radius-sm;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    text-align: center;
+
+    &--success {
+      background: $success-light;
+      color: $success;
+    }
+
+    &--danger {
+      background: $danger-light;
+      color: $danger;
+    }
+  }
+
+  .confirmation-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+    align-items: center;
+
+    .btn-cancel {
+      color: $danger;
+
+      &:hover {
+        background: $danger-light;
+      }
+    }
+
+    .btn-new-booking {
+      width: 100%;
+      max-width: 320px;
+    }
+  }
+}
+
+/* Espace Pro Dashboard */
+.admin-login-card {
+  max-width: 440px;
+  margin: 40px auto;
+
+  .admin-login-hint {
+    color: $gray-500;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+
+  .admin-login-error {
+    background: $danger-light;
+    color: $danger;
+    padding: 10px;
+    border-radius: $radius-sm;
+    margin-bottom: 16px;
+    font-size: 0.85rem;
+  }
+
+  .admin-login-actions {
+    @include flex-between;
+    margin-top: 20px;
+  }
+}
+
+.admin-dashboard-header {
+  @include flex-between;
+  align-items: center;
+  border-bottom: 1px solid $gray-200;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+
+  .admin-title {
+    font-size: 1.3rem;
+    color: $gray-900;
+  }
+
+  .admin-company-sub {
+    font-size: 0.85rem;
+    color: $gray-500;
+  }
+
+  .admin-header-actions {
+    display: flex;
+    gap: 10px;
+  }
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-empty-state {
+  color: $gray-500;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.admin-row-date {
+  font-weight: 600;
+}
+
+.admin-row-phone {
+  font-size: 0.8rem;
+  color: $gray-500;
+}
+
+.admin-row-address {
+  font-size: 0.85rem;
+}
+
+.admin-status-select {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  width: auto;
+}
+
+.admin-section-title {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
+
+.admin-services-grid {
+  margin-bottom: 28px;
+}
+
+.admin-service-card-inactive {
+  opacity: 0.6;
+}
+
+.admin-btn-toggle {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+}
+
+.admin-new-service-form {
+  background: $gray-50;
+  padding: 16px;
+  border-radius: $radius;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+
+  .field-name {
+    flex: 2 1 200px;
+  }
+
+  .field-number {
+    flex: 1 1 100px;
+  }
+}
+
+.legal-section-pending {
+  margin-top: 12px;
+  color: $gray-500;
+  font-size: 0.9rem;
 }

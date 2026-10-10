@@ -63,7 +63,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   return (
     <div className="card">
       <h2 className="card-title">3. Vos coordonnées & Lieu d'intervention</h2>
-      <p style={{ color: 'var(--gray-500)', marginBottom: 20, fontSize: '0.95rem' }}>
+      <p className="card-subtitle">
         Renseignez l'adresse où le technicien interviendra et vos coordonnées pour la confirmation.
       </p>
 
@@ -75,7 +75,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         </div>
         <div className="summary-row">
           <span className="summary-label">Date :</span>
-          <span className="summary-value" style={{ textTransform: 'capitalize' }}>
+          <span className="summary-value summary-value--capitalized">
             {formattedDate}
           </span>
         </div>
@@ -96,16 +96,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
       </div>
 
       {error && (
-        <div
-          style={{
-            background: 'var(--danger-light)',
-            color: 'var(--danger)',
-            padding: 12,
-            borderRadius: 8,
-            marginBottom: 20,
-            fontSize: '0.9rem',
-          }}
-        >
+        <div className="form-alert-error">
           {error}
         </div>
       )}
@@ -194,7 +185,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
             height={200}
           />
           {coordinates && (
-            <div style={{ fontSize: '0.8rem', color: 'var(--success)', marginTop: 4 }}>
+            <div className="form-gps-status">
               ✓ Coordonnées GPS validées pour le déplacement de l'artisan
             </div>
           )}
@@ -211,14 +202,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
           />
         </div>
 
-        <div
-          style={{
-            marginTop: 28,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
+        <div className="form-actions-between">
           <button
             type="button"
             className="btn btn-secondary"

@@ -105,23 +105,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
 
   if (!isAuthenticated) {
     return (
-      <div className="card" style={{ maxWidth: 440, margin: '40px auto' }}>
+      <div className="card admin-login-card">
         <h2 className="card-title">Connexion Espace Pro</h2>
-        <p style={{ color: 'var(--gray-500)', fontSize: '0.9rem', marginBottom: 20 }}>
+        <p className="admin-login-hint">
           Saisissez votre mot de passe d'administration (par défaut : <code>admin123</code>).
         </p>
 
         {loginError && (
-          <div
-            style={{
-              background: 'var(--danger-light)',
-              color: 'var(--danger)',
-              padding: 10,
-              borderRadius: 8,
-              marginBottom: 16,
-              fontSize: '0.85rem',
-            }}
-          >
+          <div className="admin-login-error">
             {loginError}
           </div>
         )}
@@ -139,7 +130,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
+          <div className="admin-login-actions">
             <button type="button" className="btn btn-secondary" onClick={onBackToClient}>
               ← Retour au site
             </button>
@@ -154,23 +145,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
 
   return (
     <div className="card">
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid var(--gray-200)',
-          paddingBottom: 16,
-          marginBottom: 20,
-        }}
-      >
+      <div className="admin-dashboard-header">
         <div>
-          <h2 style={{ fontSize: '1.3rem', color: 'var(--gray-900)' }}>Espace Gestion Artisan</h2>
-          <div style={{ fontSize: '0.85rem', color: 'var(--gray-500)' }}>
+          <h2 className="admin-title">Espace Gestion Artisan</h2>
+          <div className="admin-company-sub">
             Entreprise : {config.company_name || 'Crénelio'}
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div className="admin-header-actions">
           <button className="btn btn-secondary" onClick={onBackToClient}>
             Voir l'espace client
           </button>
@@ -181,7 +163,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+      <div className="admin-tabs">
         <button
           className={`btn ${activeTab === 'appointments' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('appointments')}
@@ -201,7 +183,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
       ) : activeTab === 'appointments' ? (
         <div>
           {appointments.length === 0 ? (
-            <p style={{ color: 'var(--gray-500)', padding: '24px 0', textAlign: 'center' }}>
+            <p className="admin-empty-state">
               Aucun rendez-vous enregistré pour le moment.
             </p>
           ) : (
@@ -222,15 +204,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                   const dateStr = format(startObj, 'dd/MM/yyyy HH:mm', { locale: fr });
                   return (
                     <tr key={a.id}>
-                      <td style={{ fontWeight: 600 }}>{dateStr}</td>
+                      <td className="admin-row-date">{dateStr}</td>
                       <td>{a.service_name}</td>
                       <td>
                         <strong>{a.client_name}</strong>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--gray-500)' }}>
+                        <div className="admin-row-phone">
                           {a.client_phone}
                         </div>
                       </td>
-                      <td style={{ fontSize: '0.85rem' }}>
+                      <td className="admin-row-address">
                         {a.address}, {a.postal_code} {a.city}
                       </td>
                       <td>
@@ -238,8 +220,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                       </td>
                       <td>
                         <select
-                          className="form-input"
-                          style={{ padding: '4px 8px', fontSize: '0.8rem', width: 'auto' }}
+                          className="form-input admin-status-select"
                           value={a.status}
                           onChange={(e) => handleStatusChange(a.id, e.target.value)}
                         >
@@ -258,13 +239,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
         </div>
       ) : (
         <div>
-          <h3 style={{ fontSize: '1.1rem', marginBottom: 12 }}>Prestations actives</h3>
-          <div className="services-grid" style={{ marginBottom: 28 }}>
+          <h3 className="admin-section-title">Prestations actives</h3>
+          <div className="services-grid admin-services-grid">
             {services.map((s) => (
               <div
                 key={s.id}
-                className="service-card"
-                style={{ opacity: s.is_active ? 1 : 0.6 }}
+                className={`service-card ${!s.is_active ? 'admin-service-card-inactive' : ''}`}
               >
                 <div>
                   <div className="service-name">{s.name}</div>
@@ -280,8 +260,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                     {s.price} €
                   </span>
                   <button
-                    className="btn btn-secondary"
-                    style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                    className="btn btn-secondary admin-btn-toggle"
                     onClick={() => handleToggleService(s)}
                   >
                     {s.is_active ? 'Désactiver' : 'Activer'}
@@ -291,20 +270,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
             ))}
           </div>
 
-          <h3 style={{ fontSize: '1.1rem', marginBottom: 12 }}>Ajouter une nouvelle prestation</h3>
+          <h3 className="admin-section-title">Ajouter une nouvelle prestation</h3>
           <form
             onSubmit={handleAddService}
-            style={{
-              background: 'var(--gray-50)',
-              padding: 16,
-              borderRadius: 'var(--radius)',
-              display: 'flex',
-              gap: 12,
-              flexWrap: 'wrap',
-              alignItems: 'flex-end',
-            }}
+            className="admin-new-service-form"
           >
-            <div style={{ flex: '2 1 200px' }}>
+            <div className="field-name">
               <label className="form-label">Nom de la prestation</label>
               <input
                 type="text"
@@ -315,7 +286,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                 placeholder="Ex: Remplacement robinet"
               />
             </div>
-            <div style={{ flex: '1 1 100px' }}>
+            <div className="field-number">
               <label className="form-label">Durée (minutes)</label>
               <input
                 type="number"
@@ -327,7 +298,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                 onChange={(e) => setNewServiceDuration(e.target.value)}
               />
             </div>
-            <div style={{ flex: '1 1 100px' }}>
+            <div className="field-number">
               <label className="form-label">Prix (€)</label>
               <input
                 type="number"

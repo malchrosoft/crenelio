@@ -95,7 +95,7 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
                 {config.pro_phone && <> Tél. : <a href={`tel:${config.pro_phone}`}>{config.pro_phone}</a>.</>}
                 {config.pro_email && <> E-mail : <a href={`mailto:${config.pro_email}`}>{config.pro_email}</a>.</>}
               </p>
-              <p style={{ marginTop: '12px', color: '#64748b', fontSize: '0.9rem' }}>
+              <p className="legal-section-pending">
                 Les informations légales complètes (SIRET, assurance...) sont en cours de configuration.
               </p>
             </div>

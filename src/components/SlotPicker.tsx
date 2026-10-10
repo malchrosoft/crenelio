@@ -66,7 +66,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
   return (
     <div className="card">
       <h2 className="card-title">2. Choisissez la date et le créneau</h2>
-      <p style={{ color: 'var(--gray-500)', marginBottom: 20, fontSize: '0.95rem' }}>
+      <p className="card-subtitle">
         Prestation : <strong>{service.name}</strong> ({service.duration_minutes} min)
       </p>
 
@@ -88,23 +88,13 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
           </label>
 
           {loading ? (
-            <div style={{ padding: '24px 0', color: 'var(--gray-500)' }}>
+            <div className="slots-loading">
               Recherche des disponibilités...
             </div>
           ) : error ? (
-            <div style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>{error}</div>
+            <div className="slots-error">{error}</div>
           ) : slots.length === 0 ? (
-            <div
-              style={{
-                background: 'var(--gray-50)',
-                border: '1px dashed var(--gray-300)',
-                borderRadius: 'var(--radius)',
-                padding: 24,
-                textAlign: 'center',
-                color: 'var(--gray-500)',
-                fontSize: '0.9rem',
-              }}
-            >
+            <div className="slots-empty">
               Aucun créneau disponible pour cette journée.
               <br />
               Veuillez sélectionner une autre date.
@@ -129,14 +119,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
         </div>
       </div>
 
-      <div
-        style={{
-          marginTop: 28,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
+      <div className="form-actions-between">
         <button className="btn btn-secondary" onClick={onBack} type="button">
           ← Retour aux prestations
         </button>

@@ -22,6 +22,7 @@ interface BookingPageProps {
 const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
   const [searchParams] = useSearchParams();
   const preselectedServiceId = searchParams.get('service');
+  const initialAdmin = searchParams.get('admin') === '1' || searchParams.get('view') === 'admin';
 
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -30,7 +31,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isAdminView, setIsAdminView] = useState<boolean>(false);
+  const [isAdminView, setIsAdminView] = useState<boolean>(initialAdmin);
 
   // Pré-sélection de la prestation depuis la vitrine (?service=ID)
   useEffect(() => {

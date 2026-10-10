@@ -37,20 +37,15 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
             {config.vitrine_tagline && (
               <p className="footer-brand__tagline">{config.vitrine_tagline}</p>
             )}
-            {config.service_area && (
-              <p className="footer-brand__area">
-                <MapPinIcon size={16} weight="fill" aria-hidden="true" />
-                {config.service_area}
-              </p>
-            )}
           </div>
 
           {/* Colonne Navigation */}
           <div>
             <p className="footer-col__title">Navigation</p>
             <ul className="footer-links">
-              <li><Link to="/">Accueil</Link></li>
+              <li><a href="/#">Accueil</a></li>
               <li><a href="/#prestations">Prestations</a></li>
+              <li><a href="/#zone">Zone d'intervention</a></li>
               <li><a href="/#contact">Contact</a></li>
               <li>
                 <Link to="/booking" className="footer-cta-link">
@@ -100,14 +95,14 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
             >
               Mentions légales
             </button>
-            <a
-              href="/booking"
+            <Link
+              to="/booking?view=admin"
               className="footer-bottom__admin"
-              title="Espace professionnel"
+              title="Espace d'administration artisan"
             >
               <LockKeyIcon size={14} weight="fill" aria-hidden="true" />
               Espace Pro
-            </a>
+            </Link>
           </div>
         </div>
       </footer>
