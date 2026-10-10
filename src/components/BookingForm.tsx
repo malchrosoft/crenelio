@@ -8,6 +8,8 @@ import { fr } from 'date-fns/locale';
 interface BookingFormProps {
   service: Service;
   slot: Slot;
+  defaultCenter?: [number, number];
+  defaultZoom?: number;
   onSubmit: (payload: BookingPayload) => Promise<void>;
   onBack: () => void;
   loading: boolean;
@@ -17,6 +19,8 @@ interface BookingFormProps {
 export const BookingForm: React.FC<BookingFormProps> = ({
   service,
   slot,
+  defaultCenter,
+  defaultZoom,
   onSubmit,
   onBack,
   loading,
@@ -183,7 +187,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         {/* Carte OpenStreetMap avec Pigeon Maps */}
         <div className="form-group">
           <label className="form-label">Localisation sur la carte (OpenStreetMap)</label>
-          <InterventionMap coordinates={coordinates} height={200} />
+          <InterventionMap
+            coordinates={coordinates}
+            defaultCenter={defaultCenter}
+            defaultZoom={defaultZoom}
+            height={200}
+          />
           {coordinates && (
             <div style={{ fontSize: '0.8rem', color: 'var(--success)', marginTop: 4 }}>
               ✓ Coordonnées GPS validées pour le déplacement de l'artisan

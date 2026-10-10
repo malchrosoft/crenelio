@@ -80,6 +80,9 @@ export interface AppConfig {
   buffer_minutes?: string;
   min_notice_hours?: string;
   max_advance_days?: string;
+  default_latitude?: string;
+  default_longitude?: string;
+  default_zoom?: string;
   [key: string]: string | undefined;
 }
 

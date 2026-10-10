@@ -2,97 +2,137 @@
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-**Crénelio** est une webapp open source légère de prise de rendez-vous pour techniciens, artisans et auto-entrepreneurs intervenant à domicile.
+**Crénelio** est une application web open source et auto-hébergée de prise de rendez-vous en ligne, spécialement conçue pour les artisans, techniciens et professionnels intervenant à domicile (plomberie, électricité, dépannage, rénovation...).
 
-Vos clients réservent un créneau en ligne ; vous gérez vos disponibilités, vos prestations et votre planning depuis une interface simple.
+Vos clients sélectionnent une prestation, choisissent un créneau disponible, valident leur adresse avec géolocalisation automatique, et confirment leur rendez-vous. Vous gérez vos prestations, vos horaires, vos indisponibilités et vos interventions depuis un espace pro sécurisé.
 
-Construite avec **React**, **PHP** et **MySQL**, Crénelio est pensée pour un déploiement simple sur un hébergement OVHcloud, sans infrastructure complexe.
+Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et **MySQL**, Crénelio est optimisé pour un déploiement clé-en-main sur hébergement mutualisé **OVHcloud** sans surcoût d'infrastructure.
 
 > **Crénelio** — *Réservez le créneau de votre intervention.*
 
-## Project
+---
 
-A lightweight starter project combining a **React SPA frontend**, a **native PHP REST API** (PDO + clean routing), and a **MySQL database layer** — designed for seamless deployment on **OVHcloud shared hosting**.
+## Fonctionnalités
 
-## Features
+### Parcours Client (Prise de rendez-vous en 3 étapes)
+- **Choix de la prestation** : sélection avec durée, tarif indicatif et descriptif détaillé.
+- **Calendrier & créneaux en direct** : calcul dynamique des disponibilités en temps réel basé sur les horaires d'ouverture habituels, la durée de la prestation, le temps de battement/trajet (`buffer_minutes`), le préavis minimum et les congés/indisponibilités.
+- **Autocomplétion d'adresse BAN (Base Adresse Nationale)** :
+  - Recherche prédictive en direct via l'API officielle `api-adresse.data.gouv.fr`.
+  - Remplissage automatique des champs (adresse, code postal, ville).
+  - Détection et enregistrement des coordonnées GPS précises (`[latitude, longitude]`).
+- **Cartographie OpenStreetMap intégrée** :
+  - Intégration cartographique légère avec **Pigeon Maps** (sans clé API tierce).
+  - Centrage initial par défaut sur la commune d'activité de l'artisan (ex: Clamart `[48.8000, 2.2625]`), paramétrable dans la base de données.
+  - Positionnement interactif d'un marqueur sur le lieu exact de l'intervention.
+- **Confirmation & suivi** : récapitulatif complet de l'intervention avec token unique d'annulation/suivi.
 
-- **React 18** frontend with Vite (fast HMR, optimized production builds)
-- **Native PHP REST API** — no framework overhead, just clean routing with regex patterns
-- **PDO database layer** with prepared statements (SQL injection safe)
-- **Sample CRUD schema** (users table with name, email, role)
-- **Pre-configured `.ovhconfig`** for OVH PHP 8.2 + environment settings
-- **`.htaccess` rewrite rules** for API routing and SPA fallback
-- **Build script** that bundles React into static assets served via PHP
-- **Step-by-step deployment guide** for FTP/SFTP to OVH web hosting
+### Espace Professionnel / Administration
+- **Authentification par mot de passe sécurisé** (hachage Bcrypt).
+- **Planning des interventions** : suivi des rendez-vous par statut (`confirmed`, `completed`, `cancelled`, `pending`) avec coordonnées client et notes d'accès.
+- **Gestion du catalogue de prestations** : ajout, modification, prix et durée en minutes.
+- **Configuration dynamique en base de données** : nom d'entreprise, coordonnées de contact, zone de chalandise, coordonnées GPS et zoom par défaut de la carte.
 
-## Quick Start
+---
 
-### Prerequisites
+## Pile Technologique (Tech Stack)
 
-- Node.js 18+
-- PHP 8.0+ (for local development)
-- MySQL 8.0+ / MariaDB (local or OVH)
+| Couche | Technologies |
+|---|---|
+| **Frontend** | React 18, TypeScript, Vite 5, Sass (SCSS BEM/modulaire), Pigeon Maps, Date-fns |
+| **Backend** | PHP 8.2 natif (Architecture MVC propre, PDO requêtes préparées, sans dépendance lourde) |
+| **Base de données** | MySQL 8.0+ / MariaDB (InnoDB, UTF-8 mb4) |
+| **Géocodage & Cartes**| Base Adresse Nationale (BAN data.gouv.fr) + OpenStreetMap via Pigeon Maps |
+| **Hébergement cible** | OVHcloud Hébergement Web mutualisé (Perso / Pro / Performance) ou serveur dédié |
 
-### Local Development
+---
+
+## Démarrage Rapide
+
+### Prérequis
+- **Node.js 18+** & npm
+- **Python 3.8+** (utilisé pour les scripts multiplateformes `start.py` / `stop.py`, sans dépendance externe)
+- **Docker & Docker Compose** (gère MySQL 8 et l'API PHP 8.2 nativement)
+
+### Installation Locale
 
 ```bash
-# 1. Install dependencies
+# 1. Cloner le projet
+git clone git@github.com:malchrosoft/crenelio.git
+cd crenelio
+
+# 2. Installer les dépendances du frontend
 npm install
 
-# 2. Copy environment config and edit with your DB credentials
-cp .env.example .env
+# 3. Lancer l'environnement complet (DB Docker + API PHP + Frontend Vite)
+npm start
 
-# 3. Import the database schema
-mysql -h 127.0.0.1 -u root -p your_db_name < sql/schema.sql
-
-# 4. Start the PHP API server (terminal 1)
-cd api && php -S localhost:8000
-
-# 5. Start the Vite dev server (terminal 2)
-npm run dev
+# Pour arrêter proprement l'ensemble des services :
+npm stop
 ```
 
-Open the URL shown by Vite (usually `http://localhost:5173`).
+L'application est directement accessible sur `http://localhost:5173`. L'API backend répond sur `http://localhost:8000/api`.
 
-### Production Build
+### Build de Production
 
 ```bash
 npm run build
 ```
 
-This generates optimized static files in `api/public/assets/`.
+Le bundle optimisé est généré directement dans `api/public/assets/`, prêt à être distribué par le serveur web.
 
-## API Endpoints
+---
 
-| Method   | Endpoint         | Description          |
-|----------|------------------|----------------------|
-| `GET`    | `/api/users`     | List all users       |
-| `GET`    | `/api/users/:id` | Get a single user    |
-| `POST`   | `/api/users`     | Create a new user    |
-| `PUT`    | `/api/users/:id` | Update a user        |
-| `DELETE` | `/api/users/:id` | Delete a user        |
+## Endpoints de l'API REST (`/api`)
 
-## Deployment
+### Configuration & Authentification
+| Méthode | Route | Description |
+|---|---|---|
+| `GET` | `/api/config` | Configuration publique (nom pro, coordonnées, centrage carte) |
+| `GET` | `/api/admin/config` | Configuration complète (espace pro) |
+| `PUT` | `/api/admin/config` | Mise à jour des réglages artisan |
+| `POST` | `/api/admin/login` | Authentification administrateur |
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for the complete step-by-step guide covering:
+### Prestations & Créneaux
+| Méthode | Route | Description |
+|---|---|---|
+| `GET` | `/api/services` | Liste des prestations actives |
+| `POST` | `/api/services` | Ajouter une prestation (espace pro) |
+| `PUT` | `/api/services/:id` | Modifier une prestation |
+| `DELETE` | `/api/services/:id` | Supprimer une prestation |
+| `GET` | `/api/slots?service_id=1&date=YYYY-MM-DD` | Calcul temps réel des créneaux libres |
 
-- Building the React frontend
-- Creating the MySQL database on OVH
-- Importing the schema via phpMyAdmin
-- Configuring database credentials
-- Uploading via FTP/SFTP (FileZilla, lftp, rsync)
-- Enabling HTTPS with Let's Encrypt
-- Troubleshooting common issues
+### Horaires & Disponibilités
+| Méthode | Route | Description |
+|---|---|---|
+| `GET` | `/api/schedules` | Horaires hebdomadaires habituels |
+| `PUT` | `/api/schedules/:day` | Modifier les horaires d'un jour (1=Lundi .. 7=Dimanche) |
+| `GET` | `/api/unavailabilities` | Liste des congés et fermetures exceptionnelles |
+| `POST` | `/api/unavailabilities` | Poser une indisponibilité |
+| `DELETE` | `/api/unavailabilities/:id` | Supprimer une indisponibilité |
 
-## Tech Stack
+### Rendez-vous
+| Méthode | Route | Description |
+|---|---|---|
+| `GET` | `/api/appointments` | Liste des rendez-vous (espace pro) |
+| `POST` | `/api/appointments` | Réservation d'un créneau (client) |
+| `GET` | `/api/appointments/token/:token` | Consultation d'un rendez-vous via son token |
+| `POST` | `/api/appointments/token/:token/cancel` | Annulation d'un rendez-vous par le client |
+| `PUT` | `/api/appointments/:id/status` | Modification du statut (confirmed, completed, cancelled) |
 
-| Layer      | Technology                          |
-|------------|-------------------------------------|
-| Frontend   | React 18, Vite 5                    |
-| Backend    | Native PHP 8.2 (PDO, no framework)  |
-| Database   | MySQL 8 / MariaDB                   |
-| Hosting    | OVHcloud Shared Hosting             |
-| Build      | Vite (Rollup)                       |
+---
+
+## Déploiement
+
+Consultez [DEPLOYMENT.md](DEPLOYMENT.md) pour le guide de déploiement pas à pas sur hébergement OVHcloud (FTP/SFTP, configuration `.ovhconfig`, mise en place de la base de données et HTTPS Let's Encrypt).
+
+---
+
+## Feuille de Route & Évolutions Futures
+
+Consultez [ROADMAP.md](ROADMAP.md) pour le suivi des fonctionnalités prévues (frais de déplacement, theming & effets graphiques, page vitrine, emails & iCal, RGPD, logo & mentions légales).
+
+---
 
 ## Licence
 

@@ -1,0 +1,44 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: crenelio-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: crenelio
+      MYSQL_USER: crenelio
+      MYSQL_PASSWORD: crenelio_dev
+      MYSQL_ROOT_PASSWORD: crenelio_root
+    volumes:
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./sql/seed_init.sql:/docker-entrypoint-initdb.d/02-seed-init.sql:ro
+      - ./sql/seed_test_data.sql:/docker-entrypoint-initdb.d/03-seed-test-data.sql:ro
+      - db_data:/var/lib/mysql
+
+  api:
+    image: php:8.2-apache
+    container_name: crenelio-api
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./api:/var/www/html
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: crenelio
+      DB_USER: crenelio
+      DB_PASS: crenelio_dev
+      APP_ENV: development
+      CORS_ORIGIN: "*"
+    depends_on:
+      - db
+    command: >
+      sh -c "docker-php-ext-install pdo pdo_mysql &&
+             a2enmod rewrite &&
+             sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf &&
+             apache2-foreground"
+
+volumes:
+  db_data:

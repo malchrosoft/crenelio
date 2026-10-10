@@ -1,6 +1,8 @@
 # API directory .htaccess — prevents direct access to PHP config files
 # and ensures all API traffic goes through index.php.
 
+AddDefaultCharset UTF-8
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 

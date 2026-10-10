@@ -1,6 +1,8 @@
 # OVH Hosting Root .htaccess
 # Place this in the www/ directory on your OVH hosting.
 
+AddDefaultCharset UTF-8
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 

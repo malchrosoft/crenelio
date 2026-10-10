@@ -5,6 +5,7 @@
 -- ===================================================================
 
 SET FOREIGN_KEY_CHECKS = 0;
+SET NAMES utf8mb4;
 
 DROP TABLE IF EXISTS `appointments`;
 DROP TABLE IF EXISTS `unavailabilities`;
@@ -90,64 +91,3 @@ CREATE TABLE `appointments` (
 CREATE INDEX `idx_appointments_dates` ON `appointments` (`start_datetime`, `end_datetime`);
 CREATE INDEX `idx_appointments_status` ON `appointments` (`status`);
 
--- ===================================================================
--- Données initiales (Seed Data)
--- ===================================================================
-
--- Paramétrage clé-valeur
-INSERT INTO `config` (`config_key`, `config_value`) VALUES
-('company_name',        'Crénelio Dépannage & Services'),
-('pro_name',            'Alexandre Martin'),
-('pro_email',           'contact@crenelio.local'),
-('pro_phone',           '06 12 34 56 78'),
-('service_area',        'Clamart et communes limitrophes (rayon 15 km)'),
-('slot_step_minutes',   '30'),   -- Graduation des créneaux affichés (30 min)
-('buffer_minutes',      '30'),   -- Temps de battement / trajet entre interventions
-('min_notice_hours',    '12'),   -- Réservation au moins 12h à l'avance
-('max_advance_days',    '30'),   -- Réservation jusqu'à 30 jours à l'avance
-('admin_password_hash', '$2y$10$wO8l9Ea6vQ6C2u4K8j7mQeeFm1lVqB.qWc1VzW2Z2i1pW7uH3sUGe'); -- 'admin123'
-
--- Prestations d'exemple pour un artisan à domicile
-INSERT INTO `services` (`name`, `description`, `duration_minutes`, `price`, `is_active`, `display_order`) VALUES
-(
-    'Diagnostic & Recherche de panne',
-    'Déplacement et diagnostic complet de l''installation. Devis gratuit immédiat si réparation complémentaire requise.',
-    45,
-    59.00,
-    1,
-    1
-),
-(
-    'Entretien & Contrôle préventif',
-    'Nettoyage, vérification des organes de sécurité, tests de bon fonctionnement et rapport d''intervention.',
-    60,
-    89.00,
-    1,
-    2
-),
-(
-    'Dépannage d''urgence standard',
-    'Intervention prioritaire avec réparation immédiate (pièces d''usure courantes incluses).',
-    90,
-    129.00,
-    1,
-    3
-),
-(
-    'Visite technique & Devis projet',
-    'Relevé technique sur place pour chiffrage précis de vos futurs travaux ou rénovations.',
-    45,
-    0.00,
-    1,
-    4
-);
-
--- Horaires d'ouverture hebdomadaires habituels
-INSERT INTO `schedules` (`day_of_week`, `is_active`, `morning_start`, `morning_end`, `afternoon_start`, `afternoon_end`) VALUES
-(1, 1, '08:30:00', '12:00:00', '13:30:00', '18:00:00'), -- Lundi
-(2, 1, '08:30:00', '12:00:00', '13:30:00', '18:00:00'), -- Mardi
-(3, 1, '08:30:00', '12:00:00', '13:30:00', '18:00:00'), -- Mercredi
-(4, 1, '08:30:00', '12:00:00', '13:30:00', '18:00:00'), -- Jeudi
-(5, 1, '08:30:00', '12:00:00', '13:30:00', '17:30:00'), -- Vendredi
-(6, 1, '09:00:00', '12:30:00', NULL, NULL),               -- Samedi matin
-(7, 0, NULL, NULL, NULL, NULL);                            -- Dimanche fermé

@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "python3 scripts/start.py || python scripts/start.py",
+    "stop": "python3 scripts/stop.py || python scripts/stop.py",
     "build": "vite build",
     "preview": "vite preview",
     "deploy:build": "bash scripts/build.sh"

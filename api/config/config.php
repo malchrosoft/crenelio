@@ -15,12 +15,19 @@ if (file_exists($envFile)) {
     foreach ($lines as $line) {
         if (str_starts_with(trim($line), '#')) continue;
         [$key, $value] = explode('=', $line, 2);
-        $_ENV[trim($key)] = trim($value);
+        $trimmedKey = trim($key);
+        if (!getenv($trimmedKey)) {
+            $_ENV[$trimmedKey] = trim($value);
+        }
     }
 }
 
 function env(string $key, mixed $default = null): mixed
 {
+    $val = getenv($key);
+    if ($val !== false) {
+        return $val;
+    }
     return $_ENV[$key] ?? $default;
 }
 

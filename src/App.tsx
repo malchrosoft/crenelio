@@ -132,16 +132,28 @@ export const App: React.FC = () => {
           )}
 
           {/* Étape 3 : Coordonnées & Lieu d'intervention */}
-          {step === 3 && selectedService && selectedSlot && (
-            <BookingForm
-              service={selectedService}
-              slot={selectedSlot}
-              onSubmit={handleBookingSubmit}
-              onBack={() => setStep(2)}
-              loading={loading}
-              error={error}
-            />
-          )}
+          {step === 3 && selectedService && selectedSlot && (() => {
+            const defaultLat = config.default_latitude ? parseFloat(config.default_latitude) : 48.8000;
+            const defaultLon = config.default_longitude ? parseFloat(config.default_longitude) : 2.2625;
+            const defaultZoom = config.default_zoom ? parseInt(config.default_zoom, 10) : 12;
+            const defaultCenter: [number, number] = [
+              isNaN(defaultLat) ? 48.8000 : defaultLat,
+              isNaN(defaultLon) ? 2.2625 : defaultLon,
+            ];
+
+            return (
+              <BookingForm
+                service={selectedService}
+                slot={selectedSlot}
+                defaultCenter={defaultCenter}
+                defaultZoom={isNaN(defaultZoom) ? 12 : defaultZoom}
+                onSubmit={handleBookingSubmit}
+                onBack={() => setStep(2)}
+                loading={loading}
+                error={error}
+              />
+            );
+          })()}
 
           {/* Étape 4 : Confirmation */}
           {step === 4 && confirmedAppointment && (
