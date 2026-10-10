@@ -100,7 +100,7 @@ INSERT INTO `config` (`config_key`, `config_value`) VALUES
 ('pro_name',            'Alexandre Martin'),
 ('pro_email',           'contact@crenelio.local'),
 ('pro_phone',           '06 12 34 56 78'),
-('service_area',        'Métropole lilloise (rayon 25 km)'),
+('service_area',        'Clamart et communes limitrophes (rayon 15 km)'),
 ('slot_step_minutes',   '30'),   -- Graduation des créneaux affichés (30 min)
 ('buffer_minutes',      '30'),   -- Temps de battement / trajet entre interventions
 ('min_notice_hours',    '12'),   -- Réservation au moins 12h à l'avance

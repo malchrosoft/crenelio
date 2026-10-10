@@ -1,0 +1,60 @@
+// ===================================================================
+// Styles de base et Reset SCSS
+// ===================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: $font-sans;
+  background-color: $gray-50;
+  color: $gray-800;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+/* En-tête */
+.app-header {
+  @include flex-between;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid $gray-200;
+
+  .brand-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $primary;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-subtitle {
+    font-size: 0.875rem;
+    color: $gray-500;
+    margin-top: 2px;
+  }
+}

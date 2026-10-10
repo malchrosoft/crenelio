@@ -163,7 +163,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
               required
               value={postalCode}
               onChange={(e) => setPostalCode(e.target.value)}
-              placeholder="Ex: 59000"
+              placeholder="Ex: 92140"
             />
           </div>
 
@@ -175,7 +175,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
               required
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              placeholder="Ex: Lille"
+              placeholder="Ex: Clamart"
             />
           </div>
         </div>

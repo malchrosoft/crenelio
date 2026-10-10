@@ -9,7 +9,7 @@ interface InterventionMapProps {
 
 export const InterventionMap: React.FC<InterventionMapProps> = ({
   coordinates = null,
-  defaultCenter = [50.62925, 3.057256], // Lille par défaut
+  defaultCenter = [48.8000, 2.2625], // Clamart (92140) par défaut
   height = 240,
 }) => {
   const center: [number, number] = coordinates || defaultCenter;
