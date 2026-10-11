@@ -6,13 +6,21 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ## 📋 Backlog Prioritaire
 
-### 1. Frais de Déplacement (Optionnels selon prestation)
-- **Modèle de données :**
-  - Ajouter un champ dans la table `services` (ex: `travel_fee_type`: `'none' | 'fixed' | 'per_km'`, `travel_fee_amount`: `DECIMAL(10,2)`).
-  - Ou clé de configuration globale dans `config` (`default_travel_fee`) surchargeable par prestation.
-- **Expérience Client & Admin :**
-  - Affichage transparent du détail tarifaire (prestation de base + éventuels frais de déplacement) dans le récapitulatif avant confirmation.
-  - Pilotage simple depuis l'espace Pro (activer/désactiver les frais par prestation).
+### 1. Frais de Déplacement Hybrides (Par Prestation & Paliers Kilométriques)
+- **Options tarifaires par prestation (`services.travel_fee_mode`) :**
+  - `'none'` : Aucun frais / déplacement inclus (ex: télé-diagnostic, prestation atelier).
+  - `'fixed'` : Montant forfaitaire fixe dédié à la prestation (ex: forfait intervention urgente +20 €), renseigné dans `services.travel_fee_amount`.
+  - `'distance_tiers'` : Application automatique des paliers kilométriques configurés globalement.
+- **Paliers kilométriques configurables (`config`) :**
+  - Calcul dynamique de la distance via coordonnées GPS (formule de Haversine entre l'artisan et l'adresse BAN du client).
+  - Paliers paramétrables (ex: `0-15 km: 0 €`, `15-30 km: 15 €`, `30-50 km: 30 €`).
+  - Rayon maximal d'intervention automatique (ex: `50 km`).
+- **Comportement Hors-Zone (> Rayon max) :**
+  - Blocage de la réservation instantanée avec message bienveillant indiquant la distance calculée.
+  - Formulaire de demande exceptionnelle directe par **email** (nom, adresse, téléphone, prestation demandée) envoyé à l'artisan, avec téléphone affiché en dernier recours.
+- **Transparence tarifaire :**
+  - Décomposition détaillée dans le récapitulatif avant confirmation (Prestation + Frais de déplacement calculés = Total estimé).
+  - Mentions sur la vitrine et dans la confirmation de rendez-vous.
 
 ---
 
