@@ -58,6 +58,9 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
     - Lieu / Adresse complète de l'intervention.
     - Nom, téléphone (cliquable `tel:`) et email du client.
     - Notes d'accès (digicode, détails du problème).
+- **Historique & Traçabilité des Notifications (`appointment_notifications`) :**
+  - Table de logs dédiée enregistrant chaque notification envoyée (`appointment_id`, `recipient`, `status`, `sent_at`, `delivery_status`).
+  - **Consultation directe dans l'IHM Pro :** Visualisation des logs d'envoi attachés à chaque rendez-vous depuis le tableau de bord (icône/bouton dédié, date/heure exacte d'expédition, statut et destinataire) pour répondre immédiatement aux interrogations des clients.
 
 ---
 
