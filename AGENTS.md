@@ -146,9 +146,58 @@ Le fichier [`ROADMAP.md`](file:///Users/aymeric.malchrowicz/DEVELOPPEMENT/crenel
 
 ---
 
-## 5. Règles de Validation avant Commit / PR
+## 5. Contraintes Connues & Dette Technique
+
+Ces points sont assumés et documentés : ne pas les « corriger » au détour d'une
+autre tâche, mais en tenir compte et les traiter dans l'item dédié.
+
+### 🔴 Sécurité — Espace Pro non protégé côté serveur
+- `ConfigController::login` renvoie un token trivial et devinable :
+  `sha256(mot de passe + nom de la base + date du jour)`.
+- **Aucune route `/admin/*` ne vérifie ce token** : l'authentification est purement
+  côté client. N'importe quel appel direct à l'API contourne l'écran de connexion.
+- Conséquence : toutes les routes d'écriture (prestations, config, statuts, horaires)
+  sont ouvertes. À reprendre **avec l'Item 12** (2FA) — y ajouter une vraie
+  vérification serveur, sans quoi la 2FA ne protégerait qu'un écran contournable.
+
+### 🔑 Fichiers `.env` — hors de portée des agents
+- `api/.env` et `api/.env.example` ne sont ni lisibles ni modifiables par un agent
+  (règle de permission `Read(./.env*)` et hook `PreToolUse`). Même `git diff` dessus
+  est refusé.
+- En conséquence : **documenter toute nouvelle variable dans `README.md`**
+  (section « Configuration (`api/.env`) ») **et dans `DEPLOYMENT.md`**, puis fournir
+  à l'humain le bloc exact à coller dans `.env.example`. Ne jamais tenter de
+  contourner le blocage.
+- Corollaire : un secret ne doit jamais migrer vers la table `config`, qui est
+  exposée par `GET /admin/config` (et que la contrainte de sécurité ci-dessus rend
+  publique de fait).
+
+### ✉️ Envoi d'emails désactivé par défaut
+- Sans `SMTP_HOST` ni `MAIL_FROM`, aucun email ne part : les tentatives sont
+  journalisées en `failed` dans `appointment_notifications` avec un motif explicite.
+- Ce comportement est **voulu** : une panne d'envoi ne doit jamais faire échouer une
+  réservation déjà enregistrée. Conserver ce contrat dans toute évolution du
+  `Notifier` (il ne propage aucune exception vers les contrôleurs).
+- L'Item 12 (OTP par email) en dépend : sans SMTP configuré, aucun code ne partira.
+
+### 🗓️ Fuseau horaire
+- Les datetimes sont stockés **naïfs** en base et s'interprètent dans `APP_TIMEZONE`
+  (défaut `Europe/Paris`, appliqué globalement par `date_default_timezone_set()`
+  dans `config/config.php`). Toute comparaison ou génération de date doit rester
+  cohérente avec ce fuseau.
+
+### 📭 Notifications d'annulation absentes
+- Aucun email n'est envoyé lors d'une annulation, ni au client ni à l'artisan.
+  L'énumération `appointment_notifications.type` devra être étendue le jour où
+  cette fonctionnalité sera traitée.
+
+---
+
+## 6. Règles de Validation avant Commit / PR
 Avant de finaliser toute modification :
 1. Vérifier que le build Vite s'exécute sans erreur : `npm run build`, **et** que le typage est sain : `npx tsc --noEmit`.
 2. Vérifier l'absence de fichiers temporaires ou orphelins : `git status`.
 3. S'assurer que les identifiants et tokens secrets ne sont jamais commités.
 4. Mettre à jour `ROADMAP.md` si des fonctionnalités du backlog ont été complétées.
+5. Toute évolution de schéma va dans `sql/schema.sql` **et** dans une migration
+   idempotente de `sql/migrations/` (cf. section 2.A).
