@@ -291,7 +291,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                       <td>
                         <strong>{a.client_name}</strong>
                         <div className="admin-row-phone">
-                          {a.client_phone}
+                          <a href={`tel:${a.client_phone}`} className="admin-contact-link">{a.client_phone}</a>
+                        </div>
+                        <div className="admin-row-email">
+                          <a href={`mailto:${a.client_email}`} className="admin-contact-link">{a.client_email}</a>
                         </div>
                       </td>
                       <td className="admin-row-address">
