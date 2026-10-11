@@ -9,6 +9,7 @@ import {
   Appointment,
   AppConfig,
   BookingPayload,
+  TravelQuote,
 } from './types';
 
 const BASE_URL = '/api';
@@ -65,6 +66,14 @@ export const api = {
   // Moteur de créneaux
   getSlots: (serviceId: number, date: string) =>
     request<SlotsResponse>('GET', `/slots?service_id=${serviceId}&date=${date}`),
+
+  // Frais de déplacement
+  quoteTravelFee: (serviceId: number, coordinates: [number, number] | null) =>
+    request<TravelQuote>('POST', '/travel-fee/quote', {
+      service_id: serviceId,
+      latitude: coordinates ? coordinates[0] : undefined,
+      longitude: coordinates ? coordinates[1] : undefined,
+    }),
 
   // Rendez-vous
   createAppointment: (payload: BookingPayload) =>

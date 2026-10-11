@@ -984,3 +984,168 @@
   color: $gray-500;
   font-size: 0.9rem;
 }
+
+/* ===================================================================
+   Frais de déplacement (transparence tarifaire & hors-zone)
+   =================================================================== */
+
+/* Ligne de total dans le récapitulatif tarifaire */
+.summary-row--total {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 2px solid $gray-300;
+  font-size: 1.05rem;
+
+  .summary-label {
+    color: $gray-700;
+    font-weight: 600;
+  }
+
+  .summary-value {
+    color: $primary;
+    font-weight: 700;
+  }
+}
+
+/* Montant non encore calculable (adresse non géocodée) */
+.summary-value--pending {
+  color: $gray-500;
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* Distance rappelée à côté des frais de déplacement */
+.summary-distance {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: $radius-full;
+  background: $primary-light;
+  color: $primary;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* Invitation à sélectionner l'adresse dans les suggestions BAN */
+.form-gps-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 4px;
+  color: $warning;
+  font-size: 0.8rem;
+}
+
+/* Blocage bienveillant lorsque l'adresse sort du rayon d'intervention */
+.booking-out-of-zone {
+  margin-bottom: 24px;
+  padding: 18px 20px;
+  border: 1px solid $warning;
+  border-radius: $radius;
+  background: $warning-light;
+
+  .booking-out-of-zone__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: $warning;
+    font-size: 1rem;
+  }
+
+  .booking-out-of-zone__text {
+    margin: 0 0 16px;
+    color: $gray-700;
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .booking-out-of-zone__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+/* Badge de déplacement sur les cartes de prestation (Espace Pro & vitrine) */
+.badge-travel {
+  background: $primary-light;
+  color: $primary;
+}
+
+/* Bloc « déplacement » des formulaires de prestation (Espace Pro) */
+.service-travel-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: end;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-hint {
+  margin-top: 4px;
+  color: $gray-500;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+/* Champ numérique court suivi de son unité (« 15 km », « 30 € ») */
+.form-field-unit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .form-input--compact {
+    width: 92px;
+    flex: 0 0 auto;
+    text-align: right;
+  }
+}
+
+.form-unit {
+  color: $gray-500;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Onglet « Zone & déplacement » de l'espace Pro */
+.admin-settings-intro {
+  margin: 0 0 20px;
+  color: $gray-500;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.admin-settings-form {
+  max-width: 640px;
+}
+
+.admin-tier-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.admin-tier-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.admin-settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.admin-settings-message {
+  color: $success;
+  font-size: 0.85rem;
+}

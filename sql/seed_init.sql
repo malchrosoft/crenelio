@@ -19,6 +19,16 @@ INSERT INTO `config` (`config_key`, `config_value`) VALUES
 ('default_latitude',    '48.8000'), -- Clamart par défaut
 ('default_longitude',   '2.2625'),  -- Clamart par défaut
 ('default_zoom',        '12'),
+-- Frais de déplacement : paliers kilométriques globaux (mode 'distance_tiers')
+-- Chaque palier couvre les distances jusqu'à `max_km` inclus ; le premier palier
+-- satisfait gagne. Un palier à max_km vide/0 est ignoré.
+('travel_tier_1_max_km', '15'),
+('travel_tier_1_fee',    '0'),
+('travel_tier_2_max_km', '30'),
+('travel_tier_2_fee',    '15'),
+('travel_tier_3_max_km', '50'),
+('travel_tier_3_fee',    '30'),
+('travel_max_km',        '50'),  -- Rayon maximal d'intervention en réservation directe
 ('admin_password_hash', '$2y$10$qyk0/fef0o7Ic3vocJBAXOp18E.2J0UaQhC62vS98B9fAlfK7aCQi'), -- 'admin123'
 -- Vitrine
 ('vitrine_tagline',      'Votre artisan de confiance, à domicile'),

@@ -12,9 +12,11 @@ import {
   HammerIcon,
   ClockIcon,
   CurrencyEurIcon,
+  CarIcon,
   ArrowRightIcon,
 } from '@phosphor-icons/react';
 import { Service } from '../../types';
+import { formatEuro } from '../../utils/format';
 
 // Icônes Phosphor par mots-clés dans le nom de la prestation
 const renderServiceIcon = (name: string) => {
@@ -93,6 +95,14 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ services }) => {
                       ? `À partir de ${Number(service.price).toFixed(0)} €`
                       : 'Devis gratuit'}
                   </span>
+                  {service.travel_fee_mode !== 'none' && (
+                    <span className="badge badge-travel">
+                      <CarIcon size={16} weight="fill" aria-hidden="true" />
+                      {service.travel_fee_mode === 'fixed'
+                        ? `Déplacement ${formatEuro(Number(service.travel_fee_amount))}`
+                        : 'Déplacement selon distance'}
+                    </span>
+                  )}
                 </div>
 
                 <span className="vitrine-service-card__cta">

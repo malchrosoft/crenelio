@@ -93,9 +93,10 @@ class Appointment
         Database::execute(
             'INSERT INTO `appointments` (
                 service_id, client_name, client_email, client_phone,
-                address, postal_code, city, notes,
+                address, postal_code, city,
+                travel_fee, distance_km, is_out_of_zone, notes,
                 start_datetime, end_datetime, status, cancel_token
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 (int)$data['service_id'],
                 trim($data['client_name']),
@@ -104,6 +105,9 @@ class Appointment
                 trim($data['address']),
                 trim($data['postal_code']),
                 trim($data['city']),
+                (float)($data['travel_fee'] ?? 0),
+                isset($data['distance_km']) ? $data['distance_km'] : null,
+                !empty($data['is_out_of_zone']) ? 1 : 0,
                 isset($data['notes']) ? trim($data['notes']) : null,
                 $data['start_datetime'],
                 $data['end_datetime'],

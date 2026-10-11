@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
+import { MapPinIcon } from '@phosphor-icons/react';
 import { Appointment } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../api';
+import { formatEuro, formatKm } from '../utils/format';
 
 interface BookingConfirmationProps {
   appointment: Appointment;
@@ -17,6 +19,14 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   const [isCancelled, setIsCancelled] = useState(appointment.status === 'cancelled');
   const [cancelling, setCancelling] = useState(false);
   const [cancelMessage, setCancelMessage] = useState<string | null>(null);
+
+  // Détail tarifaire figé au moment de la réservation
+  const servicePrice = parseFloat(String(appointment.service_price ?? 0)) || 0;
+  const travelFee = parseFloat(String(appointment.travel_fee ?? 0)) || 0;
+  const distanceKm =
+    appointment.distance_km !== null && appointment.distance_km !== undefined
+      ? parseFloat(String(appointment.distance_km))
+      : null;
 
   const startObj = new Date(appointment.start_datetime);
   const endObj = new Date(appointment.end_datetime);
@@ -110,6 +120,28 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
             <span className="summary-value">{appointment.notes}</span>
           </div>
         )}
+        <div className="summary-row">
+          <span className="summary-label">Prestation :</span>
+          <span className="summary-value">{formatEuro(servicePrice)}</span>
+        </div>
+        {travelFee > 0 && (
+          <div className="summary-row">
+            <span className="summary-label">Frais de déplacement :</span>
+            <span className="summary-value">
+              {formatEuro(travelFee)}
+              {distanceKm !== null && (
+                <span className="summary-distance">
+                  <MapPinIcon size={13} weight="fill" aria-hidden="true" />
+                  {formatKm(distanceKm)}
+                </span>
+              )}
+            </span>
+          </div>
+        )}
+        <div className="summary-row summary-row--total">
+          <span className="summary-label">Total estimé :</span>
+          <span className="summary-value">{formatEuro(servicePrice + travelFee)}</span>
+        </div>
       </div>
 
       <div className="confirmation-actions">

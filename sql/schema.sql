@@ -33,6 +33,12 @@ CREATE TABLE `services` (
     `description`      TEXT            NULL,
     `duration_minutes` INT             NOT NULL DEFAULT 60,
     `price`            DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
+    -- Mode de facturation du déplacement propre à la prestation :
+    --   none           : déplacement inclus / prestation sans déplacement
+    --   fixed          : forfait fixe porté par `travel_fee_amount`
+    --   distance_tiers : paliers kilométriques globaux de la table `config`
+    `travel_fee_mode`   ENUM('none', 'fixed', 'distance_tiers') NOT NULL DEFAULT 'none',
+    `travel_fee_amount` DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
     `is_active`        BOOLEAN         NOT NULL DEFAULT TRUE,
     `display_order`    INT             NOT NULL DEFAULT 0,
     `created_at`       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -77,6 +83,10 @@ CREATE TABLE `appointments` (
     `address`             TEXT            NOT NULL,
     `postal_code`         VARCHAR(20)     NOT NULL,
     `city`                VARCHAR(100)    NOT NULL,
+    -- Frais de déplacement figés au moment de la réservation (traçabilité tarifaire)
+    `travel_fee`          DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
+    `distance_km`         DECIMAL(6,2)    NULL,
+    `is_out_of_zone`      BOOLEAN         NOT NULL DEFAULT FALSE,
     `notes`               TEXT            NULL,
     `start_datetime`      DATETIME        NOT NULL,
     `end_datetime`        DATETIME        NOT NULL,

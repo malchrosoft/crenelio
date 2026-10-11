@@ -7,11 +7,85 @@ import {
   WarningCircleIcon,
   CalendarBlankIcon,
   XIcon,
+  CarIcon,
 } from '@phosphor-icons/react';
 import { api } from '../api';
-import { Appointment, Service, AppConfig } from '../types';
+import { Appointment, Service, AppConfig, TravelFeeMode } from '../types';
+import { formatEuro } from '../utils/format';
 import { format, isPast, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
+
+/** Paliers kilométriques modifiables depuis l'espace Pro (cf. `config.travel_tier_*`). */
+const TRAVEL_TIER_INDEXES = [1, 2, 3] as const;
+
+/** Libellés d'aide associés à chaque mode de facturation du déplacement. */
+const TRAVEL_MODE_HINTS: Record<TravelFeeMode, string> = {
+  none: 'Déplacement inclus : aucun frais ajouté, aucun contrôle de zone.',
+  fixed: 'Forfait fixe ajouté au tarif, quelle que soit la distance parcourue.',
+  distance_tiers:
+    'Paliers kilométriques globaux appliqués selon la distance calculée depuis votre point de départ.',
+};
+
+interface TravelFeeFieldsProps {
+  mode: TravelFeeMode;
+  amount: string;
+  onModeChange: (mode: TravelFeeMode) => void;
+  onAmountChange: (amount: string) => void;
+}
+
+/** Champs de facturation du déplacement, partagés par la création et l'édition. */
+const TravelFeeFields: React.FC<TravelFeeFieldsProps> = ({
+  mode,
+  amount,
+  onModeChange,
+  onAmountChange,
+}) => (
+  <div className="service-travel-fields">
+    <div className="form-group">
+      <label className="form-label">Frais de déplacement</label>
+      <select
+        className="form-input"
+        value={mode}
+        onChange={(e) => onModeChange(e.target.value as TravelFeeMode)}
+      >
+        <option value="none">Inclus (aucun frais)</option>
+        <option value="fixed">Forfait fixe</option>
+        <option value="distance_tiers">Paliers kilométriques</option>
+      </select>
+      <p className="form-hint">{TRAVEL_MODE_HINTS[mode]}</p>
+    </div>
+
+    {mode === 'fixed' && (
+      <div className="form-group">
+        <label className="form-label">Montant du forfait</label>
+        <div className="form-field-unit">
+          <input
+            type="number"
+            className="form-input form-input--compact"
+            min="0"
+            step="0.5"
+            value={amount}
+            onChange={(e) => onAmountChange(e.target.value)}
+          />
+          <span className="form-unit">€</span>
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+/** Isole les clés de déplacement de la configuration globale. */
+function extractTravelSettings(config: AppConfig): Record<string, string> {
+  const keys = [
+    ...TRAVEL_TIER_INDEXES.flatMap((index) => [
+      `travel_tier_${index}_max_km`,
+      `travel_tier_${index}_fee`,
+    ]),
+    'travel_max_km',
+  ];
+
+  return Object.fromEntries(keys.map((key) => [key, config[key] ?? '']));
+}
 
 interface AdminDashboardProps {
   onBackToClient: () => void;
@@ -44,6 +118,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
   const [newServiceDescription, setNewServiceDescription] = useState('');
   const [newServiceDuration, setNewServiceDuration] = useState('60');
   const [newServicePrice, setNewServicePrice] = useState('50.00');
+  const [newServiceTravelMode, setNewServiceTravelMode] = useState<TravelFeeMode>('none');
+  const [newServiceTravelAmount, setNewServiceTravelAmount] = useState('0.00');
 
   // Édition inline
   const [editingServiceId, setEditingServiceId] = useState<number | null>(null);
@@ -51,9 +127,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
   const [editDescription, setEditDescription] = useState('');
   const [editDuration, setEditDuration] = useState('');
   const [editPrice, setEditPrice] = useState('');
+  const [editTravelMode, setEditTravelMode] = useState<TravelFeeMode>('none');
+  const [editTravelAmount, setEditTravelAmount] = useState('0.00');
 
   // Erreurs par prestation (ex: suppression impossible)
   const [serviceErrors, setServiceErrors] = useState<Record<number, string>>({});
+
+  // Paliers kilométriques & rayon maximal d'intervention
+  const [travelSettings, setTravelSettings] = useState<Record<string, string>>({});
+  const [travelSettingsSaving, setTravelSettingsSaving] = useState(false);
+  const [travelSettingsMessage, setTravelSettingsMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -98,10 +181,34 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
       setAppointments(apps);
       setServices(servs);
       setConfig(cfg);
+      setTravelSettings(extractTravelSettings(cfg));
     } catch (err: unknown) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  function updateTravelSetting(key: string, value: string) {
+    setTravelSettings((prev) => ({ ...prev, [key]: value }));
+    setTravelSettingsMessage(null);
+  }
+
+  async function handleSaveTravelSettings(e: React.FormEvent) {
+    e.preventDefault();
+    setTravelSettingsSaving(true);
+    setTravelSettingsMessage(null);
+    try {
+      const res = await api.updateAdminConfig(travelSettings);
+      setConfig(res.config);
+      setTravelSettings(extractTravelSettings(res.config));
+      setTravelSettingsMessage('Paliers enregistrés.');
+    } catch (err: unknown) {
+      setTravelSettingsMessage(
+        err instanceof Error ? err.message : "Erreur lors de l'enregistrement des paliers"
+      );
+    } finally {
+      setTravelSettingsSaving(false);
     }
   }
 
@@ -151,7 +258,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
         const matchName = a.client_name.toLowerCase().includes(q);
         const matchPhone = a.client_phone.toLowerCase().includes(q);
         const matchEmail = a.client_email.toLowerCase().includes(q);
-        const matchService = a.service_name.toLowerCase().includes(q);
+        const matchService = (a.service_name ?? '').toLowerCase().includes(q);
         const matchCity = a.city.toLowerCase().includes(q);
         const matchAddress = a.address.toLowerCase().includes(q);
         if (!matchName && !matchPhone && !matchEmail && !matchService && !matchCity && !matchAddress) {
@@ -200,12 +307,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
         description: newServiceDescription || undefined,
         duration_minutes: parseInt(newServiceDuration, 10),
         price: parseFloat(newServicePrice),
+        travel_fee_mode: newServiceTravelMode,
+        travel_fee_amount: newServiceTravelMode === 'fixed' ? parseFloat(newServiceTravelAmount) : 0,
         is_active: 1,
       });
       setNewServiceName('');
       setNewServiceDescription('');
       setNewServiceDuration('60');
       setNewServicePrice('50.00');
+      setNewServiceTravelMode('none');
+      setNewServiceTravelAmount('0.00');
       setIsAddModalOpen(false);
       const updated = await api.listServices(true);
       setServices(updated);
@@ -232,6 +343,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
     setEditDescription(service.description ?? '');
     setEditDuration(String(service.duration_minutes));
     setEditPrice(String(service.price));
+    setEditTravelMode(service.travel_fee_mode ?? 'none');
+    setEditTravelAmount(String(service.travel_fee_amount ?? '0.00'));
     // Effacer l'éventuelle erreur de suppression affichée
     setServiceErrors((prev) => {
       const next = { ...prev };
@@ -252,6 +365,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
         description: editDescription || undefined,
         duration_minutes: parseInt(editDuration, 10),
         price: parseFloat(editPrice),
+        travel_fee_mode: editTravelMode,
+        travel_fee_amount: editTravelMode === 'fixed' ? parseFloat(editTravelAmount) : 0,
       });
       setServices((prev) => prev.map((s) => (s.id === id ? { ...s, ...updated } : s)));
       setEditingServiceId(null);
@@ -351,6 +466,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
           onClick={() => setActiveTab('services')}
         >
           Prestations ({services.length})
+        </button>
+        <button
+          className={clsx('btn', {
+            'btn-primary': activeTab === 'settings',
+            'btn-secondary': activeTab !== 'settings',
+          })}
+          onClick={() => setActiveTab('settings')}
+        >
+          Zone & déplacement
         </button>
       </div>
 
@@ -585,7 +709,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
             </div>
           )}
         </div>
-      ) : (
+      ) : activeTab === 'services' ? (
         <div>
           <div className="admin-section-header">
             <h3 className="admin-section-title">Prestations ({services.length})</h3>
@@ -656,6 +780,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                         />
                       </div>
                     </div>
+                    <TravelFeeFields
+                      mode={editTravelMode}
+                      amount={editTravelAmount}
+                      onModeChange={setEditTravelMode}
+                      onAmountChange={setEditTravelAmount}
+                    />
                     <div className="service-card__actions">
                       <button type="submit" className="btn btn-primary admin-btn-sm">
                         Enregistrer
@@ -687,6 +817,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                         <CurrencyEurIcon size={14} weight="fill" aria-hidden="true" />
                         {s.price} €
                       </span>
+                      {s.travel_fee_mode !== 'none' && (
+                        <span className="badge badge-travel">
+                          <CarIcon size={14} weight="fill" aria-hidden="true" />
+                          {s.travel_fee_mode === 'fixed'
+                            ? `Forfait ${formatEuro(parseFloat(String(s.travel_fee_amount)))}`
+                            : 'Paliers km'}
+                        </span>
+                      )}
                     </div>
                     <div className="service-card__actions">
                       <button
@@ -793,6 +931,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                       />
                     </div>
                   </div>
+                  <TravelFeeFields
+                    mode={newServiceTravelMode}
+                    amount={newServiceTravelAmount}
+                    onModeChange={setNewServiceTravelMode}
+                    onAmountChange={setNewServiceTravelAmount}
+                  />
                   <div className="admin-modal__actions">
                     <button
                       type="button"
@@ -809,6 +953,82 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
               </div>
             </div>
           )}
+        </div>
+      ) : (
+        <div>
+          <div className="admin-section-header">
+            <h3 className="admin-section-title">Zone d'intervention & frais de déplacement</h3>
+          </div>
+          <p className="admin-settings-intro">
+            Ces paliers s'appliquent aux prestations réglées sur « Paliers kilométriques ». La distance est
+            calculée à vol d'oiseau entre votre point de départ et l'adresse du client.
+          </p>
+
+          <form className="admin-settings-form" onSubmit={handleSaveTravelSettings}>
+            <div className="admin-tier-grid">
+              {TRAVEL_TIER_INDEXES.map((index) => (
+                <div className="admin-tier-row" key={index}>
+                  <div className="form-group">
+                    <label className="form-label">Palier {index} — jusqu'à</label>
+                    <div className="form-field-unit">
+                      <input
+                        type="number"
+                        className="form-input form-input--compact"
+                        min="0"
+                        step="1"
+                        value={travelSettings[`travel_tier_${index}_max_km`] ?? ''}
+                        onChange={(e) => updateTravelSetting(`travel_tier_${index}_max_km`, e.target.value)}
+                      />
+                      <span className="form-unit">km</span>
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Frais</label>
+                    <div className="form-field-unit">
+                      <input
+                        type="number"
+                        className="form-input form-input--compact"
+                        min="0"
+                        step="0.5"
+                        value={travelSettings[`travel_tier_${index}_fee`] ?? ''}
+                        onChange={(e) => updateTravelSetting(`travel_tier_${index}_fee`, e.target.value)}
+                      />
+                      <span className="form-unit">€</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <p className="form-hint">Laisser la distance d'un palier vide pour le désactiver.</p>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Rayon maximal d'intervention</label>
+              <div className="form-field-unit">
+                <input
+                  type="number"
+                  className="form-input form-input--compact"
+                  min="0"
+                  step="1"
+                  value={travelSettings.travel_max_km ?? ''}
+                  onChange={(e) => updateTravelSetting('travel_max_km', e.target.value)}
+                />
+                <span className="form-unit">km</span>
+              </div>
+              <p className="form-hint">
+                Au-delà de ce rayon, la réservation en ligne est bloquée et le client est invité à formuler
+                une demande exceptionnelle par email.
+              </p>
+            </div>
+
+            <div className="admin-settings-actions">
+              <button type="submit" className="btn btn-primary" disabled={travelSettingsSaving}>
+                {travelSettingsSaving ? 'Enregistrement…' : 'Enregistrer les paliers'}
+              </button>
+              {travelSettingsMessage && (
+                <span className="admin-settings-message">{travelSettingsMessage}</span>
+              )}
+            </div>
+          </form>
         </div>
       )}
     </div>

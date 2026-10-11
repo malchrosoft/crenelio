@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { MapPinIcon, WarningCircleIcon, PhoneIcon, EnvelopeSimpleIcon } from '@phosphor-icons/react';
 import AddressAutocomplete from './AddressAutocomplete';
 import InterventionMap from './InterventionMap';
-import { Service, Slot, BookingPayload, AddressResult } from '../types';
+import { api } from '../api';
+import { Service, Slot, BookingPayload, AddressResult, TravelQuote } from '../types';
+import { formatEuro, formatKm } from '../utils/format';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -10,6 +13,8 @@ interface BookingFormProps {
   slot: Slot;
   defaultCenter?: [number, number];
   defaultZoom?: number;
+  proEmail?: string;
+  proPhone?: string;
   onSubmit: (payload: BookingPayload) => Promise<void>;
   onBack: () => void;
   loading: boolean;
@@ -21,6 +26,8 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   slot,
   defaultCenter,
   defaultZoom,
+  proEmail,
+  proPhone,
   onSubmit,
   onBack,
   loading,
@@ -35,8 +42,38 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   const [notes, setNotes] = useState('');
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
 
+  // Décomposition tarifaire (prestation + déplacement), recalculée par l'API
+  const [travelQuote, setTravelQuote] = useState<TravelQuote | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
+
   const slotDateObj = new Date(slot.start_datetime);
   const formattedDate = format(slotDateObj, 'EEEE d MMMM yyyy', { locale: fr });
+
+  // Estimation des frais dès que la prestation ou l'adresse géocodée change.
+  useEffect(() => {
+    let cancelled = false;
+    setQuoteLoading(true);
+
+    api
+      .quoteTravelFee(service.id, coordinates)
+      .then((quote) => {
+        if (!cancelled) setTravelQuote(quote);
+      })
+      .catch(() => {
+        if (!cancelled) setTravelQuote(null);
+      })
+      .finally(() => {
+        if (!cancelled) setQuoteLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [service.id, coordinates]);
+
+  const isOutOfZone = travelQuote?.is_out_of_zone ?? false;
+  const needsCoordinates = travelQuote?.needs_coordinates ?? false;
+  const isBookable = !isOutOfZone && !needsCoordinates;
 
   function handleSelectAddress(result: AddressResult) {
     setAddress(result.address);
@@ -45,8 +82,36 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     setCoordinates(result.coordinates);
   }
 
+  /** Lien mailto pré-rempli pour une demande d'intervention exceptionnelle hors zone. */
+  function buildExceptionalRequestLink(): string {
+    const subject = `Demande d'intervention hors zone — ${service.name}`;
+    const lines = [
+      `Bonjour,`,
+      ``,
+      `Je souhaite une intervention bien que mon adresse se situe hors de votre zone habituelle.`,
+      ``,
+      `Prestation souhaitée : ${service.name}`,
+      `Créneau envisagé : ${formattedDate} à ${slot.start}`,
+      `Nom : ${clientName}`,
+      `Téléphone : ${clientPhone}`,
+      `Email : ${clientEmail}`,
+      `Adresse : ${address}, ${postalCode} ${city}`,
+      travelQuote?.distance_km !== null && travelQuote?.distance_km !== undefined
+        ? `Distance estimée : ${formatKm(travelQuote.distance_km)}`
+        : '',
+      notes ? `Précisions : ${notes}` : '',
+      ``,
+      `Merci par avance pour votre retour.`,
+    ].filter((line, index, all) => line !== '' || all[index - 1] !== '');
+
+    return `mailto:${proEmail ?? ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!isBookable) {
+      return;
+    }
     await onSubmit({
       service_id: service.id,
       client_name: clientName,
@@ -57,6 +122,8 @@ export const BookingForm: React.FC<BookingFormProps> = ({
       city,
       notes,
       start_datetime: slot.start_datetime,
+      latitude: coordinates ? coordinates[0] : undefined,
+      longitude: coordinates ? coordinates[1] : undefined,
     });
   }
 
@@ -86,14 +153,75 @@ export const BookingForm: React.FC<BookingFormProps> = ({
           </span>
         </div>
         <div className="summary-row">
-          <span className="summary-label">Tarif indicatif :</span>
+          <span className="summary-label">Tarif de la prestation :</span>
           <span className="summary-value">
-            {parseFloat(String(service.price)) > 0
-              ? `${parseFloat(String(service.price)).toFixed(2).replace('.', ',')} €`
-              : 'Gratuit'}
+            {formatEuro(travelQuote?.service_price ?? parseFloat(String(service.price)))}
+          </span>
+        </div>
+
+        {/* Transparence tarifaire : le déplacement n'est affiché que s'il est facturé */}
+        {travelQuote && travelQuote.mode !== 'none' && (
+          <div className="summary-row">
+            <span className="summary-label">Frais de déplacement :</span>
+            <span className="summary-value">
+              {needsCoordinates ? (
+                <span className="summary-value--pending">À calculer selon l'adresse</span>
+              ) : (
+                <>
+                  {formatEuro(travelQuote.travel_fee)}
+                  {travelQuote.distance_km !== null && (
+                    <span className="summary-distance">
+                      <MapPinIcon size={13} weight="fill" aria-hidden="true" />
+                      {formatKm(travelQuote.distance_km)}
+                    </span>
+                  )}
+                </>
+              )}
+            </span>
+          </div>
+        )}
+
+        <div className="summary-row summary-row--total">
+          <span className="summary-label">Total estimé :</span>
+          <span className="summary-value">
+            {quoteLoading && !travelQuote
+              ? '…'
+              : formatEuro(travelQuote?.total ?? parseFloat(String(service.price)))}
           </span>
         </div>
       </div>
+
+      {/* Blocage bienveillant hors zone d'intervention */}
+      {isOutOfZone && travelQuote && (
+        <div className="booking-out-of-zone">
+          <div className="booking-out-of-zone__header">
+            <WarningCircleIcon size={22} weight="fill" aria-hidden="true" />
+            <strong>Adresse hors de la zone d'intervention</strong>
+          </div>
+          <p className="booking-out-of-zone__text">
+            Votre adresse se situe à{' '}
+            <strong>{travelQuote.distance_km !== null ? formatKm(travelQuote.distance_km) : '—'}</strong> du
+            point de départ, au-delà du rayon habituel de{' '}
+            <strong>{travelQuote.max_km !== null ? formatKm(travelQuote.max_km) : '—'}</strong>. La réservation
+            en ligne n'est pas possible, mais un déplacement exceptionnel reste envisageable : écrivez-nous et
+            nous reviendrons vers vous rapidement.
+          </p>
+          <div className="booking-out-of-zone__actions">
+            {proEmail && (
+              <a className="btn btn-primary" href={buildExceptionalRequestLink()}>
+                <EnvelopeSimpleIcon size={16} weight="fill" aria-hidden="true" />
+                Envoyer une demande exceptionnelle
+              </a>
+            )}
+            {proPhone && (
+              <a className="btn btn-secondary" href={`tel:${proPhone.replace(/\s/g, '')}`}>
+                <PhoneIcon size={16} weight="fill" aria-hidden="true" />
+                {proPhone}
+              </a>
+            )}
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="form-alert-error">
@@ -189,6 +317,13 @@ export const BookingForm: React.FC<BookingFormProps> = ({
               ✓ Coordonnées GPS validées pour le déplacement de l'artisan
             </div>
           )}
+          {!coordinates && needsCoordinates && (
+            <div className="form-gps-hint">
+              <MapPinIcon size={15} weight="fill" aria-hidden="true" />
+              Cette prestation facture le déplacement à la distance : sélectionnez votre adresse dans les
+              suggestions pour calculer les frais.
+            </div>
+          )}
         </div>
 
         <div className="form-group">
@@ -211,7 +346,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
           >
             ← Modifier le créneau
           </button>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
+          <button type="submit" className="btn btn-primary" disabled={loading || !isBookable}>
             {loading ? 'Confirmation en cours...' : 'Confirmer le rendez-vous ✓'}
           </button>
         </div>

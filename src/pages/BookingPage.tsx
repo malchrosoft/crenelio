@@ -178,6 +178,8 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
                   slot={selectedSlot}
                   defaultCenter={defaultCenter}
                   defaultZoom={isNaN(defaultZoom) ? 12 : defaultZoom}
+                  proEmail={config.pro_email}
+                  proPhone={config.pro_phone}
                   onSubmit={handleBookingSubmit}
                   onBack={() => setStep(2)}
                   loading={loading}

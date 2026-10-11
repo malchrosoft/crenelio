@@ -12,6 +12,7 @@ require_once __DIR__ . '/../controllers/ServiceController.php';
 require_once __DIR__ . '/../controllers/ScheduleController.php';
 require_once __DIR__ . '/../controllers/SlotController.php';
 require_once __DIR__ . '/../controllers/AppointmentController.php';
+require_once __DIR__ . '/../controllers/TravelFeeController.php';
 
 $router = new Router();
 
@@ -20,6 +21,7 @@ $serviceController     = new ServiceController();
 $scheduleController    = new ScheduleController();
 $slotController        = new SlotController();
 $appointmentController = new AppointmentController();
+$travelFeeController   = new TravelFeeController();
 
 // -------------------------------------------------------------------
 // 1. Configuration & Authentification Pro
@@ -53,7 +55,12 @@ $router->delete('/unavailabilities/:id',     [$scheduleController, 'destroyUnava
 $router->get('/slots',                      [$slotController, 'index']);
 
 // -------------------------------------------------------------------
-// 5. Rendez-vous (Public & Gestion)
+// 5. Frais de déplacement (estimation avant réservation)
+// -------------------------------------------------------------------
+$router->post('/travel-fee/quote',          [$travelFeeController, 'quote']);
+
+// -------------------------------------------------------------------
+// 6. Rendez-vous (Public & Gestion)
 // -------------------------------------------------------------------
 $router->get('/appointments',               [$appointmentController, 'index']);
 $router->get('/appointments/:id',           [$appointmentController, 'show']);

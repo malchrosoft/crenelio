@@ -6,7 +6,9 @@
 require_once __DIR__ . '/../models/Appointment.php';
 require_once __DIR__ . '/../models/Service.php';
 require_once __DIR__ . '/../models/Config.php';
+require_once __DIR__ . '/../core/TravelFee.php';
 require_once __DIR__ . '/../core/Response.php';
+require_once __DIR__ . '/TravelFeeController.php';
 
 class AppointmentController
 {
@@ -67,8 +69,34 @@ class AppointmentController
         $durationMinutes = (int)$service['duration_minutes'];
         $endDatetime = date('Y-m-d H:i:s', strtotime("+$durationMinutes minutes", strtotime($startDatetime)));
 
-        // Vérification de non-conflit de créneau (avec buffer de trajet)
         $config = Config::getAll();
+
+        // Frais de déplacement : recalculés côté serveur, le devis client n'est jamais
+        // source de vérité (il n'est qu'un affichage de transparence tarifaire).
+        [$latitude, $longitude] = TravelFeeController::readCoordinates($body);
+        $travelQuote = TravelFee::quote($service, $latitude, $longitude, $config);
+
+        if ($travelQuote['needs_coordinates']) {
+            Response::json([
+                'error' => "Cette prestation facture le déplacement à la distance. Veuillez sélectionner votre adresse dans les suggestions proposées pour la localiser précisément."
+            ], 400);
+        }
+
+        if ($travelQuote['is_out_of_zone']) {
+            Response::json([
+                'error'      => sprintf(
+                    "L'adresse indiquée se situe à %s km du point de départ, au-delà du rayon d'intervention de %s km. La réservation en ligne n'est pas possible, mais une demande exceptionnelle reste envisageable.",
+                    self::formatKm($travelQuote['distance_km']),
+                    self::formatKm($travelQuote['max_km'])
+                ),
+                'code'       => 'out_of_zone',
+                'travel'     => $travelQuote,
+                'pro_email'  => $config['pro_email'] ?? null,
+                'pro_phone'  => $config['pro_phone'] ?? null,
+            ], 422);
+        }
+
+        // Vérification de non-conflit de créneau (avec buffer de trajet)
         $bufferMinutes = max(0, (int)($config['buffer_minutes'] ?? 30));
 
         $checkStart = date('Y-m-d H:i:s', strtotime("-$bufferMinutes minutes", strtotime($startDatetime)));
@@ -89,6 +117,9 @@ class AppointmentController
             'address'        => $body['address'],
             'postal_code'    => $body['postal_code'],
             'city'           => $body['city'],
+            'travel_fee'     => $travelQuote['travel_fee'],
+            'distance_km'    => $travelQuote['distance_km'],
+            'is_out_of_zone' => $travelQuote['is_out_of_zone'],
             'notes'          => $body['notes'] ?? null,
             'start_datetime' => $startDatetime,
             'end_datetime'   => $endDatetime,
@@ -99,8 +130,21 @@ class AppointmentController
 
         Response::json([
             'message'     => 'Votre rendez-vous a été confirmé avec succès !',
-            'appointment' => $appointment
+            'appointment' => $appointment,
+            'travel'      => $travelQuote
         ], 201);
+    }
+
+    /**
+     * Formatage français d'une distance (« 23,4 »), tolérant aux valeurs absentes.
+     */
+    private static function formatKm(?float $km): string
+    {
+        if ($km === null) {
+            return '—';
+        }
+
+        return rtrim(rtrim(number_format($km, 1, ',', ' '), '0'), ',');
     }
 
     /**

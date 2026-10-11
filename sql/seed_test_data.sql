@@ -6,12 +6,14 @@
 SET NAMES utf8mb4;
 
 -- 1. Prestations d'exemple pour un artisan à domicile
-INSERT INTO `services` (`name`, `description`, `duration_minutes`, `price`, `is_active`, `display_order`) VALUES
+INSERT INTO `services` (`name`, `description`, `duration_minutes`, `price`, `travel_fee_mode`, `travel_fee_amount`, `is_active`, `display_order`) VALUES
 (
     'Diagnostic & Recherche de panne',
     'Déplacement et diagnostic complet de l''installation. Devis gratuit immédiat si réparation complémentaire requise.',
     45,
     59.00,
+    'distance_tiers',
+    0.00,
     1,
     1
 ),
@@ -20,6 +22,8 @@ INSERT INTO `services` (`name`, `description`, `duration_minutes`, `price`, `is_
     'Nettoyage, vérification des organes de sécurité, tests de bon fonctionnement et rapport d''intervention.',
     60,
     89.00,
+    'distance_tiers',
+    0.00,
     1,
     2
 ),
@@ -28,6 +32,8 @@ INSERT INTO `services` (`name`, `description`, `duration_minutes`, `price`, `is_
     'Intervention prioritaire avec réparation immédiate (pièces d''usure courantes incluses).',
     90,
     129.00,
+    'fixed',
+    20.00,
     1,
     3
 ),
@@ -35,6 +41,8 @@ INSERT INTO `services` (`name`, `description`, `duration_minutes`, `price`, `is_
     'Visite technique & Devis projet',
     'Relevé technique sur place pour chiffrage précis de vos futurs travaux ou rénovations.',
     45,
+    0.00,
+    'none',
     0.00,
     1,
     4

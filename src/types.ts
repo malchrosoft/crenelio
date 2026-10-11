@@ -2,16 +2,41 @@
  * TypeScript types for Crénelio.
  */
 
+/** Mode de facturation du déplacement porté par la prestation. */
+export type TravelFeeMode = 'none' | 'fixed' | 'distance_tiers';
+
 export interface Service {
   id: number;
   name: string;
   description: string | null;
   duration_minutes: number;
   price: string | number;
+  travel_fee_mode: TravelFeeMode;
+  travel_fee_amount: string | number;
   is_active: number | boolean;
   display_order: number;
   created_at?: string;
   updated_at?: string;
+}
+
+/** Palier kilométrique global appliqué en mode `distance_tiers`. */
+export interface TravelTier {
+  max_km: number;
+  fee: number;
+}
+
+/** Décomposition tarifaire renvoyée par `POST /travel-fee/quote`. */
+export interface TravelQuote {
+  mode: TravelFeeMode;
+  service_price: number;
+  travel_fee: number;
+  total: number;
+  distance_km: number | null;
+  is_out_of_zone: boolean;
+  max_km: number | null;
+  /** true si la prestation facture à la distance mais que l'adresse n'est pas géocodée. */
+  needs_coordinates: boolean;
+  tiers: TravelTier[];
 }
 
 export interface Slot {
@@ -60,6 +85,9 @@ export interface Appointment {
   address: string;
   postal_code: string;
   city: string;
+  travel_fee: string | number;
+  distance_km: string | number | null;
+  is_out_of_zone: number | boolean;
   notes: string | null;
   start_datetime: string;
   end_datetime: string;
@@ -83,6 +111,14 @@ export interface AppConfig {
   default_latitude?: string;
   default_longitude?: string;
   default_zoom?: string;
+  // Frais de déplacement (paliers kilométriques globaux)
+  travel_tier_1_max_km?: string;
+  travel_tier_1_fee?: string;
+  travel_tier_2_max_km?: string;
+  travel_tier_2_fee?: string;
+  travel_tier_3_max_km?: string;
+  travel_tier_3_fee?: string;
+  travel_max_km?: string;
   // Vitrine
   vitrine_tagline?: string;
   vitrine_about?: string;
@@ -119,4 +155,7 @@ export interface BookingPayload {
   city: string;
   notes?: string;
   start_datetime: string;
+  /** Coordonnées issues de la Base Adresse Nationale, requises en mode `distance_tiers`. */
+  latitude?: number;
+  longitude?: number;
 }
