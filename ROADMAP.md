@@ -138,3 +138,20 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
     - Validité stricte de **15 minutes** et limitation à 3 tentatives infructueuses.
     - Envoi immédiat par email à l'adresse de contact du professionnel (`pro_email`).
     - Dès validation du code à 6 chiffres, l'appareil est autorisé pour un nouveau cycle de **10 jours**.
+
+---
+
+### 13. Gestion Avancée du Planning, Recherche & Suivi des Rendez-vous Échus
+- **Outil de recherche & filtrage multi-critères :**
+  - Barre de recherche textuelle rapide (nom client, téléphone, email, ville, prestation).
+  - Filtres par statut (`Tous`, `En attente`, `Confirmés`, `Terminés`, `Annulés`).
+  - Filtre temporel : *À venir*, *Aujourd'hui*, *Échus / Passés*.
+- **Détection & Traitement visuel des rendez-vous échus non honorés :**
+  - Les rendez-vous passés sans statut `completed` ou `cancelled` restent visibles dans la liste.
+  - **Mise en valeur visuelle différenciée :**
+    - Couleur d'arrière-plan d'alerte douce (`$warning-light` ou `$danger-light`).
+    - Badge / Icône d'alerte spécifique (`WarningIcon` / `ClockCountdownIcon`) signalant le retard / non-clôture.
+- **Action de report / reprogrammation rapide :**
+  - Bouton d'action « Déplacer / Reprogrammer » ouvrant un sélecteur de nouvelle date et heure.
+  - Mise à jour des dates de début/fin en base avec conservation de l'historique.
+  - Notification automatique optionnelle au client informant du décalage de son intervention.
