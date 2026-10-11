@@ -2,8 +2,8 @@
 
 **Date :** 11 Octobre 2026
 **Dépôt :** `/Users/aymeric.malchrowicz/DEVELOPPEMENT/crenelio`
-**Dernier commit de référence :** `c1f5e38` (`main`, poussé) — *Item 1 : frais de déplacement hybrides*
-**Travaux en cours (non commités) :** Item 4 — Notifications email, iCal & journal d'envoi.
+**Dernier commit :** `1c29a47` (`main`, poussé) — *docs(agents) : contraintes connues & dette technique*
+**Statut Git :** propre, rien en suspens — tout est poussé sur `origin/main`.
 
 ---
 
@@ -11,7 +11,7 @@
 
 - **Item 13 (Recherche, filtres, RDV échus & reprogrammation) :** ✅ terminé et commité (`f3a1eb2`).
 - **Item 1 (Frais de déplacement hybrides & hors-zone) :** ✅ terminé, commité et poussé (`cb9c0df` / `c1f5e38`).
-- **Item 4 (Notifications email, iCal & journal d'envoi) :** ✅ implémenté et vérifié, **pas encore commité**.
+- **Item 4 (Notifications email, iCal & journal d'envoi) :** ✅ terminé, commité et poussé (`762e94e` / `1372d87`).
 
 ### Détail de l'Item 4
 - **`api/core/Mailer.php`** : client SMTP natif (socket, STARTTLS 587 ou TLS implicite 465,
@@ -85,13 +85,14 @@ Le service mail de l'Item 4 est en place, la dépendance est levée.
 3. Étape 3 : OTP à 6 chiffres (`random_int`), 15 min de validité, 3 tentatives, envoyé à `pro_email`
    via `Notifier` / `Mailer`.
 
-À noter pour cet item : le token d'administration actuel reste faible
-(`sha256(mot de passe + nom de base + date du jour)`, cf. `ConfigController::login`), et les
-routes `/admin/*` ne le vérifient pas côté serveur. À reprendre avec la 2FA.
+⚠️ L'espace Pro n'est **pas protégé côté serveur** : le token de `ConfigController::login` est
+trivial et aucune route `/admin/*` ne le vérifie. La 2FA seule ne corrigerait rien — il faut
+embarquer la vérification serveur dans le même chantier.
 
-### Reliquat connu de l'Item 4
-Aucune notification n'est envoyée lors d'une **annulation** (ni au client, ni à l'artisan).
-L'énumération `appointment_notifications.type` devra être étendue le moment venu.
+### Contraintes et reliquats
+Consignés dans [`AGENTS.md`](AGENTS.md), section *5. Contraintes Connues & Dette Technique*
+(sécurité de l'espace Pro, fichiers `.env` hors de portée des agents, envoi d'emails désactivé
+sans SMTP, fuseau horaire, absence de notification à l'annulation).
 
 ---
 
