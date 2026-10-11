@@ -7,6 +7,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 SET NAMES utf8mb4;
 
+DROP TABLE IF EXISTS `appointment_notifications`;
 DROP TABLE IF EXISTS `appointments`;
 DROP TABLE IF EXISTS `unavailabilities`;
 DROP TABLE IF EXISTS `schedules`;
@@ -100,4 +101,23 @@ CREATE TABLE `appointments` (
 
 CREATE INDEX `idx_appointments_dates` ON `appointments` (`start_datetime`, `end_datetime`);
 CREATE INDEX `idx_appointments_status` ON `appointments` (`status`);
+
+-- -------------------------------------------------------------------
+-- 6. Journal des notifications email rattachées aux rendez-vous
+-- -------------------------------------------------------------------
+CREATE TABLE `appointment_notifications` (
+    `id`             INT AUTO_INCREMENT PRIMARY KEY,
+    `appointment_id` INT             NOT NULL,
+    `type`           ENUM('client_confirmation', 'pro_confirmation') NOT NULL,
+    `recipient`      VARCHAR(255)    NOT NULL,
+    `subject`        VARCHAR(255)    NOT NULL,
+    `status`         ENUM('pending', 'sent', 'failed') NOT NULL DEFAULT 'pending',
+    `error_message`  TEXT            NULL,
+    `sent_at`        DATETIME        NULL,
+    `created_at`     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_notification_appointment` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX `idx_notifications_appointment` ON `appointment_notifications` (`appointment_id`, `created_at`);
 

@@ -69,5 +69,7 @@ $router->get('/appointments/token/:token',  [$appointmentController, 'showByToke
 $router->post('/appointments/token/:token/cancel', [$appointmentController, 'cancelByToken']);
 $router->put('/appointments/:id/status',    [$appointmentController, 'updateStatus']);
 $router->put('/appointments/:id/reschedule',[$appointmentController, 'reschedule']);
+$router->get('/appointments/:id/notifications', [$appointmentController, 'notifications']);
+$router->post('/appointments/:id/notifications/resend', [$appointmentController, 'resendNotification']);
 
 return $router;

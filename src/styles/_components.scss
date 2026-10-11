@@ -1149,3 +1149,120 @@
   color: $success;
   font-size: 0.85rem;
 }
+
+/* ===================================================================
+   Journal des notifications email (Espace Pro)
+   =================================================================== */
+
+.notification-empty {
+  margin: 0;
+  color: $gray-500;
+  font-size: 0.9rem;
+}
+
+.notification-list {
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notification-item {
+  padding: 12px 14px;
+  border: 1px solid $gray-200;
+  border-left-width: 3px;
+  border-radius: $radius-sm;
+  background: $gray-50;
+  font-size: 0.85rem;
+
+  &--sent {
+    border-left-color: $success;
+
+    .notification-item__status { color: $success; }
+  }
+
+  &--failed {
+    border-left-color: $danger;
+    background: $danger-light;
+
+    .notification-item__status { color: $danger; }
+  }
+
+  &--pending {
+    border-left-color: $warning;
+    background: $warning-light;
+
+    .notification-item__status { color: $warning; }
+  }
+
+  .notification-item__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .notification-item__status {
+    display: inline-flex;
+  }
+
+  .notification-item__label {
+    font-weight: 600;
+    color: $gray-800;
+  }
+
+  .notification-item__date {
+    margin-left: auto;
+    color: $gray-500;
+    font-size: 0.78rem;
+  }
+
+  .notification-item__recipient {
+    color: $gray-600;
+  }
+
+  .notification-item__subject {
+    margin-top: 2px;
+    color: $gray-500;
+    font-size: 0.8rem;
+  }
+
+  .notification-item__error {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: $radius-sm;
+    background: #ffffff;
+    color: $danger;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.75rem;
+    word-break: break-word;
+  }
+}
+
+.notification-resend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid $gray-100;
+
+  .notification-resend__label {
+    color: $gray-500;
+    font-size: 0.85rem;
+  }
+}
+
+/* Page publique de gestion d'un rendez-vous (lien reçu par email) */
+.manage-page-help {
+  margin: 16px 0 0;
+  color: $gray-500;
+  font-size: 0.9rem;
+  line-height: 1.6;
+
+  a {
+    color: $primary;
+  }
+}

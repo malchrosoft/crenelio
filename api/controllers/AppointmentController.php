@@ -7,6 +7,8 @@ require_once __DIR__ . '/../models/Appointment.php';
 require_once __DIR__ . '/../models/Service.php';
 require_once __DIR__ . '/../models/Config.php';
 require_once __DIR__ . '/../core/TravelFee.php';
+require_once __DIR__ . '/../core/Notifier.php';
+require_once __DIR__ . '/../models/Notification.php';
 require_once __DIR__ . '/../core/Response.php';
 require_once __DIR__ . '/TravelFeeController.php';
 
@@ -128,11 +130,59 @@ class AppointmentController
 
         $appointment = Appointment::create($data);
 
+        // Notifications : journalisées puis tentées, sans jamais compromettre
+        // une réservation déjà enregistrée en base.
+        $notifications = Notifier::sendBookingConfirmations($appointment, $config);
+
         Response::json([
-            'message'     => 'Votre rendez-vous a été confirmé avec succès !',
-            'appointment' => $appointment,
-            'travel'      => $travelQuote
+            'message'       => 'Votre rendez-vous a été confirmé avec succès !',
+            'appointment'   => $appointment,
+            'travel'        => $travelQuote,
+            'notifications' => $notifications
         ], 201);
+    }
+
+    /**
+     * GET /appointments/:id/notifications — Journal d'envoi d'un rendez-vous (Espace Pro).
+     */
+    public function notifications(array $params): void
+    {
+        $id = (int)($params['id'] ?? 0);
+
+        if (!Appointment::find($id)) {
+            Response::json(['error' => 'Rendez-vous non trouvé'], 404);
+        }
+
+        Response::json(Notification::forAppointment($id));
+    }
+
+    /**
+     * POST /appointments/:id/notifications/resend — Relance manuelle d'un envoi.
+     */
+    public function resendNotification(array $params): void
+    {
+        $id = (int)($params['id'] ?? 0);
+        $appointment = Appointment::find($id);
+
+        if (!$appointment) {
+            Response::json(['error' => 'Rendez-vous non trouvé'], 404);
+        }
+
+        $type = Response::body()['type'] ?? '';
+        if (!in_array($type, Notification::TYPES, true)) {
+            Response::json(['error' => 'Type de notification inconnu'], 400);
+        }
+
+        try {
+            $result = Notifier::resend($appointment, Config::getAll(), $type);
+        } catch (InvalidArgumentException $e) {
+            Response::json(['error' => $e->getMessage()], 400);
+        }
+
+        Response::json([
+            'result'        => $result,
+            'notifications' => Notification::forAppointment($id)
+        ]);
     }
 
     /**

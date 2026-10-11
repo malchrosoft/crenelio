@@ -8,12 +8,30 @@ import {
   CalendarBlankIcon,
   XIcon,
   CarIcon,
+  EnvelopeSimpleIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  HourglassIcon,
+  ArrowClockwiseIcon,
 } from '@phosphor-icons/react';
 import { api } from '../api';
-import { Appointment, Service, AppConfig, TravelFeeMode } from '../types';
+import {
+  Appointment,
+  Service,
+  AppConfig,
+  TravelFeeMode,
+  AppointmentNotification,
+  NotificationType,
+} from '../types';
 import { formatEuro } from '../utils/format';
 import { format, isPast, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
+
+/** Libellés lisibles des emails journalisés. */
+const NOTIFICATION_LABELS: Record<NotificationType, string> = {
+  client_confirmation: 'Confirmation client',
+  pro_confirmation: 'Fiche intervention (artisan)',
+};
 
 /** Paliers kilométriques modifiables depuis l'espace Pro (cf. `config.travel_tier_*`). */
 const TRAVEL_TIER_INDEXES = [1, 2, 3] as const;
@@ -133,6 +151,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
   // Erreurs par prestation (ex: suppression impossible)
   const [serviceErrors, setServiceErrors] = useState<Record<number, string>>({});
 
+  // Journal des notifications email du rendez-vous consulté
+  const [notificationsAppointment, setNotificationsAppointment] = useState<Appointment | null>(null);
+  const [notifications, setNotifications] = useState<AppointmentNotification[]>([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [notificationsError, setNotificationsError] = useState<string | null>(null);
+  const [resendingType, setResendingType] = useState<NotificationType | null>(null);
+
   // Paliers kilométriques & rayon maximal d'intervention
   const [travelSettings, setTravelSettings] = useState<Record<string, string>>({});
   const [travelSettingsSaving, setTravelSettingsSaving] = useState(false);
@@ -150,11 +175,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
       if (e.key === 'Escape') {
         if (isAddModalOpen) setIsAddModalOpen(false);
         if (reschedulingAppointment) setReschedulingAppointment(null);
+        if (notificationsAppointment) setNotificationsAppointment(null);
       }
     };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
-  }, [isAddModalOpen, reschedulingAppointment]);
+  }, [isAddModalOpen, reschedulingAppointment, notificationsAppointment]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -186,6 +212,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function openNotifications(appointment: Appointment) {
+    setNotificationsAppointment(appointment);
+    setNotifications([]);
+    setNotificationsError(null);
+    setNotificationsLoading(true);
+    try {
+      setNotifications(await api.listNotifications(appointment.id));
+    } catch (err: unknown) {
+      setNotificationsError(err instanceof Error ? err.message : 'Erreur lors du chargement du journal');
+    } finally {
+      setNotificationsLoading(false);
+    }
+  }
+
+  async function handleResendNotification(type: NotificationType) {
+    if (!notificationsAppointment) return;
+    setResendingType(type);
+    setNotificationsError(null);
+    try {
+      const res = await api.resendNotification(notificationsAppointment.id, type);
+      setNotifications(res.notifications);
+      if (res.result.status === 'failed') {
+        setNotificationsError("L'envoi a de nouveau échoué — le motif figure dans le journal ci-dessous.");
+      }
+    } catch (err: unknown) {
+      setNotificationsError(err instanceof Error ? err.message : "Erreur lors du renvoi");
+    } finally {
+      setResendingType(null);
     }
   }
 
@@ -639,6 +696,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                             <CalendarBlankIcon size={14} weight="bold" />
                             Reprogrammer
                           </button>
+                          <button
+                            type="button"
+                            className="btn btn-secondary admin-btn-reschedule"
+                            onClick={() => openNotifications(a)}
+                            title="Consulter le journal des emails envoyés pour ce rendez-vous"
+                          >
+                            <EnvelopeSimpleIcon size={14} weight="bold" />
+                            Emails
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -705,6 +771,91 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+          )}
+
+          {/* ── Journal des notifications email ── */}
+          {notificationsAppointment && (
+            <div
+              className="admin-modal-overlay"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="notifications-modal-title"
+              onClick={() => setNotificationsAppointment(null)}
+            >
+              <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="admin-modal__header">
+                  <h3 className="admin-modal__title" id="notifications-modal-title">
+                    Emails du rendez-vous #{notificationsAppointment.id}
+                  </h3>
+                  <button
+                    className="admin-modal__close"
+                    onClick={() => setNotificationsAppointment(null)}
+                    aria-label="Fermer"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="admin-modal__body">
+                  <p className="admin-modal-hint">
+                    Client : <strong>{notificationsAppointment.client_name}</strong> (
+                    {notificationsAppointment.client_email})
+                  </p>
+
+                  {notificationsError && <div className="form-alert-error">{notificationsError}</div>}
+
+                  {notificationsLoading ? (
+                    <p className="slots-loading">Chargement du journal…</p>
+                  ) : notifications.length === 0 ? (
+                    <p className="notification-empty">
+                      Aucun email n'a encore été journalisé pour ce rendez-vous.
+                    </p>
+                  ) : (
+                    <ul className="notification-list">
+                      {notifications.map((n) => (
+                        <li key={n.id} className={clsx('notification-item', `notification-item--${n.status}`)}>
+                          <div className="notification-item__head">
+                            <span className="notification-item__status" aria-hidden="true">
+                              {n.status === 'sent' ? (
+                                <CheckCircleIcon size={18} weight="fill" />
+                              ) : n.status === 'failed' ? (
+                                <XCircleIcon size={18} weight="fill" />
+                              ) : (
+                                <HourglassIcon size={18} weight="fill" />
+                              )}
+                            </span>
+                            <span className="notification-item__label">{NOTIFICATION_LABELS[n.type]}</span>
+                            <span className="notification-item__date">
+                              {format(parseISO(n.sent_at ?? n.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                            </span>
+                          </div>
+                          <div className="notification-item__recipient">{n.recipient}</div>
+                          <div className="notification-item__subject">{n.subject}</div>
+                          {n.error_message && (
+                            <div className="notification-item__error">{n.error_message}</div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <div className="notification-resend">
+                    <span className="notification-resend__label">Renvoyer :</span>
+                    {(Object.keys(NOTIFICATION_LABELS) as NotificationType[]).map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        className="btn btn-secondary admin-btn-sm"
+                        onClick={() => handleResendNotification(type)}
+                        disabled={resendingType !== null}
+                      >
+                        <ArrowClockwiseIcon size={14} weight="bold" />
+                        {resendingType === type ? 'Envoi…' : NOTIFICATION_LABELS[type]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}

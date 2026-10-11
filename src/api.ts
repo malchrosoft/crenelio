@@ -10,6 +10,8 @@ import {
   AppConfig,
   BookingPayload,
   TravelQuote,
+  AppointmentNotification,
+  NotificationType,
 } from './types';
 
 const BASE_URL = '/api';
@@ -91,5 +93,15 @@ export const api = {
     request<Appointment>('PUT', `/appointments/${id}/status`, { status, reason }),
   rescheduleAppointment: (id: number, start_datetime: string, status?: string) =>
     request<Appointment>('PUT', `/appointments/${id}/reschedule`, { start_datetime, status }),
+
+  // Journal des notifications email
+  listNotifications: (appointmentId: number) =>
+    request<AppointmentNotification[]>('GET', `/appointments/${appointmentId}/notifications`),
+  resendNotification: (appointmentId: number, type: NotificationType) =>
+    request<{ result: { type: NotificationType; status: string }; notifications: AppointmentNotification[] }>(
+      'POST',
+      `/appointments/${appointmentId}/notifications/resend`,
+      { type }
+    ),
 };
 

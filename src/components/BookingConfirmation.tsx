@@ -10,11 +10,14 @@ import { formatEuro, formatKm } from '../utils/format';
 interface BookingConfirmationProps {
   appointment: Appointment;
   onNewBooking: () => void;
+  /** Masqué lorsque la fiche est ouverte depuis le lien de gestion reçu par email. */
+  showNewBooking?: boolean;
 }
 
 export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
   appointment,
   onNewBooking,
+  showNewBooking = true,
 }) => {
   const [isCancelled, setIsCancelled] = useState(appointment.status === 'cancelled');
   const [cancelling, setCancelling] = useState(false);
@@ -63,12 +66,14 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
           {isCancelled ? '✕' : '✓'}
         </div>
         <h2 className="confirmation-title">
-          {isCancelled ? 'Rendez-vous annulé' : 'Rendez-vous confirmé !'}
+          {isCancelled ? 'Rendez-vous annulé' : showNewBooking ? 'Rendez-vous confirmé !' : 'Votre rendez-vous'}
         </h2>
         <p className="confirmation-subtitle">
           {isCancelled
             ? 'Ce créneau a été libéré dans le planning de l’artisan.'
-            : 'Un e-mail récapitulatif a été envoyé avec toutes les informations nécessaires.'}
+            : showNewBooking
+              ? 'Un e-mail récapitulatif a été envoyé avec toutes les informations nécessaires.'
+              : 'Retrouvez ici le détail de votre intervention et annulez-la si besoin.'}
         </p>
       </div>
 
@@ -155,13 +160,15 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
             {cancelling ? 'Annulation...' : 'Annuler ce rendez-vous'}
           </button>
         )}
-        <button
-          type="button"
-          className="btn btn-primary btn-new-booking"
-          onClick={onNewBooking}
-        >
-          Réserver un autre créneau
-        </button>
+        {showNewBooking && (
+          <button
+            type="button"
+            className="btn btn-primary btn-new-booking"
+            onClick={onNewBooking}
+          >
+            Réserver un autre créneau
+          </button>
+        )}
       </div>
     </div>
   );

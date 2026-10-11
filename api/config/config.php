@@ -43,5 +43,23 @@ define('DB_CHARSET', env('DB_CHARSET', 'utf8mb4'));
 define('APP_ENV', env('APP_ENV', 'production'));
 define('APP_DEBUG', APP_ENV === 'development');
 
+// Fuseau de référence de l'artisan : les datetimes stockés en base sont
+// naïfs et s'interprètent dans ce fuseau (créneaux, emails, fichiers iCal).
+define('APP_TIMEZONE', env('APP_TIMEZONE', 'Europe/Paris'));
+date_default_timezone_set(APP_TIMEZONE);
+
+// URL publique du site, utilisée pour les liens de gestion envoyés par email
+define('APP_URL', rtrim(env('APP_URL', ''), '/'));
+
+// Envoi d'emails (SMTP) — jamais stocké en base, uniquement dans api/.env
+define('SMTP_HOST',      env('SMTP_HOST', ''));
+define('SMTP_PORT',      (int)env('SMTP_PORT', 587));
+define('SMTP_USER',      env('SMTP_USER', ''));
+define('SMTP_PASS',      env('SMTP_PASS', ''));
+// 'starttls' (587, recommandé), 'tls' (465, TLS implicite) ou 'none'
+define('SMTP_SECURE',    env('SMTP_SECURE', 'starttls'));
+define('MAIL_FROM',      env('MAIL_FROM', ''));
+define('MAIL_FROM_NAME', env('MAIL_FROM_NAME', 'Crénelio'));
+
 // CORS settings — adjust to your domain in production
 define('CORS_ORIGIN', env('CORS_ORIGIN', '*'));

@@ -98,6 +98,23 @@ export interface Appointment {
   updated_at?: string;
 }
 
+/** Type d'email émis automatiquement autour d'un rendez-vous. */
+export type NotificationType = 'client_confirmation' | 'pro_confirmation';
+
+/** Entrée du journal d'envoi rattachée à un rendez-vous. */
+export interface AppointmentNotification {
+  id: number;
+  appointment_id: number;
+  type: NotificationType;
+  recipient: string;
+  subject: string;
+  status: 'pending' | 'sent' | 'failed';
+  error_message: string | null;
+  sent_at: string | null;
+  created_at: string;
+  updated_at?: string;
+}
+
 export interface AppConfig {
   company_name?: string;
   pro_name?: string;
