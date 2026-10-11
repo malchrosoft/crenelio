@@ -6,7 +6,11 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ## 📋 Backlog Prioritaire
 
-### 1. Frais de Déplacement Hybrides (Par Prestation & Paliers Kilométriques)
+### 1. Frais de Déplacement Hybrides (Par Prestation & Paliers Kilométriques) — ✅ Terminée
+- **Moteur de calcul `api/core/TravelFee.php` :** distance géodésique (Haversine) entre `config.default_latitude/longitude` et l'adresse BAN du client, résolution des paliers et détection du hors-zone.
+- **Endpoint public `POST /travel-fee/quote` :** décomposition tarifaire (prestation + déplacement + total, distance, hors-zone) consommée par le tunnel pour l'affichage avant confirmation.
+- **Frais figés en base à la réservation :** `appointments.travel_fee`, `distance_km`, `is_out_of_zone` ; le montant est toujours recalculé côté serveur, jamais repris du client.
+- **Espace Pro :** mode et forfait de déplacement dans la création et l'édition des prestations, badge dédié sur les cartes, onglet « Zone & déplacement » pour les paliers et le rayon maximal.
 - **Options tarifaires par prestation (`services.travel_fee_mode`) :**
   - `'none'` : Aucun frais / déplacement inclus (ex: télé-diagnostic, prestation atelier).
   - `'fixed'` : Montant forfaitaire fixe dédié à la prestation (ex: forfait intervention urgente +20 €), renseigné dans `services.travel_fee_amount`.
@@ -162,12 +166,12 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
 |---|---|---|---|---|---|
-| **1** | **Item 1** | **Frais de déplacement hybrides & gestion hors-zone** | Tunnel / Tarification | ⏳ *À faire* | Coordonnées GPS BAN déjà en place |
-| **2** | **Item 4** | **Notifications email, iCal & logs d'envoi IHM** | Communication / Traçabilité | ⏳ *À faire* | Configuration SMTP / Service Mail PHP |
-| **3** | **Item 12** | **Sécurité 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Dépend du service Mail (Item 4) |
-| **4** | **Item 6** | **Identité visuelle & Logo (Favicon, Header)** | Design / Personnalisation | ⏳ *À faire* | Paramètres de config |
-| **5** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
-| **6** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
+| **1** | **Item 4** | **Notifications email, iCal & logs d'envoi IHM** | Communication / Traçabilité | ⏳ *À faire* | Configuration SMTP / Service Mail PHP |
+| **2** | **Item 12** | **Sécurité 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Dépend du service Mail (Item 4) |
+| **3** | **Item 6** | **Identité visuelle & Logo (Favicon, Header)** | Design / Personnalisation | ⏳ *À faire* | Paramètres de config |
+| **4** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
+| **5** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
+| — | **Item 1** | Frais de déplacement hybrides & gestion hors-zone | Tunnel / Tarification | ✅ **Terminé** | — |
 | — | **Item 3** | Page Vitrine par Défaut (Homepage Artisan) | Vitrine / Navigation | ✅ **Terminé** | — |
 | — | **Item 7** | Footer Complet & Mentions Légales | Légal / Footer | ✅ **Terminé** | — |
 | — | **Item 8** | Dette Technique & Harmonisation Styles SCSS | Qualité Code / SCSS | ✅ **Terminé** | — |

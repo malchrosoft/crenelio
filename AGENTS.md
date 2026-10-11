@@ -22,6 +22,10 @@ Le schéma et les données sont montés en lecture seule dans `/docker-entrypoin
 - `sql/schema.sql` : **DDL pur** (création des tables `config`, `services`, `schedules`, `unavailabilities`, `appointments` et index).
 - `sql/seed_init.sql` : **DML socle applicatif** (clés indispensables de la table `config`, horaires hebdomadaires standards).
 - `sql/seed_test_data.sql` : **DML de test / démo** (prestations d'exemple, congés/indisponibilités de test, rendez-vous récents et à venir).
+- `sql/migrations/` : **Migrations idempotentes** à appliquer sur une base existante lorsqu'un item modifie le schéma. `schema.sql` reste la source de vérité : toute colonne ajoutée en migration doit y figurer également, sans quoi un `docker compose down -v` la ferait disparaître.
+  ```bash
+  docker compose exec -T db mysql -ucrenelio -pcrenelio_dev crenelio < sql/migrations/<fichier>.sql
+  ```
 
 **Commande de démarrage :**
 ```bash
@@ -73,6 +77,10 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
    ```bash
    npm run build
    ```
+   ⚠️ `vite build` ne contrôle pas les types (esbuild se contente de les effacer). Lancer en complément :
+   ```bash
+   npx tsc --noEmit
+   ```
    *(Le build génère les assets optimisés dans `api/public/assets/`)*.
 
 ---
@@ -121,7 +129,7 @@ Le fichier [`ROADMAP.md`](file:///Users/aymeric.malchrowicz/DEVELOPPEMENT/crenel
 
 ## 5. Règles de Validation avant Commit / PR
 Avant de finaliser toute modification :
-1. Vérifier que le build Vite s'exécute sans erreur : `npm run build`.
+1. Vérifier que le build Vite s'exécute sans erreur : `npm run build`, **et** que le typage est sain : `npx tsc --noEmit`.
 2. Vérifier l'absence de fichiers temporaires ou orphelins : `git status`.
 3. S'assurer que les identifiants et tokens secrets ne sont jamais commités.
 4. Mettre à jour `ROADMAP.md` si des fonctionnalités du backlog ont été complétées.
