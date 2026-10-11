@@ -50,7 +50,13 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 4. Notifications Email Modernes & Fichiers iCal (Client & Artisan)
+### 4. Notifications Email Modernes & Fichiers iCal (Client & Artisan) — ✅ Terminée
+- **Client SMTP natif `api/core/Mailer.php` :** socket, STARTTLS (587) ou TLS implicite (465), `AUTH LOGIN`, composition MIME `multipart/mixed` + `multipart/alternative` (texte & HTML) et pièce jointe. En-têtes encodés RFC 2047 avec repli des sujets longs.
+- **Identifiants hors base :** `SMTP_*`, `MAIL_FROM*`, `APP_URL` et `APP_TIMEZONE` lus uniquement dans `api/.env` (cf. `DEPLOYMENT.md`, étape 4b).
+- **Envoi non bloquant :** `api/core/Notifier.php` journalise en `pending` avant l'appel SMTP puis bascule en `sent` / `failed` ; une panne d'envoi ne fait jamais échouer une réservation enregistrée.
+- **Page publique `/rdv/:token` :** cible du lien de gestion envoyé au client, réutilisant la fiche de confirmation (consultation et annulation).
+- **IHM Pro :** bouton « Emails » sur chaque rendez-vous ouvrant le journal d'envoi (statut, destinataire, sujet, horodatage, motif d'échec) avec relance manuelle par type.
+- **Reste à faire :** notification d'annulation (client et artisan) — non couverte par cet item.
 - **Mécanisme d'envoi moderne & sécurisé :**
   - Intégration SMTP sécurisé (STARTTLS / TLS) ou API de messagerie moderne (ex: Brevo / Resend / Mailjet / Symfony Mailer).
   - Configuration sécurisée des identifiants SMTP via l'espace Pro / `.env`.
@@ -166,11 +172,11 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
 |---|---|---|---|---|---|
-| **1** | **Item 4** | **Notifications email, iCal & logs d'envoi IHM** | Communication / Traçabilité | ⏳ *À faire* | Configuration SMTP / Service Mail PHP |
-| **2** | **Item 12** | **Sécurité 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Dépend du service Mail (Item 4) |
-| **3** | **Item 6** | **Identité visuelle & Logo (Favicon, Header)** | Design / Personnalisation | ⏳ *À faire* | Paramètres de config |
-| **4** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
-| **5** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
+| **1** | **Item 12** | **Sécurité 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Service mail disponible (Item 4) ✅ |
+| **2** | **Item 6** | **Identité visuelle & Logo (Favicon, Header)** | Design / Personnalisation | ⏳ *À faire* | Paramètres de config |
+| **3** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
+| **4** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
+| — | **Item 4** | Notifications email, iCal & logs d'envoi IHM | Communication / Traçabilité | ✅ **Terminé** | — |
 | — | **Item 1** | Frais de déplacement hybrides & gestion hors-zone | Tunnel / Tarification | ✅ **Terminé** | — |
 | — | **Item 3** | Page Vitrine par Défaut (Homepage Artisan) | Vitrine / Navigation | ✅ **Terminé** | — |
 | — | **Item 7** | Footer Complet & Mentions Légales | Légal / Footer | ✅ **Terminé** | — |

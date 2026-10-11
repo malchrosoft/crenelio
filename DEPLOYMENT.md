@@ -78,9 +78,45 @@ DB_USER=your-db-user
 DB_PASS=your-db-password
 APP_ENV=production
 CORS_ORIGIN=https://your-domain.com
+
+# Public site URL — used to build the appointment management link sent by email
+APP_URL=https://your-domain.com
+# Artisan reference timezone: stored datetimes and .ics files are interpreted here
+APP_TIMEZONE=Europe/Paris
 ```
 
 Alternatively, edit `api/config/config.php` directly and hardcode the values (less ideal but works on shared hosting where `.env` parsing might need adjustments).
+
+---
+
+## Step 4b: Configure Email Sending (SMTP)
+
+Confirmation emails (client) and intervention sheets with an `.ics` attachment
+(artisan) go out through a native SMTP client — no Composer dependency. Add the
+following to the same `api/.env` file:
+
+```env
+SMTP_HOST=ssl0.ovh.net
+SMTP_PORT=587
+SMTP_USER=contact@your-domain.com
+SMTP_PASS=your-mailbox-password
+# starttls (port 587, recommended), tls (port 465, implicit TLS) or none
+SMTP_SECURE=starttls
+MAIL_FROM=contact@your-domain.com
+MAIL_FROM_NAME=Your Company Name
+```
+
+Notes:
+
+- **Credentials never live in the database.** They are read from `.env` only, so
+  the Pro area cannot leak them and they are not part of any backup dump.
+- `MAIL_FROM` should be a mailbox belonging to your domain — sending as a
+  third-party address (gmail.com, etc.) gets rejected by SPF/DKIM checks.
+- Leaving `SMTP_HOST` or `MAIL_FROM` empty disables sending. Bookings still
+  succeed: every attempt is logged in `appointment_notifications` with an
+  explicit `failed` status, visible from the Pro planning ("Emails" button).
+- A failed send never breaks a booking. Use the "Renvoyer" buttons in the
+  notification log to retry once the SMTP settings are fixed.
 
 ---
 

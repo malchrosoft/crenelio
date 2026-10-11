@@ -111,12 +111,31 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
   - `api/core/Database.php` : Singleton PDO avec requêtes préparées systématiques.
   - `api/core/Router.php` : Moteur de routes regex supportant les paramètres nommés (`:id`, `:token`, `:day`).
   - `api/core/Response.php` : Réponses JSON standardisées et gestion CORS.
+  - `api/core/TravelFee.php` : Distance géodésique (Haversine), paliers kilométriques et détection du hors-zone.
+  - `api/core/Mailer.php` : Client SMTP natif (socket, STARTTLS / TLS implicite, AUTH LOGIN) et composition MIME multipart.
+  - `api/core/ICalendar.php` : Génération du `.ics` (RFC 5545) joint à l'email de l'artisan.
+  - `api/core/EmailTemplates.php` : Gabarits HTML et texte des emails. Les styles y sont **volontairement en ligne** : les clients de messagerie ignorent les feuilles de style externes. La règle « pas de style inline » ne vaut que pour le front React.
+  - `api/core/Notifier.php` : Orchestration des envois. Journalise en `pending` *avant* d'appeler le SMTP, puis bascule en `sent` / `failed`. **Ne propage jamais d'exception** : une panne d'envoi ne doit pas faire échouer une réservation déjà enregistrée.
 - **Modèles & Contrôleurs :**
   - `Config` / `ConfigController` : Stockage clé-valeur pour les paramètres artisans et login admin.
   - `Service` / `ServiceController` : CRUD des prestations.
   - `Schedule` / `ScheduleController` : Horaires d'ouverture hebdomadaires et indisponibilités.
   - `SlotController` : Moteur de calcul en direct des créneaux disponibles selon durée et buffers.
-  - `Appointment` / `AppointmentController` : Réservation, annulation par token, changement de statut.
+  - `Appointment` / `AppointmentController` : Réservation, annulation par token, changement de statut, reprogrammation, journal des notifications.
+  - `Notification` : Journal `appointment_notifications` (une ligne par tentative d'envoi, consultable depuis l'IHM Pro).
+  - `TravelFeeController` : Devis public de frais de déplacement (`POST /travel-fee/quote`).
+
+### Envoi d'emails en développement local
+Les identifiants SMTP sont lus **exclusivement** depuis `api/.env` (`SMTP_HOST`, `SMTP_PORT`,
+`SMTP_USER`, `SMTP_PASS`, `SMTP_SECURE`, `MAIL_FROM`, `MAIL_FROM_NAME`, plus `APP_URL` pour le
+lien de gestion client). Rien n'est stocké en base.
+
+Sans `SMTP_HOST`, l'envoi est désactivé : les réservations aboutissent normalement et chaque
+tentative est journalisée en `failed` avec un motif explicite, visible via le bouton « Emails »
+du planning Pro. C'est le comportement par défaut en local.
+
+Pour vérifier réellement un envoi sans écrire à une vraie adresse, viser un serveur SMTP de
+capture (Mailpit, MailHog ou un script de test jetable) via les variables d'environnement.
 
 ---
 

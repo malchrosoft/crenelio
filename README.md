@@ -35,7 +35,8 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 - **Pied de page & Mentions légales** : informations légales obligatoires et modale dédiée pré-configurée.
 
 ### Espace Professionnel / Administration
-- **Authentification sécurisée & 2FA** : mot de passe fort (hachage Bcrypt) et double authentification par code OTP temporaire à 6 chiffres par email (valide 15 min), avec mémorisation des appareils de confiance pendant 10 jours.
+- **Authentification sécurisée** : mot de passe fort (hachage Bcrypt).
+- **Double authentification (2FA)** — 🚧 *en cours de développement* : code OTP temporaire à 6 chiffres par email (valide 15 min), avec mémorisation des appareils de confiance pendant 10 jours.
 - **Planning des interventions** : suivi des rendez-vous par statut (`confirmed`, `completed`, `cancelled`, `pending`) avec coordonnées client et notes d'accès.
 - **Gestion du catalogue de prestations** : ajout, édition inline, descriptif d'intervention, prix, durée et suppression protégée.
 - **Configuration dynamique en base de données** : nom d'entreprise, coordonnées de contact, zone de chalandise, coordonnées GPS et zoom par défaut de la carte.
@@ -88,6 +89,66 @@ npm run build
 
 Le bundle optimisé est généré directement dans `api/public/assets/`, prêt à être distribué par le serveur web.
 
+> `vite build` ne contrôle pas les types (esbuild se contente de les effacer).
+> Lancer `npx tsc --noEmit` en complément avant tout commit.
+
+---
+
+## Configuration (`api/.env`)
+
+Le backend lit sa configuration depuis `api/.env` (gabarit : `api/.env.example`), avec repli sur
+les variables d'environnement du serveur. **Aucun secret n'est stocké en base de données.**
+
+```env
+# -------------------------------------------------------------------
+# Base de données
+# -------------------------------------------------------------------
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=crenelio
+DB_USER=crenelio
+DB_PASS=
+DB_CHARSET=utf8mb4
+
+# -------------------------------------------------------------------
+# Application
+# -------------------------------------------------------------------
+APP_ENV=development            # development | production
+CORS_ORIGIN=*                  # en production : https://votre-domaine.com
+# URL publique du site — sert à construire le lien de gestion envoyé au client
+APP_URL=https://votre-domaine.com
+# Fuseau de référence de l'artisan : les datetimes stockés en base et les
+# fichiers .ics s'interprètent dans ce fuseau
+APP_TIMEZONE=Europe/Paris
+
+# -------------------------------------------------------------------
+# Envoi d'emails (SMTP)
+# -------------------------------------------------------------------
+SMTP_HOST=ssl0.ovh.net
+SMTP_PORT=587
+SMTP_USER=contact@votre-domaine.com
+SMTP_PASS=
+SMTP_SECURE=starttls           # starttls (587) | tls (465, implicite) | none
+MAIL_FROM=contact@votre-domaine.com
+MAIL_FROM_NAME=Crénelio
+```
+
+| Variable | Défaut | Rôle |
+|---|---|---|
+| `DB_HOST` / `DB_PORT` / `DB_NAME` / `DB_USER` / `DB_PASS` | `localhost` / `3306` / — | Connexion MySQL (PDO) |
+| `APP_ENV` | `production` | `development` active l'affichage des erreurs PHP |
+| `CORS_ORIGIN` | `*` | Origine autorisée ; à restreindre au domaine en production |
+| `APP_URL` | *(vide)* | Base du lien `/rdv/:token` envoyé au client. Vide ⇒ l'email affiche le téléphone à la place |
+| `APP_TIMEZONE` | `Europe/Paris` | Fuseau d'interprétation des créneaux et des fichiers `.ics` |
+| `SMTP_HOST` / `SMTP_PORT` | *(vide)* / `587` | Serveur d'envoi. **Vide ⇒ envoi désactivé** |
+| `SMTP_USER` / `SMTP_PASS` | *(vide)* | Identifiants `AUTH LOGIN` ; laisser vide pour un relais sans authentification |
+| `SMTP_SECURE` | `starttls` | `starttls` (587), `tls` (465, TLS implicite) ou `none` |
+| `MAIL_FROM` / `MAIL_FROM_NAME` | *(vide)* / `Crénelio` | Expéditeur. Doit appartenir au domaine, sinon rejet SPF/DKIM |
+
+**Sans `SMTP_HOST` ou `MAIL_FROM`, l'envoi est simplement désactivé** : les réservations
+aboutissent normalement et chaque tentative est journalisée en `failed` avec un motif explicite,
+consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relançable manuellement.
+
 ---
 
 ## Endpoints de l'API REST (`/api`)
@@ -108,6 +169,7 @@ Le bundle optimisé est généré directement dans `api/public/assets/`, prêt �
 | `PUT` | `/api/services/:id` | Modifier une prestation |
 | `DELETE` | `/api/services/:id` | Supprimer une prestation |
 | `GET` | `/api/slots?service_id=1&date=YYYY-MM-DD` | Calcul temps réel des créneaux libres |
+| `POST` | `/api/travel-fee/quote` | Devis des frais de déplacement pour une prestation et une adresse géocodée |
 
 ### Horaires & Disponibilités
 | Méthode | Route | Description |
@@ -125,7 +187,11 @@ Le bundle optimisé est généré directement dans `api/public/assets/`, prêt �
 | `POST` | `/api/appointments` | Réservation d'un créneau (client) |
 | `GET` | `/api/appointments/token/:token` | Consultation d'un rendez-vous via son token |
 | `POST` | `/api/appointments/token/:token/cancel` | Annulation d'un rendez-vous par le client |
+| `GET` | `/api/appointments/:id` | Détail d'un rendez-vous (espace pro) |
 | `PUT` | `/api/appointments/:id/status` | Modification du statut (confirmed, completed, cancelled) |
+| `PUT` | `/api/appointments/:id/reschedule` | Reprogrammation (l'heure de fin suit la durée de la prestation) |
+| `GET` | `/api/appointments/:id/notifications` | Journal des emails envoyés pour ce rendez-vous |
+| `POST` | `/api/appointments/:id/notifications/resend` | Relance manuelle d'un email (`client_confirmation` ou `pro_confirmation`) |
 
 ---
 

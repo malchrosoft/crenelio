@@ -2,15 +2,36 @@
 
 **Date :** 11 Octobre 2026
 **Dépôt :** `/Users/aymeric.malchrowicz/DEVELOPPEMENT/crenelio`
-**Dernier commit de référence :** `f3a1eb2` (`main`) — *Item 13 : recherche, filtres, RDV échus, reprogrammation*
-**Travaux en cours (non commités) :** Item 1 — Frais de déplacement hybrides & gestion hors-zone.
+**Dernier commit de référence :** `c1f5e38` (`main`, poussé) — *Item 1 : frais de déplacement hybrides*
+**Travaux en cours (non commités) :** Item 4 — Notifications email, iCal & journal d'envoi.
 
 ---
 
 ## 1. Ce qui est réellement achevé
 
 - **Item 13 (Recherche, filtres, RDV échus & reprogrammation) :** ✅ terminé et commité (`f3a1eb2`).
-- **Item 1 (Frais de déplacement hybrides & hors-zone) :** ✅ implémenté et vérifié, **pas encore commité**.
+- **Item 1 (Frais de déplacement hybrides & hors-zone) :** ✅ terminé, commité et poussé (`cb9c0df` / `c1f5e38`).
+- **Item 4 (Notifications email, iCal & journal d'envoi) :** ✅ implémenté et vérifié, **pas encore commité**.
+
+### Détail de l'Item 4
+- **`api/core/Mailer.php`** : client SMTP natif (socket, STARTTLS 587 ou TLS implicite 465,
+  `AUTH LOGIN`), MIME `multipart/mixed` > `multipart/alternative` (texte + HTML) + pièce jointe,
+  en-têtes RFC 2047 avec repli des sujets longs (toutes les lignes d'en-tête restent ≤ 78 caractères).
+- **`api/core/ICalendar.php`** : `.ics` RFC 5545, créneau élargi du `buffer_minutes` de trajet,
+  lieu, coordonnées client et notes d'accès, pliage de lignes à 75 octets sans casser l'UTF-8.
+- **`api/core/EmailTemplates.php`** : gabarits responsive (tableaux, styles en ligne — seule mise en
+  forme fiable en email) et alternative texte brut pour la délivrabilité.
+- **`api/core/Notifier.php`** : journalise en `pending` *avant* l'appel SMTP, bascule en `sent` /
+  `failed`, n'émet aucune exception vers le contrôleur.
+- **Endpoints** : `GET /appointments/:id/notifications` et `POST /appointments/:id/notifications/resend`.
+- **Page publique `/rdv/:token`** (`AppointmentManagePage.tsx`) : cible du lien de gestion envoyé au
+  client, réutilise `BookingConfirmation` via la prop `showNewBooking`.
+- **IHM Pro** : bouton « Emails » par rendez-vous ouvrant le journal (statut coloré, destinataire,
+  sujet, horodatage, motif d'échec) avec relance manuelle par type.
+- **Secrets** : `SMTP_*`, `MAIL_FROM*`, `APP_URL`, `APP_TIMEZONE` lus uniquement dans `api/.env`.
+  ⚠️ **Ces clés ne sont pas encore renseignées** : en local comme en prod, tant que `SMTP_HOST` est
+  vide, les envois sont journalisés en `failed` (« Envoi d'emails non configuré ») sans jamais
+  bloquer une réservation. Voir `DEPLOYMENT.md`, étape 4b.
 
 ### Détail de l'Item 1
 - **Moteur `api/core/TravelFee.php`** : distance géodésique (Haversine) entre `config.default_latitude/longitude`
@@ -39,11 +60,14 @@
 | `services` | `travel_fee_mode`, `travel_fee_amount` | ✅ en base **et** dans `sql/schema.sql` |
 | `appointments` | `travel_fee`, `distance_km`, `is_out_of_zone` | ✅ en base **et** dans `sql/schema.sql` |
 | `config` | `travel_tier_{1,2,3}_max_km`, `travel_tier_{1,2,3}_fee`, `travel_max_km` | ✅ en base **et** dans `sql/seed_init.sql` |
+| `appointment_notifications` | table complète (Item 4), `ON DELETE CASCADE` depuis `appointments` | ✅ en base **et** dans `sql/schema.sql` |
 
-- Migration idempotente disponible : `sql/migrations/2026-10-11_item1_travel_fees.sql` (déjà appliquée en dev).
+- Migrations idempotentes disponibles, déjà appliquées en dev :
+  `sql/migrations/2026-10-11_item1_travel_fees.sql` et `sql/migrations/2026-10-11_item4_notifications.sql`.
 - Reproductibilité vérifiée : `schema.sql` + `seed_init.sql` + `seed_test_data.sql` rejoués sur une base
   vierge produisent 33 clés de config et les 4 prestations de démo avec leurs modes de déplacement.
-- ⚠️ `appointments` n'a toujours **ni** table `appointment_notifications`, **ni** colonne de statut d'envoi (Item 4).
+- Reproductibilité revérifiée après l'Item 4 : les 6 tables et les 33 clés de config sont recréées
+  à l'identique sur une base vierge.
 
 ### Écarts corrigés au passage
 La base dev avait dérivé des fichiers `sql/` : colonnes `travel_fee_*` présentes en base mais absentes de
@@ -54,15 +78,20 @@ Les deux sens ont été réalignés.
 
 ## 3. Prochain chantier prioritaire
 
-### 🎯 Item 4 — Notifications email, iCal & logs d'envoi IHM
-1. Service d'envoi PHP (SMTP STARTTLS/TLS ou API Brevo / Resend / Mailjet), identifiants via `api/.env`.
-2. Table `appointment_notifications` (`id`, `appointment_id`, `recipient`, `subject`, `status
-   pending|sent|failed`, `sent_at`, `error_message`) — à ajouter dans `schema.sql` **et** en migration.
-3. Email client (template HTML responsive, lien de gestion/annulation) et email artisan avec pièce
-   jointe `.ics` (adresse, `tel:` cliquable, notes d'accès).
-4. Consultation des logs d'envoi par rendez-vous depuis le planning Pro.
+### 🎯 Item 12 — Sécurité 2FA Espace Pro (OTP email, appareil de confiance 10 jours)
+Le service mail de l'Item 4 est en place, la dépendance est levée.
+1. Étape 1 : vérification du mot de passe admin (Bcrypt, déjà en place).
+2. Étape 2 : jeton d'appareil signé (`device_token`) valable 10 jours, stocké côté client.
+3. Étape 3 : OTP à 6 chiffres (`random_int`), 15 min de validité, 3 tentatives, envoyé à `pro_email`
+   via `Notifier` / `Mailer`.
 
-Item 12 (2FA email OTP) dépend du service mail de l'Item 4.
+À noter pour cet item : le token d'administration actuel reste faible
+(`sha256(mot de passe + nom de base + date du jour)`, cf. `ConfigController::login`), et les
+routes `/admin/*` ne le vérifient pas côté serveur. À reprendre avec la 2FA.
+
+### Reliquat connu de l'Item 4
+Aucune notification n'est envoyée lors d'une **annulation** (ni au client, ni à l'artisan).
+L'énumération `appointment_notifications.type` devra être étendue le moment venu.
 
 ---
 
