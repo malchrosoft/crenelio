@@ -126,4 +126,15 @@ class Appointment
             [$status, $reason, $id]
         ) > 0;
     }
+
+    /**
+     * Reschedule an appointment (change start and end datetime).
+     */
+    public static function reschedule(int $id, string $startDatetime, string $endDatetime): bool
+    {
+        return Database::execute(
+            'UPDATE `appointments` SET start_datetime = ?, end_datetime = ? WHERE id = ?',
+            [$startDatetime, $endDatetime, $id]
+        ) > 0;
+    }
 }

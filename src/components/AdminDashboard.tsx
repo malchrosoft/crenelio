@@ -1,9 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import clsx from 'clsx';
-import { ClockIcon, CurrencyEurIcon } from '@phosphor-icons/react';
+import {
+  ClockIcon,
+  CurrencyEurIcon,
+  MagnifyingGlassIcon,
+  WarningCircleIcon,
+  CalendarBlankIcon,
+  XIcon,
+} from '@phosphor-icons/react';
 import { api } from '../api';
 import { Appointment, Service, AppConfig } from '../types';
-import { format } from 'date-fns';
+import { format, isPast, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 interface AdminDashboardProps {
@@ -20,6 +27,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
   const [config, setConfig] = useState<AppConfig>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'appointments' | 'services' | 'settings'>('appointments');
+
+  // Recherche & Filtres planning
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled'>('all');
+  const [timeFilter, setTimeFilter] = useState<'all' | 'upcoming' | 'today' | 'overdue' | 'past'>('all');
+
+  // Reprogrammation de rendez-vous (champ datetime-local unique)
+  const [reschedulingAppointment, setReschedulingAppointment] = useState<Appointment | null>(null);
+  const [rescheduleDatetime, setRescheduleDatetime] = useState('');
+  const [rescheduleLoading, setRescheduleLoading] = useState(false);
 
   // Nouvelle prestation
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -44,16 +61,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
     }
   }, [isAuthenticated]);
 
-  // Fermeture de la pop-up sur Echap
+  // Fermeture des pop-ups sur Echap
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isAddModalOpen) {
-        setIsAddModalOpen(false);
+      if (e.key === 'Escape') {
+        if (isAddModalOpen) setIsAddModalOpen(false);
+        if (reschedulingAppointment) setReschedulingAppointment(null);
       }
     };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
-  }, [isAddModalOpen]);
+  }, [isAddModalOpen, reschedulingAppointment]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -97,6 +115,82 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
       alert(err instanceof Error ? err.message : 'Erreur lors de la mise à jour');
     }
   }
+
+  function startReschedule(appointment: Appointment) {
+    setReschedulingAppointment(appointment);
+    const dateObj = new Date(appointment.start_datetime);
+    // Format YYYY-MM-DDTHH:mm pour input datetime-local
+    setRescheduleDatetime(format(dateObj, "yyyy-MM-dd'T'HH:mm"));
+  }
+
+  async function handleRescheduleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!reschedulingAppointment) return;
+    setRescheduleLoading(true);
+    try {
+      // Conversion de YYYY-MM-DDTHH:mm en YYYY-MM-DD HH:mm:00
+      const formattedDatetime = rescheduleDatetime.replace('T', ' ') + ':00';
+      const updated = await api.rescheduleAppointment(reschedulingAppointment.id, formattedDatetime, 'confirmed');
+      setAppointments((prev) =>
+        prev.map((a) => (a.id === reschedulingAppointment.id ? { ...a, ...updated } : a))
+      );
+      setReschedulingAppointment(null);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Erreur lors du déplacement du rendez-vous');
+    } finally {
+      setRescheduleLoading(false);
+    }
+  }
+
+  // Filtrage et détection des rendez-vous échus
+  const filteredAppointments = useMemo(() => {
+    return appointments.filter((a) => {
+      // 1. Filtre par recherche textuelle
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchName = a.client_name.toLowerCase().includes(q);
+        const matchPhone = a.client_phone.toLowerCase().includes(q);
+        const matchEmail = a.client_email.toLowerCase().includes(q);
+        const matchService = a.service_name.toLowerCase().includes(q);
+        const matchCity = a.city.toLowerCase().includes(q);
+        const matchAddress = a.address.toLowerCase().includes(q);
+        if (!matchName && !matchPhone && !matchEmail && !matchService && !matchCity && !matchAddress) {
+          return false;
+        }
+      }
+
+      // 2. Filtre par statut
+      if (statusFilter !== 'all' && a.status !== statusFilter) {
+        return false;
+      }
+
+      // 3. Filtre temporel
+      const startDate = parseISO(a.start_datetime);
+      const isAppointmentPast = isPast(startDate) && !isToday(startDate);
+      const isAppointmentToday = isToday(startDate);
+      const isOverdue = isAppointmentPast && (a.status === 'confirmed' || a.status === 'pending');
+
+      if (timeFilter === 'upcoming') {
+        if (isAppointmentPast) return false;
+      } else if (timeFilter === 'today') {
+        if (!isAppointmentToday) return false;
+      } else if (timeFilter === 'overdue') {
+        if (!isOverdue) return false;
+      } else if (timeFilter === 'past') {
+        if (!isAppointmentPast) return false;
+      }
+
+      return true;
+    });
+  }, [appointments, searchQuery, statusFilter, timeFilter]);
+
+  // Nombre de rendez-vous échus non honorés
+  const overdueCount = useMemo(() => {
+    return appointments.filter((a) => {
+      const startDate = parseISO(a.start_datetime);
+      return isPast(startDate) && !isToday(startDate) && (a.status === 'confirmed' || a.status === 'pending');
+    }).length;
+  }, [appointments]);
 
   async function handleAddService(e: React.FormEvent) {
     e.preventDefault();
@@ -264,9 +358,92 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
         <p>Chargement des données...</p>
       ) : activeTab === 'appointments' ? (
         <div>
-          {appointments.length === 0 ? (
+          {/* ── Barre de recherche et filtres multi-critères ── */}
+          <div className="admin-filters-bar">
+            <div className="admin-search-wrapper">
+              <MagnifyingGlassIcon size={18} weight="bold" className="admin-search-icon" aria-hidden="true" />
+              <input
+                type="text"
+                className="form-input admin-search-input"
+                placeholder="Rechercher par client, téléphone, email, prestation, adresse, ville…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className="admin-search-clear"
+                  onClick={() => setSearchQuery('')}
+                  aria-label="Effacer la recherche"
+                >
+                  <XIcon size={16} weight="bold" />
+                </button>
+              )}
+            </div>
+
+            <div className="admin-filters-groups">
+              <div className="admin-filter-pills" role="radiogroup" aria-label="Filtre de statut">
+                <button
+                  type="button"
+                  className={clsx('admin-pill-btn', { 'admin-pill-btn--active': statusFilter === 'all' })}
+                  onClick={() => setStatusFilter('all')}
+                >
+                  Tous ({appointments.length})
+                </button>
+                <button
+                  type="button"
+                  className={clsx('admin-pill-btn', { 'admin-pill-btn--active': statusFilter === 'confirmed' })}
+                  onClick={() => setStatusFilter('confirmed')}
+                >
+                  Confirmés
+                </button>
+                <button
+                  type="button"
+                  className={clsx('admin-pill-btn', { 'admin-pill-btn--active': statusFilter === 'pending' })}
+                  onClick={() => setStatusFilter('pending')}
+                >
+                  En attente
+                </button>
+                <button
+                  type="button"
+                  className={clsx('admin-pill-btn', { 'admin-pill-btn--active': statusFilter === 'completed' })}
+                  onClick={() => setStatusFilter('completed')}
+                >
+                  Terminés
+                </button>
+                <button
+                  type="button"
+                  className={clsx('admin-pill-btn', { 'admin-pill-btn--active': statusFilter === 'cancelled' })}
+                  onClick={() => setStatusFilter('cancelled')}
+                >
+                  Annulés
+                </button>
+              </div>
+
+              <div>
+                <select
+                  className="admin-time-select"
+                  value={timeFilter}
+                  onChange={(e) => setTimeFilter(e.target.value as typeof timeFilter)}
+                  aria-label="Filtre temporel"
+                >
+                  <option value="all">Toutes dates</option>
+                  <option value="upcoming">À venir</option>
+                  <option value="today">Aujourd'hui</option>
+                  <option value="overdue">
+                    Échus non clôturés {overdueCount > 0 ? `(${overdueCount})` : ''}
+                  </option>
+                  <option value="past">Historique passé</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {filteredAppointments.length === 0 ? (
             <p className="admin-empty-state">
-              Aucun rendez-vous enregistré pour le moment.
+              {appointments.length === 0
+                ? 'Aucun rendez-vous enregistré pour le moment.'
+                : 'Aucun rendez-vous ne correspond aux critères de recherche.'}
             </p>
           ) : (
             <table className="data-table">
@@ -281,12 +458,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                 </tr>
               </thead>
               <tbody>
-                {appointments.map((a) => {
-                  const startObj = new Date(a.start_datetime);
+                {filteredAppointments.map((a) => {
+                  const startObj = parseISO(a.start_datetime);
                   const dateStr = format(startObj, 'dd/MM/yyyy HH:mm', { locale: fr });
+                  const isAppointmentPast = isPast(startObj) && !isToday(startObj);
+                  const isOverdue = isAppointmentPast && (a.status === 'confirmed' || a.status === 'pending');
+
                   return (
-                    <tr key={a.id}>
-                      <td className="admin-row-date">{dateStr}</td>
+                    <tr
+                      key={a.id}
+                      className={clsx({ 'admin-row-overdue': isOverdue })}
+                    >
+                      <td className="admin-row-date">
+                        <div>{dateStr}</div>
+                        {isOverdue && (
+                          <span className="badge-overdue" title="Rendez-vous arrivé à échéance et non clôturé">
+                            <WarningCircleIcon size={13} weight="fill" />
+                            Échu à traiter
+                          </span>
+                        )}
+                      </td>
                       <td>{a.service_name}</td>
                       <td>
                         <strong>{a.client_name}</strong>
@@ -304,22 +495,94 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                         <span className={`status-badge status-${a.status}`}>{a.status}</span>
                       </td>
                       <td>
-                        <select
-                          className="form-input admin-status-select"
-                          value={a.status}
-                          onChange={(e) => handleStatusChange(a.id, e.target.value)}
-                        >
-                          <option value="pending">En attente</option>
-                          <option value="confirmed">Confirmé</option>
-                          <option value="completed">Terminé</option>
-                          <option value="cancelled">Annulé</option>
-                        </select>
+                        <div className="admin-table-actions">
+                          <select
+                            className="form-input admin-status-select"
+                            value={a.status}
+                            onChange={(e) => handleStatusChange(a.id, e.target.value)}
+                          >
+                            <option value="pending">En attente</option>
+                            <option value="confirmed">Confirmé</option>
+                            <option value="completed">Terminé</option>
+                            <option value="cancelled">Annulé</option>
+                          </select>
+                          <button
+                            type="button"
+                            className="btn btn-secondary admin-btn-reschedule"
+                            onClick={() => startReschedule(a)}
+                            title="Déplacer ou reprogrammer la date/heure de l'intervention"
+                          >
+                            <CalendarBlankIcon size={14} weight="bold" />
+                            Reprogrammer
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
+          )}
+
+          {/* ── Pop-up / Modale de reprogrammation (champ unique datetime-local) ── */}
+          {reschedulingAppointment && (
+            <div
+              className="admin-modal-overlay"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="reschedule-modal-title"
+              onClick={() => setReschedulingAppointment(null)}
+            >
+              <div
+                className="admin-modal"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="admin-modal__header">
+                  <h3 className="admin-modal__title" id="reschedule-modal-title">
+                    Reprogrammer l'intervention #{reschedulingAppointment.id}
+                  </h3>
+                  <button
+                    className="admin-modal__close"
+                    onClick={() => setReschedulingAppointment(null)}
+                    aria-label="Fermer"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <form onSubmit={handleRescheduleSubmit} className="admin-modal__body">
+                  <p className="admin-modal-hint">
+                    Client : <strong>{reschedulingAppointment.client_name}</strong> ({reschedulingAppointment.service_name})
+                  </p>
+                  <div className="form-group">
+                    <label className="form-label">Nouvelle date et heure d'intervention *</label>
+                    <input
+                      type="datetime-local"
+                      className="form-input"
+                      required
+                      value={rescheduleDatetime}
+                      onChange={(e) => setRescheduleDatetime(e.target.value)}
+                    />
+                  </div>
+                  <div className="admin-modal__actions">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setReschedulingAppointment(null)}
+                      disabled={rescheduleLoading}
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={rescheduleLoading}
+                    >
+                      {rescheduleLoading ? 'Mise à jour…' : 'Enregistrer la nouvelle date'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
           )}
         </div>
       ) : (

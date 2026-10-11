@@ -141,32 +141,38 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 13. Gestion Avancée du Planning, Recherche & Suivi des Rendez-vous Échus
+### 13. Gestion Avancée du Planning, Recherche & Suivi des Rendez-vous Échus — ✅ Terminée
 - **Outil de recherche & filtrage multi-critères :**
-  - Barre de recherche textuelle rapide (nom client, téléphone, email, ville, prestation).
-  - Filtres par statut (`Tous`, `En attente`, `Confirmés`, `Terminés`, `Annulés`).
-  - Filtre temporel : *À venir*, *Aujourd'hui*, *Échus / Passés*.
+  - Barre de recherche textuelle instantanée (nom client, téléphone, email, prestation, adresse, ville).
+  - Filtres par statut (`Tous`, `Confirmés`, `En attente`, `Terminés`, `Annulés`).
+  - Filtre temporel : *Toutes dates*, *À venir*, *Aujourd'hui*, *Échus non clôturés*, *Historique passé*.
 - **Détection & Traitement visuel des rendez-vous échus non honorés :**
   - Les rendez-vous passés sans statut `completed` ou `cancelled` restent visibles dans la liste.
   - **Mise en valeur visuelle différenciée :**
-    - Couleur d'arrière-plan d'alerte douce (`$warning-light` ou `$danger-light`).
-    - Badge / Icône d'alerte spécifique (`WarningIcon` / `ClockCountdownIcon`) signalant le retard / non-clôture.
+    - Couleur d'arrière-plan d'attention ambrée dédiée (`.admin-row-overdue`).
+    - Badge d'alerte spécifique (`WarningCircleIcon`) signalant « Échu à traiter ».
+- **Action de report / reprogrammation rapide :**
+  - Bouton d'action « Reprogrammer » sur chaque ligne de rendez-vous.
+  - Modale dédiée avec champ unique ergonomique HTML5 `datetime-local`.
+  - Endpoint API `PUT /appointments/:id/reschedule` recalculant automatiquement l'heure de fin selon la durée de la prestation.
+
 ---
 
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
 |---|---|---|---|---|---|
-| **1** | **Item 13** | **Recherche, filtres, RDV échus & reprogrammation** | Espace Pro / Planning | ⏳ *À faire* | Indépendant (Améliore immédiatement l'existant) |
-| **2** | **Item 1** | **Frais de déplacement hybrides & gestion hors-zone** | Tunnel / Tarification | ⏳ *À faire* | Coordonnées GPS BAN déjà en place |
-| **3** | **Item 4** | **Notifications email, iCal & logs d'envoi IHM** | Communication / Traçabilité | ⏳ *À faire* | Configuration SMTP / Service Mail PHP |
-| **4** | **Item 12** | **Sécurité 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Dépend du service Mail (Item 4) |
-| **5** | **Item 6** | **Identité visuelle & Logo (Favicon, Header)** | Design / Personnalisation | ⏳ *À faire* | Paramètres de config |
-| **6** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
-| **7** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
+| **1** | **Item 1** | **Frais de déplacement hybrides & gestion hors-zone** | Tunnel / Tarification | ⏳ *À faire* | Coordonnées GPS BAN déjà en place |
+| **2** | **Item 4** | **Notifications email, iCal & logs d'envoi IHM** | Communication / Traçabilité | ⏳ *À faire* | Configuration SMTP / Service Mail PHP |
+| **3** | **Item 12** | **Sécurité 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Dépend du service Mail (Item 4) |
+| **4** | **Item 6** | **Identité visuelle & Logo (Favicon, Header)** | Design / Personnalisation | ⏳ *À faire* | Paramètres de config |
+| **5** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
+| **6** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
 | — | **Item 3** | Page Vitrine par Défaut (Homepage Artisan) | Vitrine / Navigation | ✅ **Terminé** | — |
 | — | **Item 7** | Footer Complet & Mentions Légales | Légal / Footer | ✅ **Terminé** | — |
 | — | **Item 8** | Dette Technique & Harmonisation Styles SCSS | Qualité Code / SCSS | ✅ **Terminé** | — |
 | — | **Item 9** | Modernisation Sass (Dart Sass Modern Compiler) | Outillage / Build | ✅ **Terminé** | — |
 | — | **Item 10**| Gestion Propre des Classes Conditionnelles (`clsx`) | Qualité Code / React | ✅ **Terminé** | — |
 | — | **Item 11**| Gestion des Prestations (Création pop-up, Édition, Delete)| Espace Pro / Catalogue | ✅ **Terminé** | — |
+| — | **Item 13**| Recherche, filtres, RDV échus & reprogrammation datetime | Espace Pro / Planning | ✅ **Terminé** | — |
+

@@ -701,6 +701,142 @@
   width: auto;
 }
 
+/* Filtres et Recherche de rendez-vous */
+.admin-filters-bar {
+  background: $gray-50;
+  border: 1px solid $gray-200;
+  border-radius: $radius;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-search-wrapper {
+  position: relative;
+  width: 100%;
+
+  .admin-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $gray-400;
+  }
+
+  .admin-search-input {
+    padding-left: 38px;
+    padding-right: 36px;
+  }
+
+  .admin-search-clear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: $gray-400;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 4px;
+
+    &:hover {
+      color: $gray-700;
+    }
+  }
+}
+
+.admin-filters-groups {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.admin-pill-btn {
+  padding: 5px 12px;
+  border-radius: $radius-full;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid $gray-300;
+  background: white;
+  color: $gray-600;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+
+  &--active {
+    background: $primary;
+    border-color: $primary;
+    color: white;
+    font-weight: 600;
+
+    &:hover {
+      background: $primary-hover;
+      color: white;
+    }
+  }
+}
+
+.admin-time-select {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  border: 1px solid $gray-300;
+  background: white;
+  color: $gray-700;
+  cursor: pointer;
+}
+
+/* Lignes de rendez-vous échus */
+.admin-row-overdue {
+  background-color: rgba(234, 88, 12, 0.08) !important;
+
+  &:hover {
+    background-color: rgba(234, 88, 12, 0.14) !important;
+  }
+}
+
+.badge-overdue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: $radius-full;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: $warning-light;
+  color: $warning;
+  margin-top: 4px;
+}
+
+.admin-table-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-btn-reschedule {
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .admin-section-title {
   font-size: 1.1rem;
   margin-bottom: 12px;

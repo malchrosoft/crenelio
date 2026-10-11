@@ -171,4 +171,48 @@ class AppointmentController
 
         Response::json(Appointment::find($id));
     }
+
+    /**
+     * PUT /appointments/:id/reschedule — Reprogrammation de la date et l'heure par le pro.
+     */
+    public function reschedule(array $params): void
+    {
+        $id = (int)($params['id'] ?? 0);
+        $appointment = Appointment::find($id);
+
+        if (!$appointment) {
+            Response::json(['error' => 'Rendez-vous non trouvé'], 404);
+        }
+
+        $body = Response::body();
+        $startDatetime = $body['start_datetime'] ?? '';
+
+        if (empty($startDatetime)) {
+            Response::json(['error' => 'Nouvelle date et heure requises'], 400);
+        }
+
+        $startTime = strtotime($startDatetime);
+        if (!$startTime) {
+            Response::json(['error' => 'Format de date invalide'], 400);
+        }
+
+        // Calcul de la nouvelle heure de fin selon la durée de la prestation
+        $service = Service::find((int)$appointment['service_id']);
+        $durationMinutes = $service ? (int)$service['duration_minutes'] : 60;
+        $endTime = $startTime + ($durationMinutes * 60);
+
+        $newStart = date('Y-m-d H:i:s', $startTime);
+        $newEnd   = date('Y-m-d H:i:s', $endTime);
+
+        Appointment::reschedule($id, $newStart, $newEnd);
+
+        // Si le rendez-vous était échu ou annulé, on peut réactiver son statut à confirmed
+        $newStatus = $body['status'] ?? null;
+        if ($newStatus && in_array($newStatus, ['pending', 'confirmed'], true)) {
+            Appointment::updateStatus($id, $newStatus);
+        }
+
+        Response::json(Appointment::find($id));
+    }
 }
+
