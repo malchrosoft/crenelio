@@ -151,7 +151,22 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - **Mise en valeur visuelle différenciée :**
     - Couleur d'arrière-plan d'alerte douce (`$warning-light` ou `$danger-light`).
     - Badge / Icône d'alerte spécifique (`WarningIcon` / `ClockCountdownIcon`) signalant le retard / non-clôture.
-- **Action de report / reprogrammation rapide :**
-  - Bouton d'action « Déplacer / Reprogrammer » ouvrant un sélecteur de nouvelle date et heure.
-  - Mise à jour des dates de début/fin en base avec conservation de l'historique.
-  - Notification automatique optionnelle au client informant du décalage de son intervention.
+---
+
+## 📊 Matrice d'Ordonnancement & Suivi du Backlog
+
+| Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
+|---|---|---|---|---|---|
+| **1** | **Item 13** | **Recherche, filtres, RDV échus & reprogrammation** | Espace Pro / Planning | ⏳ *À faire* | Indépendant (Améliore immédiatement l'existant) |
+| **2** | **Item 1** | **Frais de déplacement hybrides & gestion hors-zone** | Tunnel / Tarification | ⏳ *À faire* | Coordonnées GPS BAN déjà en place |
+| **3** | **Item 4** | **Notifications email, iCal & logs d'envoi IHM** | Communication / Traçabilité | ⏳ *À faire* | Configuration SMTP / Service Mail PHP |
+| **4** | **Item 12** | **Sécurité 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Dépend du service Mail (Item 4) |
+| **5** | **Item 6** | **Identité visuelle & Logo (Favicon, Header)** | Design / Personnalisation | ⏳ *À faire* | Paramètres de config |
+| **6** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
+| **7** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
+| — | **Item 3** | Page Vitrine par Défaut (Homepage Artisan) | Vitrine / Navigation | ✅ **Terminé** | — |
+| — | **Item 7** | Footer Complet & Mentions Légales | Légal / Footer | ✅ **Terminé** | — |
+| — | **Item 8** | Dette Technique & Harmonisation Styles SCSS | Qualité Code / SCSS | ✅ **Terminé** | — |
+| — | **Item 9** | Modernisation Sass (Dart Sass Modern Compiler) | Outillage / Build | ✅ **Terminé** | — |
+| — | **Item 10**| Gestion Propre des Classes Conditionnelles (`clsx`) | Qualité Code / React | ✅ **Terminé** | — |
+| — | **Item 11**| Gestion des Prestations (Création pop-up, Édition, Delete)| Espace Pro / Catalogue | ✅ **Terminé** | — |
