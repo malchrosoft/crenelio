@@ -229,7 +229,7 @@ class Mailer
             'Content-Type: multipart/alternative; boundary="' . $altBoundary . '"',
             '',
             '--' . $altBoundary,
-            'Content-Type: text/plain; charset=uft-8',
+            'Content-Type: text/plain; charset=utf-8',
             'Content-Transfer-Encoding: base64',
             '',
             chunk_split(base64_encode($textBody), 76, "\r\n"),
