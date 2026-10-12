@@ -43,7 +43,7 @@ class Notifier
                 EmailTemplates::proConfirmation($appointment, $config),
                 [
                     'filename' => 'rendez-vous-' . (int)$appointment['id'] . '.ics',
-                    'mime'     => 'text/calendar; charset=UTF-8; method=REQUEST',
+                    'mime'     => 'text/calendar; charset=utf-8; method=REQUEST',
                     'content'  => ICalendar::forAppointment($appointment, $config),
                 ]
             );
@@ -73,7 +73,7 @@ class Notifier
                 EmailTemplates::proConfirmation($appointment, $config),
                 [
                     'filename' => 'rendez-vous-' . (int)$appointment['id'] . '.ics',
-                    'mime'     => 'text/calendar; charset=UTF-8; method=REQUEST',
+                    'mime'     => 'text/calendar; charset=utf-8; method=REQUEST',
                     'content'  => ICalendar::forAppointment($appointment, $config),
                 ]
             );
