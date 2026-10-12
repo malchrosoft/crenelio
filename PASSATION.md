@@ -1,13 +1,29 @@
 # 📋 Fiche de Passation & Point d'Avancement — Crénelio
 
-**Date :** 11 Octobre 2026
+**Date :** 12 Octobre 2026
 **Dépôt :** `/Users/aymeric.malchrowicz/DEVELOPPEMENT/crenelio`
-**Dernier commit :** `1c29a47` (`main`, poussé) — *docs(agents) : contraintes connues & dette technique*
-**Statut Git :** propre, rien en suspens — tout est poussé sur `origin/main`.
+**Dernier commit :** `7ec7c23` (`main`, poussé) — *feat(vitrine) : engagements chargés dynamiquement*
+**Statut Git :** commits directs sur `main` (projet solo), sans ligne d'attribution.
 
 ---
 
 ## 1. Ce qui est réellement achevé
+
+### Session du 12/10/2026
+- **Encodage de la base locale :** les accents étaient stockés en double encodage (`é` → `C383C2A9`).
+  `seed_init.sql` est sain : le volume `db_data` avait été rempli par un ancien import, et MySQL
+  ne rejoue `docker-entrypoint-initdb.d` que sur un volume vide. Corrigé par
+  `docker compose down -v && docker compose up -d db` ; vérifié en hexadécimal (`C3A9`).
+  Pour lire les accents en CLI : `mysql --default-character-set=utf8mb4`.
+- **`Mailer.php` :** faute `charset=uft-8` corrigée dans la partie `text/plain` (`fba6368`).
+- **`seed_init.sql` :** apostrophe de `vitrine_about` échappée en `''` (SQL standard) (`8179084`).
+- **Vitrine — Contact :** cartes construites uniquement si `pro_phone`, `pro_email` ou
+  `service_area` sont renseignés ; aucune grille sinon, le CTA de réservation reste (`ac7c4d6`).
+- **Vitrine — Engagements :** toutes les clés `vitrine_engagement_N` renseignées sont chargées en
+  boucle, triées par N, sans limite ; la déduction de l'icône est inchangée. `AppConfig` déclare
+  ces clés par un type gabarit `` `vitrine_engagement_${number}` `` (`7ec7c23`).
+
+### Sessions précédentes
 
 - **Item 13 (Recherche, filtres, RDV échus & reprogrammation) :** ✅ terminé et commité (`f3a1eb2`).
 - **Item 1 (Frais de déplacement hybrides & hors-zone) :** ✅ terminé, commité et poussé (`cb9c0df` / `c1f5e38`).
@@ -76,9 +92,19 @@ Les deux sens ont été réalignés.
 
 ---
 
-## 3. Prochain chantier prioritaire
+## 3. Prochains chantiers prioritaires (ordre fixé le 12/10/2026)
 
-### 🎯 Item 12 — Sécurité 2FA Espace Pro (OTP email, appareil de confiance 10 jours)
+### 🎯 1. Item 14 — IHM de configuration complète
+L'onglet « Paramètres » n'édite que les 7 clés de déplacement ; `company_name` y est seulement
+affiché. Ajouter un formulaire par groupe : entreprise & coordonnées, réservation & créneaux,
+carte, vitrine, engagements (liste libre `vitrine_engagement_N`), mentions légales.
+Le changement de mot de passe reste dans l'Item 12. Détail dans `ROADMAP.md`.
+
+### 🎯 2. Item 15 — Header & footer sur le tunnel de réservation
+Le header sticky (inline dans `VitrinePage.tsx`) et `Footer` ne sont pas rendus sur `/booking`.
+Extraire le header en composant réutilisable, l'afficher en permanence sur `/booking`, réutiliser `Footer`.
+
+### 3. Item 12 — Sécurité 2FA Espace Pro (OTP email, appareil de confiance 10 jours)
 Le service mail de l'Item 4 est en place, la dépendance est levée.
 1. Étape 1 : vérification du mot de passe admin (Bcrypt, déjà en place).
 2. Étape 2 : jeton d'appareil signé (`device_token`) valable 10 jours, stocké côté client.
