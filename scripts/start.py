@@ -80,18 +80,34 @@ def wait_for_api():
     print_warn("L'API met du temps à répondre. Poursuite du démarrage...")
 
 def run_vite():
+    import socket
     print("\n" + "=" * 55)
     print("💻 Lancement du serveur Vite...")
-    print("👉 Application accessible sur : http://localhost:5173")
+    # Déterminer un port libre, à partir de 5173
+    base_port = 5174
+    max_port = 5181
+    selected_port = None
+    for port in range(base_port, max_port + 1):
+        # Vérifier si le port est disponible
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            try:
+                sock.bind(("127.0.0.1", port))
+                selected_port = port
+                break
+            except OSError:
+                continue
+    if selected_port is None:
+        print_err("Aucun port disponible entre 5173 et 5180. Abandon du lancement Vite.")
+        return
+    print_ok(f"Port {selected_port} sélectionné pour Vite.")
+    print(f"👉 Application accessible sur : http://localhost:{selected_port}")
     print("👉 Espace Admin accessible avec mot de passe : admin123")
     print("👉 Appuyez sur Ctrl+C pour arrêter le serveur.")
     print("=" * 55 + "\n", flush=True)
-
-    # Utilise npx vite pour être 100% portable sur Windows/macOS/Linux
-    cmd = ["npx", "vite"]
+    # Utilise npx vite avec le port choisi, portable Windows/macOS/Linux
+    cmd = ["npx", "vite", "--port", str(selected_port)]
     if sys.platform == "win32":
-        cmd = ["npx.cmd", "vite"]
-
+        cmd = ["npx.cmd", "vite", "--port", str(selected_port)]
     try:
         subprocess.run(cmd)
     except KeyboardInterrupt:
