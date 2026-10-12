@@ -32,7 +32,7 @@ INSERT INTO `config` (`config_key`, `config_value`) VALUES
 ('admin_password_hash', '$2y$10$qyk0/fef0o7Ic3vocJBAXOp18E.2J0UaQhC62vS98B9fAlfK7aCQi'), -- 'admin123'
 -- Vitrine
 ('vitrine_tagline',      'Votre artisan de confiance, à domicile'),
-('vitrine_about',        'Artisan qualifié et expérimenté, j\'interviens rapidement chez vous pour tous vos travaux. Devis gratuit, travail soigné et garanti.'),
+('vitrine_about',        'Artisan qualifié et expérimenté, j''interviens rapidement chez vous pour tous vos travaux. Devis gratuit, travail soigné et garanti.'),
 ('vitrine_photo_url',    ''),
 ('vitrine_engagement_1', '🕐 Ponctualité garantie'),
 ('vitrine_engagement_2', '🛡️ Travail soigné et garanti'),
