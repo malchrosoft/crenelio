@@ -37,15 +37,14 @@ const renderEngagementIcon = (text: string) => {
 
 /**
  * Section engagements / valeurs de l'artisan.
- * 4 engagements configurables depuis la table config avec Phosphor Icons fill.
+ * Toutes les clés `vitrine_engagement_N` renseignées en config, triées par N, avec Phosphor Icons fill.
  */
 const EngagementsSection: React.FC<EngagementsSectionProps> = ({ config }) => {
-  const engagements = [
-    config.vitrine_engagement_1,
-    config.vitrine_engagement_2,
-    config.vitrine_engagement_3,
-    config.vitrine_engagement_4,
-  ].filter(Boolean) as string[];
+  const engagements = Object.entries(config)
+    .map(([key, value]) => [Number(/^vitrine_engagement_(\d+)$/.exec(key)?.[1]), String(value ?? '').trim()] as const)
+    .filter(([n, value]) => !Number.isNaN(n) && value)
+    .sort(([a], [b]) => a - b)
+    .map(([, value]) => value);
 
   if (engagements.length === 0) return null;
 

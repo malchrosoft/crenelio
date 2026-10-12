@@ -140,10 +140,7 @@ export interface AppConfig {
   vitrine_tagline?: string;
   vitrine_about?: string;
   vitrine_photo_url?: string;
-  vitrine_engagement_1?: string;
-  vitrine_engagement_2?: string;
-  vitrine_engagement_3?: string;
-  vitrine_engagement_4?: string;
+  [key: `vitrine_engagement_${number}`]: string | undefined;
   // Mentions légales
   legal_raison_sociale?: string;
   legal_siret?: string;
