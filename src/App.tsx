@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { api } from './api';
+import { applyFavicon } from './utils/favicon';
 import { Service, AppConfig } from './types';
 import VitrinePage from './pages/VitrinePage';
 import BookingPage from './pages/BookingPage';
@@ -25,6 +26,7 @@ export const App: React.FC = () => {
       .then(([cfg, servs]) => {
         setConfig(cfg);
         setServices(servs);
+        if (cfg.branding_favicon_url) applyFavicon(cfg.branding_favicon_url);
       })
       .catch((err: Error) => {
         console.error('Erreur chargement initial:', err);

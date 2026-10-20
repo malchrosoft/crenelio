@@ -12,6 +12,8 @@ import {
   TravelQuote,
   AppointmentNotification,
   NotificationType,
+  BrandingKind,
+  BrandingUrls,
 } from './types';
 
 const BASE_URL = '/api';
@@ -22,14 +24,16 @@ async function request<T>(
   body: unknown = null,
   token: string | null = null
 ): Promise<T> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  // FormData (envoi de fichiers) : le navigateur fixe lui-même l'en-tête multipart
+  const isForm = body instanceof FormData;
+  const headers: Record<string, string> = isForm ? {} : { 'Content-Type': 'application/json' };
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
   const options: RequestInit = { method, headers };
   if (body) {
-    options.body = JSON.stringify(body);
+    options.body = isForm ? body : JSON.stringify(body);
   }
 
   const res = await fetch(`${BASE_URL}${path}`, options);
@@ -103,5 +107,12 @@ export const api = {
       `/appointments/${appointmentId}/notifications/resend`,
       { type }
     ),
-};
 
+  // Logo & favicon : un fichier par extension (png, svg, ico)
+  uploadBranding: (kind: BrandingKind, files: Partial<Record<'png' | 'svg' | 'ico', Blob>>) => {
+    const form = new FormData();
+    Object.entries(files).forEach(([ext, blob]) => blob && form.append(ext, blob, `${kind}.${ext}`));
+    return request<BrandingUrls>('POST', `/admin/branding/${kind}`, form);
+  },
+  deleteBranding: (kind: BrandingKind) => request<BrandingUrls>('DELETE', `/admin/branding/${kind}`),
+};

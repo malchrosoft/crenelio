@@ -1004,3 +1004,20 @@
     gap: 6px;
   }
 }
+
+/* Logo de l'entreprise (repli : icône + nom, cf. BrandMark) */
+.brand-logo {
+  display: block;
+  width: auto;
+  max-width: 220px;
+  height: 40px;
+  object-fit: contain;
+
+  .booking-page-header__brand & {
+    height: 32px;
+  }
+
+  .footer-brand__name & {
+    height: 48px;
+  }
+}

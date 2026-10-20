@@ -156,8 +156,8 @@ autre tâche, mais en tenir compte et les traiter dans l'item dédié.
   `sha256(mot de passe + nom de la base + date du jour)`.
 - **Aucune route `/admin/*` ne vérifie ce token** : l'authentification est purement
   côté client. N'importe quel appel direct à l'API contourne l'écran de connexion.
-- Conséquence : toutes les routes d'écriture (prestations, config, statuts, horaires)
-  sont ouvertes. À reprendre **avec l'Item 12** (2FA) — y ajouter une vraie
+- Conséquence : toutes les routes d'écriture (prestations, config, statuts, horaires,
+  envoi et suppression du logo / favicon via `/admin/branding/:kind`) sont ouvertes. À reprendre **avec l'Item 12** (2FA) — y ajouter une vraie
   vérification serveur, sans quoi la 2FA ne protégerait qu'un écran contournable.
 
 ### 🔑 Fichiers `.env` — hors de portée des agents

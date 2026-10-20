@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { CalendarCheckIcon, ArrowLeftIcon } from '@phosphor-icons/react';
+import { ArrowLeftIcon } from '@phosphor-icons/react';
 import { api } from '../api';
 import { Appointment, AppConfig } from '../types';
 import BookingConfirmation from '../components/BookingConfirmation';
+import BrandMark from '../components/BrandMark';
 
 interface AppointmentManagePageProps {
   config: AppConfig;
@@ -53,7 +54,6 @@ const AppointmentManagePage: React.FC<AppointmentManagePageProps> = ({ config })
     };
   }, [token]);
 
-  const companyName = config.company_name || 'Crénelio';
 
   return (
     <div>
@@ -63,8 +63,7 @@ const AppointmentManagePage: React.FC<AppointmentManagePageProps> = ({ config })
           Retour à l'accueil
         </Link>
         <span className="booking-page-header__brand">
-          <CalendarCheckIcon size={22} weight="fill" aria-hidden="true" />
-          {companyName}
+          <BrandMark config={config} iconSize={22} />
         </span>
       </div>
 

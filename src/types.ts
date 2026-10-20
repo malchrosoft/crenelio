@@ -148,8 +148,15 @@ export interface AppConfig {
   legal_assurance?: string;
   legal_adresse?: string;
   legal_hebergeur?: string;
-  [key: string]: string | undefined;
+  // Logo & favicon : URLs versionnées calculées par l'API (null si aucun fichier)
+  branding_logo_url?: string | null;
+  branding_favicon_url?: string | null;
+  [key: string]: string | null | undefined;
 }
+
+export type BrandingKind = 'logo' | 'favicon';
+
+export type BrandingUrls = Pick<AppConfig, 'branding_logo_url' | 'branding_favicon_url'>;
 
 export interface AddressResult {
   address: string;

@@ -8,6 +8,7 @@ import {
   LockKeyIcon,
   GithubLogoIcon,
 } from '@phosphor-icons/react';
+import BrandMark from '../BrandMark';
 import { AppConfig } from '../../types';
 import LegalModal from '../LegalModal';
 
@@ -32,8 +33,7 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
           {/* Colonne Marque */}
           <div className="footer-brand">
             <div className="footer-brand__name">
-              <CalendarCheckIcon size={24} weight="fill" aria-hidden="true" />
-              {companyName}
+              <BrandMark config={config} iconSize={24} />
             </div>
             {config.vitrine_tagline && (
               <p className="footer-brand__tagline">{config.vitrine_tagline}</p>

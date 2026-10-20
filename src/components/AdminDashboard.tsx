@@ -22,8 +22,13 @@ import {
   TravelFeeMode,
   AppointmentNotification,
   NotificationType,
+  BrandingUrls,
 } from '../types';
 import { formatEuro } from '../utils/format';
+import { CONFIG_GROUPS, buildOtherGroup } from '../config/configSchema';
+import ConfigGroupForm from './admin/ConfigGroupForm';
+import BrandingField from './admin/BrandingField';
+import { applyFavicon } from '../utils/favicon';
 import { format, isPast, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -118,7 +123,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
   const [services, setServices] = useState<Service[]>([]);
   const [config, setConfig] = useState<AppConfig>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'appointments' | 'services' | 'settings'>('appointments');
+  const [activeTab, setActiveTab] = useState<'appointments' | 'services' | 'settings' | 'config'>('appointments');
 
   // Recherche & Filtres planning
   const [searchQuery, setSearchQuery] = useState('');
@@ -267,6 +272,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
     } finally {
       setTravelSettingsSaving(false);
     }
+  }
+
+  /** Nouvelles URLs de logo / favicon : mises à jour de l'aperçu et de l'onglet du navigateur. */
+  function applyBranding(urls: BrandingUrls) {
+    setConfig((prev) => ({ ...prev, ...urls }));
+    applyFavicon(urls.branding_favicon_url);
   }
 
   async function handleStatusChange(id: number, newStatus: string) {
@@ -532,6 +543,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
           onClick={() => setActiveTab('settings')}
         >
           Zone & déplacement
+        </button>
+        <button
+          className={clsx('btn', {
+            'btn-primary': activeTab === 'config',
+            'btn-secondary': activeTab !== 'config',
+          })}
+          onClick={() => setActiveTab('config')}
+        >
+          Configuration
         </button>
       </div>
 
@@ -1103,6 +1123,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                 </form>
               </div>
             </div>
+          )}
+        </div>
+      ) : activeTab === 'config' ? (
+        <div className="admin-config">
+          {[...CONFIG_GROUPS, buildOtherGroup(config)].map(
+            (group) =>
+              group && (
+                <ConfigGroupForm key={group.id} group={group} config={config} onSaved={setConfig}>
+                  {group.id === 'identity' && (
+                    <div className="admin-settings-form">
+                      <BrandingField kind="logo" url={config.branding_logo_url} onChange={applyBranding} />
+                      <BrandingField
+                        kind="favicon"
+                        url={config.branding_favicon_url}
+                        logoUrl={config.branding_logo_url}
+                        onChange={applyBranding}
+                      />
+                    </div>
+                  )}
+                </ConfigGroupForm>
+              )
           )}
         </div>
       ) : (

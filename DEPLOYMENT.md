@@ -187,6 +187,23 @@ On OVH shared hosting, permissions are generally managed automatically. However,
 
 If using FileZilla, right-click files → **File permissions...** → set numeric value.
 
+### Logo & favicon storage
+
+`api/storage/branding/` must be **writable by PHP** (`755`, or `775` if uploads fail): the Pro area
+writes the logo and favicon there. It is not versioned (each installation has its own files), so
+create it on the server if your upload skipped the empty folder.
+
+Files can also be dropped there by FTP under their usual names — the first one present wins:
+
+| Type    | Recognized names (priority order)              | Fallback when absent        |
+|---------|------------------------------------------------|-----------------------------|
+| Logo    | `logo.svg`, `logo.png`                         | Company name as text        |
+| Favicon | `favicon.png`, `favicon.svg`, `favicon.ico`    | Built-in default icon       |
+
+Deleting a file (from the Pro area or by FTP) restores the fallback. The folder is never served
+directly (`api/storage/.htaccess` denies access); files go through `/api/branding/logo` and
+`/api/branding/favicon`.
+
 ---
 
 ## Step 7: Verify the Deployment

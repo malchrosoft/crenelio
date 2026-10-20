@@ -13,6 +13,7 @@ require_once __DIR__ . '/../controllers/ScheduleController.php';
 require_once __DIR__ . '/../controllers/SlotController.php';
 require_once __DIR__ . '/../controllers/AppointmentController.php';
 require_once __DIR__ . '/../controllers/TravelFeeController.php';
+require_once __DIR__ . '/../controllers/BrandingController.php';
 
 $router = new Router();
 
@@ -22,6 +23,7 @@ $scheduleController    = new ScheduleController();
 $slotController        = new SlotController();
 $appointmentController = new AppointmentController();
 $travelFeeController   = new TravelFeeController();
+$brandingController    = new BrandingController();
 
 // -------------------------------------------------------------------
 // 1. Configuration & Authentification Pro
@@ -30,6 +32,11 @@ $router->get('/config',                     [$configController, 'getPublic']);
 $router->get('/admin/config',               [$configController, 'getAll']);
 $router->put('/admin/config',               [$configController, 'update']);
 $router->post('/admin/login',               [$configController, 'login']);
+
+// Logo & favicon (fichiers sous leurs noms d'usage, cf. core/Branding.php)
+$router->get('/branding/:kind',             [$brandingController, 'show']);
+$router->post('/admin/branding/:kind',      [$brandingController, 'upload']);
+$router->delete('/admin/branding/:kind',    [$brandingController, 'destroy']);
 
 // -------------------------------------------------------------------
 // 2. Prestations / Services

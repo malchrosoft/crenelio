@@ -10,6 +10,7 @@ import EngagementsSection from '../components/vitrine/EngagementsSection';
 import MapSection from '../components/vitrine/MapSection';
 import ContactSection from '../components/vitrine/ContactSection';
 import Footer from '../components/vitrine/Footer';
+import BrandMark from '../components/BrandMark';
 
 interface VitrinePageProps {
   config: AppConfig;
@@ -21,7 +22,6 @@ interface VitrinePageProps {
  * Header sticky avec CTA apparaissant dès que le bouton Hero n'est plus visible.
  */
 const VitrinePage: React.FC<VitrinePageProps> = ({ config, services }) => {
-  const companyName = config.company_name || 'Crénelio';
   const heroCtaRef = useRef<HTMLAnchorElement | null>(null);
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(false);
 
@@ -55,8 +55,7 @@ const VitrinePage: React.FC<VitrinePageProps> = ({ config, services }) => {
         aria-hidden={!isHeaderVisible}
       >
         <Link to="/" className="vitrine-header__brand" aria-label="Retour à l'accueil">
-          <CalendarCheckIcon size={28} weight="fill" aria-hidden="true" />
-          {companyName}
+          <BrandMark config={config} iconSize={28} />
         </Link>
         <Link to="/booking" className="vitrine-header__cta">
           <CalendarCheckIcon size={20} weight="fill" aria-hidden="true" />

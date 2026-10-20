@@ -1,0 +1,2 @@
+# Fichiers servis uniquement via /api/branding/* : aucun accès direct
+Require all denied

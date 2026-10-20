@@ -5,6 +5,10 @@ vendor/
 # Build output (generated, not committed)
 api/public/assets/
 
+# Logo & favicon propres à chaque installation
+api/storage/branding/*
+!api/storage/branding/.gitkeep
+
 # Environment & secrets
 # Ignore ALL .env* files EXCEPT api/.env.example
 .env*

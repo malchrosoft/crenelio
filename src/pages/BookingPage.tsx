@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import clsx from 'clsx';
-import { CalendarCheckIcon, LockKeyIcon, ArrowLeftIcon, UserIcon } from '@phosphor-icons/react';
+import { LockKeyIcon, ArrowLeftIcon, UserIcon } from '@phosphor-icons/react';
 import { api } from '../api';
 import { Service, Slot, Appointment, BookingPayload, AppConfig } from '../types';
 import ServiceSelector from '../components/ServiceSelector';
 import SlotPicker from '../components/SlotPicker';
 import BookingForm from '../components/BookingForm';
 import BookingConfirmation from '../components/BookingConfirmation';
+import BrandMark from '../components/BrandMark';
 import AdminDashboard from '../components/AdminDashboard';
 
 interface BookingPageProps {
@@ -69,7 +70,6 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
     setError(null);
   }
 
-  const companyName = config.company_name || 'Crénelio';
 
   return (
     <div>
@@ -80,8 +80,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
           Retour à l'accueil
         </Link>
         <span className="booking-page-header__brand">
-          <CalendarCheckIcon size={22} weight="fill" aria-hidden="true" />
-          {companyName}
+          <BrandMark config={config} iconSize={22} />
         </span>
         <button
           type="button"
