@@ -189,10 +189,11 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 15. Header & Footer Communs au Tunnel de Réservation
+### 15. Header & Footer Communs au Tunnel de Réservation ✅
 - **Constat :** le header sticky et le `Footer` ne sont rendus que sur la vitrine (`VitrinePage.tsx`) ; la page `/booking` en est dépourvue.
 - **Objectif :** conserver le header et le footer de la vitrine sur la partie réservation pour une navigation et une identité continues.
 - **Pistes :** extraire le header de `VitrinePage.tsx` en composant réutilisable (ou layout commun aux routes publiques) ; sur `/booking`, header affiché en permanence (sans déclenchement lié au bouton du Hero) ; réutiliser `Footer` tel quel.
+- **Réalisé (22/10/2026) :** composant `SiteHeader` partagé (vitrine : fixe et déclenché par le CTA du hero ; `/booking` : permanent en `position: sticky`, sans bouton « Prendre rendez-vous »), `Footer` rendu sous le stepper. Le lien « Espace Pro » du header de réservation disparaît au profit de celui du footer. La page `/rdv/:token` garde son header allégé.
 
 ---
 
@@ -237,7 +238,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
 |---|---|---|---|---|---|
-| **1** | **Item 15** | **Header & footer communs au tunnel de réservation** | Vitrine / Navigation | ⏳ *À faire* | Extraction du header de `VitrinePage` |
+| **1** | **Item 15** | **Header & footer communs au tunnel de réservation** | Vitrine / Navigation | ✅ *Terminé* | Extraction du header de `VitrinePage` |
 | **2** | **Item 12** | **Sécurité : vérification serveur des routes `/admin/*` + 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Service mail disponible (Item 4) ✅ |
 | **3** | **Item 20** | **Compte SMTP configurable depuis l'espace Pro** | Communication / Configuration | 🕒 *Reporté* | Item 12 |
 | **4** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |

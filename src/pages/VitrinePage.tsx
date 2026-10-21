@@ -1,7 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import clsx from 'clsx';
-import { CalendarCheckIcon } from '@phosphor-icons/react';
 import { AppConfig, Service } from '../types';
 import HeroSection from '../components/vitrine/HeroSection';
 import AboutSection from '../components/vitrine/AboutSection';
@@ -10,7 +7,7 @@ import EngagementsSection from '../components/vitrine/EngagementsSection';
 import MapSection from '../components/vitrine/MapSection';
 import ContactSection from '../components/vitrine/ContactSection';
 import Footer from '../components/vitrine/Footer';
-import BrandMark from '../components/BrandMark';
+import SiteHeader from '../components/SiteHeader';
 
 interface VitrinePageProps {
   config: AppConfig;
@@ -46,22 +43,8 @@ const VitrinePage: React.FC<VitrinePageProps> = ({ config, services }) => {
 
   return (
     <div className="vitrine-page">
-      {/* Header sticky conditionnel (apparaît quand le bouton du hero disparaît) */}
-      <header
-        className={clsx('vitrine-header', {
-          'vitrine-header--visible': isHeaderVisible,
-          'vitrine-header--hidden': !isHeaderVisible,
-        })}
-        aria-hidden={!isHeaderVisible}
-      >
-        <Link to="/" className="vitrine-header__brand" aria-label="Retour à l'accueil">
-          <BrandMark config={config} iconSize={28} />
-        </Link>
-        <Link to="/booking" className="vitrine-header__cta">
-          <CalendarCheckIcon size={20} weight="fill" aria-hidden="true" />
-          Prendre rendez-vous
-        </Link>
-      </header>
+      {/* Header fixe conditionnel (apparaît quand le bouton du hero disparaît) */}
+      <SiteHeader config={config} visible={isHeaderVisible} />
 
       {/* Sections en cascade (scroll infini) */}
       <main id="main-content">

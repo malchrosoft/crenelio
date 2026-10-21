@@ -51,6 +51,11 @@
     pointer-events: auto;
   }
 
+  // Tunnel de réservation : toujours affiché, collé en haut sans sortir du flux
+  &--persistent {
+    position: sticky;
+  }
+
   .vitrine-header__brand {
     display: flex;
     align-items: center;
@@ -1017,12 +1022,18 @@ $engagement-gap: 24px;
     gap: 8px;
   }
 
-  .booking-page-header__admin-btn {
-    font-size: 0.85rem;
-    padding: 6px 14px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+}
+
+// Tunnel de réservation : header et footer de la vitrine autour du stepper
+.booking-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .booking-layout__content {
+    flex: 1;
+    width: 100%;
+    padding-top: 40px;
   }
 }
 

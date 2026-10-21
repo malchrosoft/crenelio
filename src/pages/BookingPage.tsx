@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import clsx from 'clsx';
-import { LockKeyIcon, ArrowLeftIcon } from '@phosphor-icons/react';
 import { api } from '../api';
 import { Service, Slot, Appointment, BookingPayload, AppConfig } from '../types';
 import ServiceSelector from '../components/ServiceSelector';
 import SlotPicker from '../components/SlotPicker';
 import BookingForm from '../components/BookingForm';
 import BookingConfirmation from '../components/BookingConfirmation';
-import BrandMark from '../components/BrandMark';
+import SiteHeader from '../components/SiteHeader';
+import Footer from '../components/vitrine/Footer';
 import { isPremisesOnly, premisesLabel } from '../utils/zone';
 
 interface BookingPageProps {
@@ -18,7 +18,7 @@ interface BookingPageProps {
 
 /**
  * Page de réservation — stepper en 3 étapes.
- * Header allégé avec lien retour vers la vitrine.
+ * Header et footer de la vitrine, pour une navigation continue.
  * Support de ?service=ID depuis la vitrine (pré-sélection de la prestation).
  */
 const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
@@ -74,23 +74,10 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
   if (legacyAdminLink) return <Navigate to="/admin" replace />;
 
   return (
-    <div>
-      {/* Header allégé avec retour vitrine */}
-      <div className="booking-page-header">
-        <Link to="/" className="booking-page-header__back">
-          <ArrowLeftIcon size={18} weight="bold" />
-          Retour à l'accueil
-        </Link>
-        <span className="booking-page-header__brand">
-          <BrandMark config={config} iconSize={22} />
-        </span>
-        <Link to="/admin" className="btn btn-secondary booking-page-header__admin-btn">
-          <LockKeyIcon size={16} weight="fill" />
-          Espace Pro
-        </Link>
-      </div>
+    <div className="booking-layout">
+      <SiteHeader config={config} persistent showCta={false} />
 
-      <div className="container">
+      <main id="main-content" className="container booking-layout__content">
         <>
             {/* Stepper */}
             {step < 4 && (
@@ -180,7 +167,9 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
               />
             )}
         </>
-      </div>
+      </main>
+
+      <Footer config={config} />
     </div>
   );
 };
