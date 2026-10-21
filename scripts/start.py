@@ -40,7 +40,7 @@ def check_env_file():
         print_ok("api/.env créé.")
 
 def start_docker():
-    print_step("Démarrage des conteneurs Docker (DB MySQL & API PHP)...")
+    print_step("Démarrage des conteneurs Docker (MySQL, API PHP, Mailpit)...")
     cmd = ["docker", "compose", "up", "-d"]
     res = subprocess.run(cmd)
     if res.returncode != 0:
@@ -79,13 +79,31 @@ def wait_for_api():
         time.sleep(1)
     print_warn("L'API met du temps à répondre. Poursuite du démarrage...")
 
+def print_urls(port: int):
+    """Adresses utiles pour tester l'application en local."""
+    app = f"http://localhost:{port}"
+    urls = [
+        ("Vitrine", app + "/"),
+        ("Réservation", app + "/booking"),
+        ("Espace Artisan", app + "/admin  (mot de passe : admin123)"),
+        ("Emails capturés", "http://localhost:8025  (Mailpit)"),
+        ("API PHP", "http://localhost:8000/api/config"),
+        ("Base MySQL", "127.0.0.1:3306  (crenelio / crenelio_dev)"),
+    ]
+    width = max(len(label) for label, _ in urls)
+    print("\n🔗 Adresses utiles :")
+    for label, url in urls:
+        print(f"   {label.ljust(width)}  {url}")
+    print()
+
+
 def run_vite():
     import socket
     print("\n" + "=" * 55)
     print("💻 Lancement du serveur Vite...")
-    # Déterminer un port libre, à partir de 5173
-    base_port = 5174
-    max_port = 5181
+    # Déterminer un port libre, à partir de 5173 (port attendu par APP_URL dans docker-compose.yml)
+    base_port = 5173
+    max_port = 5180
     selected_port = None
     for port in range(base_port, max_port + 1):
         # Vérifier si le port est disponible
@@ -100,14 +118,16 @@ def run_vite():
         print_err("Aucun port disponible entre 5173 et 5180. Abandon du lancement Vite.")
         return
     print_ok(f"Port {selected_port} sélectionné pour Vite.")
-    print(f"👉 Application accessible sur : http://localhost:{selected_port}")
-    print("👉 Espace Admin accessible avec mot de passe : admin123")
+    if selected_port != base_port:
+        print_warn(f"Port {base_port} occupé : les liens des emails (APP_URL) pointeront vers {base_port}.")
+    print_urls(selected_port)
     print("👉 Appuyez sur Ctrl+C pour arrêter le serveur.")
     print("=" * 55 + "\n", flush=True)
     # Utilise npx vite avec le port choisi, portable Windows/macOS/Linux
-    cmd = ["npx", "vite", "--port", str(selected_port)]
+    # --strictPort : Vite ne glisse pas sur un autre port que celui annoncé ci-dessus
+    cmd = ["npx", "vite", "--port", str(selected_port), "--strictPort"]
     if sys.platform == "win32":
-        cmd = ["npx.cmd", "vite", "--port", str(selected_port)]
+        cmd = ["npx.cmd", "vite", "--port", str(selected_port), "--strictPort"]
     try:
         subprocess.run(cmd)
     except KeyboardInterrupt:
