@@ -82,6 +82,35 @@ class Branding
         };
     }
 
+    /** Identifiant du logo intégré aux emails (`<img src="cid:...">`). */
+    public const EMAIL_LOGO_CID = 'logo@crenelio';
+
+    /** Hauteur et largeur maximales du logo dans l'en-tête des emails (px). */
+    private const EMAIL_LOGO_HEIGHT = 48;
+    private const EMAIL_LOGO_MAX_WIDTH = 240;
+
+    /**
+     * Logo PNG à intégrer aux emails, avec ses dimensions d'affichage.
+     * Gmail et Outlook n'affichent pas le SVG : seul `logo.png` est utilisable. Il est généré
+     * automatiquement à l'envoi d'un logo SVG depuis l'espace Pro (cf. BrandingField).
+     *
+     * @return array{content: string, width: int, height: int}|null
+     */
+    public static function emailLogo(): ?array
+    {
+        $path = self::find('logo', 'png');
+        $size = $path ? @getimagesize($path) : false;
+        if (!$size || $size[0] <= 0 || $size[1] <= 0) {
+            return null;
+        }
+        $scale = min(self::EMAIL_LOGO_HEIGHT / $size[1], self::EMAIL_LOGO_MAX_WIDTH / $size[0]);
+        return [
+            'content' => (string)file_get_contents($path),
+            'width'   => max(1, (int)round($size[0] * $scale)),
+            'height'  => max(1, (int)round($size[1] * $scale)),
+        ];
+    }
+
     /** Supprime tous les fichiers d'un type. */
     public static function clear(string $kind): void
     {

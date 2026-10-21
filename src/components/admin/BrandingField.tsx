@@ -44,11 +44,14 @@ const SETTINGS: Record<BrandingKind, { label: string; fallback: string; aspects:
   },
 };
 
-/** Fichiers à enregistrer pour une zone rognée : le favicon est décliné en PNG 512 px et ICO. */
+/**
+ * Fichiers à enregistrer pour une zone rognée : le favicon est décliné en PNG 512 px et ICO.
+ * Un logo SVG est doublé d'un PNG 600 px : Gmail et Outlook n'affichent pas le SVG dans les emails.
+ */
 async function buildFiles(kind: BrandingKind, source: CropSource, area: CropArea) {
   const svg = source.kind === 'svg' ? new Blob([cropSvg(source, area)], { type: 'image/svg+xml' }) : undefined;
   if (kind === 'logo') {
-    return svg ? { svg } : { png: await cropToPng(source, area, 2048) };
+    return svg ? { svg, png: await cropToPng(source, area, 600, true) } : { png: await cropToPng(source, area, 2048) };
   }
   const png = await cropToPng(source, area, 512, true);
   return { png, ico: await buildIco(png), svg };

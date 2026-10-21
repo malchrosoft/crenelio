@@ -10,6 +10,8 @@
  * Chaque fabrique renvoie `['subject' => ..., 'html' => ..., 'text' => ...]`.
  */
 
+require_once __DIR__ . '/Branding.php';
+
 class EmailTemplates
 {
     private const PRIMARY = '#2563eb';
@@ -298,6 +300,24 @@ class EmailTemplates
             );
         }
 
+        // En-tête : logo PNG intégré sur fond blanc (un logo peut être illisible sur la couleur
+        // principale), sinon nom de l'entreprise en blanc sur la couleur principale
+        $logo = Branding::emailLogo();
+        $headerHtml = $logo !== null
+            ? sprintf(
+                '<tr><td style="background:#ffffff;padding:18px 28px;border-bottom:4px solid %s;"><img src="cid:%s" width="%d" height="%d" alt="%s" style="display:block;border:0;width:%3$dpx;height:%4$dpx;"></td></tr>',
+                self::PRIMARY,
+                Branding::EMAIL_LOGO_CID,
+                $logo['width'],
+                $logo['height'],
+                self::escape($company)
+            )
+            : sprintf(
+                '<tr><td style="background:%s;padding:22px 28px;color:#ffffff;font-size:18px;font-weight:700;">%s</td></tr>',
+                self::PRIMARY,
+                self::escape($company)
+            );
+
         $footerParts = array_filter([
             self::escape($config['pro_phone'] ?? ''),
             self::escape($config['pro_email'] ?? ''),
@@ -316,7 +336,7 @@ class EmailTemplates
 <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background:%2$s;padding:24px 12px;">
 <tr><td align="center">
     <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border:1px solid %3$s;border-radius:12px;overflow:hidden;">
-        <tr><td style="background:%4$s;padding:22px 28px;color:#ffffff;font-size:18px;font-weight:700;">%5$s</td></tr>
+        %5$s
         <tr><td style="padding:28px;">
             <h1 style="margin:0 0 12px;color:%6$s;font-size:21px;">%1$s</h1>
             <p style="margin:0 0 20px;color:%7$s;font-size:15px;line-height:1.6;">%8$s</p>
@@ -334,7 +354,7 @@ class EmailTemplates
             self::GRAY_50,
             self::GRAY_200,
             self::PRIMARY,
-            self::escape($company),
+            $headerHtml,
             self::GRAY_800,
             self::GRAY_500,
             $intro,

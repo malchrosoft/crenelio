@@ -34,6 +34,7 @@ class Mailer
      * Envoie un message. Lève une RuntimeException en cas d'échec.
      *
      * @param array{filename: string, mime: string, content: string}|null $attachment
+     * @param list<array{cid: string, mime: string, content: string}>     $inline Images référencées par `cid:` dans le HTML
      */
     public static function send(
         string $toEmail,
@@ -42,7 +43,8 @@ class Mailer
         string $htmlBody,
         string $textBody,
         ?array $attachment = null,
-        ?string $replyTo = null
+        ?string $replyTo = null,
+        array $inline = []
     ): void {
         if (!self::isConfigured()) {
             throw new RuntimeException("Envoi d'emails non configuré (SMTP_HOST / MAIL_FROM manquants dans api/.env)");
@@ -52,7 +54,7 @@ class Mailer
             throw new RuntimeException("Adresse destinataire invalide : $toEmail");
         }
 
-        $message = self::buildMimeMessage($toEmail, $toName, $subject, $htmlBody, $textBody, $attachment, $replyTo);
+        $message = self::buildMimeMessage($toEmail, $toName, $subject, $htmlBody, $textBody, $attachment, $replyTo, $inline);
 
         $mailer = new self();
         try {
@@ -201,7 +203,11 @@ class Mailer
     // -----------------------------------------------------------------
 
     /**
+     * Structure : mixed → [related → [alternative → [texte, HTML], images intégrées], pièce jointe].
+     * La couche `related` n'est ajoutée que s'il y a des images intégrées.
+     *
      * @param array{filename: string, mime: string, content: string}|null $attachment
+     * @param list<array{cid: string, mime: string, content: string}>     $inline
      */
     private static function buildMimeMessage(
         string $toEmail,
@@ -210,10 +216,12 @@ class Mailer
         string $htmlBody,
         string $textBody,
         ?array $attachment,
-        ?string $replyTo = null
+        ?string $replyTo = null,
+        array $inline = []
     ): string {
-        $mixedBoundary = 'mixed_' . bin2hex(random_bytes(12));
-        $altBoundary   = 'alt_' . bin2hex(random_bytes(12));
+        $mixedBoundary   = 'mixed_' . bin2hex(random_bytes(12));
+        $relatedBoundary = 'related_' . bin2hex(random_bytes(12));
+        $altBoundary     = 'alt_' . bin2hex(random_bytes(12));
         $domain        = substr(strrchr(MAIL_FROM, '@') ?: '@localhost', 1);
 
         $headers = [
@@ -230,8 +238,7 @@ class Mailer
             $headers[] = 'Reply-To: ' . $replyTo;
         }
 
-        $parts = [
-            '--' . $mixedBoundary,
+        $alternative = [
             'Content-Type: multipart/alternative; boundary="' . $altBoundary . '"',
             '',
             '--' . $altBoundary,
@@ -247,6 +254,31 @@ class Mailer
             '--' . $altBoundary . '--',
             '',
         ];
+
+        if ($inline) {
+            $related = [
+                'Content-Type: multipart/related; type="multipart/alternative"; boundary="' . $relatedBoundary . '"',
+                '',
+                '--' . $relatedBoundary,
+                ...$alternative,
+            ];
+            foreach ($inline as $image) {
+                $related = array_merge($related, [
+                    '--' . $relatedBoundary,
+                    'Content-Type: ' . $image['mime'],
+                    'Content-Transfer-Encoding: base64',
+                    'Content-ID: <' . $image['cid'] . '>',
+                    'Content-Disposition: inline',
+                    '',
+                    chunk_split(base64_encode($image['content']), 76, "\r\n"),
+                ]);
+            }
+            $related[] = '--' . $relatedBoundary . '--';
+            $related[] = '';
+            $alternative = $related;
+        }
+
+        $parts = ['--' . $mixedBoundary, ...$alternative];
 
         if ($attachment !== null) {
             $parts = array_merge($parts, [

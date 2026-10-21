@@ -13,6 +13,7 @@ require_once __DIR__ . '/../models/Notification.php';
 require_once __DIR__ . '/Mailer.php';
 require_once __DIR__ . '/ICalendar.php';
 require_once __DIR__ . '/EmailTemplates.php';
+require_once __DIR__ . '/Branding.php';
 
 class Notifier
 {
@@ -169,6 +170,12 @@ class Notifier
             $message['subject']
         );
 
+        // Logo de l'en-tête, joint en image intégrée s'il est référencé par le gabarit
+        $inline = [];
+        if (str_contains($message['html'], 'cid:' . Branding::EMAIL_LOGO_CID) && ($logo = Branding::emailLogo())) {
+            $inline[] = ['cid' => Branding::EMAIL_LOGO_CID, 'mime' => 'image/png', 'content' => $logo['content']];
+        }
+
         try {
             Mailer::send(
                 $recipient,
@@ -177,7 +184,8 @@ class Notifier
                 $message['html'],
                 $message['text'],
                 $attachment,
-                $replyTo
+                $replyTo,
+                $inline
             );
 
             Notification::markSent($notificationId);
