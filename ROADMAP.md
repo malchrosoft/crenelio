@@ -234,6 +234,23 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
+### 21. Exploitation des Interventions avec AG Grid (édition Community)
+- **Besoin :** une vue tabulaire des interventions dans l'espace Pro pour les exploiter au quotidien : tri, filtres par colonne, recherche, regroupement par statut ou par commune, export CSV.
+- **Choix :** `ag-grid-react` en **édition Community** (licence MIT). Ne pas utiliser les fonctionnalités Enterprise (export Excel natif, regroupement de lignes avancé, tableaux croisés) qui exigent une licence payante.
+- **Pistes :** remplacer ou compléter la liste actuelle du planning ; thème AG Grid aligné sur les variables SCSS ; colonnes : date, client, prestation, adresse, frais de déplacement, statut ; actions de ligne réutilisant les appels existants (statut, reprogrammation, emails).
+
+### 22. Génération des Factures (plus tard)
+- **Besoin :** générer une facture à partir d'une intervention réalisée, depuis la grille de l'Item 21.
+- **Pistes :** numérotation chronologique continue et sans trou, mentions légales obligatoires (SIRET, TVA ou mention d'exonération), montant prestation + frais de déplacement, export PDF, facture non modifiable une fois émise (avoir pour corriger).
+- **Prérequis :** Item 21 ; Item 12 (données comptables à protéger côté serveur).
+
+### 23. Calendrier des Interventions avec FullCalendar
+- **Besoin :** gérer le calendrier d'intervention dans l'espace Pro avec des vues jour / semaine / mois.
+- **Choix :** `@fullcalendar/react` avec les plugins **standard** (licence MIT : `daygrid`, `timegrid`, `interaction`, `list`). Les plugins Premium (vues ressources, timeline) sont payants et non nécessaires pour un artisan seul.
+- **Pistes :** affichage des rendez-vous, indisponibilités et horaires de travail ; glisser-déposer pour reprogrammer, validé par le `SlotEngine` (refus si le créneau n'est pas proposable) ; création d'un rendez-vous au clic (formulaire de l'Item 19) ; locale `fr`, fuseau `APP_TIMEZONE`.
+
+---
+
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
@@ -243,6 +260,9 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 | **3** | **Item 20** | **Compte SMTP configurable depuis l'espace Pro** | Communication / Configuration | 🕒 *Reporté* | Item 12 |
 | **4** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
 | **5** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
+| **6** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — |
+| **7** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ |
+| **8** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 |
 | — | **Item 19** | Saisie d'un rendez-vous par l'artisan (formulaires partagés, hors zone forçable) | Espace Pro / Planning | ✅ **Terminé** | — |
 | — | **Item 18** | Zone d'intervention calculée, mode sans déplacement, demandes hors zone validées par l'artisan | Zone / Réservation | ✅ **Terminé** | — |
 | — | **Item 17** | Espace Artisan en pleine page (`/admin`, menu rétractable) | Espace Pro / Navigation | ✅ **Terminé** | — |
