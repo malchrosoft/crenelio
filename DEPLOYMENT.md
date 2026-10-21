@@ -79,7 +79,8 @@ DB_PASS=your-db-password
 APP_ENV=production
 CORS_ORIGIN=https://your-domain.com
 
-# Public site URL — used to build the appointment management link sent by email
+# Public site URL — used for links sent by email: appointment management (client)
+# and accept / refuse of out-of-zone requests (artisan)
 APP_URL=https://your-domain.com
 # Artisan reference timezone: stored datetimes and .ics files are interpreted here
 APP_TIMEZONE=Europe/Paris
@@ -186,6 +187,19 @@ On OVH shared hosting, permissions are generally managed automatically. However,
 - Config files: `600` (if supported, to restrict access)
 
 If using FileZilla, right-click files → **File permissions...** → set numeric value.
+
+### Database migration (out-of-zone requests)
+
+On an existing database, apply `sql/migrations/2026-10-21_item18_exception_requests.sql` once
+(phpMyAdmin → SQL tab, or the `mysql` client). It is idempotent.
+
+### Service area storage
+
+`api/storage/zone/` must also be **writable by PHP**: the Pro area (« Zone & déplacement » →
+« Calculer les communes ») saves the selected communes there as `service-area.geojson`. Not
+versioned either: after a first deployment the vitrine map shows only the starting point until
+the zone is computed and saved once. The computation calls the public API `geo.api.gouv.fr`
+from the browser.
 
 ### Logo & favicon storage
 

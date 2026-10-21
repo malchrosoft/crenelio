@@ -41,7 +41,8 @@ class Mailer
         string $subject,
         string $htmlBody,
         string $textBody,
-        ?array $attachment = null
+        ?array $attachment = null,
+        ?string $replyTo = null
     ): void {
         if (!self::isConfigured()) {
             throw new RuntimeException("Envoi d'emails non configuré (SMTP_HOST / MAIL_FROM manquants dans api/.env)");
@@ -51,7 +52,7 @@ class Mailer
             throw new RuntimeException("Adresse destinataire invalide : $toEmail");
         }
 
-        $message = self::buildMimeMessage($toEmail, $toName, $subject, $htmlBody, $textBody, $attachment);
+        $message = self::buildMimeMessage($toEmail, $toName, $subject, $htmlBody, $textBody, $attachment, $replyTo);
 
         $mailer = new self();
         try {
@@ -208,7 +209,8 @@ class Mailer
         string $subject,
         string $htmlBody,
         string $textBody,
-        ?array $attachment
+        ?array $attachment,
+        ?string $replyTo = null
     ): string {
         $mixedBoundary = 'mixed_' . bin2hex(random_bytes(12));
         $altBoundary   = 'alt_' . bin2hex(random_bytes(12));
@@ -223,6 +225,10 @@ class Mailer
             'MIME-Version: 1.0',
             'Content-Type: multipart/mixed; boundary="' . $mixedBoundary . '"',
         ];
+        // Réponse directe au client (demande exceptionnelle) ; adresse déjà validée par l'appelant
+        if ($replyTo !== null && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
+            $headers[] = 'Reply-To: ' . $replyTo;
+        }
 
         $parts = [
             '--' . $mixedBoundary,

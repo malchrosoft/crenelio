@@ -1,7 +1,7 @@
-import React, { lazy, Suspense, useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import clsx from 'clsx';
-import { LockKeyIcon, ArrowLeftIcon, UserIcon } from '@phosphor-icons/react';
+import { LockKeyIcon, ArrowLeftIcon } from '@phosphor-icons/react';
 import { api } from '../api';
 import { Service, Slot, Appointment, BookingPayload, AppConfig } from '../types';
 import ServiceSelector from '../components/ServiceSelector';
@@ -9,9 +9,7 @@ import SlotPicker from '../components/SlotPicker';
 import BookingForm from '../components/BookingForm';
 import BookingConfirmation from '../components/BookingConfirmation';
 import BrandMark from '../components/BrandMark';
-
-// Espace Pro chargé à la demande : il n'alourdit pas le parcours des clients
-const AdminDashboard = lazy(() => import('../components/AdminDashboard'));
+import { isPremisesOnly, premisesLabel } from '../utils/zone';
 
 interface BookingPageProps {
   config: AppConfig;
@@ -26,7 +24,8 @@ interface BookingPageProps {
 const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
   const [searchParams] = useSearchParams();
   const preselectedServiceId = searchParams.get('service');
-  const initialAdmin = searchParams.get('admin') === '1' || searchParams.get('view') === 'admin';
+  // Anciens liens vers l'espace Pro (?view=admin, ?admin=1) : redirigés vers /admin
+  const legacyAdminLink = searchParams.get('admin') === '1' || searchParams.get('view') === 'admin';
 
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -35,7 +34,6 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isAdminView, setIsAdminView] = useState<boolean>(initialAdmin);
 
   // Pré-sélection de la prestation depuis la vitrine (?service=ID)
   useEffect(() => {
@@ -73,6 +71,8 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
   }
 
 
+  if (legacyAdminLink) return <Navigate to="/admin" replace />;
+
   return (
     <div>
       {/* Header allégé avec retour vitrine */}
@@ -84,33 +84,14 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
         <span className="booking-page-header__brand">
           <BrandMark config={config} iconSize={22} />
         </span>
-        <button
-          type="button"
-          className="btn btn-secondary booking-page-header__admin-btn"
-          onClick={() => setIsAdminView(!isAdminView)}
-        >
-          {isAdminView ? (
-            <>
-              <UserIcon size={16} weight="fill" />
-              Espace Client
-            </>
-          ) : (
-            <>
-              <LockKeyIcon size={16} weight="fill" />
-              Espace Pro
-            </>
-          )}
-        </button>
+        <Link to="/admin" className="btn btn-secondary booking-page-header__admin-btn">
+          <LockKeyIcon size={16} weight="fill" />
+          Espace Pro
+        </Link>
       </div>
 
       <div className="container">
-        {/* Vue Admin */}
-        {isAdminView ? (
-          <Suspense fallback={<p>Chargement de l'espace Pro…</p>}>
-            <AdminDashboard onBackToClient={() => setIsAdminView(false)} />
-          </Suspense>
-        ) : (
-          <>
+        <>
             {/* Stepper */}
             {step < 4 && (
               <div className="stepper">
@@ -181,8 +162,8 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
                   slot={selectedSlot}
                   defaultCenter={defaultCenter}
                   defaultZoom={isNaN(defaultZoom) ? 12 : defaultZoom}
-                  proEmail={config.pro_email}
                   proPhone={config.pro_phone}
+                  premisesAddress={isPremisesOnly(config) ? premisesLabel(config) || null : null}
                   onSubmit={handleBookingSubmit}
                   onBack={() => setStep(2)}
                   loading={loading}
@@ -198,8 +179,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
                 onNewBooking={handleReset}
               />
             )}
-          </>
-        )}
+        </>
       </div>
     </div>
   );

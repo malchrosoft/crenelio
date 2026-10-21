@@ -12,6 +12,8 @@
  * géocodée par la Base Adresse Nationale côté tunnel de réservation.
  */
 
+require_once __DIR__ . '/ServiceArea.php';
+
 class TravelFee
 {
     /** Nombre maximal de paliers lus dans la table `config`. */
@@ -79,6 +81,12 @@ class TravelFee
      *     needs_coordinates: bool, tiers: array
      * }
      */
+    /** Vrai si l'artisan ne se déplace pas : les rendez-vous ont lieu à l'adresse de l'entreprise. */
+    public static function isPremisesOnly(array $config): bool
+    {
+        return ($config['travel_mode'] ?? 'onsite') === 'premises';
+    }
+
     public static function quote(array $service, ?float $latitude, ?float $longitude, array $config): array
     {
         $mode         = $service['travel_fee_mode'] ?? 'none';
@@ -96,16 +104,46 @@ class TravelFee
             'is_out_of_zone'    => false,
             'max_km'            => $maxKm,
             'needs_coordinates' => false,
+            // Motif du hors zone : `radius` (au-delà du rayon) ou `commune` (commune non desservie)
+            'out_of_zone_reason' => null,
+            // Hors zone mais à moins du rayon + 10 % : demande exceptionnelle possible
+            'can_request_exception' => false,
             'tiers'             => $mode === 'distance_tiers' ? self::tiers($config) : [],
         ];
 
-        // Prestation sans déplacement facturé : ni frais, ni contrôle de zone.
+        // Artisan qui reçoit dans ses locaux : aucun déplacement, quelle que soit la prestation.
+        if (self::isPremisesOnly($config)) {
+            $quote['mode'] = 'none';
+            $quote['tiers'] = [];
+            return $quote;
+        }
+
+        // Communes desservies : contrôle pour toute prestation dès qu'une zone est enregistrée
+        if (ServiceArea::features()) {
+            if ($latitude === null || $longitude === null) {
+                $quote['needs_coordinates'] = true;
+                return $quote;
+            }
+            // Hors communes : signalé, mais les frais restent calculés (rendez-vous forcé par l'artisan,
+            // demande exceptionnelle acceptée)
+            if (!ServiceArea::contains($latitude, $longitude)) {
+                $quote['is_out_of_zone'] = true;
+                $quote['out_of_zone_reason'] = 'commune';
+                $quote['distance_km'] = self::distanceFrom($latitude, $longitude, self::startPoint($config));
+                $quote['can_request_exception'] = self::withinMargin($quote['distance_km'], $maxKm);
+            }
+        }
+
+        // Prestation sans déplacement facturé : ni frais, ni contrôle de rayon.
         if ($mode === 'none') {
             return $quote;
         }
 
-        $distanceKm = self::distanceFromBase($latitude, $longitude, $config);
-        $quote['distance_km'] = $distanceKm;
+        // Frais : depuis l'origine choisie (point de départ ou adresse de l'entreprise) ;
+        // zone : toujours depuis le point de départ, centre du rayon d'intervention.
+        $distanceKm = self::distanceFrom($latitude, $longitude, self::feeOrigin($config));
+        $zoneKm     = self::distanceFrom($latitude, $longitude, self::startPoint($config));
+        $quote['distance_km'] = $distanceKm ?? $quote['distance_km'];
 
         if ($mode === 'fixed') {
             $quote['travel_fee'] = round((float)($service['travel_fee_amount'] ?? 0), 2);
@@ -119,8 +157,10 @@ class TravelFee
         }
 
         // Hors zone : la réservation directe est bloquée au-delà du rayon maximal.
-        if ($distanceKm !== null && $maxKm !== null && $distanceKm > $maxKm) {
+        if ($zoneKm !== null && $maxKm !== null && $zoneKm > $maxKm) {
             $quote['is_out_of_zone'] = true;
+            $quote['out_of_zone_reason'] ??= 'radius';
+            $quote['can_request_exception'] = self::withinMargin($zoneKm, $maxKm);
         }
 
         $quote['total'] = round($servicePrice + $quote['travel_fee'], 2);
@@ -128,18 +168,46 @@ class TravelFee
         return $quote;
     }
 
+    /** Marge au-delà du rayon où une demande exceptionnelle reste proposée (10 %). */
+    public const EXCEPTION_MARGIN = 0.10;
+
+    /** Vrai si la distance au point de départ reste sous le rayon + 10 % (rayon défini). */
+    private static function withinMargin(?float $distanceKm, ?float $maxKm): bool
+    {
+        return $distanceKm !== null && $maxKm !== null && $distanceKm <= $maxKm * (1 + self::EXCEPTION_MARGIN);
+    }
+
+    /** Point de départ (centre du rayon d'intervention). */
+    private static function startPoint(array $config): array
+    {
+        return [$config['default_latitude'] ?? null, $config['default_longitude'] ?? null];
+    }
+
     /**
-     * Distance entre le point de base de l'artisan et le client, ou null si
-     * l'une des deux positions est inconnue.
+     * Origine du calcul des frais (`travel_fee_origin`) : `start` (défaut), le point de départ ;
+     * `company`, l'adresse de l'entreprise si elle est géolocalisée, sinon le point de départ.
+     *
+     * @return array{0: mixed, 1: mixed}
      */
-    private static function distanceFromBase(?float $latitude, ?float $longitude, array $config): ?float
+    private static function feeOrigin(array $config): array
+    {
+        if (($config['travel_fee_origin'] ?? 'start') === 'company'
+            && ($config['premises_latitude'] ?? '') !== '' && ($config['premises_longitude'] ?? '') !== '') {
+            return [$config['premises_latitude'], $config['premises_longitude']];
+        }
+        return [$config['default_latitude'] ?? null, $config['default_longitude'] ?? null];
+    }
+
+    /**
+     * Distance entre une origine [lat, lon] et le client, ou null si l'une des deux positions est inconnue.
+     */
+    private static function distanceFrom(?float $latitude, ?float $longitude, array $origin): ?float
     {
         if ($latitude === null || $longitude === null) {
             return null;
         }
 
-        $baseLat = $config['default_latitude']  ?? null;
-        $baseLon = $config['default_longitude'] ?? null;
+        [$baseLat, $baseLon] = $origin;
 
         if ($baseLat === null || $baseLat === '' || $baseLon === null || $baseLon === '') {
             return null;

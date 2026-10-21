@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import { api } from './api';
 import { applyFavicon } from './utils/favicon';
 import { applyDocumentTitle } from './utils/documentTitle';
+import AdminPage from './pages/AdminPage';
+import DecisionPage from './pages/DecisionPage';
 import { Service, AppConfig } from './types';
 import VitrinePage from './pages/VitrinePage';
 import BookingPage from './pages/BookingPage';
@@ -45,6 +47,8 @@ export const App: React.FC = () => {
         path="/booking"
         element={<BookingPage config={config} services={services} />}
       />
+      <Route path="/admin" element={<AdminPage />} />
+      <Route path="/decision/:token" element={<DecisionPage config={config} />} />
       <Route
         path="/rdv/:token"
         element={<AppointmentManagePage config={config} />}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GithubLogoIcon, TranslateIcon } from '@phosphor-icons/react';
 import { AppConfig } from '../types';
+import { premisesLabel } from '../utils/zone';
 import legalCreditsI18n from '../data/legalCreditsI18n.json';
 
 type LangKey = keyof typeof legalCreditsI18n;
@@ -27,10 +28,12 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
   }, [onClose]);
 
   const companyName = config.company_name || 'Crénelio';
+  // Siège social : adresse dédiée, sinon celle de l'entreprise (cas le plus courant chez un artisan)
+  const legalAddress = config.legal_adresse?.trim() || premisesLabel(config);
   const hasLegal =
     config.legal_raison_sociale ||
     config.legal_siret ||
-    config.legal_adresse;
+    legalAddress;
 
   return (
     <div
@@ -65,7 +68,7 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
                   <h3>Éditeur du site</h3>
                   <address>
                     <strong>{config.legal_raison_sociale}</strong>
-                    {config.legal_adresse && <><br />{config.legal_adresse}</>}
+                    {legalAddress && <><br />{legalAddress}</>}
                     {config.pro_phone && (
                       <><br />Tél. : <a href={`tel:${config.pro_phone}`}>{config.pro_phone}</a></>
                     )}

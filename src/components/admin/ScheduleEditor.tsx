@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../api';
 import { Schedule } from '../../types';
+import ResetButton from './ResetButton';
 
 const DAY_NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 const TIME_FIELDS = ['morning_start', 'morning_end', 'afternoon_start', 'afternoon_end'] as const;
@@ -21,11 +22,18 @@ const toDraft = (s: Schedule): DayDraft => ({
  */
 const ScheduleEditor: React.FC = () => {
   const [days, setDays] = useState<DayDraft[]>([]);
+  // Valeurs en base, pour « Annuler »
+  const [stored, setStored] = useState<DayDraft[]>([]);
+  const dirty = JSON.stringify(days) !== JSON.stringify(stored);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    api.getSchedules().then((list) => setDays(list.map(toDraft).sort((a, b) => a.day_of_week - b.day_of_week)));
+    api.getSchedules().then((list) => {
+      const drafts = list.map(toDraft).sort((a, b) => a.day_of_week - b.day_of_week);
+      setDays(drafts);
+      setStored(drafts);
+    });
   }, []);
 
   function update(day: number, patch: Partial<DayDraft>) {
@@ -49,6 +57,7 @@ const ScheduleEditor: React.FC = () => {
             throw new Error(`${DAY_NAMES[d.day_of_week - 1]} : ${err.message}`);
           });
       }
+      setStored(days);
       setMessage('Horaires enregistrés.');
     } catch (err: unknown) {
       setMessage(err instanceof Error ? err.message : "Erreur lors de l'enregistrement");
@@ -120,6 +129,14 @@ const ScheduleEditor: React.FC = () => {
           <button type="submit" className="btn btn-primary" disabled={saving || days.length === 0}>
             {saving ? 'Enregistrement…' : 'Enregistrer'}
           </button>
+          <ResetButton
+            dirty={dirty}
+            disabled={saving}
+            onReset={() => {
+              setDays(stored);
+              setMessage(null);
+            }}
+          />
           {message && <span className="admin-settings-message">{message}</span>}
         </div>
       </form>

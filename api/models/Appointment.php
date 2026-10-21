@@ -65,6 +65,31 @@ class Appointment
     }
 
     /**
+     * Demande exceptionnelle en attente, retrouvée par le jeton du lien envoyé à l'artisan.
+     */
+    public static function findByDecisionToken(string $token): ?array
+    {
+        $sql = 'SELECT a.*, s.name AS service_name, s.duration_minutes, s.price AS service_price
+                FROM `appointments` a
+                JOIN `services` s ON a.service_id = s.id
+                WHERE a.decision_token = ?';
+
+        return Database::fetchOne($sql, [$token]);
+    }
+
+    /**
+     * Décision de l'artisan sur une demande exceptionnelle : statut final, jeton invalidé.
+     */
+    public static function decide(int $id, string $status, ?string $reason = null): bool
+    {
+        return Database::execute(
+            'UPDATE `appointments` SET status = ?, cancellation_reason = ?, decision_token = NULL
+             WHERE id = ? AND status = "pending" AND decision_token IS NOT NULL',
+            [$status, $reason, $id]
+        ) > 0;
+    }
+
+    /**
      * Find overlapping active appointments within a datetime window.
      */
     public static function getOverlapping(string $startDatetime, string $endDatetime, ?int $excludeId = null): array
@@ -95,8 +120,8 @@ class Appointment
                 service_id, client_name, client_email, client_phone,
                 address, postal_code, city,
                 travel_fee, distance_km, is_out_of_zone, notes,
-                start_datetime, end_datetime, status, cancel_token
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                start_datetime, end_datetime, status, cancel_token, decision_token
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 (int)$data['service_id'],
                 trim($data['client_name']),
@@ -112,7 +137,8 @@ class Appointment
                 $data['start_datetime'],
                 $data['end_datetime'],
                 $data['status'] ?? 'confirmed',
-                $token
+                $token,
+                $data['decision_token'] ?? null
             ]
         );
 

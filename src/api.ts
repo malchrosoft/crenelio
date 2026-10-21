@@ -1,6 +1,7 @@
 /**
  * Centralized API client for Crénelio (TypeScript).
  */
+import { ZoneCollection, ZoneFeature } from './utils/serviceArea';
 import {
   Service,
   SlotsResponse,
@@ -74,6 +75,8 @@ export const api = {
   // Moteur de créneaux
   getSlots: (serviceId: number, date: string) =>
     request<SlotsResponse>('GET', `/slots?service_id=${serviceId}&date=${date}`),
+  getZone: () => request<ZoneCollection>('GET', '/zone'),
+  updateZone: (features: ZoneFeature[]) => request<{ count: number }>('PUT', '/admin/zone', { features }),
   getSlotAvailability: (serviceId: number) =>
     request<SlotAvailability>('GET', `/slots/availability?service_id=${serviceId}`),
 
@@ -86,8 +89,17 @@ export const api = {
     }),
 
   // Rendez-vous
+  /** Rendez-vous saisi par l'artisan (hors zone et heure libre acceptés). */
+  createAdminAppointment: (payload: BookingPayload) =>
+    request<{ message: string; appointment: Appointment }>('POST', '/admin/appointments', payload),
   createAppointment: (payload: BookingPayload) =>
     request<{ message: string; appointment: Appointment }>('POST', '/appointments', payload),
+  /** Demande hors zone : rendez-vous « en attente » soumis à l'artisan, emails au client et à l'artisan. */
+  requestException: (payload: BookingPayload) =>
+    request<{ message: string }>('POST', '/appointments/exceptional-request', payload),
+  getDecision: (token: string) => request<Appointment>('GET', `/appointments/decision/${token}`),
+  decide: (token: string, action: 'accept' | 'refuse') =>
+    request<{ status: Appointment['status'] }>('POST', `/appointments/decision/${token}`, { action }),
   getAppointmentByToken: (token: string) =>
     request<Appointment>('GET', `/appointments/token/${token}`),
   cancelAppointmentByToken: (token: string, reason = '') =>

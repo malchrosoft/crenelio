@@ -13,6 +13,10 @@ import {
   XCircleIcon,
   HourglassIcon,
   ArrowClockwiseIcon,
+  WrenchIcon,
+  GearSixIcon,
+  MapTrifoldIcon,
+  PlusIcon,
 } from '@phosphor-icons/react';
 import { api } from '../api';
 import {
@@ -30,16 +34,34 @@ import ConfigGroupForm from './admin/ConfigGroupForm';
 import EngagementsEditor from './admin/EngagementsEditor';
 import ScheduleEditor from './admin/ScheduleEditor';
 import UnavailabilityEditor from './admin/UnavailabilityEditor';
+import TravelSettingsEditor from './admin/TravelSettingsEditor';
+import ZoneWorkspace from './admin/ZoneWorkspace';
+import ResetButton from './admin/ResetButton';
+import NewAppointment from './admin/NewAppointment';
 import BrandingField from './admin/BrandingField';
+import AdminShell, { AdminTab } from './admin/AdminShell';
 import { applyFavicon } from '../utils/favicon';
 import { applyDocumentTitle } from '../utils/documentTitle';
 import { format, isPast, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
+const NAV_ICON = { size: 20, weight: 'fill' as const, 'aria-hidden': true };
+
+/** Libellés des statuts de rendez-vous (capsules du planning). */
+const STATUS_LABELS: Record<Appointment['status'], string> = {
+  pending: 'En attente',
+  confirmed: 'Confirmé',
+  completed: 'Terminé',
+  cancelled: 'Annulé',
+};
+
 /** Libellés lisibles des emails journalisés. */
 const NOTIFICATION_LABELS: Record<NotificationType, string> = {
   client_confirmation: 'Confirmation client',
   pro_confirmation: 'Fiche intervention (artisan)',
+  exception_client_ack: 'Demande hors zone : accusé de réception client',
+  exception_pro_request: 'Demande hors zone : à valider (artisan)',
+  exception_client_refused: 'Demande hors zone : refus envoyé au client',
 };
 
 /** Paliers kilométriques modifiables depuis l'espace Pro (cf. `config.travel_tier_*`). */
@@ -108,18 +130,16 @@ function extractTravelSettings(config: AppConfig): Record<string, string> {
       `travel_tier_${index}_max_km`,
       `travel_tier_${index}_fee`,
     ]),
-    'travel_max_km',
+    'travel_fee_origin',
   ];
 
-  return Object.fromEntries(keys.map((key) => [key, config[key] ?? '']));
+  return { ...Object.fromEntries(keys.map((key) => [key, config[key] ?? ''])), travel_fee_origin: config.travel_fee_origin || 'start' };
 }
 
-interface AdminDashboardProps {
-  onBackToClient: () => void;
-}
-
-export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }) => {
+export const AdminDashboard: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  // Saisie d'un rendez-vous par l'artisan (formulaires partagés de la réservation)
+  const [creatingAppointment, setCreatingAppointment] = useState(false);
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -127,7 +147,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
   const [services, setServices] = useState<Service[]>([]);
   const [config, setConfig] = useState<AppConfig>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'appointments' | 'services' | 'hours' | 'settings' | 'config'>('appointments');
+  const [activeTab, setActiveTab] = useState<AdminTab>('appointments');
 
   // Recherche & Filtres planning
   const [searchQuery, setSearchQuery] = useState('');
@@ -175,6 +195,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
   useEffect(() => {
     if (isAuthenticated) {
       loadData();
+    } else {
+      // Config publique : nom de l'entreprise dans le header dès l'écran de connexion
+      api.getConfig().then(setConfig).catch(() => undefined);
     }
   }, [isAuthenticated]);
 
@@ -277,6 +300,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
       setTravelSettingsSaving(false);
     }
   }
+
+  // Passage en mode « locaux » : le menu Zone d'intervention disparaît, retour sur Déplacement
+  useEffect(() => {
+    if (config.travel_mode === 'premises' && activeTab === 'zone') setActiveTab('settings');
+  }, [config.travel_mode, activeTab]);
 
   // Titre de l'onglet aligné sur le nom de l'entreprise, y compris juste après son enregistrement
   useEffect(() => {
@@ -470,8 +498,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
 
   if (!isAuthenticated) {
     return (
+      <AdminShell companyName={config.company_name}>
       <div className="card admin-login-card">
-        <h2 className="card-title">Connexion Espace Pro</h2>
+        <h2 className="card-title">Connexion à l'espace Artisan</h2>
         <p className="admin-login-hint">
           Saisissez votre mot de passe d'administration (par défaut : <code>admin123</code>).
         </p>
@@ -496,87 +525,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
           </div>
 
           <div className="admin-login-actions">
-            <button type="button" className="btn btn-secondary" onClick={onBackToClient}>
-              ← Retour au site
-            </button>
             <button type="submit" className="btn btn-primary">
               Se connecter
             </button>
           </div>
         </form>
       </div>
+      </AdminShell>
     );
   }
 
+  const navItems: { id: AdminTab; label: string; icon: React.ReactNode; count?: number }[] = [
+    { id: 'appointments', label: 'Rendez-vous', icon: <CalendarBlankIcon {...NAV_ICON} />, count: appointments.length },
+    { id: 'services', label: 'Prestations', icon: <WrenchIcon {...NAV_ICON} />, count: services.length },
+    { id: 'hours', label: 'Horaires', icon: <ClockIcon {...NAV_ICON} /> },
+    { id: 'settings', label: 'Déplacement', icon: <CarIcon {...NAV_ICON} /> },
+    // Zone d'intervention : uniquement si l'artisan se déplace chez ses clients
+    ...(config.travel_mode === 'premises'
+      ? []
+      : [{ id: 'zone' as const, label: "Zone d'intervention", icon: <MapTrifoldIcon {...NAV_ICON} /> }]),
+    { id: 'config', label: 'Configuration', icon: <GearSixIcon {...NAV_ICON} /> },
+  ];
+
   return (
-    <div className="card">
-      <div className="admin-dashboard-header">
-        <div>
-          <h2 className="admin-title">Espace Gestion Artisan</h2>
-          <div className="admin-company-sub">
-            Entreprise : {config.company_name || 'Crénelio'}
-          </div>
-        </div>
-        <div className="admin-header-actions">
-          <button className="btn btn-secondary" onClick={() => setIsAuthenticated(false)}>
-            Déconnexion
-          </button>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="admin-tabs">
-        <button
-          className={clsx('btn', {
-            'btn-primary': activeTab === 'appointments',
-            'btn-secondary': activeTab !== 'appointments',
-          })}
-          onClick={() => setActiveTab('appointments')}
-        >
-          Planning des rendez-vous ({appointments.length})
-        </button>
-        <button
-          className={clsx('btn', {
-            'btn-primary': activeTab === 'services',
-            'btn-secondary': activeTab !== 'services',
-          })}
-          onClick={() => setActiveTab('services')}
-        >
-          Prestations ({services.length})
-        </button>
-        <button
-          className={clsx('btn', {
-            'btn-primary': activeTab === 'hours',
-            'btn-secondary': activeTab !== 'hours',
-          })}
-          onClick={() => setActiveTab('hours')}
-        >
-          Horaires
-        </button>
-        <button
-          className={clsx('btn', {
-            'btn-primary': activeTab === 'settings',
-            'btn-secondary': activeTab !== 'settings',
-          })}
-          onClick={() => setActiveTab('settings')}
-        >
-          Zone & déplacement
-        </button>
-        <button
-          className={clsx('btn', {
-            'btn-primary': activeTab === 'config',
-            'btn-secondary': activeTab !== 'config',
-          })}
-          onClick={() => setActiveTab('config')}
-        >
-          Configuration
-        </button>
-      </div>
-
+    <AdminShell
+      companyName={config.company_name}
+      onLogout={() => setIsAuthenticated(false)}
+      nav={{ items: navItems, active: activeTab, onSelect: setActiveTab }}
+    >
       {loading ? (
         <p>Chargement des données...</p>
+      ) : activeTab === 'appointments' && creatingAppointment ? (
+        <NewAppointment
+          config={config}
+          services={services}
+          onCancel={() => setCreatingAppointment(false)}
+          onDone={() => {
+            setCreatingAppointment(false);
+            loadData();
+          }}
+        />
       ) : activeTab === 'appointments' ? (
         <div>
+          <div className="admin-planning-toolbar">
+            <button type="button" className="btn btn-primary" onClick={() => setCreatingAppointment(true)}>
+              <PlusIcon size={18} weight="fill" aria-hidden="true" />
+              Nouveau rendez-vous
+            </button>
+          </div>
           {/* ── Barre de recherche et filtres multi-critères ── */}
           <div className="admin-filters-bar">
             <div className="admin-search-wrapper">
@@ -711,7 +707,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                         {a.address}, {a.postal_code} {a.city}
                       </td>
                       <td>
-                        <span className={`status-badge status-${a.status}`}>{a.status}</span>
+                        <span className={`status-badge status-${a.status}`}>{STATUS_LABELS[a.status] ?? a.status}</span>
                       </td>
                       <td>
                         <div className="admin-table-actions">
@@ -1143,6 +1139,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
             </div>
           )}
         </div>
+      ) : activeTab === 'zone' ? (
+        <ZoneWorkspace config={config} onSaved={setConfig} />
       ) : activeTab === 'hours' ? (
         <div className="admin-config">
           <ScheduleEditor />
@@ -1173,83 +1171,99 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
           )}
         </div>
       ) : (
-        <div>
-          <div className="admin-section-header">
-            <h3 className="admin-section-title">Zone d'intervention & frais de déplacement</h3>
-          </div>
-          <p className="admin-settings-intro">
-            Ces paliers s'appliquent aux prestations réglées sur « Paliers kilométriques ». La distance est
-            calculée à vol d'oiseau entre votre point de départ et l'adresse du client.
-          </p>
-
-          <form className="admin-settings-form" onSubmit={handleSaveTravelSettings}>
-            <div className="admin-tier-grid">
-              {TRAVEL_TIER_INDEXES.map((index) => (
-                <div className="admin-tier-row" key={index}>
-                  <div className="form-group">
-                    <label className="form-label">Palier {index} — jusqu'à</label>
-                    <div className="form-field-unit">
-                      <input
-                        type="number"
-                        className="form-input form-input--compact"
-                        min="0"
-                        step="1"
-                        value={travelSettings[`travel_tier_${index}_max_km`] ?? ''}
-                        onChange={(e) => updateTravelSetting(`travel_tier_${index}_max_km`, e.target.value)}
-                      />
-                      <span className="form-unit">km</span>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Frais</label>
-                    <div className="form-field-unit">
-                      <input
-                        type="number"
-                        className="form-input form-input--compact"
-                        min="0"
-                        step="0.5"
-                        value={travelSettings[`travel_tier_${index}_fee`] ?? ''}
-                        onChange={(e) => updateTravelSetting(`travel_tier_${index}_fee`, e.target.value)}
-                      />
-                      <span className="form-unit">€</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <p className="form-hint">Laisser la distance d'un palier vide pour le désactiver.</p>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Rayon maximal d'intervention</label>
-              <div className="form-field-unit">
-                <input
-                  type="number"
-                  className="form-input form-input--compact"
-                  min="0"
-                  step="1"
-                  value={travelSettings.travel_max_km ?? ''}
-                  onChange={(e) => updateTravelSetting('travel_max_km', e.target.value)}
-                />
-                <span className="form-unit">km</span>
+        <div className="admin-config">
+          <TravelSettingsEditor config={config} onSaved={setConfig} />
+          {config.travel_mode !== 'premises' && (
+            <section className="admin-config-group">
+              <div className="admin-section-header">
+                <h3 className="admin-section-title">Frais de déplacement par paliers</h3>
               </div>
-              <p className="form-hint">
-                Au-delà de ce rayon, la réservation en ligne est bloquée et le client est invité à formuler
-                une demande exceptionnelle par email.
+              <p className="admin-settings-intro">
+                Ces paliers s'appliquent aux prestations réglées sur « Paliers kilométriques ». La distance est
+                calculée à vol d'oiseau jusqu'à l'adresse du client.
               </p>
-            </div>
 
-            <div className="admin-settings-actions">
-              <button type="submit" className="btn btn-primary" disabled={travelSettingsSaving}>
-                {travelSettingsSaving ? 'Enregistrement…' : 'Enregistrer les paliers'}
-              </button>
-              {travelSettingsMessage && (
-                <span className="admin-settings-message">{travelSettingsMessage}</span>
-              )}
-            </div>
-          </form>
+              <form className="admin-settings-form" onSubmit={handleSaveTravelSettings}>
+                <fieldset className="form-group form-fieldset">
+                  <legend className="form-label">Distance calculée depuis</legend>
+                  <label className="form-fieldset__option">
+                    <input
+                      type="radio"
+                      name="travel_fee_origin"
+                      checked={travelSettings.travel_fee_origin !== 'company'}
+                      onChange={() => updateTravelSetting('travel_fee_origin', 'start')}
+                    />
+                    Le point de départ (centre de la zone d'intervention)
+                  </label>
+                  <label className="form-fieldset__option">
+                    <input
+                      type="radio"
+                      name="travel_fee_origin"
+                      checked={travelSettings.travel_fee_origin === 'company'}
+                      onChange={() => updateTravelSetting('travel_fee_origin', 'company')}
+                    />
+                    L'adresse de l'entreprise
+                    {!config.premises_latitude && ' (non renseignée : le point de départ est utilisé)'}
+                  </label>
+                </fieldset>
+                <div className="admin-tier-grid">
+                  {TRAVEL_TIER_INDEXES.map((index) => (
+                    <div className="admin-tier-row" key={index}>
+                      <div className="form-group">
+                        <label className="form-label">Palier {index} — jusqu'à</label>
+                        <div className="form-field-unit">
+                          <input
+                            type="number"
+                            className="form-input form-input--compact"
+                            min="0"
+                            step="1"
+                            value={travelSettings[`travel_tier_${index}_max_km`] ?? ''}
+                            onChange={(e) => updateTravelSetting(`travel_tier_${index}_max_km`, e.target.value)}
+                          />
+                          <span className="form-unit">km</span>
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Frais</label>
+                        <div className="form-field-unit">
+                          <input
+                            type="number"
+                            className="form-input form-input--compact"
+                            min="0"
+                            step="0.5"
+                            value={travelSettings[`travel_tier_${index}_fee`] ?? ''}
+                            onChange={(e) => updateTravelSetting(`travel_tier_${index}_fee`, e.target.value)}
+                          />
+                          <span className="form-unit">€</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <p className="form-hint">Laisser la distance d'un palier vide pour le désactiver.</p>
+                </div>
+
+                <div className="admin-settings-actions">
+                  <button type="submit" className="btn btn-primary" disabled={travelSettingsSaving}>
+                    {travelSettingsSaving ? 'Enregistrement…' : 'Enregistrer les paliers'}
+                  </button>
+                  <ResetButton
+                    dirty={JSON.stringify(travelSettings) !== JSON.stringify(extractTravelSettings(config))}
+                    disabled={travelSettingsSaving}
+                    onReset={() => {
+                      setTravelSettings(extractTravelSettings(config));
+                      setTravelSettingsMessage(null);
+                    }}
+                  />
+                  {travelSettingsMessage && (
+                    <span className="admin-settings-message">{travelSettingsMessage}</span>
+                  )}
+                </div>
+              </form>
+            </section>
+          )}
         </div>
       )}
-    </div>
+    </AdminShell>
   );
 };
 

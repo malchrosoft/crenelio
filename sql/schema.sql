@@ -93,6 +93,8 @@ CREATE TABLE `appointments` (
     `end_datetime`        DATETIME        NOT NULL,
     `status`              ENUM('pending', 'confirmed', 'completed', 'cancelled') NOT NULL DEFAULT 'confirmed',
     `cancel_token`        VARCHAR(64)     NOT NULL UNIQUE,
+    -- Demande exceptionnelle : jeton du lien « Accepter / refuser » de l'artisan (NULL une fois décidé)
+    `decision_token`      VARCHAR(64)     NULL UNIQUE,
     `cancellation_reason` TEXT            NULL,
     `created_at`          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -108,7 +110,10 @@ CREATE INDEX `idx_appointments_status` ON `appointments` (`status`);
 CREATE TABLE `appointment_notifications` (
     `id`             INT AUTO_INCREMENT PRIMARY KEY,
     `appointment_id` INT             NOT NULL,
-    `type`           ENUM('client_confirmation', 'pro_confirmation') NOT NULL,
+    `type`           ENUM(
+        'client_confirmation', 'pro_confirmation',
+        'exception_client_ack', 'exception_pro_request', 'exception_client_refused'
+    ) NOT NULL,
     `recipient`      VARCHAR(255)    NOT NULL,
     `subject`        VARCHAR(255)    NOT NULL,
     `status`         ENUM('pending', 'sent', 'failed') NOT NULL DEFAULT 'pending',

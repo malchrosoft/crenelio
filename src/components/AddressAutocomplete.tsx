@@ -19,18 +19,26 @@ interface AddressAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
   onSelectAddress: (result: AddressResult) => void;
+  /** Champ obligatoire (défaut : oui, comme dans le formulaire de réservation). */
+  required?: boolean;
+  /** Associe le champ à un `<label htmlFor>`. */
+  id?: string;
 }
 
 export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   value,
   onChange,
   onSelectAddress,
+  required = true,
+  id,
 }) => {
   const [query, setQuery] = useState<string>(value || '');
   const [suggestions, setSuggestions] = useState<BANFeature[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  // Libellés posés par une sélection : ne relancent pas de recherche (sinon la liste se rouvrait)
+  const selectedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     setQuery(value || '');
@@ -51,6 +59,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       setSuggestions([]);
       return;
     }
+    if (selectedRef.current.has(query)) return;
 
     const timer = setTimeout(async () => {
       setIsLoading(true);
@@ -81,6 +90,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     const postCode = props.postcode || '';
     const city = props.city || '';
 
+    selectedRef.current = new Set([props.label, fullAddress].filter(Boolean));
     setQuery(props.label || fullAddress);
     setIsOpen(false);
 
@@ -96,11 +106,13 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   return (
     <div className="autocomplete-wrapper" ref={wrapperRef}>
       <input
+        id={id}
         type="text"
         className="form-input"
         placeholder="Tapez votre adresse (ex: 12 rue de la Paix, Paris)..."
         value={query}
         onChange={(e) => {
+          selectedRef.current.clear();
           setQuery(e.target.value);
           onChange(e.target.value);
         }}
@@ -108,7 +120,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           if (suggestions.length > 0) setIsOpen(true);
         }}
         autoComplete="off"
-        required
+        required={required}
       />
 
       {isOpen && suggestions.length > 0 && (

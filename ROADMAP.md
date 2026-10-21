@@ -203,6 +203,28 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
+### 17. Espace Artisan en Pleine Page ✅
+- **Réalisé :** route dédiée `/admin` (les anciens liens `/booking?view=admin` y redirigent), header fixe « Espace Artisan » + nom de l'entreprise, déconnexion à droite, liens Accueil et Espace client ouverts dans un nouvel onglet ; menu latéral rétractable (icônes seules, état mémorisé dans le navigateur). Composant `src/components/admin/AdminShell.tsx`.
+- **Améliorations possibles :** conserver la session à l'actualisation de la page (aujourd'hui, retour à l'écran de connexion — à traiter avec l'Item 12) ; tableau des rendez-vous adapté au mobile.
+
+---
+
+### 18. Zone d'Intervention Calculée & Mode « Sans Déplacement » ✅
+- **Réalisé :** onglet « Zone & déplacement » : mode d'intervention (déplacement chez le client / réception dans les locaux), adresse de l'entreprise par autocomplétion (fixe aussi le point de départ), option « communes limitrophes ». « Calculer les communes » interroge `geo.api.gouv.fr` (`src/utils/serviceArea.ts`) : commune de départ, limitrophes, communes au moins partiellement dans le rayon `travel_max_km` ; liste à cocher puis enregistrement dans `api/storage/zone/service-area.geojson` (`PUT /admin/zone`, `GET /zone`). Carte commune `ZoneMap` : bleu si entièrement dans le rayon, orange si partiellement, cercle en pointillés. Rayon d'intervention réglé au-dessus de la carte (paliers de frais en dessous) ; clic droit sur une commune pour la retirer (rouge, décochée) ou la réintégrer. Mode locaux : vitrine « Nous trouver » avec l'adresse, aucune adresse ni frais demandés à la réservation, le serveur impose l'adresse des locaux sur le rendez-vous.
+- **Organisation :** menu « Déplacement » (mode, adresse de l'entreprise, point de départ distinct possible par adresse ou coordonnées GPS, paliers de frais) et menu « Zone d'intervention » en pleine page (`ZoneWorkspace` : rayon, limitrophes, liste masquable avec distance au centre, carte sur toute la hauteur).
+- **Réservation :** dès qu'une zone est enregistrée, l'adresse du client doit être dans une commune cochée (`api/core/ServiceArea.php`, test point dans polygone), sinon blocage « hors zone » comme pour le rayon (`out_of_zone_reason` : `commune` / `radius`) ; l'adresse doit alors être choisie dans les suggestions.
+- **Demande exceptionnelle :** hors zone mais à moins du rayon + 10 % (`TravelFee::EXCEPTION_MARGIN`), le client envoie une demande pour le créneau choisi : rendez-vous `pending` qui bloque le créneau, accusé de réception au client, email à l'artisan (Reply-To client) avec un bouton vers `/decision/:token`. Accepter ⇒ `confirmed` + confirmations habituelles (.ics) ; refuser ⇒ `cancelled` + email au client. Au-delà de la marge : « adresse non desservie », sans action. Migration `sql/migrations/2026-10-21_item18_exception_requests.sql` (colonne `decision_token`, nouveaux types d'emails).
+- **Remplace :** le fichier statique `src/data/serviceAreaGeoJson.json` (propre à une installation).
+- **Améliorations possibles :** recalcul automatique quand le rayon ou l'adresse change (aujourd'hui, à relancer à la main) ; simplification des contours pour les grands rayons (fichier plus léger) ; libellés des emails « adresse d'intervention » adaptés au mode locaux.
+
+---
+
+### 19. Saisie d'un Rendez-vous par l'Artisan ✅
+- **Réalisé :** bouton « Nouveau rendez-vous » du planning (`src/components/admin/NewAppointment.tsx`) réutilisant `ServiceSelector`, `SlotPicker` et `BookingForm` en mode `adminMode` : tous les jours ouverts, heure libre hors créneaux, email et adresse facultatifs, encart hors zone avec enregistrement forcé (`POST /admin/appointments`, `is_out_of_zone` conservé), envoi des confirmations optionnel. Capsules de statut du planning en français.
+- **Améliorations possibles :** changer le statut d'une demande « En attente » depuis le planning n'envoie pas les emails de décision (passer par le lien de l'email) ; route `/admin/appointments` ouverte comme les autres `/admin/*` (Item 12).
+
+---
+
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |

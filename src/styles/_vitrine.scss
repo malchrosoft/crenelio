@@ -30,8 +30,11 @@
   padding: 18px 24px;
   background: white;
   border-bottom: 2px solid $gray-100;
-  position: sticky;
+  // Fixe et hors flux : masqué, il ne réserve aucune place, le hero est le premier élément visible
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   box-shadow: $shadow-sm;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
@@ -232,6 +235,8 @@
 // Sections génériques
 // -------------------------------------------------------
 .vitrine-section {
+  // Ancres (#zone…) : le titre ne passe pas sous le header fixe
+  scroll-margin-top: 96px;
   padding: 72px 24px;
 
   &--alt {
@@ -513,61 +518,6 @@ $engagement-gap: 24px;
 .vitrine-map-section {
   max-width: 860px;
   margin: 0 auto;
-
-  .vitrine-map-wrapper {
-    border-radius: $radius-lg;
-    overflow: hidden;
-    border: 2px solid $gray-200;
-    box-shadow: $shadow;
-    height: 360px;
-
-    @include mobile {
-      height: 260px;
-    }
-  }
-
-  .vitrine-map-canvas {
-    height: 100%;
-  }
-
-  // Sous la carte : commune survolée à gauche, bouton de recadrage à droite
-  .vitrine-map-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-top: 12px;
-  }
-
-  .vitrine-map-recenter {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border: 1px solid $gray-200;
-    border-radius: $radius-full;
-    background: white;
-    color: $gray-800;
-    font-size: 0.9rem;
-    font-weight: 600;
-    box-shadow: $shadow;
-    cursor: pointer;
-    transition: $transition-fast;
-
-    &:hover,
-    &:focus-visible {
-      color: $primary;
-      border-color: $primary;
-    }
-  }
-
-  .vitrine-map-hover-commune {
-    margin: 0;
-    font-size: 0.95rem;
-    color: $primary;
-    font-weight: 600;
-  }
 }
 
 // -------------------------------------------------------

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPinIcon, WarningCircleIcon, PhoneIcon, EnvelopeSimpleIcon } from '@phosphor-icons/react';
+import { CheckCircleIcon, EnvelopeSimpleIcon, MapPinIcon, PhoneIcon, WarningCircleIcon } from '@phosphor-icons/react';
 import AddressAutocomplete from './AddressAutocomplete';
 import InterventionMap from './InterventionMap';
 import { api } from '../api';
@@ -13,9 +13,12 @@ interface BookingFormProps {
   slot: Slot;
   defaultCenter?: [number, number];
   defaultZoom?: number;
-  proEmail?: string;
   proPhone?: string;
+  /** Adresse des locaux si l'artisan ne se déplace pas : aucune adresse n'est demandée au client. */
+  premisesAddress?: string | null;
   onSubmit: (payload: BookingPayload) => Promise<void>;
+  /** Espace Artisan : toute saisie est enregistrable (email et adresse facultatifs, hors zone forçable). */
+  adminMode?: boolean;
   onBack: () => void;
   loading: boolean;
   error: string | null;
@@ -26,9 +29,10 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   slot,
   defaultCenter,
   defaultZoom,
-  proEmail,
+  premisesAddress,
   proPhone,
   onSubmit,
+  adminMode = false,
   onBack,
   loading,
   error,
@@ -82,34 +86,52 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     setCoordinates(result.coordinates);
   }
 
-  /** Lien mailto pré-rempli pour une demande d'intervention exceptionnelle hors zone. */
-  function buildExceptionalRequestLink(): string {
-    const subject = `Demande d'intervention hors zone — ${service.name}`;
-    const lines = [
-      `Bonjour,`,
-      ``,
-      `Je souhaite une intervention bien que mon adresse se situe hors de votre zone habituelle.`,
-      ``,
-      `Prestation souhaitée : ${service.name}`,
-      `Créneau envisagé : ${formattedDate} à ${slot.start}`,
-      `Nom : ${clientName}`,
-      `Téléphone : ${clientPhone}`,
-      `Email : ${clientEmail}`,
-      `Adresse : ${address}, ${postalCode} ${city}`,
-      travelQuote?.distance_km !== null && travelQuote?.distance_km !== undefined
-        ? `Distance estimée : ${formatKm(travelQuote.distance_km)}`
-        : '',
-      notes ? `Précisions : ${notes}` : '',
-      ``,
-      `Merci par avance pour votre retour.`,
-    ].filter((line, index, all) => line !== '' || all[index - 1] !== '');
+  // Demande exceptionnelle (hors zone, à moins du rayon + 10 %) envoyée par l'application à l'artisan
+  const [requestState, setRequestState] = useState<'idle' | 'sending' | 'sent'>('idle');
+  const [requestError, setRequestError] = useState<string | null>(null);
 
-    return `mailto:${proEmail ?? ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+  const canRequest = !adminMode && isOutOfZone && (travelQuote?.can_request_exception ?? false);
+  // Espace Artisan : envoi des confirmations (client si email, fiche artisan avec .ics)
+  const [notify, setNotify] = useState(true);
+
+  // Champs obligatoires déjà contrôlés par le navigateur (soumission du formulaire)
+  async function sendExceptionalRequest() {
+    setRequestError(null);
+    setRequestState('sending');
+    try {
+      await api.requestException({
+        service_id: service.id,
+        client_name: clientName,
+        client_email: clientEmail,
+        client_phone: clientPhone,
+        address,
+        postal_code: postalCode,
+        city,
+        notes,
+        start_datetime: slot.start_datetime,
+        latitude: coordinates ? coordinates[0] : undefined,
+        longitude: coordinates ? coordinates[1] : undefined,
+      });
+      setRequestState('sent');
+    } catch (err: unknown) {
+      setRequestState('idle');
+      setRequestError(err instanceof Error ? err.message : "La demande n'a pas pu être envoyée");
+    }
   }
+
+  // Nouvelle adresse : la demande éventuellement envoyée concernait la précédente
+  useEffect(() => {
+    setRequestState('idle');
+    setRequestError(null);
+  }, [coordinates]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!isBookable) {
+    if (canRequest) {
+      if (requestState === 'idle') await sendExceptionalRequest();
+      return;
+    }
+    if (!adminMode && !isBookable) {
       return;
     }
     await onSubmit({
@@ -117,21 +139,35 @@ export const BookingForm: React.FC<BookingFormProps> = ({
       client_name: clientName,
       client_email: clientEmail,
       client_phone: clientPhone,
-      address,
-      postal_code: postalCode,
-      city,
+      // Dans les locaux, le serveur impose l'adresse de l'entreprise
+      address: premisesAddress ? '-' : address,
+      postal_code: premisesAddress ? '-' : postalCode,
+      city: premisesAddress ? '-' : city,
       notes,
       start_datetime: slot.start_datetime,
       latitude: coordinates ? coordinates[0] : undefined,
       longitude: coordinates ? coordinates[1] : undefined,
+      ...(adminMode ? { notify } : {}),
     });
   }
 
   return (
     <div className="card">
-      <h2 className="card-title">3. Vos coordonnées & Lieu d'intervention</h2>
+      <h2 className="card-title">
+        {adminMode
+          ? premisesAddress
+            ? '3. Coordonnées du client'
+            : "3. Client & lieu d'intervention"
+          : premisesAddress
+            ? '3. Vos coordonnées'
+            : "3. Vos coordonnées & Lieu d'intervention"}
+      </h2>
       <p className="card-subtitle">
-        Renseignez l'adresse où le technicien interviendra et vos coordonnées pour la confirmation.
+        {adminMode
+          ? "Seuls le nom et le téléphone sont obligatoires ; un rendez-vous hors zone reste enregistrable."
+          : premisesAddress
+          ? 'Renseignez vos coordonnées pour la confirmation du rendez-vous.'
+          : "Renseignez l'adresse où le technicien interviendra et vos coordonnées pour la confirmation."}
       </p>
 
       {/* Récapitulatif du créneau */}
@@ -152,6 +188,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({
             {slot.start} – {slot.end} ({service.duration_minutes} min)
           </span>
         </div>
+        {premisesAddress && (
+          <div className="summary-row">
+            <span className="summary-label">Lieu du rendez-vous :</span>
+            <span className="summary-value">{premisesAddress}</span>
+          </div>
+        )}
         <div className="summary-row">
           <span className="summary-label">Tarif de la prestation :</span>
           <span className="summary-value">
@@ -191,38 +233,6 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         </div>
       </div>
 
-      {/* Blocage bienveillant hors zone d'intervention */}
-      {isOutOfZone && travelQuote && (
-        <div className="booking-out-of-zone">
-          <div className="booking-out-of-zone__header">
-            <WarningCircleIcon size={22} weight="fill" aria-hidden="true" />
-            <strong>Adresse hors de la zone d'intervention</strong>
-          </div>
-          <p className="booking-out-of-zone__text">
-            Votre adresse se situe à{' '}
-            <strong>{travelQuote.distance_km !== null ? formatKm(travelQuote.distance_km) : '—'}</strong> du
-            point de départ, au-delà du rayon habituel de{' '}
-            <strong>{travelQuote.max_km !== null ? formatKm(travelQuote.max_km) : '—'}</strong>. La réservation
-            en ligne n'est pas possible, mais un déplacement exceptionnel reste envisageable : écrivez-nous et
-            nous reviendrons vers vous rapidement.
-          </p>
-          <div className="booking-out-of-zone__actions">
-            {proEmail && (
-              <a className="btn btn-primary" href={buildExceptionalRequestLink()}>
-                <EnvelopeSimpleIcon size={16} weight="fill" aria-hidden="true" />
-                Envoyer une demande exceptionnelle
-              </a>
-            )}
-            {proPhone && (
-              <a className="btn btn-secondary" href={`tel:${proPhone.replace(/\s/g, '')}`}>
-                <PhoneIcon size={16} weight="fill" aria-hidden="true" />
-                {proPhone}
-              </a>
-            )}
-          </div>
-        </div>
-      )}
-
       {error && (
         <div className="form-alert-error">
           {error}
@@ -257,85 +267,154 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         </div>
 
         <div className="form-group">
-          <label className="form-label">Adresse email (pour la confirmation) *</label>
+          <label className="form-label">
+            {adminMode ? 'Adresse email (facultative)' : 'Adresse email (pour la confirmation) *'}
+          </label>
           <input
             type="email"
             className="form-input"
-            required
+            required={!adminMode}
             value={clientEmail}
             onChange={(e) => setClientEmail(e.target.value)}
             placeholder="Ex: jean.dupont@example.com"
           />
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Adresse d'intervention (recherche automatique) *</label>
-          <AddressAutocomplete
-            value={address}
-            onChange={setAddress}
-            onSelectAddress={handleSelectAddress}
-          />
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">Code postal *</label>
-            <input
-              type="text"
-              className="form-input"
-              required
-              value={postalCode}
-              onChange={(e) => setPostalCode(e.target.value)}
-              placeholder="Ex: 92140"
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Ville *</label>
-            <input
-              type="text"
-              className="form-input"
-              required
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="Ex: Clamart"
-            />
-          </div>
-        </div>
-
-        {/* Carte OpenStreetMap avec Pigeon Maps */}
-        <div className="form-group">
-          <label className="form-label">Localisation sur la carte (OpenStreetMap)</label>
-          <InterventionMap
-            coordinates={coordinates}
-            defaultCenter={defaultCenter}
-            defaultZoom={defaultZoom}
-            height={200}
-          />
-          {coordinates && (
-            <div className="form-gps-status">
-              ✓ Coordonnées GPS validées pour le déplacement de l'artisan
+        {/* Adresse d'intervention : inutile si le rendez-vous a lieu dans les locaux */}
+        {!premisesAddress && (
+          <>
+            <div className="form-group">
+              <label className="form-label">
+                Adresse d'intervention (recherche automatique){adminMode ? '' : ' *'}
+              </label>
+              <AddressAutocomplete
+                required={!adminMode}
+                value={address}
+                onChange={setAddress}
+                onSelectAddress={handleSelectAddress}
+              />
             </div>
-          )}
-          {!coordinates && needsCoordinates && (
-            <div className="form-gps-hint">
-              <MapPinIcon size={15} weight="fill" aria-hidden="true" />
-              Cette prestation facture le déplacement à la distance : sélectionnez votre adresse dans les
-              suggestions pour calculer les frais.
+
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Code postal{adminMode ? '' : ' *'}</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  required={!adminMode}
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(e.target.value)}
+                  placeholder="Ex: 92140"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Ville{adminMode ? '' : ' *'}</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  required={!adminMode}
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Ex: Clamart"
+                />
+              </div>
             </div>
-          )}
-        </div>
+
+            {/* Carte OpenStreetMap avec Pigeon Maps */}
+            <div className="form-group">
+              <label className="form-label">Localisation sur la carte (OpenStreetMap)</label>
+              <InterventionMap
+                coordinates={coordinates}
+                defaultCenter={defaultCenter}
+                defaultZoom={defaultZoom}
+                height={200}
+              />
+              {coordinates && (
+                <div className="form-gps-status">
+                  ✓ Coordonnées GPS validées pour le déplacement de l'artisan
+                </div>
+              )}
+              {!coordinates && needsCoordinates && (
+                <div className="form-gps-hint">
+                  <MapPinIcon size={15} weight="fill" aria-hidden="true" />
+                  Sélectionnez votre adresse dans les suggestions pour vérifier qu'elle est dans la zone
+                  d'intervention et calculer les éventuels frais de déplacement.
+                </div>
+              )}
+            </div>
+
+          </>
+        )}
 
         <div className="form-group">
-          <label className="form-label">Précisions d'accès ou description du problème</label>
+          <label className="form-label">
+            {premisesAddress ? 'Description de votre besoin' : "Précisions d'accès ou description du problème"}
+          </label>
           <textarea
             className="form-textarea"
             rows={3}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Digicode, étage, marque de l'appareil, panne constatée..."
+            placeholder={
+              premisesAddress
+                ? "Marque de l'appareil, panne constatée..."
+                : "Digicode, étage, marque de l'appareil, panne constatée..."
+            }
           />
         </div>
+
+        {/* Encart hors zone, en fin de formulaire ; demande exceptionnelle à moins du rayon + 10 % */}
+        {isOutOfZone && travelQuote && (
+          <div className="booking-out-of-zone">
+            <div className="booking-out-of-zone__header">
+              <WarningCircleIcon size={22} weight="fill" aria-hidden="true" />
+              <strong>Adresse hors de la zone d'intervention</strong>
+            </div>
+            <p className="booking-out-of-zone__text">
+              {travelQuote.out_of_zone_reason === 'commune' ? (
+                <>
+                  Votre commune{city ? <> (<strong>{city}</strong>)</> : null} ne fait pas partie des communes
+                  desservies.
+                </>
+              ) : (
+                <>
+                  Votre adresse se situe à{' '}
+                  <strong>{travelQuote.distance_km !== null ? formatKm(travelQuote.distance_km) : '—'}</strong> du
+                  point de départ, au-delà du rayon habituel de{' '}
+                  <strong>{travelQuote.max_km !== null ? formatKm(travelQuote.max_km) : '—'}</strong>.
+                </>
+              )}{' '}
+              {adminMode
+                ? "Vous pouvez tout de même forcer l'enregistrement de ce rendez-vous."
+                : travelQuote.can_request_exception
+                ? "La réservation directe n'est pas possible, mais un déplacement exceptionnel reste envisageable : envoyez une demande pour ce créneau, l'artisan l'acceptera ou la refusera."
+                : "Cette adresse n'est pas desservie."}
+            </p>
+            {canRequest && requestState === 'sent' && (
+              <p className="booking-out-of-zone__sent">
+                <CheckCircleIcon size={18} weight="fill" aria-hidden="true" />
+                Demande transmise : vous allez recevoir un email de confirmation de la transmission. Le créneau
+                est réservé le temps que l'artisan accepte ou refuse votre demande ; vous serez prévenu par email.
+              </p>
+            )}
+            {canRequest && requestState !== 'sent' && proPhone && (
+              <p className="booking-out-of-zone__phone">
+                <PhoneIcon size={16} weight="fill" aria-hidden="true" />
+                Une question ? <a href={`tel:${proPhone.replace(/\s/g, '')}`}>{proPhone}</a>
+              </p>
+            )}
+            {requestError && <p className="booking-out-of-zone__error">{requestError}</p>}
+          </div>
+        )}
+
+        {adminMode && (
+          <label className="booking-form__notify">
+            <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
+            Envoyer les confirmations par email (au client si son email est renseigné, et votre fiche avec le
+            fichier agenda)
+          </label>
+        )}
 
         <div className="form-actions-between">
           <button
@@ -346,9 +425,27 @@ export const BookingForm: React.FC<BookingFormProps> = ({
           >
             ← Modifier le créneau
           </button>
-          <button type="submit" className="btn btn-primary" disabled={loading || !isBookable}>
-            {loading ? 'Confirmation en cours...' : 'Confirmer le rendez-vous ✓'}
-          </button>
+          {/* Hors zone mais proche : la confirmation devient l'envoi d'une demande à l'artisan */}
+          {adminMode ? (
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading
+                ? 'Enregistrement…'
+                : isOutOfZone
+                  ? "Forcer l'enregistrement (hors zone)"
+                  : 'Enregistrer le rendez-vous'}
+            </button>
+          ) : canRequest ? (
+            requestState !== 'sent' && (
+              <button type="submit" className="btn btn-primary" disabled={requestState === 'sending'}>
+                <EnvelopeSimpleIcon size={16} weight="fill" aria-hidden="true" />
+                {requestState === 'sending' ? 'Envoi…' : 'Envoyer une demande exceptionnelle'}
+              </button>
+            )
+          ) : (
+            <button type="submit" className="btn btn-primary" disabled={loading || !isBookable}>
+              {loading ? 'Confirmation en cours...' : 'Confirmer le rendez-vous ✓'}
+            </button>
+          )}
         </div>
       </form>
     </div>

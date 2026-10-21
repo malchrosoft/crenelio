@@ -8,6 +8,8 @@ api/public/assets/
 # Logo & favicon propres à chaque installation
 api/storage/branding/*
 !api/storage/branding/.gitkeep
+api/storage/zone/*
+!api/storage/zone/.gitkeep
 
 # Environment & secrets
 # Ignore ALL .env* files EXCEPT api/.env.example

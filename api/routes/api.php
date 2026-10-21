@@ -10,6 +10,7 @@ require_once __DIR__ . '/../core/Response.php';
 require_once __DIR__ . '/../controllers/ConfigController.php';
 require_once __DIR__ . '/../controllers/ServiceController.php';
 require_once __DIR__ . '/../controllers/ScheduleController.php';
+require_once __DIR__ . '/../controllers/ZoneController.php';
 require_once __DIR__ . '/../controllers/SlotController.php';
 require_once __DIR__ . '/../controllers/AppointmentController.php';
 require_once __DIR__ . '/../controllers/TravelFeeController.php';
@@ -24,6 +25,7 @@ $slotController        = new SlotController();
 $appointmentController = new AppointmentController();
 $travelFeeController   = new TravelFeeController();
 $brandingController    = new BrandingController();
+$zoneController        = new ZoneController();
 
 // -------------------------------------------------------------------
 // 1. Configuration & Authentification Pro
@@ -34,6 +36,8 @@ $router->put('/admin/config',               [$configController, 'update']);
 $router->post('/admin/login',               [$configController, 'login']);
 
 // Logo & favicon (fichiers sous leurs noms d'usage, cf. core/Branding.php)
+$router->get('/zone',                       [$zoneController, 'show']);
+$router->put('/admin/zone',                 [$zoneController, 'update']);
 $router->get('/branding/:kind',             [$brandingController, 'show']);
 $router->post('/admin/branding/:kind',      [$brandingController, 'upload']);
 $router->delete('/admin/branding/:kind',    [$brandingController, 'destroy']);
@@ -73,6 +77,10 @@ $router->post('/travel-fee/quote',          [$travelFeeController, 'quote']);
 $router->get('/appointments',               [$appointmentController, 'index']);
 $router->get('/appointments/:id',           [$appointmentController, 'show']);
 $router->post('/appointments',              [$appointmentController, 'store']);
+$router->post('/admin/appointments',        [$appointmentController, 'adminStore']);
+$router->post('/appointments/exceptional-request', [$appointmentController, 'exceptionalRequest']);
+$router->get('/appointments/decision/:token',  [$appointmentController, 'decisionShow']);
+$router->post('/appointments/decision/:token', [$appointmentController, 'decide']);
 $router->get('/appointments/token/:token',  [$appointmentController, 'showByToken']);
 $router->post('/appointments/token/:token/cancel', [$appointmentController, 'cancelByToken']);
 $router->put('/appointments/:id/status',    [$appointmentController, 'updateStatus']);

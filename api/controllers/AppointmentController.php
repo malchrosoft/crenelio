@@ -50,6 +50,18 @@ class AppointmentController
     {
         $body = Response::body();
 
+        // Sans déplacement, le rendez-vous a lieu dans les locaux : l'adresse est celle de l'entreprise
+        $config = Config::getAll();
+        if (TravelFee::isPremisesOnly($config)) {
+            $body['address']     = $config['premises_address'] ?? '';
+            $body['postal_code'] = $config['premises_postal_code'] ?? '';
+            $body['city']        = $config['premises_city'] ?? '';
+            unset($body['latitude'], $body['longitude']);
+            if ($body['address'] === '' || $body['city'] === '') {
+                Response::json(['error' => "L'adresse des locaux n'est pas renseignée : réservation impossible pour le moment."], 503);
+            }
+        }
+
         // Validations obligatoires
         $requiredFields = ['service_id', 'client_name', 'client_email', 'client_phone', 'address', 'postal_code', 'city', 'start_datetime'];
         foreach ($requiredFields as $field) {
@@ -72,8 +84,6 @@ class AppointmentController
         $durationMinutes = (int)$service['duration_minutes'];
         $endDatetime = date('Y-m-d H:i:s', strtotime("+$durationMinutes minutes", strtotime($startDatetime)));
 
-        $config = Config::getAll();
-
         // Frais de déplacement : recalculés côté serveur, le devis client n'est jamais
         // source de vérité (il n'est qu'un affichage de transparence tarifaire).
         [$latitude, $longitude] = TravelFeeController::readCoordinates($body);
@@ -81,17 +91,19 @@ class AppointmentController
 
         if ($travelQuote['needs_coordinates']) {
             Response::json([
-                'error' => "Cette prestation facture le déplacement à la distance. Veuillez sélectionner votre adresse dans les suggestions proposées pour la localiser précisément."
+                'error' => "Veuillez sélectionner votre adresse dans les suggestions proposées pour la localiser précisément (zone d'intervention ou frais de déplacement)."
             ], 400);
         }
 
         if ($travelQuote['is_out_of_zone']) {
             Response::json([
-                'error'      => sprintf(
-                    "L'adresse indiquée se situe à %s km du point de départ, au-delà du rayon d'intervention de %s km. La réservation en ligne n'est pas possible, mais une demande exceptionnelle reste envisageable.",
-                    self::formatKm($travelQuote['distance_km']),
-                    self::formatKm($travelQuote['max_km'])
-                ),
+                'error'      => $travelQuote['out_of_zone_reason'] === 'commune'
+                    ? "L'adresse indiquée se situe dans une commune qui ne fait pas partie de la zone d'intervention. La réservation en ligne n'est pas possible, mais une demande exceptionnelle reste envisageable."
+                    : sprintf(
+                        "L'adresse indiquée se situe à %s km du point de départ, au-delà du rayon d'intervention de %s km. La réservation en ligne n'est pas possible, mais une demande exceptionnelle reste envisageable.",
+                        self::formatKm($travelQuote['distance_km']),
+                        self::formatKm($travelQuote['max_km'])
+                    ),
                 'code'       => 'out_of_zone',
                 'travel'     => $travelQuote,
                 'pro_email'  => $config['pro_email'] ?? null,
@@ -184,6 +196,191 @@ class AppointmentController
     /**
      * Formatage français d'une distance (« 23,4 »), tolérant aux valeurs absentes.
      */
+    /**
+     * POST /admin/appointments — Rendez-vous saisi par l'artisan depuis l'espace Artisan.
+     * Toute saisie est acceptée : email et adresse facultatifs, heure libre, hors zone forcé
+     * (signalé par `is_out_of_zone`). Confirmations envoyées seulement si `notify` est vrai.
+     */
+    public function adminStore(): void
+    {
+        $body = Response::body();
+        foreach (['service_id', 'client_name', 'client_phone', 'start_datetime'] as $field) {
+            if (empty($body[$field]) || !is_scalar($body[$field])) {
+                Response::json(['error' => "Le champ '$field' est obligatoire"], 400);
+            }
+        }
+        $email = trim((string)($body['client_email'] ?? ''));
+        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            Response::json(['error' => 'Adresse email invalide'], 400);
+        }
+        $startDatetime = (string)$body['start_datetime'];
+        if (!preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $startDatetime) || strtotime($startDatetime) === false) {
+            Response::json(['error' => 'Date et heure invalides'], 400);
+        }
+
+        $service = Service::find((int)$body['service_id']);
+        if (!$service) {
+            Response::json(['error' => 'Prestation introuvable'], 404);
+        }
+
+        $config = Config::getAll();
+        $address = (string)($body['address'] ?? '');
+        $postalCode = (string)($body['postal_code'] ?? '');
+        $city = (string)($body['city'] ?? '');
+        if (TravelFee::isPremisesOnly($config)) {
+            $address = $config['premises_address'] ?? '';
+            $postalCode = $config['premises_postal_code'] ?? '';
+            $city = $config['premises_city'] ?? '';
+        }
+
+        [$latitude, $longitude] = TravelFeeController::readCoordinates($body);
+        $quote = TravelFee::quote($service, $latitude, $longitude, $config);
+        $durationMinutes = (int)$service['duration_minutes'];
+
+        $appointment = Appointment::create([
+            'service_id'     => (int)$service['id'],
+            'client_name'    => mb_substr((string)$body['client_name'], 0, 255),
+            'client_email'   => $email,
+            'client_phone'   => mb_substr((string)$body['client_phone'], 0, 50),
+            'address'        => $address,
+            'postal_code'    => mb_substr($postalCode, 0, 20),
+            'city'           => mb_substr($city, 0, 100),
+            'travel_fee'     => $quote['travel_fee'],
+            'distance_km'    => $quote['distance_km'],
+            'is_out_of_zone' => $quote['is_out_of_zone'],
+            'notes'          => isset($body['notes']) ? mb_substr((string)$body['notes'], 0, 2000) : null,
+            'start_datetime' => $startDatetime,
+            'end_datetime'   => date('Y-m-d H:i:s', strtotime("+$durationMinutes minutes", strtotime($startDatetime))),
+            'status'         => 'confirmed',
+        ]);
+
+        $notifications = !empty($body['notify']) ? Notifier::sendBookingConfirmations($appointment, $config) : [];
+
+        Response::json([
+            'message'       => 'Rendez-vous enregistré',
+            'appointment'   => $appointment,
+            'travel'        => $quote,
+            'notifications' => $notifications,
+        ], 201);
+    }
+
+    /**
+     * POST /appointments/exceptional-request — Demande d'intervention hors zone (Public).
+     * Réservée aux adresses hors zone à moins du rayon + 10 % ; au-delà, l'adresse n'est pas desservie.
+     * Crée un rendez-vous « pending » qui bloque le créneau, envoie l'accusé de réception au client
+     * et la demande à l'artisan, qui accepte ou refuse via le lien de l'email.
+     */
+    public function exceptionalRequest(): void
+    {
+        $body = Response::body();
+        foreach (['service_id', 'client_name', 'client_email', 'client_phone', 'address', 'postal_code', 'city', 'start_datetime'] as $field) {
+            if (empty($body[$field]) || !is_scalar($body[$field])) {
+                Response::json(['error' => "Le champ '$field' est obligatoire"], 400);
+            }
+        }
+        if (!filter_var($body['client_email'], FILTER_VALIDATE_EMAIL)) {
+            Response::json(['error' => 'Adresse email invalide'], 400);
+        }
+
+        $service = Service::find((int)$body['service_id']);
+        if (!$service || !$service['is_active']) {
+            Response::json(['error' => 'Prestation sélectionnée non trouvée ou inactive'], 404);
+        }
+
+        $config = Config::getAll();
+        [$latitude, $longitude] = TravelFeeController::readCoordinates($body);
+        $quote = TravelFee::quote($service, $latitude, $longitude, $config);
+        if (!$quote['is_out_of_zone'] || !$quote['can_request_exception']) {
+            Response::json([
+                'error' => $quote['is_out_of_zone']
+                    ? "Cette adresse n'est pas desservie."
+                    : "Cette adresse est dans la zone d'intervention : vous pouvez réserver directement.",
+            ], 422);
+        }
+
+        $startDatetime = (string)$body['start_datetime'];
+        if (!SlotEngine::isAvailable($service, $startDatetime, $config)) {
+            Response::json([
+                'error' => "Ce créneau n'est plus disponible. Veuillez choisir un autre créneau."
+            ], 409);
+        }
+
+        $durationMinutes = (int)$service['duration_minutes'];
+        $appointment = Appointment::create([
+            'service_id'     => (int)$service['id'],
+            'client_name'    => mb_substr((string)$body['client_name'], 0, 255),
+            'client_email'   => (string)$body['client_email'],
+            'client_phone'   => mb_substr((string)$body['client_phone'], 0, 50),
+            'address'        => (string)$body['address'],
+            'postal_code'    => mb_substr((string)$body['postal_code'], 0, 20),
+            'city'           => mb_substr((string)$body['city'], 0, 100),
+            'travel_fee'     => $quote['travel_fee'],
+            'distance_km'    => $quote['distance_km'],
+            'is_out_of_zone' => true,
+            'notes'          => isset($body['notes']) ? mb_substr((string)$body['notes'], 0, 2000) : null,
+            'start_datetime' => $startDatetime,
+            'end_datetime'   => date('Y-m-d H:i:s', strtotime("+$durationMinutes minutes", strtotime($startDatetime))),
+            'status'         => 'pending',
+            'decision_token' => bin2hex(random_bytes(32)),
+        ]);
+
+        // Ne lève jamais : un échec d'envoi est journalisé et visible dans l'espace Artisan
+        $notifications = Notifier::sendExceptionRequest($appointment, $config);
+
+        Response::json([
+            'message'       => 'Demande transmise',
+            'notifications' => $notifications,
+        ], 201);
+    }
+
+    /**
+     * GET /appointments/decision/:token — Récapitulatif d'une demande exceptionnelle à décider (lien de l'email artisan).
+     */
+    public function decisionShow(array $params): void
+    {
+        $appointment = Appointment::findByDecisionToken((string)($params['token'] ?? ''));
+        if (!$appointment) {
+            Response::json(['error' => 'Demande introuvable ou déjà traitée.'], 404);
+        }
+        unset($appointment['cancel_token'], $appointment['decision_token']);
+        Response::json($appointment);
+    }
+
+    /**
+     * POST /appointments/decision/:token — Acceptation ou refus par l'artisan.
+     * Accepter : rendez-vous confirmé et confirmations habituelles (client + artisan avec .ics).
+     * Refuser : rendez-vous annulé, créneau libéré, client informé.
+     */
+    public function decide(array $params): void
+    {
+        $appointment = Appointment::findByDecisionToken((string)($params['token'] ?? ''));
+        if (!$appointment) {
+            Response::json(['error' => 'Demande introuvable ou déjà traitée.'], 404);
+        }
+
+        $action = Response::body()['action'] ?? '';
+        if (!in_array($action, ['accept', 'refuse'], true)) {
+            Response::json(['error' => 'Action invalide (accept ou refuse attendu)'], 400);
+        }
+
+        $accepted = $action === 'accept';
+        $id = (int)$appointment['id'];
+        if (!Appointment::decide($id, $accepted ? 'confirmed' : 'cancelled', $accepted ? null : "Demande hors zone refusée par l'artisan")) {
+            Response::json(['error' => 'Demande déjà traitée.'], 409);
+        }
+
+        $config = Config::getAll();
+        $appointment = Appointment::find($id);
+        $notifications = $accepted
+            ? Notifier::sendBookingConfirmations($appointment, $config)
+            : [Notifier::sendExceptionRefused($appointment, $config)];
+
+        Response::json([
+            'status'        => $appointment['status'],
+            'notifications' => $notifications,
+        ]);
+    }
+
     private static function formatKm(?float $km): string
     {
         if ($km === null) {

@@ -14,6 +14,18 @@ interface SlotPickerProps {
   onSelectSlot: (slot: Slot | null) => void;
   onBack: () => void;
   onNext: () => void;
+  /** Espace Artisan : tous les jours ouverts au choix et heure libre possible, hors créneaux proposés. */
+  adminMode?: boolean;
+}
+
+/** Créneau construit à partir d'une heure libre (HH:MM) et de la durée de la prestation. */
+function freeSlot(date: string, time: string, durationMinutes: number): Slot {
+  const [h, m] = time.split(':').map(Number);
+  const endMinutes = h * 60 + m + durationMinutes;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  // Au-delà de minuit : borné à 23:59 (cas marginal, saisie libre de l'artisan)
+  const end = endMinutes >= 24 * 60 ? '23:59' : `${pad(Math.floor(endMinutes / 60))}:${pad(endMinutes % 60)}`;
+  return { start: time, end, start_datetime: `${date} ${time}:00`, end_datetime: `${date} ${end}:00` };
 }
 
 export const SlotPicker: React.FC<SlotPickerProps> = ({
@@ -24,16 +36,22 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
   onSelectSlot,
   onBack,
   onNext,
+  adminMode = false,
 }) => {
+  const [freeTime, setFreeTime] = useState('');
+
+  // Changement de jour : l'heure libre saisie ne vaut plus
+  useEffect(() => setFreeTime(''), [selectedDate]);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [availability, setAvailability] = useState<SlotAvailability | null>(null);
+  // undefined : chargement en cours ; null : indisponible (repli sans grisage)
+  const [availability, setAvailability] = useState<SlotAvailability | null | undefined>(undefined);
 
   // Jours réservables pour cette prestation (horaires, durée, planning, indisponibilités)
   useEffect(() => {
     let isMounted = true;
-    setAvailability(null);
+    setAvailability(undefined);
     api
       .getSlotAvailability(service.id)
       .then((res) => isMounted && setAvailability(res))
@@ -43,7 +61,18 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
     };
   }, [service]);
 
-  const availableDates = useMemo(() => (availability ? new Set(availability.dates) : undefined), [availability]);
+  // Pendant le chargement, aucun jour cliquable : évite de choisir un jour qui sera grisé
+  const availableDates = useMemo(
+    () =>
+      adminMode
+        ? undefined
+        : availability === undefined
+          ? new Set<string>()
+          : availability
+            ? new Set(availability.dates)
+            : undefined,
+    [availability, adminMode]
+  );
 
   useEffect(() => {
     if (!selectedDate || !service) return;
@@ -91,7 +120,7 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
         <div>
           <label className="form-label">Sélectionnez un jour</label>
           <CalendarPicker
-            maxAdvanceDays={availability?.max_advance_days}
+            maxAdvanceDays={adminMode ? 365 : availability?.max_advance_days}
             availableDates={availableDates}
             selectedDate={selectedDate}
             onSelectDate={(d) => {
@@ -127,12 +156,33 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
                     key={slot.start_datetime}
                     type="button"
                     className={clsx('slot-btn', { selected: isSelected })}
-                    onClick={() => onSelectSlot(slot)}
+                    onClick={() => {
+                      setFreeTime('');
+                      onSelectSlot(slot);
+                    }}
                   >
                     {slot.start} – {slot.end}
                   </button>
                 );
               })}
+            </div>
+          )}
+          {adminMode && selectedDate && (
+            <div className="slots-free-time">
+              <label className="form-label" htmlFor="slot-free-time">
+                Ou une heure libre (hors créneaux proposés)
+              </label>
+              <input
+                id="slot-free-time"
+                type="time"
+                step={300}
+                className="form-input form-input--compact"
+                value={freeTime}
+                onChange={(e) => {
+                  setFreeTime(e.target.value);
+                  onSelectSlot(e.target.value ? freeSlot(selectedDate, e.target.value, service.duration_minutes) : null);
+                }}
+              />
             </div>
           )}
         </div>

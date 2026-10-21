@@ -64,6 +64,105 @@ class EmailTemplates
     }
 
     /**
+     * Demande exceptionnelle — accusé de réception au client : rien n'est encore confirmé.
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function exceptionClientAck(array $appointment, array $config): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $subject = sprintf('Demande d\'intervention transmise — %s', $company);
+        $intro = sprintf(
+            'Bonjour %s, votre adresse se situe juste au-delà de notre zone d\'intervention habituelle. Votre demande a bien été transmise : le créneau ci-dessous est réservé le temps que l\'artisan l\'examine.',
+            self::escape($appointment['client_name'])
+        );
+        $rows = self::summaryRows($appointment);
+        $outro = 'Vous recevrez un email de confirmation si la demande est acceptée, ou un email vous informant de son refus. Rien n\'est dû tant que le rendez-vous n\'est pas confirmé.';
+
+        return [
+            'subject' => $subject,
+            'html'    => self::layout($company, 'Demande transmise', $intro, $rows, $outro, null, $config),
+            'text'    => self::plainText('Demande transmise', $intro, $rows, $outro, null, $config),
+        ];
+    }
+
+    /**
+     * Demande exceptionnelle — email à l'artisan avec le bouton menant à la page d'acceptation / refus.
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function exceptionProRequest(array $appointment, array $config): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $decisionUrl = APP_URL !== '' && !empty($appointment['decision_token'])
+            ? APP_URL . '/decision/' . $appointment['decision_token']
+            : null;
+
+        $subject = sprintf(
+            'Demande hors zone à valider — %s le %s à %s',
+            $appointment['client_name'],
+            self::formatDate($appointment['start_datetime']),
+            self::formatTime($appointment['start_datetime'])
+        );
+        $intro = 'Un client situé juste au-delà de votre zone d\'intervention demande un rendez-vous. Le créneau est bloqué en « En attente » jusqu\'à votre décision.';
+
+        $rows = array_merge(self::summaryRows($appointment), [
+            'Client'    => self::escape($appointment['client_name']),
+            'Téléphone' => self::escape($appointment['client_phone']),
+            'Email'     => self::escape($appointment['client_email']),
+        ]);
+        if ($appointment['distance_km'] !== null) {
+            $rows['Distance'] = self::formatKm((float)$appointment['distance_km']) . ' du point de départ';
+        }
+        if (!empty($appointment['notes'])) {
+            $rows['Précisions'] = nl2br(self::escape($appointment['notes']));
+        }
+
+        $outro = $decisionUrl !== null
+            ? 'Accepter envoie la confirmation au client (et le fichier agenda) ; refuser l\'en informe et libère le créneau. Vous pouvez aussi répondre directement à cet email pour échanger avec le client.'
+            : 'Validez ou refusez cette demande depuis le planning de l\'espace Artisan (statut « En attente »).';
+
+        return [
+            'subject' => $subject,
+            'html'    => self::layout(
+                $company,
+                'Demande hors zone à valider',
+                $intro,
+                $rows,
+                $outro,
+                $decisionUrl !== null ? ['label' => 'Accepter ou refuser la demande', 'url' => $decisionUrl] : null,
+                $config
+            ),
+            'text'    => self::plainText('Demande hors zone à valider', $intro, $rows, $outro, $decisionUrl, $config, 'Accepter ou refuser la demande'),
+        ];
+    }
+
+    /**
+     * Demande exceptionnelle refusée — information du client.
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function exceptionClientRefused(array $appointment, array $config): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $subject = sprintf('Demande d\'intervention non retenue — %s', $company);
+        $intro = sprintf(
+            'Bonjour %s, nous sommes désolés : votre demande d\'intervention hors de notre zone habituelle n\'a pas pu être acceptée. Le créneau ci-dessous a été libéré.',
+            self::escape($appointment['client_name'])
+        );
+        $rows = self::summaryRows($appointment);
+        $outro = !empty($config['pro_phone'])
+            ? sprintf('Pour toute question, contactez-nous au %s.', self::escape($config['pro_phone']))
+            : 'Merci de votre compréhension.';
+
+        return [
+            'subject' => $subject,
+            'html'    => self::layout($company, 'Demande non retenue', $intro, $rows, $outro, null, $config),
+            'text'    => self::plainText('Demande non retenue', $intro, $rows, $outro, null, $config),
+        ];
+    }
+
+    /**
      * Email adressé à l'artisan : fiche d'intervention complète.
      *
      * @return array{subject: string, html: string, text: string}
@@ -258,7 +357,8 @@ class EmailTemplates
         array $rows,
         string $outro,
         ?string $manageUrl,
-        array $config
+        array $config,
+        string $linkLabel = 'Gérer mon rendez-vous'
     ): string {
         $lines = [mb_strtoupper($title, 'UTF-8'), '', self::stripHtml($intro), ''];
 
@@ -268,7 +368,7 @@ class EmailTemplates
 
         $lines[] = '';
         if ($manageUrl !== null) {
-            $lines[] = 'Gérer mon rendez-vous : ' . $manageUrl;
+            $lines[] = $linkLabel . ' : ' . $manageUrl;
             $lines[] = '';
         }
 

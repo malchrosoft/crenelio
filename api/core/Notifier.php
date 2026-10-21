@@ -25,13 +25,16 @@ class Notifier
     {
         $results = [];
 
-        $results[] = self::dispatch(
-            $appointment,
-            'client_confirmation',
-            $appointment['client_email'],
-            $appointment['client_name'],
-            EmailTemplates::clientConfirmation($appointment, $config)
-        );
+        // Rendez-vous saisi par l'artisan sans email client : seule la fiche artisan part
+        if (trim((string)$appointment['client_email']) !== '') {
+            $results[] = self::dispatch(
+                $appointment,
+                'client_confirmation',
+                $appointment['client_email'],
+                $appointment['client_name'],
+                EmailTemplates::clientConfirmation($appointment, $config)
+            );
+        }
 
         $proEmail = trim((string)($config['pro_email'] ?? ''));
         if ($proEmail !== '') {
@@ -50,6 +53,56 @@ class Notifier
         }
 
         return $results;
+    }
+
+    /**
+     * Demande exceptionnelle : accusé de réception au client, demande à valider à l'artisan
+     * (réponse directe au client via Reply-To).
+     *
+     * @return array<int, array{type: string, status: string}>
+     */
+    public static function sendExceptionRequest(array $appointment, array $config): array
+    {
+        $results = [
+            self::dispatch(
+                $appointment,
+                'exception_client_ack',
+                $appointment['client_email'],
+                $appointment['client_name'],
+                EmailTemplates::exceptionClientAck($appointment, $config)
+            ),
+        ];
+
+        $proEmail = trim((string)($config['pro_email'] ?? ''));
+        if ($proEmail !== '') {
+            $results[] = self::dispatch(
+                $appointment,
+                'exception_pro_request',
+                $proEmail,
+                (string)($config['pro_name'] ?? ''),
+                EmailTemplates::exceptionProRequest($appointment, $config),
+                null,
+                $appointment['client_email']
+            );
+        }
+
+        return $results;
+    }
+
+    /**
+     * Demande exceptionnelle refusée : information du client.
+     *
+     * @return array{type: string, status: string}
+     */
+    public static function sendExceptionRefused(array $appointment, array $config): array
+    {
+        return self::dispatch(
+            $appointment,
+            'exception_client_refused',
+            $appointment['client_email'],
+            $appointment['client_name'],
+            EmailTemplates::exceptionClientRefused($appointment, $config)
+        );
     }
 
     /**
@@ -106,7 +159,8 @@ class Notifier
         string $recipient,
         string $recipientName,
         array $message,
-        ?array $attachment = null
+        ?array $attachment = null,
+        ?string $replyTo = null
     ): array {
         $notificationId = Notification::createPending(
             (int)$appointment['id'],
@@ -122,7 +176,8 @@ class Notifier
                 $message['subject'],
                 $message['html'],
                 $message['text'],
-                $attachment
+                $attachment,
+                $replyTo
             );
 
             Notification::markSent($notificationId);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { api } from '../../api';
 import { AppConfig } from '../../types';
 import { ConfigField, ConfigGroup } from '../../config/configSchema';
+import ResetButton from './ResetButton';
 
 interface ConfigGroupFormProps {
   group: ConfigGroup;
@@ -21,6 +22,9 @@ const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSave
   const [values, setValues] = useState(() => pickValues(group.fields, config));
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  const stored = pickValues(group.fields, config);
+  const dirty = group.fields.some(({ key }) => values[key] !== stored[key]);
 
   function update(key: string, value: string) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -97,6 +101,14 @@ const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSave
           <button type="submit" className="btn btn-primary" disabled={saving}>
             {saving ? 'Enregistrement…' : 'Enregistrer'}
           </button>
+          <ResetButton
+            dirty={dirty}
+            disabled={saving}
+            onReset={() => {
+              setValues(stored);
+              setMessage(null);
+            }}
+          />
           {message && <span className="admin-settings-message">{message}</span>}
         </div>
       </form>

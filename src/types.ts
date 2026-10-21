@@ -34,8 +34,12 @@ export interface TravelQuote {
   distance_km: number | null;
   is_out_of_zone: boolean;
   max_km: number | null;
-  /** true si la prestation facture à la distance mais que l'adresse n'est pas géocodée. */
+  /** true si l'adresse doit être géocodée (frais à la distance ou zone de communes) et ne l'est pas. */
   needs_coordinates: boolean;
+  /** Motif du hors zone : au-delà du rayon, ou commune non desservie. */
+  out_of_zone_reason: 'radius' | 'commune' | null;
+  /** Hors zone mais à moins du rayon + 10 % : demande exceptionnelle proposée. */
+  can_request_exception: boolean;
   tiers: TravelTier[];
 }
 
@@ -105,7 +109,12 @@ export interface Appointment {
 }
 
 /** Type d'email émis automatiquement autour d'un rendez-vous. */
-export type NotificationType = 'client_confirmation' | 'pro_confirmation';
+export type NotificationType =
+  | 'client_confirmation'
+  | 'pro_confirmation'
+  | 'exception_client_ack'
+  | 'exception_pro_request'
+  | 'exception_client_refused';
 
 /** Entrée du journal d'envoi rattachée à un rendez-vous. */
 export interface AppointmentNotification {
@@ -148,6 +157,21 @@ export interface AppConfig {
   vitrine_photo_url?: string;
   [key: `vitrine_engagement_${number}`]: string | undefined;
   // Mentions légales
+  /** `onsite` (défaut) : l'artisan se déplace ; `premises` : clients reçus dans les locaux. */
+  travel_mode?: 'onsite' | 'premises';
+  premises_address?: string;
+  premises_postal_code?: string;
+  premises_city?: string;
+  premises_latitude?: string;
+  premises_longitude?: string;
+  /** Origine du calcul des frais de déplacement : point de départ (défaut) ou adresse de l'entreprise. */
+  travel_fee_origin?: 'start' | 'company';
+  /** '1' : le point de départ (centre du rayon) est l'adresse de l'entreprise. */
+  start_same_as_premises?: string;
+  /** Libellé du point de départ s'il diffère de l'entreprise (coordonnées dans default_latitude / default_longitude). */
+  start_address?: string;
+  /** '1' : communes limitrophes de la commune de départ ajoutées au calcul de zone. */
+  zone_include_neighbours?: string;
   legal_raison_sociale?: string;
   legal_siret?: string;
   legal_naf?: string;
@@ -185,4 +209,6 @@ export interface BookingPayload {
   /** Coordonnées issues de la Base Adresse Nationale, requises en mode `distance_tiers`. */
   latitude?: number;
   longitude?: number;
+  /** Espace Artisan : envoyer les confirmations par email. */
+  notify?: boolean;
 }

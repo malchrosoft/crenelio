@@ -138,7 +138,7 @@ MAIL_FROM_NAME=Crénelio
 | `DB_HOST` / `DB_PORT` / `DB_NAME` / `DB_USER` / `DB_PASS` | `localhost` / `3306` / — | Connexion MySQL (PDO) |
 | `APP_ENV` | `production` | `development` active l'affichage des erreurs PHP |
 | `CORS_ORIGIN` | `*` | Origine autorisée ; à restreindre au domaine en production |
-| `APP_URL` | *(vide)* | Base du lien `/rdv/:token` envoyé au client. Vide ⇒ l'email affiche le téléphone à la place |
+| `APP_URL` | *(vide)* | Base des liens envoyés par email : `/rdv/:token` (client) et `/decision/:token` (acceptation / refus d'une demande hors zone par l'artisan). Vide ⇒ l'email client affiche le téléphone, et l'artisan valide la demande depuis le planning (statut « En attente ») |
 | `APP_TIMEZONE` | `Europe/Paris` | Fuseau d'interprétation des créneaux et des fichiers `.ics` |
 | `SMTP_HOST` / `SMTP_PORT` | *(vide)* / `587` | Serveur d'envoi. **Vide ⇒ envoi désactivé** |
 | `SMTP_USER` / `SMTP_PASS` | *(vide)* | Identifiants `AUTH LOGIN` ; laisser vide pour un relais sans authentification |

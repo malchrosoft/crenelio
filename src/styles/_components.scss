@@ -635,33 +635,236 @@
   }
 }
 
-.admin-dashboard-header {
+// -------------------------------------------------------
+// Espace Artisan : header fixe, menu latéral rétractable, contenu pleine page
+// -------------------------------------------------------
+$admin-topbar-height: 64px;
+$admin-sidebar-width: 240px;
+$admin-sidebar-collapsed: 68px;
+
+.admin-shell {
+  min-height: 100vh;
+  padding-top: $admin-topbar-height;
+}
+
+.admin-topbar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  height: $admin-topbar-height;
   @include flex-between;
   align-items: center;
+  gap: 16px;
+  padding: 0 20px 0 12px;
+  background: white;
   border-bottom: 1px solid $gray-200;
-  padding-bottom: 16px;
-  margin-bottom: 20px;
+  box-shadow: $shadow-sm;
 
-  .admin-title {
-    font-size: 1.3rem;
-    color: $gray-900;
-  }
-
-  .admin-company-sub {
-    font-size: 0.85rem;
-    color: $gray-500;
-  }
-
-  .admin-header-actions {
+  .admin-topbar__brand {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .admin-topbar__toggle {
+    @include flex-center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: $radius-sm;
+    background: transparent;
+    color: $gray-600;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &:hover,
+    &:focus-visible {
+      background: $gray-100;
+      color: $primary;
+    }
+  }
+
+  .admin-topbar__title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: $gray-900;
+    white-space: nowrap;
+  }
+
+  .admin-topbar__company {
+    font-size: 0.9rem;
+    color: $gray-500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .admin-topbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .admin-topbar__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: $radius-sm;
+    color: $gray-600;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: $transition-fast;
+
+    &:hover,
+    &:focus-visible {
+      background: $gray-100;
+      color: $primary;
+    }
+  }
+
+  .admin-topbar__logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  @include tablet {
+    .admin-topbar__company {
+      display: none;
+    }
+
+    .admin-topbar__link span,
+    .admin-topbar__logout span {
+      display: none;
+    }
   }
 }
 
-.admin-tabs {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+.admin-sidebar {
+  position: fixed;
+  top: $admin-topbar-height;
+  bottom: 0;
+  left: 0;
+  z-index: 40;
+  width: $admin-sidebar-width;
+  padding: 16px 12px;
+  overflow-y: auto;
+  background: white;
+  border-right: 1px solid $gray-200;
+  transition: width 0.2s ease-in-out;
+
+  .admin-sidebar__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .admin-sidebar__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    border-radius: $radius-sm;
+    background: transparent;
+    color: $gray-700;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: $gray-100;
+      color: $primary;
+    }
+  }
+
+  .admin-sidebar__item--active {
+    background: $primary-light;
+    color: $primary;
+  }
+
+  .admin-sidebar__label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .admin-sidebar__count {
+    padding: 1px 8px;
+    border-radius: $radius-full;
+    background: $gray-100;
+    color: $gray-600;
+    font-size: 0.8rem;
+  }
+}
+
+.admin-main {
+  margin-left: $admin-sidebar-width;
+  padding: 28px 32px;
+  transition: margin-left 0.2s ease-in-out;
+
+  @include mobile {
+    padding: 20px 16px;
+  }
+}
+
+// Menu replié : icônes seules
+.admin-shell--collapsed {
+  .admin-sidebar {
+    width: $admin-sidebar-collapsed;
+
+    .admin-sidebar__item {
+      justify-content: center;
+      padding: 10px;
+    }
+
+    .admin-sidebar__label,
+    .admin-sidebar__count {
+      display: none;
+    }
+  }
+
+  .admin-main {
+    margin-left: $admin-sidebar-collapsed;
+  }
+}
+
+// Sur mobile, le menu déplié passe par-dessus le contenu plutôt que de le comprimer
+@include mobile {
+  .admin-shell:not(.admin-shell--collapsed) .admin-sidebar {
+    box-shadow: $shadow-lg;
+  }
+
+  .admin-shell .admin-main {
+    margin-left: $admin-sidebar-collapsed;
+  }
+}
+
+// Écran de connexion : pas de menu
+.admin-shell--no-nav .admin-main {
+  margin-left: 0;
+}
+
+.admin-loading {
+  padding: 40px;
+  text-align: center;
+  color: $gray-500;
 }
 
 .admin-empty-state {
@@ -1399,6 +1602,10 @@
     }
   }
 
+  .engagements-editor__add {
+    margin: 4px 0 $space-md;
+  }
+
   .engagements-editor__empty {
     color: $gray-500;
     font-size: 0.9rem;
@@ -1514,5 +1721,439 @@
 
   @include tablet {
     grid-template-columns: 1fr;
+  }
+}
+
+// -------------------------------------------------------
+// Carte de zone (vitrine et espace Artisan)
+// -------------------------------------------------------
+.zone-map {
+  .zone-map__canvas {
+    height: 380px;
+    border-radius: $radius-lg;
+    overflow: hidden;
+    border: 2px solid $gray-200;
+    box-shadow: $shadow;
+
+    @include mobile {
+      height: 280px;
+    }
+  }
+
+  // Sous la carte : commune survolée à gauche, bouton de recadrage à droite
+  .zone-map__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 12px;
+    min-height: 40px;
+  }
+
+  .zone-map__hover {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $primary;
+  }
+
+  .zone-map__recenter {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid $gray-200;
+    border-radius: $radius-full;
+    background: white;
+    color: $gray-800;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: $shadow;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &:hover,
+    &:focus-visible {
+      color: $primary;
+      border-color: $primary;
+    }
+  }
+}
+
+// -------------------------------------------------------
+// Zone d'intervention (Espace Artisan)
+// -------------------------------------------------------
+.zone-editor {
+  .zone-editor__modes {
+    border: none;
+    padding: 0;
+    margin: 0 0 20px;
+  }
+
+  .zone-editor__mode,
+  .zone-editor__check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+
+  .zone-editor__check {
+    margin-bottom: 20px;
+  }
+
+  .zone-editor__start {
+    border: none;
+    padding: 0;
+  }
+
+  .zone-editor__gps {
+    display: grid;
+    grid-template-columns: auto 1fr auto 1fr;
+    gap: 8px 12px;
+    align-items: center;
+    margin-top: 12px;
+
+    .form-label {
+      margin: 0;
+    }
+
+    @include mobile {
+      grid-template-columns: auto 1fr;
+    }
+  }
+
+
+
+  .zone-editor__list {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px 20px;
+
+    label {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 8px;
+      align-items: center;
+      cursor: pointer;
+    }
+  }
+
+  .zone-editor__legend-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 20px;
+    margin: 0 0 16px;
+    font-size: 0.9rem;
+  }
+
+  .zone-editor__legend-title {
+    font-weight: 600;
+    color: $gray-700;
+  }
+
+  .zone-editor__meta {
+    grid-column: 2;
+    font-size: 0.8rem;
+    color: $gray-500;
+  }
+
+  // Pastille de couleur : bleu si entièrement couverte, orange si partiellement
+  .zone-editor__legend {
+    font-weight: 600;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin-right: 6px;
+      border-radius: 2px;
+    }
+
+    &--full::before {
+      background: $primary;
+    }
+
+    &--partial::before {
+      background: $warning;
+    }
+
+    &--excluded {
+      color: $gray-400;
+      text-decoration: line-through;
+
+      &::before {
+        background: $danger;
+      }
+    }
+  }
+}
+
+// Zone d'intervention en pleine page : panneau à gauche, carte sur toute la hauteur disponible
+.zone-workspace {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) 1fr;
+  gap: 24px;
+  // Hauteur de la fenêtre moins le header fixe et les marges verticales de .admin-main
+  height: calc(100vh - #{$admin-topbar-height} - 56px);
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .zone-workspace__panel {
+    overflow-y: auto;
+    padding-right: 8px;
+
+    .admin-section-title {
+      margin-bottom: 16px;
+    }
+  }
+
+  .zone-workspace__communes {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid $gray-200;
+
+    // Panneau étroit : boutons empilés sur toute la largeur
+    .admin-settings-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .zone-workspace__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: $primary;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .zone-workspace__map {
+    min-height: 0;
+
+    @include tablet {
+      height: 70vh;
+    }
+  }
+}
+
+.zone-map--fill {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .zone-map__canvas {
+    flex: 1;
+    height: auto;
+    min-height: 0;
+  }
+}
+
+// Fenêtre de confirmation
+.confirm-dialog__text p {
+  margin: 0 0 12px;
+  color: $gray-700;
+  line-height: 1.5;
+}
+
+.confirm-dialog__actions {
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+// Cadre de choix (boutons radio empilés), ex. « Distance calculée depuis »
+.form-fieldset {
+  padding: $space-md;
+  border: 1px solid $gray-200;
+  border-radius: $radius-sm;
+
+  legend {
+    padding: 0 $space-sm;
+  }
+
+  .form-fieldset__option {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    cursor: pointer;
+
+    & + .form-fieldset__option {
+      margin-top: $space-sm;
+    }
+  }
+}
+
+// Sélecteur de picto (engagements)
+.icon-picker {
+  position: relative;
+
+  .icon-picker__trigger {
+    color: $primary;
+  }
+
+  // Picto déduit du texte : contour pointillé pour le distinguer d'un choix explicite
+  .icon-picker__trigger--auto {
+    border-style: dashed;
+  }
+
+  .icon-picker__panel {
+    position: absolute;
+    top: calc(100% + #{$space-sm});
+    left: 0;
+    z-index: 30;
+    display: grid;
+    grid-template-columns: repeat(3, 120px);
+    gap: 4px;
+    padding: $space-sm;
+    background: white;
+    border: 1px solid $gray-200;
+    border-radius: $radius-sm;
+    box-shadow: $shadow-lg;
+
+    @include mobile {
+      grid-template-columns: repeat(2, 120px);
+    }
+  }
+
+  .icon-picker__option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: $space-sm 4px;
+    border: 1px solid transparent;
+    border-radius: $radius-sm;
+    background: none;
+    color: $gray-700;
+    font-size: 0.75rem;
+    text-align: center;
+    cursor: pointer;
+
+    svg {
+      color: $primary;
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: $gray-100;
+    }
+  }
+
+  .icon-picker__option--wide {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: center;
+    font-size: 0.85rem;
+  }
+
+  .icon-picker__option--selected {
+    border-color: $primary;
+    background: $primary-light;
+  }
+}
+
+// Demande exceptionnelle hors zone : confirmation et erreur
+.booking-out-of-zone__sent {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  margin: $space-sm 0 0;
+  color: $success;
+  font-weight: 600;
+}
+
+.booking-out-of-zone__error {
+  margin: $space-sm 0 0;
+  color: $danger;
+  font-size: 0.9rem;
+}
+
+// Page de décision de l'artisan (demande hors zone)
+.decision-card {
+  max-width: 640px;
+  margin: 0 auto;
+
+  .decision-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-sm;
+    margin-top: 20px;
+
+    p {
+      flex-basis: 100%;
+      margin: 0;
+    }
+  }
+
+  .decision-card__result {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    font-weight: 600;
+    color: $gray-700;
+  }
+
+  .decision-card__result--ok {
+    color: $success;
+  }
+}
+
+.booking-out-of-zone__phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: $space-sm 0 0;
+  font-size: 0.9rem;
+}
+
+// Espace Artisan : option d'envoi des confirmations sous le formulaire de rendez-vous
+.booking-form__notify {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-sm;
+  margin-bottom: $space-md;
+  font-size: 0.9rem;
+  color: $gray-700;
+  cursor: pointer;
+
+  input {
+    margin-top: 3px;
+  }
+}
+
+// Planning : barre d'actions au-dessus des filtres
+.admin-planning-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: $space-md;
+}
+
+.admin-new-appointment .admin-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-md;
+  margin-bottom: $space-md;
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
 }

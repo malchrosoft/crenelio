@@ -63,11 +63,9 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
   },
   {
     id: 'map',
-    title: 'Carte & point de départ',
-    intro: 'Centre de la carte de la vitrine et origine du calcul des distances de déplacement.',
+    title: 'Carte de la vitrine',
+    intro: "Zoom initial de la carte (avant cadrage sur les communes). Le point de départ se règle dans « Zone & déplacement ».",
     fields: [
-      { key: 'default_latitude', label: 'Latitude', type: 'number', step: 'any' },
-      { key: 'default_longitude', label: 'Longitude', type: 'number', step: 'any' },
       { key: 'default_zoom', label: 'Niveau de zoom', type: 'number', step: '1' },
     ],
   },
@@ -77,7 +75,12 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
     intro: 'Affichées dans la fenêtre « Mentions légales » du pied de page. Les rubriques vides sont masquées.',
     fields: [
       { key: 'legal_raison_sociale', label: 'Raison sociale', type: 'text' },
-      { key: 'legal_adresse', label: 'Adresse du siège', type: 'textarea' },
+      {
+        key: 'legal_adresse',
+        label: 'Adresse du siège social',
+        type: 'textarea',
+        hint: "Vide : l'adresse de l'entreprise (menu « Déplacement ») est utilisée. À renseigner seulement si le siège est ailleurs (domiciliation…).",
+      },
       { key: 'legal_siret', label: 'SIRET', type: 'text' },
       { key: 'legal_naf', label: 'Code NAF / APE', type: 'text' },
       { key: 'legal_assurance', label: 'Assurance professionnelle', type: 'text', hint: 'Assureur et numéro de contrat.' },
@@ -87,7 +90,7 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
 ];
 
 /** Clés gérées ailleurs (« Zone & déplacement », engagements, fichiers de branding) ou jamais éditables. */
-const EXCLUDED_KEY = /^(travel_|admin_password|branding_|vitrine_engagement_\d+$)/;
+const EXCLUDED_KEY = /^(travel_|premises_|zone_|start_|default_(latitude|longitude)$|admin_password|branding_|vitrine_engagement_\d+(_icon)?$)/;
 
 const DESCRIBED_KEYS = new Set(CONFIG_GROUPS.flatMap((group) => group.fields.map((f) => f.key)));
 

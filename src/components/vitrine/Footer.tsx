@@ -114,7 +114,7 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
               Mentions légales
             </button>
             <Link
-              to="/booking?view=admin"
+              to="/admin"
               className="footer-bottom__admin"
               title="Espace d'administration artisan"
             >
