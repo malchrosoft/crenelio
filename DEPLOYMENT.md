@@ -156,7 +156,6 @@ Notes:
 www/
 ├── .ovhconfig          ← OVH PHP configuration
 ├── .htaccess           ← URL rewriting (API + SPA fallback)
-├── index.html          ← React entry point
 └── api/
     ├── .htaccess       ← API routing
     ├── .env            ← your credentials (created at step 4)
@@ -194,6 +193,101 @@ rsync -avz --exclude node_modules --exclude .git --exclude src --exclude sql \
 
 ⚠️ Never overwrite `api/storage/` from your machine once the site is live: it holds the logo,
 favicon and service area saved from the Pro area.
+
+---
+
+## Step 5b: OVH Git Deployment (alternative to FTP)
+
+OVH can link a hosting folder to a **GitHub** repository (the only supported platform): on every
+`push` to the chosen branch, a webhook updates the site. Official guide:
+[Configuring and using Git with an OVHcloud web hosting plan](https://docs.ovhcloud.com/en/guides/web-cloud/web-hosting/git-integration-webhosting).
+
+### Before you start
+
+- **OVH builds nothing**: it fetches the repository files as they are. The React bundle
+  (`api/public/assets/`) is not versioned, so deploy a **dedicated branch containing the built
+  version** (e.g. `deploy`), never `main` directly.
+- **The target folder must be empty** when you link it.
+- **Every domain pointing to that folder** is linked to Git at once (*Multisite* tab).
+- **What is not in the repository** — `api/.env`, `api/storage/branding/*`, `api/storage/zone/*` —
+  must be uploaded by FTP and must never be committed.
+- **No SQL migration is run**: update the database by hand (see below).
+
+### 1. Prepare the deployment branch
+
+On your machine, for each version to publish:
+
+```bash
+npm run deploy:build                 # type check + build into api/public/assets/
+git switch deploy                    # dedicated branch (create once: git switch -c deploy)
+git merge main                       # bring in the code
+git add -f api/public/assets         # force-add the bundle, ignored on main
+git commit -m "deploy: release DD/MM"
+git push origin deploy               # triggers the OVH deployment
+git switch main
+```
+
+Never put `api/.env` or the contents of `api/storage/` on `deploy` (only the `.gitkeep` files and
+`api/storage/.htaccess`, as on `main`).
+
+> Alternative: a GitHub Action can build and push `deploy` automatically on every `push` to
+> `main`. Set it up only once the manual flow has been validated.
+
+### 2. Back up then empty the folder (site already online)
+
+Since the target folder must be empty, on an existing site:
+
+1. Download **`api/.env`** and **`api/storage/`** (logo, favicon, service area) by FTP.
+2. Export the database (phpMyAdmin → *Export*, or *Backups* in the OVH control panel).
+3. Empty the folder (e.g. `www/`) — the site is offline from here on.
+
+### 3. Link the repository
+
+1. OVH control panel → **Web Cloud** → **Hosting plans** → your plan → **Multisite** tab.
+2. On the folder's row, click **...** → **Link Git**.
+3. Enter the repository URL (`git@github.com:account/crenelio.git` for a private repository) and
+   the **`deploy`** branch.
+4. Private repository: copy the **SSH key** displayed by OVH and add it to GitHub
+   (*Settings* → *SSH and GPG keys* → *New SSH key*, or better, as a read-only *Deploy key* on
+   this repository only).
+5. Confirm, then check *Last deployment information*.
+
+### 4. Restore the installation-specific files
+
+By FTP, upload `api/.env` and the contents of `api/storage/branding/` and `api/storage/zone/`
+again, then check write permissions (step 6) and test (step 7).
+
+### 5. Automatic deployment (webhook)
+
+In **Configure Git**, copy the webhook URL provided by OVH, then in GitHub:
+*Settings* → *Webhooks* → *Add webhook* — *Payload URL*: the OVH URL, *Content type*:
+`application/json`, event: *Just the push event*, SSL verification enabled.
+Every `push` to `deploy` then updates the site; a `push` to `main` deploys nothing.
+
+### Overwrite precautions
+
+- **Never edit a Git-tracked file by FTP**: it would be overwritten by the next deployment, or
+  block the update.
+- The OVH option that **forces remote changes** overwrites the server files: back up `api/.env`
+  and `api/storage/` first.
+- **"Delete Git"** offers to empty the folder: decline, or back up first.
+- **Rollback**: bring `deploy` back to the previous version (`git revert`, then `push`) — and mind
+  the database if a migration was applied in between.
+
+---
+
+## Updating a Live Site (FTP or Git)
+
+Order to follow when a release changes the database (new file in `sql/migrations/`):
+
+1. **Back up** the database (phpMyAdmin export or OVH *Backups*) and `api/storage/`.
+2. **Apply the new migrations**, in date order, through phpMyAdmin (*SQL* tab, paste the file) or
+   the `mysql` client. They are idempotent: re-running them is safe. They only add optional
+   elements, so the previous version of the site keeps working in the meantime.
+3. **Deploy the code** (FTP upload, or `push` to `deploy`).
+4. **Check**: step 7, then the "Emails" log of a test booking.
+
+Never import `sql/schema.sql` on an existing database: it starts by dropping the tables.
 
 ---
 
@@ -299,7 +393,8 @@ OVH provides free Let's Encrypt SSL certificates:
 
 - Verify the built assets exist in `api/public/assets/`
 - Check browser console for 404 errors on JS/CSS files
-- Ensure `index.html` is in the `www/` root and references the correct asset paths
+- `api/public/assets/index.html` must reference `/assets/index.js`: rebuild with `npm run deploy:build`
+- Check that the root `.htaccess` was uploaded (it serves the compiled `index.html` for every page)
 
 ### CORS errors in browser console
 
@@ -324,7 +419,7 @@ OVH provides free Let's Encrypt SSL certificates:
 crenelio/
 ├── .ovhconfig / .htaccess  # OVH PHP version, URL rewriting (API + SPA fallback)
 ├── docker-compose.yml      # Local environment: MySQL, PHP/Apache API, Mailpit
-├── index.html              # React HTML entry point
+├── index.html              # Vite development entry (never served in production)
 ├── src/                    # React & TypeScript source
 │   ├── App.tsx             # Routes: /, /booking, /rdv/:token, /admin, /decision/:token
 │   ├── pages/              # Vitrine, booking, appointment management, Pro area, decision
@@ -346,7 +441,7 @@ crenelio/
 │   ├── seed_init.sql       # Required configuration keys and hours
 │   ├── seed_test_data.sql  # Demo data (local only)
 │   └── migrations/         # Idempotent scripts for existing databases
-└── scripts/                # start.py / stop.py (local environment)
+└── scripts/                # start.py / stop.py (local environment), build.mjs (npm run deploy:build)
 ```
 
 ---

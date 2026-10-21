@@ -10,7 +10,7 @@
     "stop": "python3 scripts/stop.py || python scripts/stop.py",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy:build": "bash scripts/build.sh"
+    "deploy:build": "node scripts/build.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

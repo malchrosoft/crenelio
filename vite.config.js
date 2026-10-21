@@ -2,7 +2,10 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
-export default defineConfig({
+// Build : le site déployé sert le bundle sous /assets/ (réécrit vers api/public/assets/ par le
+// .htaccess racine). En développement, Vite sert l'application à la racine.
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? '/assets/' : '/',
   plugins: [react()],
   css: {
     preprocessorOptions: {
@@ -35,4 +38,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

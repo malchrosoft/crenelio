@@ -156,7 +156,6 @@ MAIL_FROM_NAME=Nom de votre entreprise
 www/
 ├── .ovhconfig          ← configuration PHP OVH
 ├── .htaccess           ← réécriture d'URL (API + repli SPA)
-├── index.html          ← point d'entrée React
 └── api/
     ├── .htaccess       ← routage de l'API
     ├── .env            ← vos identifiants (créé à l'étape 4)
@@ -194,6 +193,102 @@ rsync -avz --exclude node_modules --exclude .git --exclude src --exclude sql \
 
 ⚠️ Une fois le site en ligne, n'écrasez jamais `api/storage/` depuis votre machine : il contient
 le logo, le favicon et la zone d'intervention enregistrés depuis l'espace Pro.
+
+---
+
+## Étape 5 bis : déploiement Git OVH (alternative au FTP)
+
+OVH sait lier un dossier de l'hébergement à un dépôt **GitHub** (seule plateforme prise en charge) :
+à chaque `push` sur la branche choisie, un webhook met le site à jour. Guide officiel :
+[Configurer et utiliser Git avec son hébergement web](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/git-integration-webhosting).
+
+### À savoir avant de commencer
+
+- **OVH ne compile rien** : il récupère les fichiers du dépôt tels quels. Or le bundle React
+  (`api/public/assets/`) n'est pas versionné. Il faut donc déployer une **branche dédiée contenant
+  la version compilée** (par ex. `deploy`), jamais `main` directement.
+- **Le dossier cible doit être vide** au moment de l'association.
+- **Tous les domaines du dossier** sont associés à Git en même temps (onglet *Multisite*).
+- **Ce qui n'est pas dans le dépôt** — `api/.env`, `api/storage/branding/*`, `api/storage/zone/*` —
+  doit être déposé par FTP et ne doit jamais être commité.
+- **Aucune migration SQL n'est jouée** : la base se met à jour à la main (voir plus bas).
+
+### 1. Préparer la branche de déploiement
+
+Depuis votre machine, pour chaque version à mettre en ligne :
+
+```bash
+npm run deploy:build                 # types + compilation dans api/public/assets/
+git switch deploy                    # branche dédiée (créée une fois : git switch -c deploy)
+git merge main                       # récupère le code
+git add -f api/public/assets         # force l'ajout du bundle, ignoré sur main
+git commit -m "deploy: version du JJ/MM"
+git push origin deploy               # déclenche le déploiement OVH
+git switch main
+```
+
+Ne mettez sur `deploy` ni `api/.env` ni le contenu de `api/storage/` (seuls les `.gitkeep` et
+`api/storage/.htaccess` y figurent, comme sur `main`).
+
+> Variante : une action GitHub peut compiler et pousser `deploy` automatiquement à chaque `push`
+> sur `main`. À mettre en place seulement après avoir validé le circuit manuel.
+
+### 2. Sauvegarder puis vider le dossier (site déjà en ligne)
+
+Le dossier cible devant être vide, sur un site existant :
+
+1. Téléchargez par FTP **`api/.env`** et **`api/storage/`** (logo, favicon, zone d'intervention).
+2. Exportez la base (phpMyAdmin → *Exporter*, ou *Sauvegardes* dans l'espace client OVH).
+3. Videz le dossier (par ex. `www/`) — le site est hors ligne à partir d'ici.
+
+### 3. Associer le dépôt
+
+1. Espace client OVH → **Web Cloud** → **Hébergements** → votre offre → onglet **Multisite**.
+2. Sur la ligne du dossier, cliquez sur **...** → **Associer Git**.
+3. Renseignez l'URL du dépôt (`git@github.com:compte/crenelio.git` pour un dépôt privé) et la
+   branche **`deploy`**.
+4. Dépôt privé : copiez la **clé SSH** affichée par OVH et ajoutez-la dans GitHub
+   (*Settings* → *SSH and GPG keys* → *New SSH key*, ou mieux, en *Deploy key* en lecture seule
+   sur ce seul dépôt).
+5. Validez, puis consultez *Informations du dernier déploiement*.
+
+### 4. Remettre les fichiers propres à l'installation
+
+Par FTP, redéposez `api/.env` et le contenu de `api/storage/branding/` et `api/storage/zone/`,
+puis contrôlez les droits d'écriture (étape 6) et testez (étape 7).
+
+### 5. Déploiement automatique (webhook)
+
+Dans **Configurer Git**, copiez l'URL de webhook fournie par OVH, puis dans GitHub :
+*Settings* → *Webhooks* → *Add webhook* — *Payload URL* : l'URL OVH, *Content type* :
+`application/json`, événement : *Just the push event*, vérification SSL activée.
+Chaque `push` sur `deploy` met alors le site à jour ; un `push` sur `main` ne déploie rien.
+
+### Précautions contre l'écrasement
+
+- **Ne modifiez jamais par FTP un fichier suivi par Git** : il serait écrasé au déploiement
+  suivant, ou bloquerait la mise à jour.
+- L'option OVH qui **force les modifications distantes** écrase les fichiers du serveur :
+  sauvegardez d'abord `api/.env` et `api/storage/`.
+- **« Supprimer Git »** propose de vider le dossier : refusez, ou sauvegardez avant.
+- **Retour arrière** : ramenez `deploy` à la version précédente (`git revert`, puis `push`) — et
+  pensez à la base si une migration a été appliquée entre-temps.
+
+---
+
+## Mettre à jour un site en ligne (FTP ou Git)
+
+Ordre à respecter lorsqu'une version modifie la base (nouveau fichier dans `sql/migrations/`) :
+
+1. **Sauvegarder** la base (export phpMyAdmin ou *Sauvegardes* OVH) et `api/storage/`.
+2. **Appliquer les migrations** nouvelles, dans l'ordre des dates, via phpMyAdmin (onglet *SQL*,
+   coller le fichier) ou le client `mysql`. Elles sont idempotentes : les rejouer est sans risque.
+   Elles n'ajoutent que des éléments facultatifs : l'ancienne version du site continue donc de
+   fonctionner pendant l'intervalle.
+3. **Déployer le code** (envoi FTP, ou `push` sur `deploy`).
+4. **Vérifier** : étape 7, puis le journal « Emails » d'une réservation de test.
+
+Ne jamais importer `sql/schema.sql` sur une base existante : il commence par supprimer les tables.
 
 ---
 
@@ -301,7 +396,8 @@ OVH fournit gratuitement des certificats SSL Let's Encrypt :
 
 - Vérifiez la présence des fichiers compilés dans `api/public/assets/`
 - Cherchez des erreurs 404 sur les fichiers JS/CSS dans la console du navigateur
-- Vérifiez que `index.html` est à la racine de `www/` et référence les bons chemins
+- `api/public/assets/index.html` doit pointer vers `/assets/index.js` : recompilez avec `npm run deploy:build`
+- Vérifiez que le `.htaccess` racine a été envoyé (il sert l'`index.html` compilé pour toutes les pages)
 
 ### Erreurs CORS dans la console
 
@@ -326,7 +422,7 @@ OVH fournit gratuitement des certificats SSL Let's Encrypt :
 crenelio/
 ├── .ovhconfig / .htaccess  # Version PHP OVH, réécriture d'URL (API + repli SPA)
 ├── docker-compose.yml      # Environnement local : MySQL, API PHP/Apache, Mailpit
-├── index.html              # Point d'entrée HTML de React
+├── index.html              # Entrée de développement Vite (jamais servie en production)
 ├── src/                    # Code source React & TypeScript
 │   ├── App.tsx             # Routes : /, /booking, /rdv/:token, /admin, /decision/:token
 │   ├── pages/              # Vitrine, réservation, gestion du rendez-vous, espace Pro, décision
@@ -348,7 +444,7 @@ crenelio/
 │   ├── seed_init.sql       # Clés de configuration et horaires indispensables
 │   ├── seed_test_data.sql  # Données de démonstration (local uniquement)
 │   └── migrations/         # Scripts idempotents pour les bases existantes
-└── scripts/                # start.py / stop.py (environnement local)
+└── scripts/                # start.py / stop.py (environnement local), build.mjs (npm run deploy:build)
 ```
 
 ---

@@ -3,17 +3,27 @@
 
 AddDefaultCharset UTF-8
 
+# Pas d'ajout automatique de « / » sur une URL qui coïncide avec un dossier (/api/config ↔ api/config/)
+DirectorySlash Off
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Route everything in /api/ to index.php (front controller)
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
+    # Ce fichier remplace les règles du .htaccess racine pour tout ce qui est sous api/.
+    # Bundle compilé (atteint via /assets/… depuis la racine) : servi tel quel
+    RewriteRule ^public/assets/ - [L]
+    RewriteRule ^index\.php$ - [L]
+
+    # Tout le reste passe par le contrôleur frontal, y compris les URL qui coïncident avec
+    # un dossier existant (/api/config ↔ api/config/, qui renvoyait sinon une erreur 403)
     RewriteRule ^ index.php [QSA,L]
 </IfModule>
 
 # Block direct access to config and sensitive directories
-<FilesMatch "^(config|\.env)$">
+# (« config » n'y figure plus : la règle bloquait l'URL /api/config elle-même, le contrôle d'accès
+# passant avant la réécriture. Les fichiers de api/config/ restent inaccessibles : toute requête
+# directe est envoyée à index.php, qui répond « Route not found ».)
+<FilesMatch "^\.env$">
     Require all denied
 </FilesMatch>
 

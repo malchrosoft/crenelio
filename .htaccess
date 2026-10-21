@@ -10,15 +10,16 @@ AddDefaultCharset UTF-8
     # Everything under /api is handled by api/index.php
     RewriteRule ^api/? api/index.php [QSA,L]
 
-    # Serve static assets from the build output (JS, CSS, images).
-    # Vite outputs to api/public/assets/ during build.
-    RewriteRule ^assets/? api/public/assets/ [QSA,L]
+    # Bundle compilé (JS, CSS) : /assets/<fichier> → api/public/assets/<fichier>
+    # (Vite compile avec base '/assets/', cf. vite.config.js)
+    RewriteRule ^assets/(.+)$ api/public/assets/$1 [L]
 
-    # SPA fallback: all other routes serve index.html (React handles routing).
-    # Skip this for actual files/directories that exist.
+    # Page d'accueil et routes de la SPA (/booking, /admin, /rdv/…) : index.html COMPILÉ.
+    # Le index.html de la racine du dépôt est la source de développement Vite : jamais servi.
+    RewriteRule ^(index\.html)?$ api/public/assets/index.html [L]
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.html [QSA,L]
+    RewriteRule ^ api/public/assets/index.html [L]
 </IfModule>
 
 # Security: hide sensitive files
