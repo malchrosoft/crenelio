@@ -1,15 +1,57 @@
 # 📋 Fiche de Passation & Point d'Avancement — Crénelio
 
-**Date :** 12 Octobre 2026
+**Date :** 21 Octobre 2026
 **Dépôt :** `/Users/aymeric.malchrowicz/DEVELOPPEMENT/crenelio`
-**Dernier commit :** `7ec7c23` (`main`, poussé) — *feat(vitrine) : engagements chargés dynamiquement*
+**Dernier commit :** `b7bf2e4` (`main`, poussé) — *Administration de la zone et des rendez-vous*
 **Statut Git :** commits directs sur `main` (projet solo), sans ligne d'attribution.
+**Non commité :** documentation (`DEPLOYMENT.fr.md`, `DEPLOYMENT.md`, `README.md`, `ROADMAP.md`, cette fiche) et Mailpit dans `docker-compose.yml`.
 
 ---
 
 ## 1. Ce qui est réellement achevé
 
-### Session du 12/10/2026
+### Sessions du 20 et 21/10/2026 (`cfa99d1`, `506d59d`, `b7bf2e4`)
+- **Item 14 — Configuration :** onglet piloté par `src/config/configSchema.ts` (groupes Identité,
+  Coordonnées, Page vitrine, Réservation, Carte, Mentions légales) + « Autres paramètres » pour toute
+  clé non décrite ; éditeur d'engagements (ordre, suppression, picto choisi ou déduit,
+  `vitrine_engagement_N_icon`) ; bouton « Annuler » sur chaque formulaire. `PUT /admin/config` :
+  une valeur `null` supprime la clé.
+- **Item 6 — Logo & favicon :** PNG/SVG avec zoom et recadrage (`react-easy-crop`, `viewBox` pour le
+  SVG), favicon PNG 512 + ICO (+ SVG), fichiers aux noms usuels dans `api/storage/branding/` avec
+  repli, conseils de lisibilité selon l'image. Logo dans le hero ; titre de l'onglet = nom de l'entreprise.
+- **Item 16 — Horaires :** onglet « Horaires » (plages matin / après-midi, indisponibilités).
+  `api/core/SlotEngine.php` est la source unique des créneaux : `GET /slots`,
+  `GET /slots/availability` (jours grisés) et validation de `POST /appointments`.
+- **Item 17 — Espace Artisan pleine page :** route `/admin` (les anciens `?view=admin` redirigent),
+  header fixe, menu latéral rétractable, liens du site ouverts dans un nouvel onglet,
+  espace chargé à la demande (bundle client ≈ 387 ko).
+- **Item 18 — Zone & déplacement :**
+  - Menu « Déplacement » : mode (à domicile / dans les locaux), adresse de l'entreprise
+    (`premises_*` + coordonnées), frais par paliers et origine du calcul (`travel_fee_origin`).
+  - Menu « Zone d'intervention » (pleine page) : point de départ (adresse ou GPS,
+    `default_latitude/longitude`), rayon, limitrophes, calcul des communes via `geo.api.gouv.fr`
+    (`src/utils/serviceArea.ts`), bleu / orange selon la couverture, clic droit pour retirer,
+    confirmation avant recalcul. Enregistré dans `api/storage/zone/service-area.geojson`.
+  - Réservation : adresse hors des communes cochées ⇒ hors zone (`api/core/ServiceArea.php`).
+    Jusqu'au rayon + 10 % : **demande exceptionnelle** (rendez-vous `pending`, accusé client,
+    email artisan avec lien `/decision/:token`, acceptation ⇒ confirmations, refus ⇒ email client).
+    Au-delà : « adresse non desservie ».
+  - Vitrine : repère sur l'adresse de l'entreprise (ou du siège géocodé), ni centre ni cercle.
+    Mode locaux : section « Nous trouver ». Le siège légal se replie sur l'adresse de l'entreprise.
+- **Item 19 — Rendez-vous saisi par l'artisan :** « Nouveau rendez-vous » du planning, formulaires
+  partagés en `adminMode` (heure libre, email / adresse facultatifs, hors zone forçable, envoi
+  optionnel). Capsules de statut en français.
+- **Corrections au passage :** liste d'adresses qui se rouvrait après sélection, champ d'adresse
+  obligatoire qui bloquait l'enregistrement, jours cliquables pendant le chargement du calendrier,
+  frais non calculés pour une commune exclue, blanc au-dessus du hero.
+- **Session du 21/10 (documentation) :** `DEPLOYMENT.fr.md` (traduction, liens de langue croisés),
+  `DEPLOYMENT.md` remis à jour (migrations, stockage, emails, arborescence réelle), `README.md`
+  (fonctionnalités, URLs locales, nouveaux endpoints), Item 20 ajouté à la feuille de route.
+- **Emails en local :** service **Mailpit** dans `docker-compose.yml` (UI `http://localhost:8025`,
+  SMTP `mailpit:1025`) ; le conteneur PHP reçoit `SMTP_HOST=mailpit`, `MAIL_FROM`, `APP_URL`
+  (priment sur `api/.env`). Envoi réel vérifié : statut `sent`, message visible dans Mailpit.
+
+### Session du 12/10/2026 (`fba6368` → `7ec7c23`)
 - **Encodage de la base locale :** les accents étaient stockés en double encodage (`é` → `C383C2A9`).
   `seed_init.sql` est sain : le volume `db_data` avait été rempli par un ancien import, et MySQL
   ne rejoue `docker-entrypoint-initdb.d` que sur un volume vide. Corrigé par
@@ -71,19 +113,19 @@
 
 ## 2. État exact de la base de données
 
-| Table | Colonnes de l'Item 1 | Statut |
+| Table | Évolutions | Statut |
 |---|---|---|
-| `services` | `travel_fee_mode`, `travel_fee_amount` | ✅ en base **et** dans `sql/schema.sql` |
-| `appointments` | `travel_fee`, `distance_km`, `is_out_of_zone` | ✅ en base **et** dans `sql/schema.sql` |
-| `config` | `travel_tier_{1,2,3}_max_km`, `travel_tier_{1,2,3}_fee`, `travel_max_km` | ✅ en base **et** dans `sql/seed_init.sql` |
-| `appointment_notifications` | table complète (Item 4), `ON DELETE CASCADE` depuis `appointments` | ✅ en base **et** dans `sql/schema.sql` |
+| `services` | `travel_fee_mode`, `travel_fee_amount` (Item 1) | ✅ en base **et** dans `sql/schema.sql` |
+| `appointments` | `travel_fee`, `distance_km`, `is_out_of_zone` (Item 1) ; `decision_token` (Item 18) | ✅ en base **et** dans `sql/schema.sql` |
+| `appointment_notifications` | table (Item 4) ; types `exception_client_ack`, `exception_pro_request`, `exception_client_refused` (Item 18) | ✅ en base **et** dans `sql/schema.sql` |
+| `config` | clés de déplacement, `vitrine_*`, `legal_*` ; nouvelles clés écrites par l'IHM (`travel_mode`, `premises_*`, `start_*`, `zone_include_neighbours`, `travel_fee_origin`, `vitrine_engagement_N_icon`) | ✅ créées à la demande, rien d'obligatoire en seed |
 
-- Migrations idempotentes disponibles, déjà appliquées en dev :
-  `sql/migrations/2026-10-11_item1_travel_fees.sql` et `sql/migrations/2026-10-11_item4_notifications.sql`.
-- Reproductibilité vérifiée : `schema.sql` + `seed_init.sql` + `seed_test_data.sql` rejoués sur une base
-  vierge produisent 33 clés de config et les 4 prestations de démo avec leurs modes de déplacement.
-- Reproductibilité revérifiée après l'Item 4 : les 6 tables et les 33 clés de config sont recréées
-  à l'identique sur une base vierge.
+- Migrations idempotentes, toutes appliquées en dev :
+  `2026-10-11_item1_travel_fees.sql`, `2026-10-11_item4_notifications.sql`,
+  `2026-10-21_item18_exception_requests.sql` (exécutée deux fois sans effet de bord).
+- **À appliquer en production** avant de déployer `b7bf2e4` : la migration du 21/10.
+- Fichiers hors base, non versionnés : `api/storage/branding/` et `api/storage/zone/`
+  (doivent être accessibles en écriture par PHP).
 
 ### Écarts corrigés au passage
 La base dev avait dérivé des fichiers `sql/` : colonnes `travel_fee_*` présentes en base mais absentes de
@@ -92,28 +134,25 @@ Les deux sens ont été réalignés.
 
 ---
 
-## 3. Prochains chantiers prioritaires (ordre fixé le 12/10/2026)
+## 3. Prochains chantiers prioritaires (ordre fixé le 21/10/2026)
 
-### 🎯 1. Item 14 — IHM de configuration complète
-L'onglet « Paramètres » n'édite que les 7 clés de déplacement ; `company_name` y est seulement
-affiché. Ajouter un formulaire par groupe : entreprise & coordonnées, réservation & créneaux,
-carte, vitrine, engagements (liste libre `vitrine_engagement_N`), mentions légales.
-Le changement de mot de passe reste dans l'Item 12. Détail dans `ROADMAP.md`.
+### 🎯 1. Item 15 — Header & footer sur le tunnel de réservation
+Extraire le header de `VitrinePage.tsx` en composant réutilisable, l'afficher en permanence sur
+`/booking` (et `/rdv/:token`, `/decision/:token`), réutiliser `Footer`.
 
-### 🎯 2. Item 15 — Header & footer sur le tunnel de réservation
-Le header sticky (inline dans `VitrinePage.tsx`) et `Footer` ne sont pas rendus sur `/booking`.
-Extraire le header en composant réutilisable, l'afficher en permanence sur `/booking`, réutiliser `Footer`.
+### 🎯 2. Item 12 — Sécurité de l'espace Pro
+Vérification serveur de **toutes** les routes `/admin/*` (aujourd'hui ouvertes), regroupement des
+routes d'écriture non préfixées (`/schedules/:day`, `/unavailabilities`), puis 2FA OTP par email
+(appareil de confiance 10 jours). Le Mailer est prêt et testable en local avec Mailpit.
 
-### 3. Item 12 — Sécurité 2FA Espace Pro (OTP email, appareil de confiance 10 jours)
-Le service mail de l'Item 4 est en place, la dépendance est levée.
-1. Étape 1 : vérification du mot de passe admin (Bcrypt, déjà en place).
-2. Étape 2 : jeton d'appareil signé (`device_token`) valable 10 jours, stocké côté client.
-3. Étape 3 : OTP à 6 chiffres (`random_int`), 15 min de validité, 3 tentatives, envoyé à `pro_email`
-   via `Notifier` / `Mailer`.
+### 3. Item 20 — Compte SMTP configurable depuis l'espace Pro (reporté)
+Dépend de l'Item 12 : mot de passe chiffré hors table `config`, jamais renvoyé par l'API.
 
-⚠️ L'espace Pro n'est **pas protégé côté serveur** : le token de `ConfigController::login` est
-trivial et aucune route `/admin/*` ne le vérifie. La 2FA seule ne corrigerait rien — il faut
-embarquer la vérification serveur dans le même chantier.
+### Points d'attention issus des Items 18 et 19
+- Changer à la main le statut d'une demande « En attente » n'envoie pas les emails de décision.
+- Sans `APP_URL`, l'email artisan n'a pas de bouton de décision : validation par le planning seulement.
+- Pas de limitation de fréquence sur `POST /appointments/exceptional-request` (route publique).
+- Un grand rayon produit un fichier de zone lourd pour la vitrine (contours non simplifiés).
 
 ### Contraintes et reliquats
 Consignés dans [`AGENTS.md`](AGENTS.md), section *5. Contraintes Connues & Dette Technique*

@@ -133,10 +133,12 @@ lien de gestion client). Rien n'est stocké en base.
 
 Sans `SMTP_HOST`, l'envoi est désactivé : les réservations aboutissent normalement et chaque
 tentative est journalisée en `failed` avec un motif explicite, visible via le bouton « Emails »
-du planning Pro. C'est le comportement par défaut en local.
+du planning Pro.
 
-Pour vérifier réellement un envoi sans écrire à une vraie adresse, viser un serveur SMTP de
-capture (Mailpit, MailHog ou un script de test jetable) via les variables d'environnement.
+En local, `docker-compose.yml` démarre **Mailpit** (interface `http://localhost:8025`) et fournit
+au conteneur PHP `SMTP_HOST=mailpit`, `SMTP_PORT=1025`, `SMTP_SECURE=none`, `MAIL_FROM` et
+`APP_URL` : ces variables d'environnement priment sur `api/.env`. Tout email envoyé par
+l'application y est capturé, rien ne sort de la machine.
 
 ---
 

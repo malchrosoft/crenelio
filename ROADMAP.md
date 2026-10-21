@@ -225,15 +225,28 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
+### 20. Compte SMTP Configurable depuis l'Espace Pro
+- **Besoin :** saisir le compte d'envoi (hôte, port, chiffrement, identifiant, mot de passe, expéditeur) dans l'espace Pro, en remplacement de la configuration de déploiement (`api/.env`), et l'utiliser pour tous les envois.
+- **Reporté (21/10/2026) :** le mot de passe SMTP est un secret ; il ne doit pas aller dans la table `config` (exposée par `GET /admin/config`), et tant que les routes `/admin/*` ne sont pas protégées côté serveur, n'importe qui pourrait modifier le compte et détourner les emails. **Prérequis : Item 12.**
+- **Pistes :** mot de passe chiffré hors table `config` (`api/storage/`), champ en écriture seule jamais renvoyé par l'API, bouton « Envoyer un email de test », repli sur `api/.env` si rien n'est saisi.
+- **En attendant, en local :** Docker Compose fournit un serveur de capture **Mailpit** (`http://localhost:8025`) déjà branché sur le conteneur PHP.
+
+---
+
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
 |---|---|---|---|---|---|
-| **1** | **Item 14** | **IHM de configuration complète (Espace Pro)** | Espace Pro / Configuration | ✅ *Terminé* | — |
-| **2** | **Item 15** | **Header & footer communs au tunnel de réservation** | Vitrine / Navigation | ⏳ *À faire* | Extraction du header de `VitrinePage` |
-| **3** | **Item 12** | **Sécurité 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Service mail disponible (Item 4) ✅ |
+| **1** | **Item 15** | **Header & footer communs au tunnel de réservation** | Vitrine / Navigation | ⏳ *À faire* | Extraction du header de `VitrinePage` |
+| **2** | **Item 12** | **Sécurité : vérification serveur des routes `/admin/*` + 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Service mail disponible (Item 4) ✅ |
+| **3** | **Item 20** | **Compte SMTP configurable depuis l'espace Pro** | Communication / Configuration | 🕒 *Reporté* | Item 12 |
 | **4** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
 | **5** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
+| — | **Item 19** | Saisie d'un rendez-vous par l'artisan (formulaires partagés, hors zone forçable) | Espace Pro / Planning | ✅ **Terminé** | — |
+| — | **Item 18** | Zone d'intervention calculée, mode sans déplacement, demandes hors zone validées par l'artisan | Zone / Réservation | ✅ **Terminé** | — |
+| — | **Item 17** | Espace Artisan en pleine page (`/admin`, menu rétractable) | Espace Pro / Navigation | ✅ **Terminé** | — |
+| — | **Item 16** | Horaires de travail, indisponibilités, moteur de créneaux partagé | Espace Pro / Planning | ✅ **Terminé** | — |
+| — | **Item 14** | IHM de configuration complète (Espace Pro) | Espace Pro / Configuration | ✅ **Terminé** | — |
 | — | **Item 6** | Identité visuelle : logo & favicon (recadrage, replis) | Design / Personnalisation | ✅ **Terminé** | — |
 | — | **Item 4** | Notifications email, iCal & logs d'envoi IHM | Communication / Traçabilité | ✅ **Terminé** | — |
 | — | **Item 1** | Frais de déplacement hybrides & gestion hors-zone | Tunnel / Tarification | ✅ **Terminé** | — |

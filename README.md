@@ -4,7 +4,7 @@
 
 **Crénelio** est une application web open source et auto-hébergée de prise de rendez-vous en ligne, spécialement conçue pour les artisans, techniciens et professionnels intervenant à domicile (plomberie, électricité, dépannage, rénovation...).
 
-Vos clients sélectionnent une prestation, choisissent un créneau disponible, valident leur adresse avec géolocalisation automatique, et confirment leur rendez-vous. Vous gérez vos prestations, vos horaires, vos indisponibilités et vos interventions depuis un espace pro sécurisé.
+Vos clients sélectionnent une prestation, choisissent un créneau disponible, valident leur adresse avec géolocalisation automatique, et confirment leur rendez-vous. Vous gérez vos prestations, vos horaires, votre zone d'intervention et vos rendez-vous depuis l'espace Artisan.
 
 Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et **MySQL**, Crénelio est optimisé pour un déploiement clé-en-main sur hébergement mutualisé **OVHcloud** sans surcoût d'infrastructure.
 
@@ -15,31 +15,30 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 ## Fonctionnalités
 
 ### Parcours Client & Présentation
-- **Page vitrine artisan (Homepage `/`)** :
-  - Mise en valeur des prestations, de l'artisan, de ses engagements et de ses coordonnées.
-  - Header adaptatif sticky (apparition dynamique après défilement du call-to-action principal).
-  - Zone d'intervention interactive avec carte OpenStreetMap et tracés polygonaux GeoJSON officiels des communes couvertes.
-  - Cartes de prestations avec accès direct au créneau correspondant (`/booking?service=:id`).
+- **Page vitrine artisan (`/`)** :
+  - Hero avec logo, prestations, présentation, engagements (pictos choisis ou déduits du texte) et coordonnées.
+  - Header fixe qui apparaît une fois le bouton principal du hero dépassé.
+  - Carte de la zone d'intervention : communes desservies (contours officiels), repère sur l'adresse de l'entreprise (ou du siège), bouton « Centrer sur toutes les communes ».
+  - Mode « sans déplacement » : section « Nous trouver » avec l'adresse des locaux.
+  - Titre de l'onglet et favicon repris de la configuration.
 - **Réservation en ligne en 3 étapes (`/booking`)** :
-  - **Choix de la prestation** : sélection avec durée, tarif indicatif et descriptif détaillé.
-  - **Calendrier & créneaux en direct** : calcul dynamique des disponibilités en temps réel basé sur les horaires d'ouverture habituels, la durée de la prestation, le temps de battement/trajet (`buffer_minutes`), le préavis minimum et les congés/indisponibilités.
-  - **Autocomplétion d'adresse BAN (Base Adresse Nationale)** :
-    - Recherche prédictive en direct via l'API officielle `api-adresse.data.gouv.fr`.
-    - Remplissage automatique des champs (adresse, code postal, ville).
-    - Détection et enregistrement des coordonnées GPS précises (`[latitude, longitude]`).
-  - **Cartographie OpenStreetMap intégrée** :
-    - Intégration cartographique légère avec **Pigeon Maps** (sans clé API tierce).
-    - Centrage initial par défaut sur la commune d'activité de l'artisan (ex: Clamart `[48.8000, 2.2625]`), paramétrable dans la base de données.
-    - Positionnement interactif d'un marqueur sur le lieu exact de l'intervention.
-- **Confirmation & suivi** : récapitulatif complet de l'intervention avec token unique d'annulation/suivi.
-- **Pied de page & Mentions légales** : informations légales obligatoires et modale dédiée pré-configurée.
+  - **Choix de la prestation** : durée, tarif indicatif et descriptif.
+  - **Calendrier & créneaux en direct** : jours sans créneau grisés ; créneaux calculés à partir des horaires de travail, de la durée de la prestation, du temps de trajet entre deux interventions, du délai minimal et des indisponibilités. Le serveur refuse tout créneau non proposé.
+  - **Adresse BAN (Base Adresse Nationale)** : autocomplétion via `api-adresse.data.gouv.fr`, coordonnées GPS, carte OpenStreetMap (Pigeon Maps, sans clé API).
+  - **Frais de déplacement** : forfait ou paliers kilométriques, calculés depuis le point de départ ou l'adresse de l'entreprise.
+  - **Zone d'intervention** : adresse hors des communes desservies ou au-delà du rayon ⇒ réservation directe bloquée. Jusqu'au rayon + 10 %, le client peut envoyer une **demande exceptionnelle** : rendez-vous « En attente », accusé de réception au client, email à l'artisan qui accepte ou refuse en un clic (`/decision/:token`). Au-delà : adresse non desservie.
+- **Confirmation & suivi** : récapitulatif, email de confirmation et lien de gestion / annulation (`/rdv/:token`).
+- **Mentions légales** : modale dédiée alimentée par la configuration.
 
-### Espace Professionnel / Administration
-- **Authentification sécurisée** : mot de passe fort (hachage Bcrypt).
-- **Double authentification (2FA)** — 🚧 *en cours de développement* : code OTP temporaire à 6 chiffres par email (valide 15 min), avec mémorisation des appareils de confiance pendant 10 jours.
-- **Planning des interventions** : suivi des rendez-vous par statut (`confirmed`, `completed`, `cancelled`, `pending`) avec coordonnées client et notes d'accès.
-- **Gestion du catalogue de prestations** : ajout, édition inline, descriptif d'intervention, prix, durée et suppression protégée.
-- **Configuration dynamique en base de données** : nom d'entreprise, coordonnées de contact, zone de chalandise, coordonnées GPS et zoom par défaut de la carte.
+### Espace Artisan (`/admin`)
+- **Mise en page pleine page** : header fixe (nom de l'entreprise, déconnexion, liens vers le site ouverts dans un nouvel onglet) et menu latéral rétractable.
+- **Rendez-vous** : planning, recherche et filtres, statuts en français, reprogrammation, journal des emails avec relance ; **saisie d'un rendez-vous par l'artisan** (heure libre, hors zone forçable, envoi des confirmations au choix).
+- **Prestations** : ajout, édition, prix, durée, mode de frais de déplacement.
+- **Horaires** : plages du matin et de l'après-midi par jour, indisponibilités (congés, formation…).
+- **Déplacement** : mode d'intervention (à domicile ou dans les locaux), adresse de l'entreprise, frais par paliers.
+- **Zone d'intervention** (pleine page) : point de départ (adresse ou GPS), rayon, communes limitrophes, calcul des communes via `geo.api.gouv.fr` (bleu : entièrement dans le rayon, orange : partiellement), retrait d'une commune au clic droit.
+- **Configuration** : identité (nom, logo et favicon PNG/SVG avec recadrage), coordonnées, page vitrine, engagements, réservation, mentions légales ; bouton « Annuler » sur chaque formulaire.
+- **Authentification** : mot de passe haché (Bcrypt). ⚠️ Les routes `/admin/*` ne sont pas encore protégées côté serveur : à traiter avec la double authentification (Item 12 de la [feuille de route](ROADMAP.md)).
 
 ---
 
@@ -72,14 +71,19 @@ cd crenelio
 # 2. Installer les dépendances du frontend
 npm install
 
-# 3. Lancer l'environnement complet (DB Docker + API PHP + Frontend Vite)
+# 3. Lancer l'environnement complet (MySQL, API PHP et Mailpit sous Docker + Vite)
 npm start
 
 # Pour arrêter proprement l'ensemble des services :
 npm stop
 ```
 
-L'application est directement accessible sur `http://localhost:5173`. L'API backend répond sur `http://localhost:8000/api`.
+| Adresse | Usage |
+|---|---|
+| `http://localhost:5173` | Vitrine et réservation |
+| `http://localhost:5173/admin` | Espace Artisan (mot de passe de démonstration : `admin123`) |
+| `http://localhost:8000/api` | API PHP |
+| `http://localhost:8025` | **Mailpit** : tous les emails envoyés en local y sont capturés, rien ne sort de la machine |
 
 ### Build de Production
 
@@ -145,6 +149,10 @@ MAIL_FROM_NAME=Crénelio
 | `SMTP_SECURE` | `starttls` | `starttls` (587), `tls` (465, TLS implicite) ou `none` |
 | `MAIL_FROM` / `MAIL_FROM_NAME` | *(vide)* / `Crénelio` | Expéditeur. Doit appartenir au domaine, sinon rejet SPF/DKIM |
 
+**En local, Docker Compose fournit ces variables au conteneur PHP pour viser Mailpit** (elles
+priment sur `api/.env`) : l'envoi fonctionne sans rien configurer. Retirez-les du service `api`
+de `docker-compose.yml` pour tester un vrai serveur SMTP.
+
 **Sans `SMTP_HOST` ou `MAIL_FROM`, l'envoi est simplement désactivé** : les réservations
 aboutissent normalement et chaque tentative est journalisée en `failed` avec un motif explicite,
 consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relançable manuellement.
@@ -169,7 +177,16 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 | `PUT` | `/api/services/:id` | Modifier une prestation |
 | `DELETE` | `/api/services/:id` | Supprimer une prestation |
 | `GET` | `/api/slots?service_id=1&date=YYYY-MM-DD` | Calcul temps réel des créneaux libres |
-| `POST` | `/api/travel-fee/quote` | Devis des frais de déplacement pour une prestation et une adresse géocodée |
+| `GET` | `/api/slots/availability?service_id=1` | Jours réservables de la fenêtre de réservation |
+| `POST` | `/api/travel-fee/quote` | Devis des frais de déplacement et contrôle de zone pour une adresse géocodée |
+
+### Identité & Zone
+| Méthode | Route | Description |
+|---|---|---|
+| `GET` | `/api/branding/:kind` | Logo ou favicon (`logo`, `favicon`), avec repli |
+| `POST` / `DELETE` | `/api/admin/branding/:kind` | Remplacer ou supprimer le logo / favicon |
+| `GET` | `/api/zone` | Communes de la zone d'intervention (GeoJSON) |
+| `PUT` | `/api/admin/zone` | Enregistrer les communes retenues |
 
 ### Horaires & Disponibilités
 | Méthode | Route | Description |
@@ -185,10 +202,13 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 |---|---|---|
 | `GET` | `/api/appointments` | Liste des rendez-vous (espace pro) |
 | `POST` | `/api/appointments` | Réservation d'un créneau (client) |
+| `POST` | `/api/appointments/exceptional-request` | Demande hors zone (rendez-vous « En attente » soumis à l'artisan) |
+| `GET` / `POST` | `/api/appointments/decision/:token` | Consultation puis acceptation / refus d'une demande hors zone |
+| `POST` | `/api/admin/appointments` | Rendez-vous saisi par l'artisan (hors zone et heure libre acceptés) |
 | `GET` | `/api/appointments/token/:token` | Consultation d'un rendez-vous via son token |
 | `POST` | `/api/appointments/token/:token/cancel` | Annulation d'un rendez-vous par le client |
 | `GET` | `/api/appointments/:id` | Détail d'un rendez-vous (espace pro) |
-| `PUT` | `/api/appointments/:id/status` | Modification du statut (confirmed, completed, cancelled) |
+| `PUT` | `/api/appointments/:id/status` | Modification du statut (pending, confirmed, completed, cancelled) |
 | `PUT` | `/api/appointments/:id/reschedule` | Reprogrammation (l'heure de fin suit la durée de la prestation) |
 | `GET` | `/api/appointments/:id/notifications` | Journal des emails envoyés pour ce rendez-vous |
 | `POST` | `/api/appointments/:id/notifications/resend` | Relance manuelle d'un email (`client_confirmation` ou `pro_confirmation`) |
@@ -197,13 +217,13 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 
 ## Déploiement
 
-Consultez [DEPLOYMENT.md](DEPLOYMENT.md) pour le guide de déploiement pas à pas sur hébergement OVHcloud (FTP/SFTP, configuration `.ovhconfig`, mise en place de la base de données et HTTPS Let's Encrypt).
+Guide pas à pas pour l'hébergement mutualisé OVHcloud (base de données et migrations, `.env`, SMTP, envoi FTP/SFTP, dossiers de stockage, HTTPS) : [🇫🇷 DEPLOYMENT.fr.md](DEPLOYMENT.fr.md) · [🇬🇧 DEPLOYMENT.md](DEPLOYMENT.md).
 
 ---
 
 ## Feuille de Route & Évolutions Futures
 
-Consultez [ROADMAP.md](ROADMAP.md) pour le suivi des fonctionnalités prévues (frais de déplacement, theming & effets graphiques, page vitrine, emails & iCal, RGPD, logo & mentions légales).
+Consultez [ROADMAP.md](ROADMAP.md) pour le suivi des fonctionnalités réalisées et prévues, et [PASSATION.md](PASSATION.md) pour le dernier point d'avancement.
 
 ---
 

@@ -32,13 +32,32 @@ services:
       DB_PASS: crenelio_dev
       APP_ENV: development
       CORS_ORIGIN: "*"
+      # Emails locaux capturés par Mailpit (http://localhost:8025) : rien ne part vers l'extérieur.
+      # Ces variables priment sur api/.env ; les retirer pour tester un vrai serveur SMTP.
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_SECURE: none
+      SMTP_USER: ""
+      MAIL_FROM: no-reply@crenelio.local
+      MAIL_FROM_NAME: Crénelio (local)
+      APP_URL: http://localhost:5173
     depends_on:
       - db
+      - mailpit
     command: >
       sh -c "docker-php-ext-install pdo pdo_mysql &&
              a2enmod rewrite &&
              sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf &&
              apache2-foreground"
+
+  # Serveur SMTP de capture pour le développement : interface web sur http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: crenelio-mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
 
 volumes:
   db_data:
