@@ -29,9 +29,52 @@ class ScheduleController
         }
 
         $body = Response::body();
+        $error = self::validateDay($body);
+        if ($error !== null) {
+            Response::json(['error' => $error], 400);
+        }
         Schedule::updateDay($day, $body);
 
         Response::json(Schedule::getByDay($day));
+    }
+
+    /**
+     * Plages cohérentes : heures HH:MM, chaque plage complète ou vide, début < fin,
+     * matin terminé avant l'après-midi, au moins une plage si le jour est ouvert.
+     */
+    private static function validateDay(array &$body): ?string
+    {
+        $labels = ['morning' => 'du matin', 'afternoon' => "de l'après-midi"];
+        $ranges = [];
+        foreach ($labels as $part => $label) {
+            $start = $body["{$part}_start"] ?? null;
+            $end = $body["{$part}_end"] ?? null;
+            $start = $start === '' ? null : $start;
+            $end = $end === '' ? null : $end;
+            $body["{$part}_start"] = $start;
+            $body["{$part}_end"] = $end;
+
+            if ($start === null && $end === null) {
+                continue;
+            }
+            foreach ([$start, $end] as $time) {
+                if ($time === null || !preg_match('/^([01]\d|2[0-3]):[0-5]\d(:00)?$/', $time)) {
+                    return "Plage $label incomplète ou heure invalide (format HH:MM)";
+                }
+            }
+            if (substr($start, 0, 5) >= substr($end, 0, 5)) {
+                return "La plage $label doit commencer avant de finir";
+            }
+            $ranges[] = [substr($start, 0, 5), substr($end, 0, 5)];
+        }
+
+        if (count($ranges) === 2 && $ranges[0][1] > $ranges[1][0]) {
+            return "La plage du matin doit se terminer avant le début de l'après-midi";
+        }
+        if (!empty($body['is_active']) && !$ranges) {
+            return 'Un jour travaillé doit avoir au moins une plage horaire';
+        }
+        return null;
     }
 
     /**

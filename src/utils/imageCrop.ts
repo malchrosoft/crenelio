@@ -138,3 +138,40 @@ export async function buildIco(png: Blob, sizes = [16, 32, 48]): Promise<Blob> {
 
   return new Blob([header.buffer, ...images], { type: 'image/x-icon' });
 }
+
+/** Caractéristiques visuelles d'une image, pour conseiller sur sa lisibilité. */
+export interface ImageInsights {
+  width: number;
+  height: number;
+  /** Part des pixels (quasi) transparents, de 0 à 1. */
+  transparency: number;
+  /** Luminance moyenne des pixels visibles, de 0 (noir) à 1 (blanc). */
+  luminance: number;
+}
+
+/** Analyse une image sur une vignette réduite (128 px) : transparence et luminance moyenne. */
+export async function analyzeImage(url: string): Promise<ImageInsights> {
+  const img = await loadImage(url);
+  const { naturalWidth: width, naturalHeight: height } = img;
+  const scale = Math.min(1, 128 / Math.max(width, height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+  const ctx = canvas.getContext('2d')!;
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  let transparent = 0;
+  let visible = 0;
+  let lumSum = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] < 32) {
+      transparent++;
+      continue;
+    }
+    visible++;
+    lumSum += (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255;
+  }
+  const total = data.length / 4;
+  return { width, height, transparency: transparent / total, luminance: visible ? lumSum / visible : 0 };
+}

@@ -10,6 +10,7 @@ require_once __DIR__ . '/../core/TravelFee.php';
 require_once __DIR__ . '/../core/Notifier.php';
 require_once __DIR__ . '/../models/Notification.php';
 require_once __DIR__ . '/../core/Response.php';
+require_once __DIR__ . '/../core/SlotEngine.php';
 require_once __DIR__ . '/TravelFeeController.php';
 
 class AppointmentController
@@ -98,16 +99,11 @@ class AppointmentController
             ], 422);
         }
 
-        // Vérification de non-conflit de créneau (avec buffer de trajet)
-        $bufferMinutes = max(0, (int)($config['buffer_minutes'] ?? 30));
-
-        $checkStart = date('Y-m-d H:i:s', strtotime("-$bufferMinutes minutes", strtotime($startDatetime)));
-        $checkEnd   = date('Y-m-d H:i:s', strtotime("+$bufferMinutes minutes", strtotime($endDatetime)));
-
-        $overlaps = Appointment::getOverlapping($checkStart, $checkEnd);
-        if (!empty($overlaps)) {
+        // Le créneau doit faire partie de ceux proposés : horaires de travail, durée de la prestation,
+        // indisponibilités, rendez-vous existants avec temps de trajet, délai minimal et horizon
+        if (!SlotEngine::isAvailable($service, $startDatetime, $config)) {
             Response::json([
-                'error' => "Ce créneau n'est plus disponible (conflit de planning ou temps de déplacement insuffisant). Veuillez choisir un autre créneau."
+                'error' => "Ce créneau n'est plus disponible (hors horaires, conflit de planning ou temps de déplacement insuffisant). Veuillez choisir un autre créneau."
             ], 409);
         }
 

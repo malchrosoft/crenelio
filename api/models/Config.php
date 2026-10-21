@@ -52,12 +52,14 @@ class Config
     }
 
     /**
-     * Update multiple config values.
+     * Update multiple config values. A `null` value deletes the key (ex. engagement retiré).
      */
     public static function updateMany(array $data): void
     {
         foreach ($data as $key => $value) {
-            if ($key === 'admin_password' && !empty($value)) {
+            if ($value === null && $key !== 'admin_password_hash') {
+                Database::execute('DELETE FROM `config` WHERE config_key = ?', [$key]);
+            } elseif ($key === 'admin_password' && !empty($value)) {
                 self::set('admin_password_hash', password_hash($value, PASSWORD_BCRYPT));
             } elseif ($key !== 'admin_password_hash') {
                 self::set($key, (string)$value);

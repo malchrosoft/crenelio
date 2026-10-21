@@ -1,8 +1,17 @@
-import React, { lazy, Suspense, useRef, useState } from 'react';
-import { ImageIcon, MagicWandIcon, TrashIcon, UploadSimpleIcon } from '@phosphor-icons/react';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { ImageIcon, LightbulbIcon, MagicWandIcon, TrashIcon, UploadSimpleIcon } from '@phosphor-icons/react';
 import { api } from '../../api';
 import { BrandingKind, BrandingUrls } from '../../types';
-import { buildIco, cropSvg, cropToPng, CropArea, CropSource, toCropSource } from '../../utils/imageCrop';
+import {
+  analyzeImage,
+  buildIco,
+  cropSvg,
+  cropToPng,
+  CropArea,
+  CropSource,
+  ImageInsights,
+  toCropSource,
+} from '../../utils/imageCrop';
 import type { AspectOption } from './ImageCropDialog';
 
 // Rogneur chargé à la demande : il n'alourdit pas le bundle de la vitrine
@@ -46,6 +55,38 @@ async function buildFiles(kind: BrandingKind, source: CropSource, area: CropArea
 }
 
 /**
+ * Conseils de lisibilité selon l'image enregistrée. Le logo s'affiche sur l'en-tête clair
+ * et sur le pied de page sombre ; le favicon est réduit à 16-48 px dans les onglets.
+ */
+function adviceFor(kind: BrandingKind, { width, height, transparency, luminance }: ImageInsights, vector: boolean): string[] {
+  const tips: string[] = [];
+  const transparent = transparency > 0.05;
+  const ratio = width / height;
+
+  if (!transparent) {
+    tips.push(
+      kind === 'logo'
+        ? "Fond opaque : un rectangle sera visible sur le pied de page sombre. Préférez un PNG à fond transparent ou un SVG."
+        : 'Fond opaque : le favicon apparaîtra comme un carré plein dans les onglets. Un fond transparent est plus discret.'
+    );
+  } else if (kind === 'logo' && luminance < 0.35) {
+    tips.push('Logo sombre sur fond transparent : il sera peu lisible sur le pied de page sombre. Une version claire ou un léger fond serait préférable.');
+  } else if (kind === 'logo' && luminance > 0.8) {
+    tips.push("Logo clair sur fond transparent : il sera peu lisible sur l'en-tête blanc. Une version plus foncée serait préférable.");
+  } else if (kind === 'favicon' && luminance > 0.8) {
+    tips.push('Favicon très clair : il disparaîtra sur les onglets en thème clair.');
+  }
+
+  if (kind === 'logo' && ratio > 5) {
+    tips.push("Logo très allongé : affiché à 40 px de haut, le texte deviendra minuscule. Recadrez au plus près ou utilisez une version compacte.");
+  }
+  if (!vector && kind === 'logo' && height < 120) {
+    tips.push('Résolution faible : le logo risque d’être flou sur les écrans haute densité. Un SVG ou un PNG d’au moins 120 px de haut est conseillé.');
+  }
+  return tips;
+}
+
+/**
  * Logo ou favicon : aperçu, envoi d'un PNG/SVG avec recadrage, suppression (retour au repli).
  * Le favicon peut partir du logo actuel ou d'une image dédiée, plus épurée.
  */
@@ -55,6 +96,28 @@ const BrandingField: React.FC<BrandingFieldProps> = ({ kind, url, logoUrl, onCha
   const [source, setSource] = useState<CropSource | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [advice, setAdvice] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!url) {
+      setAdvice([]);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const blob = await (await fetch(url)).blob();
+      const objectUrl = URL.createObjectURL(blob);
+      try {
+        const insights = await analyzeImage(objectUrl);
+        if (!cancelled) setAdvice(adviceFor(kind, insights, blob.type === 'image/svg+xml'));
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+    })().catch(() => !cancelled && setAdvice([]));
+    return () => {
+      cancelled = true;
+    };
+  }, [kind, url]);
 
   async function open(blob: Blob) {
     setError(null);
@@ -126,6 +189,16 @@ const BrandingField: React.FC<BrandingFieldProps> = ({ kind, url, logoUrl, onCha
         </div>
       </div>
       <p className="form-hint">{url ? 'PNG ou SVG, 2 Mo maximum.' : fallback}</p>
+      {advice.length > 0 && (
+        <ul className="branding-field__advice">
+          {advice.map((tip) => (
+            <li key={tip}>
+              <LightbulbIcon size={16} weight="fill" aria-hidden="true" />
+              {tip}
+            </li>
+          ))}
+        </ul>
+      )}
       {error && !source && <p className="form-alert-error">{error}</p>}
 
       <input

@@ -120,7 +120,8 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
   - `Config` / `ConfigController` : Stockage clé-valeur pour les paramètres artisans et login admin.
   - `Service` / `ServiceController` : CRUD des prestations.
   - `Schedule` / `ScheduleController` : Horaires d'ouverture hebdomadaires et indisponibilités.
-  - `SlotController` : Moteur de calcul en direct des créneaux disponibles selon durée et buffers.
+  - `SlotEngine` (`api/core/`) : calcul des créneaux d'une journée (horaires hebdomadaires, durée de la prestation, indisponibilités, rendez-vous existants + temps de trajet, délai minimal, horizon). Source unique : sert à proposer les créneaux **et** à valider une réservation (`POST /appointments` refuse tout créneau non proposé).
+  - `SlotController` : `GET /slots` (créneaux d'un jour) et `GET /slots/availability` (jours réservables de la fenêtre, pour griser le calendrier).
   - `Appointment` / `AppointmentController` : Réservation, annulation par token, changement de statut, reprogrammation, journal des notifications.
   - `Notification` : Journal `appointment_notifications` (une ligne par tentative d'envoi, consultable depuis l'IHM Pro).
   - `TravelFeeController` : Devis public de frais de déplacement (`POST /travel-fee/quote`).
@@ -157,7 +158,9 @@ autre tâche, mais en tenir compte et les traiter dans l'item dédié.
 - **Aucune route `/admin/*` ne vérifie ce token** : l'authentification est purement
   côté client. N'importe quel appel direct à l'API contourne l'écran de connexion.
 - Conséquence : toutes les routes d'écriture (prestations, config, statuts, horaires,
-  envoi et suppression du logo / favicon via `/admin/branding/:kind`) sont ouvertes. À reprendre **avec l'Item 12** (2FA) — y ajouter une vraie
+  envoi et suppression du logo / favicon via `/admin/branding/:kind`) sont ouvertes.
+  Les écritures d'horaires et d'indisponibilités (`PUT /schedules/:day`, `POST` / `DELETE /unavailabilities`)
+  ne sont même pas préfixées par `/admin` : à déplacer ou protéger avec le reste. À reprendre **avec l'Item 12** (2FA) — y ajouter une vraie
   vérification serveur, sans quoi la 2FA ne protégerait qu'un écran contournable.
 
 ### 🔑 Fichiers `.env` — hors de portée des agents

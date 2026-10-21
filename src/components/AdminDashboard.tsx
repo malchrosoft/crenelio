@@ -27,8 +27,12 @@ import {
 import { formatEuro } from '../utils/format';
 import { CONFIG_GROUPS, buildOtherGroup } from '../config/configSchema';
 import ConfigGroupForm from './admin/ConfigGroupForm';
+import EngagementsEditor from './admin/EngagementsEditor';
+import ScheduleEditor from './admin/ScheduleEditor';
+import UnavailabilityEditor from './admin/UnavailabilityEditor';
 import BrandingField from './admin/BrandingField';
 import { applyFavicon } from '../utils/favicon';
+import { applyDocumentTitle } from '../utils/documentTitle';
 import { format, isPast, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -123,7 +127,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
   const [services, setServices] = useState<Service[]>([]);
   const [config, setConfig] = useState<AppConfig>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'appointments' | 'services' | 'settings' | 'config'>('appointments');
+  const [activeTab, setActiveTab] = useState<'appointments' | 'services' | 'hours' | 'settings' | 'config'>('appointments');
 
   // Recherche & Filtres planning
   const [searchQuery, setSearchQuery] = useState('');
@@ -273,6 +277,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
       setTravelSettingsSaving(false);
     }
   }
+
+  // Titre de l'onglet aligné sur le nom de l'entreprise, y compris juste après son enregistrement
+  useEffect(() => {
+    if (config.company_name !== undefined) applyDocumentTitle(config.company_name);
+  }, [config.company_name]);
 
   /** Nouvelles URLs de logo / favicon : mises à jour de l'aperçu et de l'onglet du navigateur. */
   function applyBranding(urls: BrandingUrls) {
@@ -534,6 +543,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
           onClick={() => setActiveTab('services')}
         >
           Prestations ({services.length})
+        </button>
+        <button
+          className={clsx('btn', {
+            'btn-primary': activeTab === 'hours',
+            'btn-secondary': activeTab !== 'hours',
+          })}
+          onClick={() => setActiveTab('hours')}
+        >
+          Horaires
         </button>
         <button
           className={clsx('btn', {
@@ -1125,11 +1143,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
             </div>
           )}
         </div>
+      ) : activeTab === 'hours' ? (
+        <div className="admin-config">
+          <ScheduleEditor />
+          <UnavailabilityEditor />
+        </div>
       ) : activeTab === 'config' ? (
         <div className="admin-config">
           {[...CONFIG_GROUPS, buildOtherGroup(config)].map(
             (group) =>
               group && (
+                <React.Fragment key={group.id}>
                 <ConfigGroupForm key={group.id} group={group} config={config} onSaved={setConfig}>
                   {group.id === 'identity' && (
                     <div className="admin-settings-form">
@@ -1143,6 +1167,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToClient }
                     </div>
                   )}
                 </ConfigGroupForm>
+                {group.id === 'vitrine' && <EngagementsEditor config={config} onSaved={setConfig} />}
+                </React.Fragment>
               )
           )}
         </div>

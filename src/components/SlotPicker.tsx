@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import CalendarPicker from './CalendarPicker';
 import { api } from '../api';
-import { Service, Slot } from '../types';
+import { Service, Slot, SlotAvailability } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -28,6 +28,22 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [availability, setAvailability] = useState<SlotAvailability | null>(null);
+
+  // Jours réservables pour cette prestation (horaires, durée, planning, indisponibilités)
+  useEffect(() => {
+    let isMounted = true;
+    setAvailability(null);
+    api
+      .getSlotAvailability(service.id)
+      .then((res) => isMounted && setAvailability(res))
+      .catch(() => isMounted && setAvailability(null));
+    return () => {
+      isMounted = false;
+    };
+  }, [service]);
+
+  const availableDates = useMemo(() => (availability ? new Set(availability.dates) : undefined), [availability]);
 
   useEffect(() => {
     if (!selectedDate || !service) return;
@@ -75,6 +91,8 @@ export const SlotPicker: React.FC<SlotPickerProps> = ({
         <div>
           <label className="form-label">Sélectionnez un jour</label>
           <CalendarPicker
+            maxAdvanceDays={availability?.max_advance_days}
+            availableDates={availableDates}
             selectedDate={selectedDate}
             onSelectDate={(d) => {
               onSelectDate(d);

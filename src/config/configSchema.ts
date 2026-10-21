@@ -42,6 +42,16 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
     ],
   },
   {
+    id: 'vitrine',
+    title: 'Page vitrine',
+    intro: 'Textes de présentation de la page d’accueil. Les engagements se gèrent juste en dessous.',
+    fields: [
+      { key: 'vitrine_tagline', label: 'Accroche', type: 'text', hint: 'Sous le nom, en haut de page et dans le pied de page.' },
+      { key: 'vitrine_about', label: 'Présentation', type: 'textarea', hint: 'Section « À propos ».' },
+      { key: 'vitrine_photo_url', label: 'Photo (URL)', type: 'url', hint: 'Illustration de la section « À propos ». Vide : aucune photo.' },
+    ],
+  },
+  {
     id: 'booking',
     title: 'Réservation & créneaux',
     fields: [
@@ -61,10 +71,23 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
       { key: 'default_zoom', label: 'Niveau de zoom', type: 'number', step: '1' },
     ],
   },
+  {
+    id: 'legal',
+    title: 'Mentions légales',
+    intro: 'Affichées dans la fenêtre « Mentions légales » du pied de page. Les rubriques vides sont masquées.',
+    fields: [
+      { key: 'legal_raison_sociale', label: 'Raison sociale', type: 'text' },
+      { key: 'legal_adresse', label: 'Adresse du siège', type: 'textarea' },
+      { key: 'legal_siret', label: 'SIRET', type: 'text' },
+      { key: 'legal_naf', label: 'Code NAF / APE', type: 'text' },
+      { key: 'legal_assurance', label: 'Assurance professionnelle', type: 'text', hint: 'Assureur et numéro de contrat.' },
+      { key: 'legal_hebergeur', label: 'Hébergeur du site', type: 'textarea' },
+    ],
+  },
 ];
 
-/** Clés gérées ailleurs (« Zone & déplacement », fichiers de branding) ou jamais éditables. */
-const EXCLUDED_KEY = /^(travel_|admin_password|branding_)/;
+/** Clés gérées ailleurs (« Zone & déplacement », engagements, fichiers de branding) ou jamais éditables. */
+const EXCLUDED_KEY = /^(travel_|admin_password|branding_|vitrine_engagement_\d+$)/;
 
 const DESCRIBED_KEYS = new Set(CONFIG_GROUPS.flatMap((group) => group.fields.map((f) => f.key)));
 

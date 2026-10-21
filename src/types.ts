@@ -53,6 +53,12 @@ export interface SlotsResponse {
   slots: Slot[];
 }
 
+/** Jours offrant au moins un créneau dans la fenêtre de réservation. */
+export interface SlotAvailability {
+  max_advance_days: number;
+  dates: string[];
+}
+
 export interface Schedule {
   id: number;
   day_of_week: number;

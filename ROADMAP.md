@@ -173,7 +173,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 14. IHM de Configuration Complète (Espace Pro)
+### 14. IHM de Configuration Complète (Espace Pro) ✅
 - **Constat :** l'onglet « Paramètres » n'édite que les 7 clés de déplacement (`travel_tier_*`, `travel_max_km`) ; `company_name` y est seulement affiché. Toutes les autres clés de `config` ne se modifient qu'en base.
 - **Objectif :** un formulaire par groupe dans l'espace Pro :
   - *Entreprise & coordonnées* : `company_name`, `pro_name`, `pro_email`, `pro_phone`, `service_area`.
@@ -184,6 +184,8 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - *Mentions légales* : `legal_raison_sociale`, `legal_siret`, `legal_naf`, `legal_assurance`, `legal_adresse`, `legal_hebergeur`.
 - **Hors périmètre :** changement du mot de passe (`admin_password_hash`), rattaché à l'Item 12.
 - **Contraintes :** aucun secret dans `config` (exposée par `GET /admin/config`) ; tant que l'Item 12 n'est pas fait, ces écritures restent ouvertes côté serveur comme toutes les routes `/admin/*`.
+- **Réalisé :** onglet « Configuration » piloté par `src/config/configSchema.ts` (groupes Identité, Coordonnées, Page vitrine, Engagements, Réservation, Carte, Mentions légales) ; toute clé non décrite reste éditable dans « Autres paramètres ». Engagements : `EngagementsEditor` (ajout, suppression, ordre), clés renumérotées de 1 à N à l'enregistrement, les clés en trop supprimées (`PUT /admin/config` : une valeur `null` supprime la clé). Logo et favicon : conseils de lisibilité selon l'image (fond opaque, logo sombre ou clair, image très allongée, résolution faible). Vitrine : cartes d'engagement réparties en rangées équilibrées de 4 au plus (5 → 3 + 2), dernière rangée centrée.
+- **Améliorations possibles :** nombre de paliers de déplacement libre (le serveur en lit jusqu'à 10, l'écran en affiche 3) ; rafraîchir la config de l'application après un changement dans l'espace Pro (aujourd'hui au rechargement).
 
 ---
 
@@ -194,11 +196,18 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
+### 16. Horaires de Travail & Indisponibilités (Espace Pro) ✅
+- **Constat :** le moteur de créneaux lisait déjà `schedules` et `unavailabilities`, mais rien ne permettait de les modifier hors base ; le calendrier client laissait choisir des jours sans aucun créneau, et `POST /appointments` ne vérifiait que les chevauchements (pas les horaires ni le délai minimal).
+- **Réalisé :** onglet « Horaires » (plage matin + après-midi par jour, jour travaillé ou non, validation serveur des plages) et gestion des indisponibilités (ajout, suppression). Calcul extrait dans `api/core/SlotEngine.php`, partagé par `GET /slots`, le nouveau `GET /slots/availability` (jours grisés dans le calendrier) et la validation de réservation. Espace Pro chargé à la demande (bundle client de 500 à 420 ko).
+- **Améliorations possibles :** plus de deux plages par jour ; horaires d'exception sur une date précise (ex. samedi après-midi ponctuel).
+
+---
+
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
 |---|---|---|---|---|---|
-| **1** | **Item 14** | **IHM de configuration complète (Espace Pro)** | Espace Pro / Configuration | 🚧 *En cours* (étape 1 + identité faites) | — |
+| **1** | **Item 14** | **IHM de configuration complète (Espace Pro)** | Espace Pro / Configuration | ✅ *Terminé* | — |
 | **2** | **Item 15** | **Header & footer communs au tunnel de réservation** | Vitrine / Navigation | ⏳ *À faire* | Extraction du header de `VitrinePage` |
 | **3** | **Item 12** | **Sécurité 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Service mail disponible (Item 4) ✅ |
 | **4** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |

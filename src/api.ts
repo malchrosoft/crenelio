@@ -6,6 +6,7 @@ import {
   SlotsResponse,
   Schedule,
   Unavailability,
+  SlotAvailability,
   Appointment,
   AppConfig,
   BookingPayload,
@@ -49,7 +50,8 @@ export const api = {
   // Configuration & Authentification
   getConfig: () => request<AppConfig>('GET', '/config'),
   getAdminConfig: (token?: string) => request<AppConfig>('GET', '/admin/config', null, token || null),
-  updateAdminConfig: (payload: Partial<AppConfig>, token?: string) =>
+  /** Une valeur `null` supprime la clé (ex. engagement retiré). */
+  updateAdminConfig: (payload: Record<string, string | null | undefined>, token?: string) =>
     request<{ message: string; config: AppConfig }>('PUT', '/admin/config', payload, token || null),
   adminLogin: (password: string) =>
     request<{ success: boolean; token: string; message: string }>('POST', '/admin/login', { password }),
@@ -72,6 +74,8 @@ export const api = {
   // Moteur de créneaux
   getSlots: (serviceId: number, date: string) =>
     request<SlotsResponse>('GET', `/slots?service_id=${serviceId}&date=${date}`),
+  getSlotAvailability: (serviceId: number) =>
+    request<SlotAvailability>('GET', `/slots/availability?service_id=${serviceId}`),
 
   // Frais de déplacement
   quoteTravelFee: (serviceId: number, coordinates: [number, number] | null) =>

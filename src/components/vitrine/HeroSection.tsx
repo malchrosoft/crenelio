@@ -19,6 +19,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ config, ctaRef }) => {
   return (
     <section className="vitrine-hero" aria-labelledby="hero-title">
       <div className="hero__content">
+        {config.branding_logo_url && (
+          <img className="hero__logo" src={config.branding_logo_url} alt={companyName} />
+        )}
+
         {config.pro_name && (
           <p className="hero__name">{companyName}</p>
         )}

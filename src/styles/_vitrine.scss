@@ -1,3 +1,4 @@
+@use 'sass:math';
 // ===================================================================
 // Styles de la Page Vitrine — Crénelio
 // Principes : infinite scroll, accessible seniors (min 17px, CTA 56px+)
@@ -124,6 +125,17 @@
     z-index: 1;
     max-width: 720px;
     margin: 0 auto;
+  }
+
+  .hero__logo {
+    display: block;
+    max-width: min(320px, 80%);
+    max-height: 120px;
+    margin: 0 auto 24px;
+
+    @include mobile {
+      max-height: 88px;
+    }
   }
 
   .hero__name {
@@ -441,12 +453,36 @@
 // -------------------------------------------------------
 // Section Engagements
 // -------------------------------------------------------
+// Colonnes fixées selon le nombre de cartes (cf. EngagementsSection) ; la dernière rangée est centrée
+$engagement-gap: 24px;
+
 .engagements-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 24px;
-  max-width: 900px;
+  --engagement-cols: 4;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $engagement-gap;
+  max-width: 1040px;
   margin: 0 auto;
+
+  @for $cols from 1 through 4 {
+    &--cols-#{$cols} {
+      --engagement-cols: #{$cols};
+      max-width: min(1040px, #{$cols * 300px});
+
+      @include tablet {
+        --engagement-cols: #{math.min($cols, 2)};
+      }
+
+      @include mobile {
+        --engagement-cols: 1;
+      }
+    }
+  }
+
+  > .engagement-card {
+    flex: 0 0 calc((100% - (var(--engagement-cols) - 1) * #{$engagement-gap}) / var(--engagement-cols));
+  }
 }
 
 .engagement-card {
@@ -490,9 +526,44 @@
     }
   }
 
+  .vitrine-map-canvas {
+    height: 100%;
+  }
+
+  // Sous la carte : commune survolée à gauche, bouton de recadrage à droite
+  .vitrine-map-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 12px;
+  }
+
+  .vitrine-map-recenter {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid $gray-200;
+    border-radius: $radius-full;
+    background: white;
+    color: $gray-800;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: $shadow;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &:hover,
+    &:focus-visible {
+      color: $primary;
+      border-color: $primary;
+    }
+  }
+
   .vitrine-map-hover-commune {
-    margin-top: 10px;
-    text-align: center;
+    margin: 0;
     font-size: 0.95rem;
     color: $primary;
     font-weight: 600;
@@ -1008,10 +1079,11 @@
 /* Logo de l'entreprise (repli : icône + nom, cf. BrandMark) */
 .brand-logo {
   display: block;
+  height: 70px;
   width: auto;
-  max-width: 220px;
-  height: 40px;
+  max-width: 420px;
   object-fit: contain;
+  margin: -10px;
 
   .booking-page-header__brand & {
     height: 32px;

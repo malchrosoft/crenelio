@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import clsx from 'clsx';
 import { LockKeyIcon, ArrowLeftIcon, UserIcon } from '@phosphor-icons/react';
@@ -9,7 +9,9 @@ import SlotPicker from '../components/SlotPicker';
 import BookingForm from '../components/BookingForm';
 import BookingConfirmation from '../components/BookingConfirmation';
 import BrandMark from '../components/BrandMark';
-import AdminDashboard from '../components/AdminDashboard';
+
+// Espace Pro chargé à la demande : il n'alourdit pas le parcours des clients
+const AdminDashboard = lazy(() => import('../components/AdminDashboard'));
 
 interface BookingPageProps {
   config: AppConfig;
@@ -104,7 +106,9 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
       <div className="container">
         {/* Vue Admin */}
         {isAdminView ? (
-          <AdminDashboard onBackToClient={() => setIsAdminView(false)} />
+          <Suspense fallback={<p>Chargement de l'espace Pro…</p>}>
+            <AdminDashboard onBackToClient={() => setIsAdminView(false)} />
+          </Suspense>
         ) : (
           <>
             {/* Stepper */}

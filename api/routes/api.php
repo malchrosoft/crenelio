@@ -59,6 +59,7 @@ $router->delete('/unavailabilities/:id',     [$scheduleController, 'destroyUnava
 // -------------------------------------------------------------------
 // 4. Moteur de créneaux disponibles
 // -------------------------------------------------------------------
+$router->get('/slots/availability',         [$slotController, 'availability']);
 $router->get('/slots',                      [$slotController, 'index']);
 
 // -------------------------------------------------------------------

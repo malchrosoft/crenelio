@@ -48,6 +48,9 @@ const EngagementsSection: React.FC<EngagementsSectionProps> = ({ config }) => {
 
   if (engagements.length === 0) return null;
 
+  // Rangées équilibrées de 4 cartes au plus : 5 → 3 + 2, 6 → 3 + 3, 7 → 4 + 3…
+  const columns = Math.ceil(engagements.length / Math.ceil(engagements.length / 4));
+
   return (
     <section
       className="vitrine-section vitrine-section--alt"
@@ -60,7 +63,7 @@ const EngagementsSection: React.FC<EngagementsSectionProps> = ({ config }) => {
           </h2>
         </div>
 
-        <div className="engagements-grid">
+        <div className={`engagements-grid engagements-grid--cols-${columns}`}>
           {engagements.map((eng, i) => {
             const { icon, label } = renderEngagementIcon(eng);
             return (

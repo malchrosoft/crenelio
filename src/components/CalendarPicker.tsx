@@ -20,12 +20,15 @@ interface CalendarPickerProps {
   selectedDate: string | null;
   onSelectDate: (date: string) => void;
   maxAdvanceDays?: number;
+  /** Jours réservables (YYYY-MM-DD) ; les autres sont grisés. Absent : tous les jours de la fenêtre. */
+  availableDates?: Set<string>;
 }
 
 export const CalendarPicker: React.FC<CalendarPickerProps> = ({
   selectedDate,
   onSelectDate,
   maxAdvanceDays = 30,
+  availableDates,
 }) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const today = startOfDay(new Date());
@@ -77,7 +80,8 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
           const isCurrentMonth = isSameMonth(day, currentMonth);
           const isPast = isBefore(day, today);
           const isTooFar = isBefore(maxDate, day);
-          const isDisabled = !isCurrentMonth || isPast || isTooFar;
+          const isUnavailable = availableDates !== undefined && !availableDates.has(format(day, 'yyyy-MM-dd'));
+          const isDisabled = !isCurrentMonth || isPast || isTooFar || isUnavailable;
           const isSelected = selectedDateObj && isSameDay(day, selectedDateObj);
           const isToday = isSameDay(day, today);
 

@@ -1359,4 +1359,160 @@
   .branding-field__input {
     display: none;
   }
+
+  .branding-field__advice {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 10px 12px;
+    background: $warning-light;
+    border-radius: $radius-sm;
+    color: $gray-700;
+    font-size: 0.85rem;
+
+    li {
+      display: flex;
+      gap: 8px;
+      line-height: 1.5;
+
+      svg {
+        flex-shrink: 0;
+        margin-top: 2px;
+        color: $warning;
+      }
+    }
+
+    li + li {
+      margin-top: 6px;
+    }
+  }
+}
+
+.engagements-editor {
+  .engagements-editor__item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .form-input {
+      flex: 1;
+    }
+  }
+
+  .engagements-editor__empty {
+    color: $gray-500;
+    font-size: 0.9rem;
+  }
+}
+
+.btn-icon {
+  @include flex-center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+// -------------------------------------------------------
+// Horaires de travail & indisponibilités (Espace Pro)
+// -------------------------------------------------------
+.schedule-editor {
+  .schedule-editor__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .schedule-editor__head,
+  .schedule-editor__row {
+    display: grid;
+    grid-template-columns: 140px 1fr 1fr;
+    gap: 16px;
+    align-items: center;
+
+    @include mobile {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+
+  .schedule-editor__head {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $gray-500;
+
+    @include mobile {
+      display: none;
+    }
+  }
+
+  .schedule-editor__row {
+    padding: 8px 0;
+    border-bottom: 1px solid $gray-100;
+  }
+
+  .schedule-editor__row--off {
+    color: $gray-400;
+  }
+
+  .schedule-editor__day {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .schedule-editor__range {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .form-input {
+      width: auto;
+      min-width: 0;
+      flex: 1;
+    }
+  }
+}
+
+.unavailability-editor__empty {
+  color: $gray-500;
+  font-size: 0.9rem;
+}
+
+.unavailability-editor__list {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid $gray-100;
+  }
+}
+
+.unavailability-editor__form {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  // Motif sur toute la largeur, puis début, fin et bouton sur une ligne
+  .form-group:first-child {
+    grid-column: 1 / -1;
+  }
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
 }

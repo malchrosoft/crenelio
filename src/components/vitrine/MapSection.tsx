@@ -1,7 +1,36 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Map, Marker, GeoJson } from 'pigeon-maps';
+import { ArrowsInIcon } from '@phosphor-icons/react';
 import { AppConfig } from '../../types';
 import serviceAreaGeoJson from '../../data/serviceAreaGeoJson.json';
+
+type LatLng = [number, number];
+
+// Projection Web Mercator en pixels au zoom 0 (tuile de 256 px), celle des tuiles OpenStreetMap
+const toPixel = ([lat, lng]: LatLng): [number, number] => {
+  const sin = Math.sin((lat * Math.PI) / 180);
+  return [((lng + 180) / 360) * 256, (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * 256];
+};
+
+/** Emprise [sud-ouest, nord-est] de toutes les communes couvertes. */
+const COMMUNES_BOUNDS = (() => {
+  const points = serviceAreaGeoJson.features.flatMap((f) => f.geometry.coordinates.flat() as number[][]);
+  const lats = points.map(([, lat]) => lat);
+  const lngs = points.map(([lng]) => lng);
+  return [
+    [Math.min(...lats), Math.min(...lngs)],
+    [Math.max(...lats), Math.max(...lngs)],
+  ] as [LatLng, LatLng];
+})();
+
+/** Centre et zoom cadrant l'ensemble des communes dans une carte de la taille donnée (marge de 10 %). */
+function fitCommunes(width: number, height: number): { center: LatLng; zoom: number } {
+  const [sw, ne] = COMMUNES_BOUNDS;
+  const [x1, y1] = toPixel(sw);
+  const [x2, y2] = toPixel(ne);
+  const zoom = Math.log2(Math.min(width / (x2 - x1), height / (y1 - y2)) * 0.9);
+  return { center: [(sw[0] + ne[0]) / 2, (sw[1] + ne[1]) / 2], zoom: Math.min(18, zoom) };
+}
 
 interface MapSectionProps {
   config: AppConfig;
@@ -24,6 +53,15 @@ const MapSection: React.FC<MapSectionProps> = ({ config }) => {
   ];
   const safeZoom = isNaN(zoom) ? 11 : zoom;
 
+  // Vue pilotée : l'utilisateur déplace librement la carte, le bouton la recadre sur les communes
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [view, setView] = useState<{ center: LatLng; zoom: number }>({ center, zoom: safeZoom });
+
+  function recenter() {
+    const el = wrapperRef.current;
+    if (el) setView(fitCommunes(el.clientWidth, el.clientHeight));
+  }
+
   return (
     <section
       className="vitrine-section"
@@ -41,11 +79,12 @@ const MapSection: React.FC<MapSectionProps> = ({ config }) => {
         </div>
 
         <div className="vitrine-map-section">
-          <div className="vitrine-map-wrapper" role="img" aria-label="Carte de la zone d'intervention">
+          <div className="vitrine-map-wrapper" ref={wrapperRef}>
+            <div role="img" aria-label="Carte de la zone d'intervention" className="vitrine-map-canvas">
             <Map
-              height={420}
-              center={center}
-              zoom={safeZoom}
+              center={view.center}
+              zoom={view.zoom}
+              onBoundsChanged={({ center: c, zoom: z }) => setView({ center: c, zoom: z })}
               attribution={false}
             >
               <GeoJson
@@ -76,13 +115,18 @@ const MapSection: React.FC<MapSectionProps> = ({ config }) => {
                 color="#dc2626"
               />
             </Map>
+            </div>
           </div>
 
-          {hoveredCommune && (
-            <div className="vitrine-map-hover-commune">
-              Commune couverte : {hoveredCommune}
-            </div>
-          )}
+          <div className="vitrine-map-footer">
+            <p className="vitrine-map-hover-commune" aria-live="polite">
+              {hoveredCommune && <>Commune couverte : {hoveredCommune}</>}
+            </p>
+            <button type="button" className="vitrine-map-recenter" onClick={recenter}>
+              <ArrowsInIcon size={18} weight="fill" aria-hidden="true" />
+              Voir toutes les communes
+            </button>
+          </div>
         </div>
       </div>
     </section>
