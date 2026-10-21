@@ -35,16 +35,26 @@ class BrandingController
 
     /**
      * POST /admin/branding/:kind — Remplace tous les fichiers du type par ceux envoyés.
-     * Champs multipart attendus : un fichier par extension (`png`, `svg`, `ico`).
+     * Champs multipart attendus : un fichier par extension (`png`, `svg`, `ico`),
+     * plus `email` pour le logo (copie PNG allégée destinée aux emails).
      */
     public function upload(array $params): void
     {
         $kind    = $this->kind($params);
         $allowed = array_map(fn($name) => pathinfo($name, PATHINFO_EXTENSION), Branding::FILES[$kind]);
 
-        $files = [];
+        // Champ multipart => [extension attendue, nom du fichier enregistré]
+        $fields = [];
         foreach ($allowed as $ext) {
-            $file = $_FILES[$ext] ?? null;
+            $fields[$ext] = [$ext, "$kind.$ext"];
+        }
+        if ($kind === 'logo') {
+            $fields['email'] = ['png', Branding::EMAIL_LOGO_FILE];
+        }
+
+        $files = [];
+        foreach ($fields as $field => [$ext, $name]) {
+            $file = $_FILES[$field] ?? null;
             if (!$file || $file['error'] === UPLOAD_ERR_NO_FILE) {
                 continue;
             }
@@ -55,10 +65,10 @@ class BrandingController
             if (!Branding::isValid($ext, $content)) {
                 Response::json(['error' => "Fichier $ext invalide ou non autorisé"], 400);
             }
-            $files["$kind.$ext"] = $content;
+            $files[$name] = $content;
         }
 
-        if (!$files) {
+        if (!array_diff_key($files, [Branding::EMAIL_LOGO_FILE => true])) {
             Response::json(['error' => 'Aucun fichier reçu'], 400);
         }
         if (!is_dir(Branding::dir()) && !mkdir(Branding::dir(), 0775, true)) {

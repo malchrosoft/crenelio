@@ -124,10 +124,12 @@ export const api = {
       { type }
     ),
 
-  // Logo & favicon : un fichier par extension (png, svg, ico)
-  uploadBranding: (kind: BrandingKind, files: Partial<Record<'png' | 'svg' | 'ico', Blob>>) => {
+  // Logo & favicon : un fichier par extension (png, svg, ico), plus `email` (PNG allégé du logo)
+  uploadBranding: (kind: BrandingKind, files: Partial<Record<'png' | 'svg' | 'ico' | 'email', Blob>>) => {
     const form = new FormData();
-    Object.entries(files).forEach(([ext, blob]) => blob && form.append(ext, blob, `${kind}.${ext}`));
+    Object.entries(files).forEach(
+      ([field, blob]) => blob && form.append(field, blob, field === 'email' ? `${kind}-email.png` : `${kind}.${field}`)
+    );
     return request<BrandingUrls>('POST', `/admin/branding/${kind}`, form);
   },
   deleteBranding: (kind: BrandingKind) => request<BrandingUrls>('DELETE', `/admin/branding/${kind}`),

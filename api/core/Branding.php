@@ -82,6 +82,9 @@ class Branding
         };
     }
 
+    /** Copie allégée du logo pour les emails (PNG, 512 px de large au plus), générée à l'envoi. */
+    public const EMAIL_LOGO_FILE = 'logo-email.png';
+
     /** Identifiant du logo intégré aux emails (`<img src="cid:...">`). */
     public const EMAIL_LOGO_CID = 'logo@crenelio';
 
@@ -91,14 +94,15 @@ class Branding
 
     /**
      * Logo PNG à intégrer aux emails, avec ses dimensions d'affichage.
-     * Gmail et Outlook n'affichent pas le SVG : seul `logo.png` est utilisable. Il est généré
-     * automatiquement à l'envoi d'un logo SVG depuis l'espace Pro (cf. BrandingField).
+     * Gmail et Outlook n'affichent pas le SVG : on utilise la copie allégée `logo-email.png`,
+     * générée à l'envoi du logo depuis l'espace Pro (cf. BrandingField), sinon `logo.png`.
      *
      * @return array{content: string, width: int, height: int}|null
      */
     public static function emailLogo(): ?array
     {
-        $path = self::find('logo', 'png');
+        $light = self::dir() . '/' . self::EMAIL_LOGO_FILE;
+        $path  = is_file($light) ? $light : self::find('logo', 'png');
         $size = $path ? @getimagesize($path) : false;
         if (!$size || $size[0] <= 0 || $size[1] <= 0) {
             return null;
@@ -114,7 +118,11 @@ class Branding
     /** Supprime tous les fichiers d'un type. */
     public static function clear(string $kind): void
     {
-        foreach (self::FILES[$kind] ?? [] as $name) {
+        $names = self::FILES[$kind] ?? [];
+        if ($kind === 'logo') {
+            $names[] = self::EMAIL_LOGO_FILE;
+        }
+        foreach ($names as $name) {
             $path = self::dir() . '/' . $name;
             if (is_file($path)) {
                 unlink($path);

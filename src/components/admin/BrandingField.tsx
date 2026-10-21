@@ -44,14 +44,21 @@ const SETTINGS: Record<BrandingKind, { label: string; fallback: string; aspects:
   },
 };
 
+/** Largeur maximale de la copie du logo destinée aux emails (px). */
+const EMAIL_LOGO_MAX_WIDTH = 512;
+
 /**
  * Fichiers à enregistrer pour une zone rognée : le favicon est décliné en PNG 512 px et ICO.
- * Un logo SVG est doublé d'un PNG 600 px : Gmail et Outlook n'affichent pas le SVG dans les emails.
+ * Le logo est doublé d'une copie PNG allégée pour les emails (512 px de large au plus) :
+ * Gmail et Outlook n'affichent pas le SVG, et un PNG lourd alourdirait chaque envoi.
  */
 async function buildFiles(kind: BrandingKind, source: CropSource, area: CropArea) {
   const svg = source.kind === 'svg' ? new Blob([cropSvg(source, area)], { type: 'image/svg+xml' }) : undefined;
   if (kind === 'logo') {
-    return svg ? { svg, png: await cropToPng(source, area, 600, true) } : { png: await cropToPng(source, area, 2048) };
+    // cropToPng borne le plus grand côté : on le calcule pour borner la largeur à 512 px
+    const emailMaxSize = Math.round((EMAIL_LOGO_MAX_WIDTH * Math.max(area.width, area.height)) / area.width);
+    const email = await cropToPng(source, area, emailMaxSize, source.kind === 'svg');
+    return svg ? { svg, email } : { png: await cropToPng(source, area, 2048), email };
   }
   const png = await cropToPng(source, area, 512, true);
   return { png, ico: await buildIco(png), svg };
