@@ -41,6 +41,11 @@ def check_env_file():
 
 def start_docker():
     print_step("Démarrage des conteneurs Docker (MySQL, API PHP, Mailpit)...")
+    if shutil.which("docker") is None:
+        print_err("Commande `docker` introuvable.")
+        print("   Installez Docker Desktop, ou la commande seule si vous utilisez colima :")
+        print("   brew install docker docker-compose   (puis `colima start` si colima est arrêté)")
+        sys.exit(1)
     cmd = ["docker", "compose", "up", "-d"]
     res = subprocess.run(cmd)
     if res.returncode != 0:

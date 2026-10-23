@@ -7,6 +7,7 @@ Crénelio - Arrêt complet multiplateforme (Windows, macOS, Linux).
 
 import os
 import socket
+import shutil
 import subprocess
 import sys
 
@@ -21,6 +22,9 @@ def print_ok(msg: str):
 
 def stop_docker():
     print_step("Arrêt des conteneurs Docker...")
+    if shutil.which("docker") is None:
+        print("Note : commande `docker` introuvable, aucun conteneur à arrêter.")
+        return
     cmd = ["docker", "compose", "stop"]
     res = subprocess.run(cmd)
     if res.returncode == 0:
