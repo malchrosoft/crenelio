@@ -66,6 +66,44 @@ class EmailTemplates
     }
 
     /**
+     * Code de connexion à l'espace Pro (second facteur), envoyé à `pro_email`.
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function adminCode(string $code, int $minutes, array $config): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $intro = sprintf(
+            'Voici votre code de connexion à l\'espace Artisan :<br><strong style="display:inline-block;margin-top:12px;font-size:30px;letter-spacing:6px;color:%s;">%s</strong>',
+            self::GRAY_800,
+            self::escape($code)
+        );
+        $outro = sprintf(
+            'Il est valable %d minutes. Une fois validé, cet appareil sera reconnu pendant 10 jours. Si vous n\'êtes pas à l\'origine de cette connexion, ne communiquez ce code à personne et changez votre mot de passe.',
+            $minutes
+        );
+
+        return [
+            'subject' => sprintf('%s — code de connexion : %s', $company, $code),
+            'html'    => self::layout($company, 'Code de connexion', $intro, [], $outro, null, $config),
+            'text'    => self::plainText('Code de connexion', "Votre code de connexion à l'espace Artisan : $code", [], self::stripHtml($outro), null, $config),
+        ];
+    }
+
+    /**
+     * Images intégrées à joindre à un email : le logo, s'il est référencé par le gabarit.
+     *
+     * @return list<array{cid: string, mime: string, content: string}>
+     */
+    public static function inlineImages(string $html): array
+    {
+        if (!str_contains($html, 'cid:' . Branding::EMAIL_LOGO_CID) || !($logo = Branding::emailLogo())) {
+            return [];
+        }
+        return [['cid' => Branding::EMAIL_LOGO_CID, 'mime' => 'image/png', 'content' => $logo['content']]];
+    }
+
+    /**
      * Demande exceptionnelle — accusé de réception au client : rien n'est encore confirmé.
      *
      * @return array{subject: string, html: string, text: string}

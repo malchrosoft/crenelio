@@ -17,8 +17,9 @@ import {
   GearSixIcon,
   MapTrifoldIcon,
   PlusIcon,
+  WarningIcon,
 } from '@phosphor-icons/react';
-import { api } from '../api';
+import { api, UNAUTHORIZED_EVENT } from '../api';
 import {
   Appointment,
   Service,
@@ -40,6 +41,7 @@ import ResetButton from './admin/ResetButton';
 import NewAppointment from './admin/NewAppointment';
 import BrandingField from './admin/BrandingField';
 import AdminShell, { AdminTab } from './admin/AdminShell';
+import AdminLogin from './admin/AdminLogin';
 import { applyFavicon } from '../utils/favicon';
 import { applyDocumentTitle } from '../utils/documentTitle';
 import { format, isPast, isToday, parseISO } from 'date-fns';
@@ -137,11 +139,11 @@ function extractTravelSettings(config: AppConfig): Record<string, string> {
 }
 
 export const AdminDashboard: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  // `null` : session en cours de vérification (rechargement de page)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [twoFactor, setTwoFactor] = useState(true);
   // Saisie d'un rendez-vous par l'artisan (formulaires partagés de la réservation)
   const [creatingAppointment, setCreatingAppointment] = useState(false);
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState<string | null>(null);
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -192,10 +194,24 @@ export const AdminDashboard: React.FC = () => {
   const [travelSettingsSaving, setTravelSettingsSaving] = useState(false);
   const [travelSettingsMessage, setTravelSettingsMessage] = useState<string | null>(null);
 
+  // Session déjà ouverte (cookie) ; toute route refusée ensuite ramène à la connexion
+  useEffect(() => {
+    api
+      .adminSession()
+      .then((s) => {
+        setTwoFactor(s.two_factor);
+        setIsAuthenticated(s.authenticated);
+      })
+      .catch(() => setIsAuthenticated(false));
+    const expire = () => setIsAuthenticated(false);
+    window.addEventListener(UNAUTHORIZED_EVENT, expire);
+    return () => window.removeEventListener(UNAUTHORIZED_EVENT, expire);
+  }, []);
+
   useEffect(() => {
     if (isAuthenticated) {
       loadData();
-    } else {
+    } else if (isAuthenticated === false) {
       // Config publique : nom de l'entreprise dans le header dès l'écran de connexion
       api.getConfig().then(setConfig).catch(() => undefined);
     }
@@ -214,18 +230,14 @@ export const AdminDashboard: React.FC = () => {
     return () => document.removeEventListener('keydown', handleKey);
   }, [isAddModalOpen, reschedulingAppointment, notificationsAppointment]);
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoginError(null);
-    try {
-      const res = await api.adminLogin(password);
-      if (res.success) {
-        setIsAuthenticated(true);
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erreur de connexion';
-      setLoginError(msg);
-    }
+  function handleAuthenticated(withTwoFactor: boolean) {
+    setTwoFactor(withTwoFactor);
+    setIsAuthenticated(true);
+  }
+
+  async function handleLogout() {
+    await api.adminLogout().catch(() => undefined);
+    setIsAuthenticated(false);
   }
 
   async function loadData() {
@@ -496,41 +508,14 @@ export const AdminDashboard: React.FC = () => {
     }
   }
 
+  if (isAuthenticated === null) {
+    return <p className="admin-loading">Chargement de l'espace Artisan…</p>;
+  }
+
   if (!isAuthenticated) {
     return (
       <AdminShell companyName={config.company_name}>
-      <div className="card admin-login-card">
-        <h2 className="card-title">Connexion à l'espace Artisan</h2>
-        <p className="admin-login-hint">
-          Saisissez votre mot de passe d'administration (par défaut : <code>admin123</code>).
-        </p>
-
-        {loginError && (
-          <div className="admin-login-error">
-            {loginError}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <label className="form-label">Mot de passe</label>
-            <input
-              type="password"
-              className="form-input"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
-          </div>
-
-          <div className="admin-login-actions">
-            <button type="submit" className="btn btn-primary">
-              Se connecter
-            </button>
-          </div>
-        </form>
-      </div>
+        <AdminLogin onAuthenticated={handleAuthenticated} />
       </AdminShell>
     );
   }
@@ -550,9 +535,18 @@ export const AdminDashboard: React.FC = () => {
   return (
     <AdminShell
       companyName={config.company_name}
-      onLogout={() => setIsAuthenticated(false)}
+      onLogout={handleLogout}
       nav={{ items: navItems, active: activeTab, onSelect: setActiveTab }}
     >
+      {!twoFactor && (
+        <div className="admin-security-notice" role="status">
+          <WarningIcon size={20} weight="fill" aria-hidden="true" />
+          <span>
+            Double authentification inactive : renseignez l'email professionnel (Configuration) et un serveur
+            d'envoi d'emails (<code>api/.env</code>). En attendant, le mot de passe seul protège l'espace Artisan.
+          </span>
+        </div>
+      )}
       {loading ? (
         <p>Chargement des données...</p>
       ) : activeTab === 'appointments' && creatingAppointment ? (

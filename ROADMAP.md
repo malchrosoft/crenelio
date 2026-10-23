@@ -140,7 +140,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 12. Sécurité & Authentification Renforcée Espace Pro (2FA Email OTP & Appareil de confiance 10 jours)
+### 12. Sécurité & Authentification Renforcée Espace Pro (2FA Email OTP & Appareil de confiance 10 jours) ✅
 - **Objectif :**
   - Sécuriser l'accès à l'espace de gestion artisan sans complexité excessive ni dépendance externe lourde (standard conforme aux recommandations ANSSI / OWASP pour mono-utilisateur).
 - **Fonctionnement :**
@@ -153,6 +153,12 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
     - Validité stricte de **15 minutes** et limitation à 3 tentatives infructueuses.
     - Envoi immédiat par email à l'adresse de contact du professionnel (`pro_email`).
     - Dès validation du code à 6 chiffres, l'appareil est autorisé pour un nouveau cycle de **10 jours**.
+- **Réalisé (23/10/2026) :**
+  - `api/core/Auth.php` : session serveur (cookie `HttpOnly` / `SameSite=Strict`, inactivité 2 h, durée max 12 h), appareil de confiance en cookie signé HMAC (révoqué par un changement de mot de passe), code lié à la session (haché, 15 min, 3 essais, renvoi au plus toutes les 60 s), 5 échecs de mot de passe par IP en 15 min ⇒ blocage.
+  - Toutes les routes de gestion passent par `Auth::guard` (`/admin/*`, écritures prestations / horaires / indisponibilités, liste et gestion des rendez-vous, journal des emails, prestations désactivées).
+  - Front : écran de connexion en deux étapes (`AdminLogin`), session conservée au rechargement, retour à la connexion sur tout 401.
+  - Sans `pro_email` ni SMTP : mot de passe seul, bandeau d'avertissement dans l'espace Artisan.
+  - Clé de signature générée dans `api/storage/auth/secret.key` (jamais en base).
 
 ---
 
@@ -256,7 +262,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
 |---|---|---|---|---|---|
 | **1** | **Item 15** | **Header & footer communs au tunnel de réservation** | Vitrine / Navigation | ✅ *Terminé* | Extraction du header de `VitrinePage` |
-| **2** | **Item 12** | **Sécurité : vérification serveur des routes `/admin/*` + 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ⏳ *À faire* | Service mail disponible (Item 4) ✅ |
+| **2** | **Item 12** | **Sécurité : vérification serveur des routes `/admin/*` + 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ✅ *Terminé* | Service mail disponible (Item 4) ✅ |
 | **3** | **Item 20** | **Compte SMTP configurable depuis l'espace Pro** | Communication / Configuration | 🕒 *Reporté* | Item 12 |
 | **4** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
 | **5** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |

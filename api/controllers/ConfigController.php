@@ -6,6 +6,7 @@
 require_once __DIR__ . '/../models/Config.php';
 require_once __DIR__ . '/../core/Branding.php';
 require_once __DIR__ . '/../core/Response.php';
+require_once __DIR__ . '/../core/Auth.php';
 
 class ConfigController
 {
@@ -56,27 +57,52 @@ class ConfigController
     }
 
     /**
-     * POST /admin/login — Vérification du mot de passe admin.
+     * POST /admin/login — Mot de passe, puis session ouverte ou code envoyé par email.
+     * Réponse : `status` = `authenticated` ou `otp_required` (avec `email_hint`).
      */
     public function login(): void
     {
         $body = Response::body();
-        $password = $body['password'] ?? '';
+        $password = (string)($body['password'] ?? '');
 
-        if (empty($password)) {
+        if ($password === '') {
             Response::json(['error' => 'Mot de passe requis'], 400);
         }
 
-        if (Config::verifyPassword($password)) {
-            // Token de session d'administration simple
-            $token = hash('sha256', $password . DB_NAME . date('Y-m-d'));
-            Response::json([
-                'success' => true,
-                'token'   => $token,
-                'message' => 'Connexion réussie'
-            ]);
-        } else {
+        Auth::checkThrottle();
+        if (!Config::verifyPassword($password)) {
+            Auth::recordFailure();
             Response::json(['error' => 'Mot de passe incorrect'], 401);
         }
+        Auth::clearFailures();
+
+        Response::json(Auth::afterPassword() + ['two_factor' => Auth::twoFactorAvailable()]);
+    }
+
+    /** POST /admin/login/code — Code à 6 chiffres reçu par email. */
+    public function verifyCode(): void
+    {
+        $code = preg_replace('/\D/', '', (string)(Response::body()['code'] ?? ''));
+        if (strlen($code) !== 6) {
+            Response::json(['error' => 'Le code comporte 6 chiffres'], 400);
+        }
+        Auth::verifyCode($code);
+        Response::json(['status' => 'authenticated', 'two_factor' => true]);
+    }
+
+    /** GET /admin/session — État de la session (rechargement de page). */
+    public function session(): void
+    {
+        Response::json([
+            'authenticated' => Auth::isAuthenticated(),
+            'two_factor'    => Auth::twoFactorAvailable(),
+        ]);
+    }
+
+    /** POST /admin/logout */
+    public function logout(): void
+    {
+        Auth::logout();
+        Response::json(['success' => true]);
     }
 }

@@ -20,20 +20,19 @@ import {
 
 const BASE_URL = '/api';
 
-async function request<T>(
-  method: string,
-  path: string,
-  body: unknown = null,
-  token: string | null = null
-): Promise<T> {
+/** Émis quand l'API refuse une route de l'espace Pro (session absente ou expirée). */
+export const UNAUTHORIZED_EVENT = 'crenelio:unauthorized';
+
+/** Routes de connexion : un 401 y signale une erreur de saisie, pas une session expirée. */
+const LOGIN_PATHS = ['/admin/login', '/admin/login/code'];
+
+async function request<T>(method: string, path: string, body: unknown = null): Promise<T> {
   // FormData (envoi de fichiers) : le navigateur fixe lui-même l'en-tête multipart
   const isForm = body instanceof FormData;
   const headers: Record<string, string> = isForm ? {} : { 'Content-Type': 'application/json' };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
 
-  const options: RequestInit = { method, headers };
+  // La session de l'espace Pro voyage dans un cookie HttpOnly (même origine)
+  const options: RequestInit = { method, headers, credentials: 'same-origin' };
   if (body) {
     options.body = isForm ? body : JSON.stringify(body);
   }
@@ -41,6 +40,9 @@ async function request<T>(
   const res = await fetch(`${BASE_URL}${path}`, options);
   const data = await res.json().catch(() => null);
 
+  if (res.status === 401 && !LOGIN_PATHS.includes(path)) {
+    window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+  }
   if (!res.ok) {
     throw new Error(data?.error || `Erreur HTTP ${res.status}`);
   }
@@ -50,12 +52,21 @@ async function request<T>(
 export const api = {
   // Configuration & Authentification
   getConfig: () => request<AppConfig>('GET', '/config'),
-  getAdminConfig: (token?: string) => request<AppConfig>('GET', '/admin/config', null, token || null),
+  getAdminConfig: () => request<AppConfig>('GET', '/admin/config'),
   /** Une valeur `null` supprime la clé (ex. engagement retiré). */
-  updateAdminConfig: (payload: Record<string, string | null | undefined>, token?: string) =>
-    request<{ message: string; config: AppConfig }>('PUT', '/admin/config', payload, token || null),
+  updateAdminConfig: (payload: Record<string, string | null | undefined>) =>
+    request<{ message: string; config: AppConfig }>('PUT', '/admin/config', payload),
+  /** Mot de passe : session ouverte, ou code à 6 chiffres envoyé à l'artisan (nouvel appareil). */
   adminLogin: (password: string) =>
-    request<{ success: boolean; token: string; message: string }>('POST', '/admin/login', { password }),
+    request<{ status: 'authenticated' | 'otp_required'; email_hint?: string; two_factor: boolean }>(
+      'POST',
+      '/admin/login',
+      { password }
+    ),
+  adminVerifyCode: (code: string) =>
+    request<{ status: 'authenticated'; two_factor: boolean }>('POST', '/admin/login/code', { code }),
+  adminSession: () => request<{ authenticated: boolean; two_factor: boolean }>('GET', '/admin/session'),
+  adminLogout: () => request<{ success: boolean }>('POST', '/admin/logout'),
 
   // Prestations
   listServices: (all = false) => request<Service[]>('GET', `/services${all ? '?all=1' : ''}`),

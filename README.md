@@ -38,7 +38,7 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 - **Déplacement** : mode d'intervention (à domicile ou dans les locaux), adresse de l'entreprise, frais par paliers.
 - **Zone d'intervention** (pleine page) : point de départ (adresse ou GPS), rayon, communes limitrophes, calcul des communes via `geo.api.gouv.fr` (bleu : entièrement dans le rayon, orange : partiellement), retrait d'une commune au clic droit.
 - **Configuration** : identité (nom, logo et favicon PNG/SVG avec recadrage), coordonnées, page vitrine, engagements, réservation, mentions légales ; bouton « Annuler » sur chaque formulaire.
-- **Authentification** : mot de passe haché (Bcrypt). ⚠️ Les routes `/admin/*` ne sont pas encore protégées côté serveur : à traiter avec la double authentification (Item 12 de la [feuille de route](ROADMAP.md)).
+- **Authentification** : mot de passe haché (Bcrypt), session serveur (cookie `HttpOnly`, `SameSite=Strict`) vérifiée sur toutes les routes de gestion. Sur un nouvel appareil, **code à 6 chiffres envoyé à l'email professionnel** (15 min, 3 essais), puis appareil reconnu 10 jours. 5 échecs de mot de passe en 15 min bloquent l'adresse IP. Sans email professionnel ni SMTP, le mot de passe seul protège l'espace (bandeau d'avertissement). En local, le code arrive dans Mailpit (`http://localhost:8025`).
 
 ---
 
@@ -167,7 +167,10 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 | `GET` | `/api/config` | Configuration publique (nom pro, coordonnées, centrage carte) |
 | `GET` | `/api/admin/config` | Configuration complète (espace pro) |
 | `PUT` | `/api/admin/config` | Mise à jour des réglages artisan |
-| `POST` | `/api/admin/login` | Authentification administrateur |
+| `POST` | `/api/admin/login` | Mot de passe ; ouvre la session ou envoie le code (nouvel appareil) |
+| `POST` | `/api/admin/login/code` | Validation du code à 6 chiffres |
+| `GET` | `/api/admin/session` | État de la session |
+| `POST` | `/api/admin/logout` | Déconnexion |
 
 ### Prestations & Créneaux
 | Méthode | Route | Description |

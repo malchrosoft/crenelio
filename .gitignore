@@ -10,6 +10,9 @@ api/storage/branding/*
 !api/storage/branding/.gitkeep
 api/storage/zone/*
 !api/storage/zone/.gitkeep
+# Clé de signature et compteur d'échecs de connexion (Item 12)
+api/storage/auth/*
+!api/storage/auth/.gitkeep
 
 # Environment & secrets
 # Ignore ALL .env* files EXCEPT api/.env.example

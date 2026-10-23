@@ -154,16 +154,17 @@ Le fichier [`ROADMAP.md`](file:///Users/aymeric.malchrowicz/DEVELOPPEMENT/crenel
 Ces points sont assumés et documentés : ne pas les « corriger » au détour d'une
 autre tâche, mais en tenir compte et les traiter dans l'item dédié.
 
-### 🔴 Sécurité — Espace Pro non protégé côté serveur
-- `ConfigController::login` renvoie un token trivial et devinable :
-  `sha256(mot de passe + nom de la base + date du jour)`.
-- **Aucune route `/admin/*` ne vérifie ce token** : l'authentification est purement
-  côté client. N'importe quel appel direct à l'API contourne l'écran de connexion.
-- Conséquence : toutes les routes d'écriture (prestations, config, statuts, horaires,
-  envoi et suppression du logo / favicon via `/admin/branding/:kind`) sont ouvertes.
-  Les écritures d'horaires et d'indisponibilités (`PUT /schedules/:day`, `POST` / `DELETE /unavailabilities`)
-  ne sont même pas préfixées par `/admin` : à déplacer ou protéger avec le reste. À reprendre **avec l'Item 12** (2FA) — y ajouter une vraie
-  vérification serveur, sans quoi la 2FA ne protégerait qu'un écran contournable.
+### 🔐 Sécurité — Espace Pro protégé côté serveur (Item 12)
+- `api/core/Auth.php` : session PHP (cookie `HttpOnly`, `SameSite=Strict`), code à 6 chiffres
+  par email sur un appareil inconnu, appareil de confiance 10 jours (cookie signé HMAC),
+  limitation des échecs de mot de passe par IP. Clé et compteur dans `api/storage/auth/`.
+- **Toute nouvelle route de gestion doit être enveloppée par `$admin(...)`** dans
+  `api/routes/api.php` (→ `Auth::guard`, 401 sinon). Le front ramène à la connexion sur tout 401
+  (`UNAUTHORIZED_EVENT` dans `src/api.ts`).
+- Restent publiques : config publique, prestations actives, créneaux, zone, devis de déplacement,
+  réservation, demande hors zone, et les routes à token (`/appointments/token/:token`,
+  `/appointments/decision/:token`). `GET /schedules` reste public (horaires d'ouverture).
+- Sans `pro_email` ni SMTP, le second facteur est inactif (mot de passe seul, bandeau d'avertissement).
 
 ### 🔑 Fichiers `.env` — hors de portée des agents
 - `api/.env` et `api/.env.example` ne sont ni lisibles ni modifiables par un agent

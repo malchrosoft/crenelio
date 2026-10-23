@@ -292,6 +292,22 @@ Ne jamais importer `sql/schema.sql` sur une base existante : il commence par sup
 
 ---
 
+## Étape 5 ter : connexion à l'espace Pro (double authentification)
+
+L'espace Pro est protégé côté serveur : session dans un cookie `HttpOnly`, puis, sur un appareil
+inconnu, un **code à 6 chiffres envoyé à l'email professionnel** (valable 15 minutes, 3 essais).
+L'appareil est ensuite reconnu pendant **10 jours**.
+
+- **Prérequis :** l'email professionnel (onglet *Configuration*) et l'envoi d'emails (`SMTP_*` et
+  `MAIL_FROM` dans `api/.env`). Sans eux, le mot de passe seul protège l'espace Pro et un bandeau
+  l'indique après connexion. Testez l'envoi d'un email **avant** de vous déconnecter.
+- **Changez le mot de passe `admin123`** dès la mise en ligne. Le changement déconnecte toutes les
+  sessions et oublie tous les appareils reconnus.
+- **`api/storage/auth/`** contient la clé de signature (`secret.key`, créée automatiquement) et le
+  compteur d'échecs de connexion (5 échecs en 15 minutes bloquent l'adresse IP). Ne la versionnez
+  pas ; la supprimer déconnecte simplement tout le monde.
+- **HTTPS obligatoire** en production : les cookies sont alors marqués `Secure`.
+
 ## Étape 6 : régler les droits des fichiers
 
 Sur l'hébergement mutualisé OVH, les droits sont en général gérés automatiquement. Vérifiez tout de même :
@@ -304,7 +320,7 @@ Dans FileZilla : clic droit sur le fichier → **Droits d'accès au fichier...**
 
 ### Dossiers accessibles en écriture
 
-`api/storage/branding/` et `api/storage/zone/` doivent être **accessibles en écriture par PHP**
+`api/storage/branding/`, `api/storage/zone/` et `api/storage/auth/` doivent être **accessibles en écriture par PHP**
 (`755`, ou `775` si l'enregistrement échoue). Ils ne sont pas versionnés, chaque installation a
 ses propres fichiers : créez-les sur le serveur si votre envoi a ignoré les dossiers vides.
 Le dossier n'est jamais servi directement (`api/storage/.htaccess` en interdit l'accès) : les

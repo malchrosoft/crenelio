@@ -291,6 +291,22 @@ Never import `sql/schema.sql` on an existing database: it starts by dropping the
 
 ---
 
+## Step 5c: Pro Area Sign-in (Two-Factor Authentication)
+
+The Pro area is protected server-side: a session in an `HttpOnly` cookie, then, on an unknown
+device, a **6-digit code sent to the professional email** (valid 15 minutes, 3 attempts). The device
+is then remembered for **10 days**.
+
+- **Prerequisites:** the professional email (*Configuration* tab) and outgoing email (`SMTP_*` and
+  `MAIL_FROM` in `api/.env`). Without them, the password alone protects the Pro area and a banner
+  says so after sign-in. Test sending an email **before** signing out.
+- **Change the `admin123` password** as soon as the site is live. Changing it signs out every
+  session and forgets every remembered device.
+- **`api/storage/auth/`** holds the signing key (`secret.key`, created automatically) and the
+  failed sign-in counter (5 failures in 15 minutes block the IP address). Do not version it;
+  deleting it simply signs everyone out.
+- **HTTPS is required** in production: cookies are then flagged `Secure`.
+
 ## Step 6: Set File Permissions
 
 On OVH shared hosting, permissions are generally managed automatically. However, ensure:
@@ -303,7 +319,7 @@ If using FileZilla, right-click files → **File permissions...** → set numeri
 
 ### Writable storage
 
-`api/storage/branding/` and `api/storage/zone/` must be **writable by PHP** (`755`, or `775` if
+`api/storage/branding/`, `api/storage/zone/` and `api/storage/auth/` must be **writable by PHP** (`755`, or `775` if
 saving fails). They are not versioned (each installation has its own files): create them on the
 server if your upload skipped the empty folders. The folder is never served directly
 (`api/storage/.htaccess` denies access); files go through the API.

@@ -5,6 +5,7 @@
 
 require_once __DIR__ . '/../models/Service.php';
 require_once __DIR__ . '/../core/Response.php';
+require_once __DIR__ . '/../core/Auth.php';
 
 class ServiceController
 {
@@ -14,6 +15,10 @@ class ServiceController
     public function index(): void
     {
         $all = isset($_GET['all']) && $_GET['all'] === '1';
+        // Prestations désactivées : réservées à l'espace Pro
+        if ($all && !Auth::isAuthenticated()) {
+            Response::json(['error' => 'Session expirée, reconnectez-vous'], 401);
+        }
         $services = Service::all(!$all);
         Response::json($services);
     }
