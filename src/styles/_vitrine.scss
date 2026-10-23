@@ -1024,6 +1024,34 @@ $engagement-gap: 24px;
 
 }
 
+// Abandon du tunnel : lien discret sous le formulaire
+.booking-abandon {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+
+  .booking-abandon__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 8px 4px;
+    background: none;
+    border: none;
+    color: $gray-500;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition-base;
+
+    &:hover,
+    &:focus-visible {
+      color: $danger;
+      text-decoration: underline;
+    }
+  }
+}
+
 // Tunnel de réservation : header et footer de la vitrine autour du stepper
 .booking-layout {
   min-height: 100vh;

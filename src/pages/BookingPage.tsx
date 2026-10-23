@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { XIcon } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { api } from '../api';
 import { Service, Slot, Appointment, BookingPayload, AppConfig } from '../types';
@@ -9,6 +10,7 @@ import BookingForm from '../components/BookingForm';
 import BookingConfirmation from '../components/BookingConfirmation';
 import SiteHeader from '../components/SiteHeader';
 import Footer from '../components/vitrine/Footer';
+import ConfirmDialog from '../components/admin/ConfirmDialog';
 import { isPremisesOnly, premisesLabel } from '../utils/zone';
 
 interface BookingPageProps {
@@ -34,6 +36,8 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmingAbandon, setConfirmingAbandon] = useState(false);
+  const navigate = useNavigate();
 
   // Pré-sélection de la prestation depuis la vitrine (?service=ID)
   useEffect(() => {
@@ -71,6 +75,15 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
   }
 
 
+  // Abandon : confirmation seulement si une prestation a déjà été choisie
+  function handleAbandon() {
+    if (selectedService) {
+      setConfirmingAbandon(true);
+    } else {
+      navigate('/');
+    }
+  }
+
   if (legacyAdminLink) return <Navigate to="/admin" replace />;
 
   return (
@@ -79,6 +92,17 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
 
       <main id="main-content" className="container booking-layout__content">
         <>
+            {confirmingAbandon && (
+              <ConfirmDialog
+                title="Abandonner la réservation ?"
+                confirmLabel="Revenir à l'accueil"
+                onConfirm={() => navigate('/')}
+                onCancel={() => setConfirmingAbandon(false)}
+              >
+                Les choix en cours ne seront pas conservés. Aucun rendez-vous n'a encore été enregistré.
+              </ConfirmDialog>
+            )}
+
             {/* Stepper */}
             {step < 4 && (
               <div className="stepper">
@@ -158,6 +182,16 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
                 />
               );
             })()}
+
+            {/* Abandon du tunnel, sous le formulaire de l'étape en cours */}
+            {step < 4 && (
+              <div className="booking-abandon">
+                <button type="button" className="booking-abandon__btn" onClick={handleAbandon}>
+                  <XIcon size={18} weight="bold" aria-hidden="true" />
+                  Annuler et revenir à l'accueil
+                </button>
+              </div>
+            )}
 
             {/* Étape 4 : Confirmation */}
             {step === 4 && confirmedAppointment && (
