@@ -108,11 +108,22 @@ on shared hosting where `.env` parsing might need adjustments).
 
 ---
 
-## Step 4b: Configure Email Sending (SMTP)
+## Step 4b: Configure Email Sending
 
-Confirmation emails (client), intervention sheets with an `.ics` attachment (artisan) and
-out-of-zone requests go out through a native SMTP client — no Composer dependency. Add the
-following to the same `api/.env` file:
+Confirmation emails (client), intervention sheets with an `.ics` attachment (artisan),
+out-of-zone requests and Pro area sign-in codes go out without any Composer dependency, in one of
+two modes. Add the following to the same `api/.env` file:
+
+**Option A — the hosting plan's `mail()` function (recommended on OVHcloud):** no credentials.
+Leave `SMTP_HOST` empty.
+
+```env
+MAIL_FROM=contact@your-domain.com
+MAIL_FROM_NAME=Your Company Name
+```
+
+**Option B — an SMTP account** (OVHcloud mailbox or a dedicated service): used as soon as
+`SMTP_HOST` is set.
 
 ```env
 SMTP_HOST=ssl0.ovh.net
@@ -121,9 +132,14 @@ SMTP_USER=contact@your-domain.com
 SMTP_PASS=your-mailbox-password
 # starttls (port 587, recommended), tls (port 465, implicit TLS) or none
 SMTP_SECURE=starttls
+# Must be identical to SMTP_USER
 MAIL_FROM=contact@your-domain.com
 MAIL_FROM_NAME=Your Company Name
 ```
+
+**Check sending** from the Pro area: *Configuration* tab, "Envoi des emails" panel,
+"M'envoyer un email de test" button (to the contact email). Do it **before** signing out for the
+first time: a new device's sign-in code goes out the same way.
 
 Notes:
 
@@ -141,9 +157,9 @@ Notes:
     Panel): Gmail and Yahoo now require them for bulk senders;
   - quotas: about 200 emails per hour per MX Plan account, 300 per hour per source IP; 10 MB
     maximum per message;
-  - SMTP sends do not appear in the hosting plan's *Email scripts* tab: use the Pro area's
-    "Emails" log instead.
-- Leaving `SMTP_HOST` or `MAIL_FROM` empty disables sending. Bookings still succeed: every
+  - `mail()` sends are monitored (statistics, errors, unblocking) in the hosting plan's
+    *Email scripts* tab; SMTP sends do not appear there: use the Pro area's "Emails" log instead.
+- Leaving `MAIL_FROM` empty disables sending. Bookings still succeed: every
   attempt is logged in `appointment_notifications` with an explicit `failed` status, visible from
   the Pro planning ("Emails" button).
 - A failed send never breaks a booking. Use the "Renvoyer" buttons in the notification log to
@@ -432,7 +448,9 @@ OVH provides free Let's Encrypt SSL certificates:
 ### Emails are not sent
 
 - Open the "Emails" log of an appointment in the Pro area: the failure reason is shown there
-- "Envoi d'emails non configuré": `SMTP_HOST` or `MAIL_FROM` is missing from `api/.env`
+- "Envoi d'emails non configuré": `MAIL_FROM` is missing from `api/.env`
+- "Envoi refusé par la fonction mail()": the `MAIL_FROM` domain is not attached to the hosting
+  plan (*Multisite*), or sending is blocked (*Email scripts* tab)
 - Authentication errors: check `SMTP_USER` / `SMTP_PASS` and the `SMTP_SECURE` / port pair
 
 ### Logo, favicon or service area cannot be saved

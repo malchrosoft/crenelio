@@ -112,7 +112,7 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
   - `api/core/Router.php` : Moteur de routes regex supportant les paramètres nommés (`:id`, `:token`, `:day`).
   - `api/core/Response.php` : Réponses JSON standardisées et gestion CORS.
   - `api/core/TravelFee.php` : Distance géodésique (Haversine), paliers kilométriques et détection du hors-zone.
-  - `api/core/Mailer.php` : Client SMTP natif (socket, STARTTLS / TLS implicite, AUTH LOGIN) et composition MIME multipart.
+  - `api/core/Mailer.php` : envoi par SMTP natif (socket, STARTTLS / TLS implicite, AUTH LOGIN) si `SMTP_HOST` est renseigné, sinon par la fonction `mail()` de l'hébergement ; même composition MIME multipart dans les deux cas.
   - `api/core/ICalendar.php` : Génération du `.ics` (RFC 5545) joint à l'email de l'artisan.
   - `api/core/EmailTemplates.php` : Gabarits HTML et texte des emails. Les styles y sont **volontairement en ligne** : les clients de messagerie ignorent les feuilles de style externes. La règle « pas de style inline » ne vaut que pour le front React.
   - `api/core/Notifier.php` : Orchestration des envois. Journalise en `pending` *avant* d'appeler le SMTP, puis bascule en `sent` / `failed`. **Ne propage jamais d'exception** : une panne d'envoi ne doit pas faire échouer une réservation déjà enregistrée.
@@ -127,11 +127,14 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
   - `TravelFeeController` : Devis public de frais de déplacement (`POST /travel-fee/quote`).
 
 ### Envoi d'emails en développement local
-Les identifiants SMTP sont lus **exclusivement** depuis `api/.env` (`SMTP_HOST`, `SMTP_PORT`,
+Les paramètres d'envoi sont lus **exclusivement** depuis `api/.env` (`SMTP_HOST`, `SMTP_PORT`,
 `SMTP_USER`, `SMTP_PASS`, `SMTP_SECURE`, `MAIL_FROM`, `MAIL_FROM_NAME`, plus `APP_URL` pour le
-lien de gestion client). Rien n'est stocké en base.
+lien de gestion client). Rien n'est stocké en base, ni modifiable depuis l'espace Pro (Item 20
+abandonné : un mauvais réglage couperait l'envoi des codes de connexion). `GET /admin/mail` et
+`POST /admin/mail/test` n'exposent que le mode, le serveur et l'expéditeur.
 
-Sans `SMTP_HOST`, l'envoi est désactivé : les réservations aboutissent normalement et chaque
+`SMTP_HOST` vide ⇒ fonction `mail()` de l'hébergement (mode de production recommandé chez OVHcloud,
+non testable en local). Sans `MAIL_FROM`, l'envoi est désactivé : les réservations aboutissent normalement et chaque
 tentative est journalisée en `failed` avec un motif explicite, visible via le bouton « Emails »
 du planning Pro.
 
@@ -164,7 +167,7 @@ autre tâche, mais en tenir compte et les traiter dans l'item dédié.
 - Restent publiques : config publique, prestations actives, créneaux, zone, devis de déplacement,
   réservation, demande hors zone, et les routes à token (`/appointments/token/:token`,
   `/appointments/decision/:token`). `GET /schedules` reste public (horaires d'ouverture).
-- Sans `pro_email` ni SMTP, le second facteur est inactif (mot de passe seul, bandeau d'avertissement).
+- Sans `pro_email` ou sans envoi d'emails (`MAIL_FROM`), le second facteur est inactif (mot de passe seul, bandeau d'avertissement).
 
 ### 🔑 Fichiers `.env` — hors de portée des agents
 - `api/.env` et `api/.env.example` ne sont ni lisibles ni modifiables par un agent
@@ -179,12 +182,12 @@ autre tâche, mais en tenir compte et les traiter dans l'item dédié.
   publique de fait).
 
 ### ✉️ Envoi d'emails désactivé par défaut
-- Sans `SMTP_HOST` ni `MAIL_FROM`, aucun email ne part : les tentatives sont
+- Sans `MAIL_FROM`, aucun email ne part : les tentatives sont
   journalisées en `failed` dans `appointment_notifications` avec un motif explicite.
 - Ce comportement est **voulu** : une panne d'envoi ne doit jamais faire échouer une
   réservation déjà enregistrée. Conserver ce contrat dans toute évolution du
   `Notifier` (il ne propage aucune exception vers les contrôleurs).
-- L'Item 12 (OTP par email) en dépend : sans SMTP configuré, aucun code ne partira.
+- L'Item 12 (OTP par email) en dépend : sans envoi configuré, aucun code ne partira.
 
 ### ☁️ Hébergement OVHcloud mutualisé — règles générales
 Le projet cible un hébergement mutualisé OVHcloud. Toute évolution doit les respecter, et la

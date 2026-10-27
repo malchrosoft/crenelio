@@ -38,7 +38,7 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 - **Déplacement** : mode d'intervention (à domicile ou dans les locaux), adresse de l'entreprise, frais par paliers.
 - **Zone d'intervention** (pleine page) : point de départ (adresse ou GPS), rayon, communes limitrophes, calcul des communes via `geo.api.gouv.fr` (bleu : entièrement dans le rayon, orange : partiellement), retrait d'une commune au clic droit.
 - **Configuration** : identité (nom, logo et favicon PNG/SVG avec recadrage), coordonnées, page vitrine, engagements, réservation, mentions légales ; bouton « Annuler » sur chaque formulaire.
-- **Authentification** : mot de passe haché (Bcrypt), session serveur (cookie `HttpOnly`, `SameSite=Strict`) vérifiée sur toutes les routes de gestion. Sur un nouvel appareil, **code à 6 chiffres envoyé à l'email professionnel** (15 min, 3 essais), puis appareil reconnu 10 jours. 5 échecs de mot de passe en 15 min bloquent l'adresse IP. Sans email professionnel ni SMTP, le mot de passe seul protège l'espace (bandeau d'avertissement). En local, le code arrive dans Mailpit (`http://localhost:8025`).
+- **Authentification** : mot de passe haché (Bcrypt), session serveur (cookie `HttpOnly`, `SameSite=Strict`) vérifiée sur toutes les routes de gestion. Sur un nouvel appareil, **code à 6 chiffres envoyé à l'email professionnel** (15 min, 3 essais), puis appareil reconnu 10 jours. 5 échecs de mot de passe en 15 min bloquent l'adresse IP. Sans email professionnel ni envoi d'emails (`MAIL_FROM`), le mot de passe seul protège l'espace (bandeau d'avertissement). En local, le code arrive dans Mailpit (`http://localhost:8025`).
 
 ---
 
@@ -126,7 +126,8 @@ APP_URL=https://votre-domaine.com
 APP_TIMEZONE=Europe/Paris
 
 # -------------------------------------------------------------------
-# Envoi d'emails (SMTP)
+# Envoi d'emails — SMTP_HOST vide : fonction mail() de l'hébergement
+# (recommandé chez OVHcloud, seuls MAIL_FROM et MAIL_FROM_NAME sont utiles)
 # -------------------------------------------------------------------
 SMTP_HOST=ssl0.ovh.net
 SMTP_PORT=587
@@ -144,7 +145,7 @@ MAIL_FROM_NAME=Crénelio
 | `CORS_ORIGIN` | `*` | Origine autorisée ; à restreindre au domaine en production |
 | `APP_URL` | *(vide)* | Base des liens envoyés par email : `/rdv/:token` (client) et `/decision/:token` (acceptation / refus d'une demande hors zone par l'artisan). Vide ⇒ l'email client affiche le téléphone, et l'artisan valide la demande depuis le planning (statut « En attente ») |
 | `APP_TIMEZONE` | `Europe/Paris` | Fuseau d'interprétation des créneaux et des fichiers `.ics` |
-| `SMTP_HOST` / `SMTP_PORT` | *(vide)* / `587` | Serveur d'envoi. **Vide ⇒ envoi désactivé** |
+| `SMTP_HOST` / `SMTP_PORT` | *(vide)* / `587` | Serveur SMTP. **Vide ⇒ fonction `mail()` de l'hébergement** (aucun identifiant) |
 | `SMTP_USER` / `SMTP_PASS` | *(vide)* | Identifiants `AUTH LOGIN` ; laisser vide pour un relais sans authentification |
 | `SMTP_SECURE` | `starttls` | `starttls` (587), `tls` (465, TLS implicite) ou `none` |
 | `MAIL_FROM` / `MAIL_FROM_NAME` | *(vide)* / `Crénelio` | Expéditeur. Chez OVHcloud : domaine **attaché à l'hébergement** (*Multisite*) et adresse **identique à `SMTP_USER`**, sinon rejet |
@@ -157,7 +158,9 @@ Règles d'envoi propres à OVHcloud (expéditeur, `Reply-To`, SPF/DKIM/DMARC, qu
 [DEPLOYMENT.fr.md, étape 4b](DEPLOYMENT.fr.md) et les
 [bonnes pratiques d'envoi d'e-mail](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices).
 
-**Sans `SMTP_HOST` ou `MAIL_FROM`, l'envoi est simplement désactivé** : les réservations
+L'onglet *Configuration* de l'espace Pro affiche le mode d'envoi et l'expéditeur (lecture seule) et propose un **email de test**.
+
+**Sans `MAIL_FROM`, l'envoi est simplement désactivé** : les réservations
 aboutissent normalement et chaque tentative est journalisée en `failed` avec un motif explicite,
 consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relançable manuellement.
 
@@ -175,6 +178,8 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 | `POST` | `/api/admin/login/code` | Validation du code à 6 chiffres |
 | `GET` | `/api/admin/session` | État de la session |
 | `POST` | `/api/admin/logout` | Déconnexion |
+| `GET` | `/api/admin/mail` | Mode d'envoi des emails et expéditeur (lecture seule) |
+| `POST` | `/api/admin/mail/test` | Email de test vers l'email professionnel |
 
 ### Prestations & Créneaux
 | Méthode | Route | Description |

@@ -1,12 +1,15 @@
 <?php
 /**
- * Mailer — Client SMTP minimal écrit en PHP natif.
+ * Mailer — Envoi d'emails en PHP natif, sans dépendance (hébergement mutualisé OVHcloud).
  *
- * Volontairement sans dépendance (hébergement mutualisé OVHcloud) :
- * ouverture de socket, EHLO, STARTTLS ou TLS implicite, AUTH LOGIN,
- * puis composition d'un message MIME multipart avec pièce jointe.
+ * Deux modes, selon `api/.env` :
+ * - SMTP (`SMTP_HOST` renseigné) : socket, EHLO, STARTTLS ou TLS implicite, AUTH LOGIN.
+ *   C'est le mode local (Mailpit, fourni par Docker Compose) ou d'un compte dédié.
+ * - `mail()` de l'hébergement (`SMTP_HOST` vide) : aucun identifiant ; OVHcloud exige que le
+ *   domaine de `MAIL_FROM` soit attaché à l'hébergement.
+ * Dans les deux cas, le même message MIME multipart (pièce jointe, images intégrées).
  *
- * Les identifiants proviennent exclusivement de `api/.env`
+ * Les paramètres proviennent exclusivement de `api/.env`
  * (cf. `api/config/config.php`) : rien n'est stocké en base.
  *
  * Toute erreur lève une `RuntimeException` ; c'est l'appelant
@@ -22,12 +25,24 @@ class Mailer
     private $socket = null;
 
     /**
-     * L'envoi d'emails est-il configuré ? Sans hôte SMTP, les notifications
-     * sont journalisées en échec explicite plutôt que tentées dans le vide.
+     * Mode d'envoi : `smtp`, `mail` (fonction de l'hébergement) ou `none`.
+     * Sans `MAIL_FROM`, les notifications sont journalisées en échec explicite
+     * plutôt que tentées dans le vide.
      */
+    public static function transport(): string
+    {
+        if (MAIL_FROM === '') {
+            return 'none';
+        }
+        if (SMTP_HOST !== '') {
+            return 'smtp';
+        }
+        return function_exists('mail') ? 'mail' : 'none';
+    }
+
     public static function isConfigured(): bool
     {
-        return SMTP_HOST !== '' && MAIL_FROM !== '';
+        return self::transport() !== 'none';
     }
 
     /**
@@ -47,7 +62,7 @@ class Mailer
         array $inline = []
     ): void {
         if (!self::isConfigured()) {
-            throw new RuntimeException("Envoi d'emails non configuré (SMTP_HOST / MAIL_FROM manquants dans api/.env)");
+            throw new RuntimeException("Envoi d'emails non configuré (MAIL_FROM manquant dans api/.env)");
         }
 
         if (!filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
@@ -56,6 +71,11 @@ class Mailer
 
         $message = self::buildMimeMessage($toEmail, $toName, $subject, $htmlBody, $textBody, $attachment, $replyTo, $inline);
 
+        if (self::transport() === 'mail') {
+            self::sendWithMailFunction($toEmail, $message);
+            return;
+        }
+
         $mailer = new self();
         try {
             $mailer->connect();
@@ -63,6 +83,39 @@ class Mailer
             $mailer->transmit($toEmail, $message);
         } finally {
             $mailer->disconnect();
+        }
+    }
+
+    // -----------------------------------------------------------------
+    // Fonction mail() de l'hébergement
+    // -----------------------------------------------------------------
+
+    /**
+     * `mail()` ajoute lui-même `To:` et `Subject:` : on les retire des en-têtes composés.
+     * L'expéditeur d'enveloppe (`-f`) est aligné sur `MAIL_FROM` pour SPF et les retours.
+     */
+    private static function sendWithMailFunction(string $toEmail, string $message): void
+    {
+        [$head, $body] = explode("\r\n\r\n", $message, 2);
+        // Dépliage des en-têtes (lignes de continuation) pour isoler To / Subject
+        $lines = preg_split('/\r\n(?![ \t])/', $head);
+
+        $subject = '';
+        $headers = [];
+        foreach ($lines as $line) {
+            if (stripos($line, 'Subject:') === 0) {
+                $subject = trim(preg_replace('/\r\n[ \t]+/', ' ', substr($line, 8)));
+            } elseif (stripos($line, 'To:') !== 0) {
+                $headers[] = $line;
+            }
+        }
+
+        $params = filter_var(MAIL_FROM, FILTER_VALIDATE_EMAIL) ? '-f' . MAIL_FROM : '';
+        if (!mail($toEmail, $subject, $body, implode("\r\n", $headers), $params)) {
+            throw new RuntimeException(
+                "Envoi refusé par la fonction mail() de l'hébergement : vérifiez que le domaine de MAIL_FROM est attaché "
+                . "à l'hébergement (Multisite) et l'onglet « Scripts e-mail » de l'espace client OVHcloud"
+            );
         }
     }
 

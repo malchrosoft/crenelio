@@ -108,11 +108,22 @@ utile si la lecture du `.env` pose problème sur l'hébergement).
 
 ---
 
-## Étape 4b : configurer l'envoi d'emails (SMTP)
+## Étape 4b : configurer l'envoi d'emails
 
-Les emails de confirmation (client), les fiches d'intervention avec pièce jointe `.ics` (artisan)
-et les demandes hors zone partent par un client SMTP natif, sans dépendance Composer. Ajoutez au
-même fichier `api/.env` :
+Les emails de confirmation (client), les fiches d'intervention avec pièce jointe `.ics` (artisan),
+les demandes hors zone et les codes de connexion à l'espace Pro partent sans dépendance Composer,
+selon l'un de deux modes. Ajoutez au même fichier `api/.env` :
+
+**Option A — fonction `mail()` de l'hébergement (recommandée chez OVHcloud) :** aucun identifiant.
+Laissez `SMTP_HOST` vide.
+
+```env
+MAIL_FROM=contact@votre-domaine.com
+MAIL_FROM_NAME=Nom de votre entreprise
+```
+
+**Option B — compte SMTP** (boîte email OVHcloud ou service dédié) : utilisé dès que `SMTP_HOST`
+est renseigné.
 
 ```env
 SMTP_HOST=ssl0.ovh.net
@@ -121,9 +132,14 @@ SMTP_USER=contact@votre-domaine.com
 SMTP_PASS=mot-de-passe-de-la-boite
 # starttls (port 587, recommandé), tls (port 465, TLS implicite) ou none
 SMTP_SECURE=starttls
+# Doit être identique à SMTP_USER
 MAIL_FROM=contact@votre-domaine.com
 MAIL_FROM_NAME=Nom de votre entreprise
 ```
+
+**Vérifiez l'envoi** depuis l'espace Pro : onglet *Configuration*, encart « Envoi des emails »,
+bouton « M'envoyer un email de test » (vers l'email de contact). Faites-le **avant** de vous
+déconnecter la première fois : le code de connexion d'un nouvel appareil part par le même chemin.
 
 À savoir :
 
@@ -141,9 +157,10 @@ MAIL_FROM_NAME=Nom de votre entreprise
     client) : Gmail et Yahoo les exigent désormais des expéditeurs à fort volume ;
   - quotas : environ 200 emails par heure et par compte MX Plan, 300 par heure et par IP
     source ; 10 Mo maximum par message.
-  - les envois SMTP n'apparaissent pas dans l'onglet *Scripts e-mail* de l'hébergement : suivez
-    le journal « Emails » de l'espace Pro.
-- Si `SMTP_HOST` ou `MAIL_FROM` est vide, l'envoi est désactivé. Les réservations aboutissent
+  - les envois `mail()` se suivent (statistiques, erreurs, déblocage) dans l'onglet *Scripts e-mail*
+    de l'hébergement ; les envois SMTP n'y apparaissent pas : suivez le journal « Emails » de
+    l'espace Pro.
+- Si `MAIL_FROM` est vide, l'envoi est désactivé. Les réservations aboutissent
   quand même : chaque tentative est journalisée dans `appointment_notifications` avec le statut
   `failed` et un motif explicite, visible depuis le planning de l'espace Pro (bouton « Emails »).
 - Un échec d'envoi ne bloque jamais une réservation. Les boutons « Renvoyer » du journal
@@ -435,7 +452,9 @@ OVH fournit gratuitement des certificats SSL Let's Encrypt :
 ### Les emails ne partent pas
 
 - Ouvrez le journal « Emails » d'un rendez-vous dans l'espace Pro : le motif de l'échec y figure
-- « Envoi d'emails non configuré » : `SMTP_HOST` ou `MAIL_FROM` manque dans `api/.env`
+- « Envoi d'emails non configuré » : `MAIL_FROM` manque dans `api/.env`
+- « Envoi refusé par la fonction mail() » : domaine de `MAIL_FROM` non attaché à l'hébergement
+  (*Multisite*), ou envoi bloqué (onglet *Scripts e-mail*)
 - Erreur d'authentification : vérifiez `SMTP_USER` / `SMTP_PASS` et le couple `SMTP_SECURE` / port
 
 ### Impossible d'enregistrer le logo, le favicon ou la zone

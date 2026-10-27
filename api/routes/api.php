@@ -16,6 +16,7 @@ require_once __DIR__ . '/../controllers/SlotController.php';
 require_once __DIR__ . '/../controllers/AppointmentController.php';
 require_once __DIR__ . '/../controllers/TravelFeeController.php';
 require_once __DIR__ . '/../controllers/BrandingController.php';
+require_once __DIR__ . '/../controllers/MailController.php';
 
 $router = new Router();
 
@@ -27,6 +28,7 @@ $appointmentController = new AppointmentController();
 $travelFeeController   = new TravelFeeController();
 $brandingController    = new BrandingController();
 $zoneController        = new ZoneController();
+$mailController        = new MailController();
 
 // Routes de l'espace Pro : refusées (401) sans session ouverte, cf. core/Auth.php
 $admin = fn(callable $handler) => Auth::guard($handler);
@@ -41,6 +43,10 @@ $router->post('/admin/login',               [$configController, 'login']);
 $router->post('/admin/login/code',          [$configController, 'verifyCode']);
 $router->get('/admin/session',              [$configController, 'session']);
 $router->post('/admin/logout',              [$configController, 'logout']);
+
+// Envoi d'emails : état (lecture seule) et email de test vers l'email professionnel
+$router->get('/admin/mail',                 $admin([$mailController, 'status']));
+$router->post('/admin/mail/test',           $admin([$mailController, 'test']));
 
 // Logo & favicon (fichiers sous leurs noms d'usage, cf. core/Branding.php)
 $router->get('/zone',                       [$zoneController, 'show']);

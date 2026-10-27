@@ -49,6 +49,15 @@ async function request<T>(method: string, path: string, body: unknown = null): P
   return data as T;
 }
 
+/** État de l'envoi d'emails (lecture seule, réglé dans `api/.env`). */
+export interface MailStatusInfo {
+  transport: 'smtp' | 'mail' | 'none';
+  smtp_host: string | null;
+  mail_from: string | null;
+  mail_from_name: string;
+  recipient: string | null;
+}
+
 export const api = {
   // Configuration & Authentification
   getConfig: () => request<AppConfig>('GET', '/config'),
@@ -67,6 +76,8 @@ export const api = {
     request<{ status: 'authenticated'; two_factor: boolean }>('POST', '/admin/login/code', { code }),
   adminSession: () => request<{ authenticated: boolean; two_factor: boolean }>('GET', '/admin/session'),
   adminLogout: () => request<{ success: boolean }>('POST', '/admin/logout'),
+  getMailStatus: () => request<MailStatusInfo>('GET', '/admin/mail'),
+  sendTestMail: () => request<{ message: string }>('POST', '/admin/mail/test'),
 
   // Prestations
   listServices: (all = false) => request<Service[]>('GET', `/services${all ? '?all=1' : ''}`),

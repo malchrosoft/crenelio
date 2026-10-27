@@ -91,6 +91,28 @@ class EmailTemplates
     }
 
     /**
+     * Email de test déclenché depuis l'espace Pro (onglet Configuration).
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function mailTest(string $transport, array $config): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $mode = $transport === 'smtp' ? 'serveur SMTP' : 'fonction mail() de l\'hébergement';
+        $intro = sprintf(
+            'Si vous lisez ce message, l\'envoi des emails fonctionne (%s). Vos clients recevront leurs confirmations et vous recevrez vos codes de connexion.',
+            self::escape($mode)
+        );
+        $outro = 'Pensez à vérifier qu\'il n\'est pas arrivé dans les indésirables. Si c\'est le cas, vérifiez les enregistrements SPF, DKIM et DMARC du domaine.';
+
+        return [
+            'subject' => sprintf('Email de test — %s', $company),
+            'html'    => self::layout($company, 'L\'envoi des emails fonctionne', $intro, [], $outro, null, $config),
+            'text'    => self::plainText('L\'envoi des emails fonctionne', self::stripHtml($intro), [], $outro, null, $config),
+        ];
+    }
+
+    /**
      * Images intégrées à joindre à un email : le logo, s'il est référencé par le gabarit.
      *
      * @return list<array{cid: string, mime: string, content: string}>

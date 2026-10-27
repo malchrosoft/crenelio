@@ -157,7 +157,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - `api/core/Auth.php` : session serveur (cookie `HttpOnly` / `SameSite=Strict`, inactivité 2 h, durée max 12 h), appareil de confiance en cookie signé HMAC (révoqué par un changement de mot de passe), code lié à la session (haché, 15 min, 3 essais, renvoi au plus toutes les 60 s), 5 échecs de mot de passe par IP en 15 min ⇒ blocage.
   - Toutes les routes de gestion passent par `Auth::guard` (`/admin/*`, écritures prestations / horaires / indisponibilités, liste et gestion des rendez-vous, journal des emails, prestations désactivées).
   - Front : écran de connexion en deux étapes (`AdminLogin`), session conservée au rechargement, retour à la connexion sur tout 401.
-  - Sans `pro_email` ni SMTP : mot de passe seul, bandeau d'avertissement dans l'espace Artisan.
+  - Sans `pro_email` ou sans envoi d'emails : mot de passe seul, bandeau d'avertissement dans l'espace Artisan.
   - Clé de signature générée dans `api/storage/auth/secret.key` (jamais en base).
 
 ---
@@ -239,7 +239,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - **Secret mal protégé :** chiffré, le mot de passe resterait déchiffrable avec une clé posée sur le même serveur ; une session volée suffirait à détourner tous les emails, codes de connexion compris.
   - **Peu utile :** un artisan seul ne change presque jamais de serveur d'envoi, et l'hébergement OVHcloud sait envoyer sans identifiants (`mail()`).
 
-### 24. Envoi Natif OVHcloud (`mail()`) & Contrôle de l'Envoi dans l'Espace Pro
+### 24. Envoi Natif OVHcloud (`mail()`) & Contrôle de l'Envoi dans l'Espace Pro ✅
 - **Objectif :** ne plus exiger d'identifiants SMTP en production ; garder SMTP en option (Mailpit en local, ou compte dédié).
 - **Fonctionnement prévu :**
   - Sans `SMTP_HOST` mais avec `MAIL_FROM` : envoi par la fonction PHP `mail()` de l'hébergement (même message MIME, pièce jointe `.ics` et logo intégré compris). Sans `MAIL_FROM` : envoi désactivé, comme aujourd'hui.
@@ -248,6 +248,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - domaine de `MAIL_FROM` attaché à l'hébergement (*Multisite*), sinon rejet ; en SMTP, `From:` identique au compte authentifié ;
   - adresse d'un tiers uniquement en `Reply-To:` ; quota `mail()` par hébergement et par heure ; suivi et déblocage dans l'onglet *Scripts e-mail* ;
   - SPF, DKIM et DMARC à jour (DKIM à activer).
+- **Réalisé (27/10/2026) :** `Mailer::transport()` (`smtp` / `mail` / `none`), envoi `mail()` du même message MIME (en-têtes `To` / `Subject` confiés à `mail()`, expéditeur d'enveloppe `-f` = `MAIL_FROM`), `MailController` (`GET /admin/mail`, `POST /admin/mail/test`, routes protégées), encart `MailStatus` sous le groupe Coordonnées. Vérifié : email de test reçu dans Mailpit (SMTP) ; message `mail()` capturé dans le conteneur (structure complète, sujet accentué, en-têtes non dupliqués) et cas de refus.
 - **Limites :** en local, rien ne change : Docker fournit `SMTP_HOST=mailpit`, donc tous les emails continuent d'arriver dans Mailpit. Seul le mode `mail()` n'est testable que sur l'hébergement (bouton d'email de test) ; `mail()` ne renvoie qu'un accepté / refusé, le motif d'échec du journal sera moins précis.
 
 ---
@@ -275,7 +276,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 |---|---|---|---|---|---|
 | **1** | **Item 15** | **Header & footer communs au tunnel de réservation** | Vitrine / Navigation | ✅ *Terminé* | Extraction du header de `VitrinePage` |
 | **2** | **Item 12** | **Sécurité : vérification serveur des routes `/admin/*` + 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ✅ *Terminé* | Service mail disponible (Item 4) ✅ |
-| **3** | **Item 24** | **Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro** | Communication / Configuration | ⏳ *À faire* | Item 12 ✅ |
+| **3** | **Item 24** | **Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro** | Communication / Configuration | ✅ *Terminé* | Item 12 ✅ |
 | — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ *Abandonné* | Remplacé par l'Item 24 |
 | **4** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
 | **5** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |

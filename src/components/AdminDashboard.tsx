@@ -42,6 +42,7 @@ import NewAppointment from './admin/NewAppointment';
 import BrandingField from './admin/BrandingField';
 import AdminShell, { AdminTab } from './admin/AdminShell';
 import AdminLogin from './admin/AdminLogin';
+import MailStatus from './admin/MailStatus';
 import { applyFavicon } from '../utils/favicon';
 import { applyDocumentTitle } from '../utils/documentTitle';
 import { format, isPast, isToday, parseISO } from 'date-fns';
@@ -542,8 +543,8 @@ export const AdminDashboard: React.FC = () => {
         <div className="admin-security-notice" role="status">
           <WarningIcon size={20} weight="fill" aria-hidden="true" />
           <span>
-            Double authentification inactive : renseignez l'email professionnel (Configuration) et un serveur
-            d'envoi d'emails (<code>api/.env</code>). En attendant, le mot de passe seul protège l'espace Artisan.
+            Double authentification inactive : renseignez l'email de contact (Configuration) et l'adresse
+            d'expédition des emails (<code>MAIL_FROM</code> dans <code>api/.env</code>). En attendant, le mot de passe seul protège l'espace Artisan.
           </span>
         </div>
       )}
@@ -1160,6 +1161,7 @@ export const AdminDashboard: React.FC = () => {
                   )}
                 </ConfigGroupForm>
                 {group.id === 'vitrine' && <EngagementsEditor config={config} onSaved={setConfig} />}
+                {group.id === 'contact' && <MailStatus proEmail={config.pro_email} />}
                 </React.Fragment>
               )
           )}

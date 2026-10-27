@@ -1390,6 +1390,43 @@ $admin-sidebar-collapsed: 68px;
 .admin-settings-message {
   color: $success;
   font-size: 0.85rem;
+
+  &--error {
+    color: $danger;
+  }
+}
+
+/* Onglet Configuration : état de l'envoi d'emails (lecture seule) */
+.mail-status {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 20px;
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+
+  dt {
+    color: $gray-500;
+  }
+
+  dd {
+    margin: 0;
+    color: $gray-800;
+    font-weight: 600;
+    word-break: break-word;
+  }
+
+  .mail-status__off {
+    color: $danger;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 2px;
+
+    dd {
+      margin-bottom: 8px;
+    }
+  }
 }
 
 /* Onglet « Configuration » : un formulaire par groupe de paramètres */
