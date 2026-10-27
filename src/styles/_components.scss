@@ -1396,6 +1396,17 @@ $admin-sidebar-collapsed: 68px;
   }
 }
 
+/* Expéditeur hors du domaine du site : avertissement, sans blocage */
+.mail-status__warning {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: $radius-sm;
+  background: $warning-light;
+  color: $gray-800;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
 /* Onglet Configuration : état de l'envoi d'emails (lecture seule) */
 .mail-status {
   display: grid;
@@ -1417,6 +1428,13 @@ $admin-sidebar-collapsed: 68px;
 
   .mail-status__off {
     color: $danger;
+  }
+
+  .mail-status__note {
+    margin-left: 8px;
+    color: $gray-500;
+    font-weight: 400;
+    font-size: 0.85rem;
   }
 
   @include mobile {

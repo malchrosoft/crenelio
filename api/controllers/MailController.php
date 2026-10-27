@@ -22,6 +22,9 @@ class MailController
             'transport'      => $transport,
             'smtp_host'      => $transport === 'smtp' ? SMTP_HOST . ':' . SMTP_PORT : null,
             'mail_from'      => MAIL_FROM !== '' ? MAIL_FROM : null,
+            // Déduit d'APP_URL (MAIL_FROM vide dans api/.env)
+            'mail_from_auto' => MAIL_FROM_AUTO,
+            'site_domain'    => SITE_DOMAIN !== '' ? SITE_DOMAIN : null,
             'mail_from_name' => MAIL_FROM_NAME,
             'recipient'      => Config::get('pro_email') ?: null,
         ]);

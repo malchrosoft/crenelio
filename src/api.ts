@@ -54,6 +54,8 @@ export interface MailStatusInfo {
   transport: 'smtp' | 'mail' | 'none';
   smtp_host: string | null;
   mail_from: string | null;
+  mail_from_auto: boolean;
+  site_domain: string | null;
   mail_from_name: string;
   recipient: string | null;
 }

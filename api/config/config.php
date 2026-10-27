@@ -58,7 +58,15 @@ define('SMTP_USER',      env('SMTP_USER', ''));
 define('SMTP_PASS',      env('SMTP_PASS', ''));
 // 'starttls' (587, recommandé), 'tls' (465, TLS implicite) ou 'none'
 define('SMTP_SECURE',    env('SMTP_SECURE', 'starttls'));
-define('MAIL_FROM',      env('MAIL_FROM', ''));
+// Expéditeur : à défaut, noreply@ le domaine du site (APP_URL). Chez OVHcloud, ce domaine est
+// forcément attaché à l'hébergement, condition pour que l'email soit authentifié.
+define('SITE_DOMAIN', (function (): string {
+    $host = strtolower((string)parse_url(APP_URL, PHP_URL_HOST));
+    $host = preg_replace('/^www\./', '', $host);
+    return (str_contains($host, '.') && !filter_var($host, FILTER_VALIDATE_IP)) ? $host : '';
+})());
+define('MAIL_FROM_AUTO', env('MAIL_FROM', '') === '' && SITE_DOMAIN !== '');
+define('MAIL_FROM',      env('MAIL_FROM', '') ?: (SITE_DOMAIN !== '' ? 'noreply@' . SITE_DOMAIN : ''));
 define('MAIL_FROM_NAME', env('MAIL_FROM_NAME', 'Crénelio'));
 
 // CORS settings — adjust to your domain in production

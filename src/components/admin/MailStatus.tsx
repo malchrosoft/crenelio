@@ -18,6 +18,12 @@ const TRANSPORT_LABELS: Record<MailStatusInfo['transport'], string> = {
  * Envoi des emails : état en lecture seule (réglé dans `api/.env`, jamais depuis l'espace Pro)
  * et email de test vers l'email professionnel.
  */
+/** L'expéditeur est-il sur le domaine du site (sous-domaines compris) ? */
+function onSiteDomain(mailFrom: string, siteDomain: string): boolean {
+  const domain = mailFrom.split('@')[1]?.toLowerCase() ?? '';
+  return domain === siteDomain || domain.endsWith(`.${siteDomain}`);
+}
+
 const MailStatus: React.FC<MailStatusProps> = ({ proEmail }) => {
   const [status, setStatus] = useState<MailStatusInfo | null>(null);
   const [sending, setSending] = useState(false);
@@ -62,10 +68,20 @@ const MailStatus: React.FC<MailStatusProps> = ({ proEmail }) => {
             {status.smtp_host && ` (${status.smtp_host})`}
           </dd>
           <dt>Expéditeur</dt>
-          <dd>{status.mail_from ? `${status.mail_from_name} <${status.mail_from}>` : 'Non renseigné (MAIL_FROM)'}</dd>
+          <dd>
+            {status.mail_from ? `${status.mail_from_name} <${status.mail_from}>` : 'Non renseigné (MAIL_FROM)'}
+            {status.mail_from_auto && <span className="mail-status__note">déduit de l'adresse du site</span>}
+          </dd>
           <dt>Email de test envoyé à</dt>
           <dd>{proEmail || status.recipient || "Email de contact à renseigner ci-dessus"}</dd>
         </dl>
+      )}
+
+      {status?.mail_from && status.site_domain && !onSiteDomain(status.mail_from, status.site_domain) && (
+        <p className="mail-status__warning" role="status">
+          L'expéditeur n'est pas sur le domaine du site ({status.site_domain}). Chez OVHcloud, son domaine doit être
+          attaché à l'hébergement (onglet Multisite), sinon les emails sont rejetés : vérifiez avec l'email de test.
+        </p>
       )}
 
       <div className="admin-settings-actions">
