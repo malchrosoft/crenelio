@@ -2,13 +2,32 @@
 
 **Date :** 27 Octobre 2026
 **Dépôt :** `/Users/aymeric.malchrowicz/DEVELOPPEMENT/crenelio`
-**Dernier commit :** `1ff45be` (`main`, poussé) — *bouton d'abandon du tunnel de réservation*
+**Dernier commit :** `40086a9` (`main`, poussé) — *envoi par `mail()` et email de test (Item 24)*
 **Statut Git :** commits directs sur `main` (projet solo), sans ligne d'attribution.
 **Non commité :** rien (hors cette fiche).
 
 ---
 
 ## 1. Ce qui est réellement achevé
+
+### Session du 27/10/2026 (`fdb9b73` → `40086a9`)
+- **Règles OVHcloud sur l'expéditeur (`ad6358d`)**, vérifiées dans la
+  [documentation officielle](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices) :
+  domaine de `MAIL_FROM` attaché à l'hébergement (*Multisite*), sinon rejet ; en SMTP, `From:`
+  identique au compte authentifié ; adresse d'un tiers seulement en `Reply-To:` ; SPF / DKIM /
+  DMARC. Consignées comme **règle générale OVHcloud** dans `AGENTS.md` (section 5), et dans
+  `README.md` et `DEPLOYMENT*.md` (étape 4b).
+- **Item 20 abandonné :** saisir le SMTP dans l'espace Pro risquerait de couper l'envoi des codes
+  de connexion (impossible de se reconnecter pour corriger) et exposerait le mot de passe.
+- **Item 24 — Envoi natif & email de test (`40086a9`) :**
+  - `Mailer::transport()` : `smtp` si `SMTP_HOST` est renseigné, sinon `mail()` de l'hébergement,
+    `none` sans `MAIL_FROM`. Même message MIME (pièce jointe `.ics`, logo intégré).
+  - `MailController` : `GET /admin/mail` (mode, serveur, expéditeur, jamais de mot de passe) et
+    `POST /admin/mail/test` (vers `pro_email`), routes protégées.
+  - Encart `MailStatus` (onglet Configuration, sous Coordonnées), en lecture seule.
+  - Vérifié : email de test reçu dans Mailpit ; message `mail()` capturé dans le conteneur
+    (structure complète, sujet accentué, en-têtes non dupliqués) et cas de refus.
+    **Le vrai `mail()` ne se teste que sur l'hébergement.** Encart non vu dans le navigateur.
 
 ### Sessions du 21 au 23/10/2026 (`51564a4` → `1ff45be`)
 - **Item 12 — Sécurité de l'espace Pro (`14871c2`) :** `api/core/Auth.php`.
@@ -174,19 +193,17 @@ Les deux sens ont été réalignés.
 ## 3. Prochains chantiers prioritaires (ordre de la feuille de route au 27/10/2026)
 
 ### 🎯 0. Vérifications en attente
-- Tester l'écran de connexion de l'espace Pro dans le navigateur (`/admin`, code dans Mailpit).
+- Tester dans le navigateur l'écran de connexion de l'espace Pro (`/admin`, code dans Mailpit) et
+  l'encart « Envoi des emails » (onglet Configuration).
 - Renvoyer le logo depuis la configuration pour générer `logo-email.png`.
 - Vérifier que `pro_email` en base est bien l'adresse de l'artisan avant toute mise en ligne :
   le code de connexion y part.
+- À la mise en ligne : `MAIL_FROM` sur un domaine attaché à l'hébergement, `SMTP_HOST` vide,
+  DKIM activé, puis bouton « M'envoyer un email de test » **avant** la première déconnexion.
 
-### 🎯 1. Item 24 — Envoi natif OVHcloud (`mail()`) & email de test
-L'Item 20 (SMTP saisi dans l'espace Pro) est abandonné le 27/10 : risque de se bloquer dehors (le
-code de connexion part par ce SMTP) et secret mal protégé. À la place : `mail()` de l'hébergement
-quand `SMTP_HOST` est vide, encart « Envoi des emails » en lecture seule et bouton d'email de test.
-Règles OVHcloud sur l'expéditeur consignées dans `AGENTS.md` (section 5) et `DEPLOYMENT*.md` (4b).
-
-### 2. Item 2 — Theming & effets visuels · 3. Item 5 — RGPD & cookies
-### 4. Item 21 — AG Grid · 5. Item 23 — FullCalendar · 6. Item 22 — Factures (plus tard)
+### 🎯 1. Item 2 — Theming & effets visuels
+### 2. Item 5 — RGPD & cookies
+### 3. Item 21 — AG Grid · 4. Item 23 — FullCalendar · 5. Item 22 — Factures (plus tard)
 
 ### Points d'attention issus des Items 18 et 19
 - Changer à la main le statut d'une demande « En attente » n'envoie pas les emails de décision.
