@@ -122,6 +122,11 @@ MAIL_FROM=contact@votre-domaine.com
 MAIL_FROM_NAME=Nom de votre entreprise
 ```
 
+Sans `MAIL_FROM`, l'expéditeur devient `noreply@` + le domaine d'`APP_URL` (sans `www.`) : ce
+domaine sert le site, il est donc attaché à l'hébergement et respecte la règle OVHcloud. Si vous
+choisissez une adresse sur un autre domaine, l'encart « Envoi des emails » de l'espace Pro le
+signale : vérifiez qu'il est attaché à l'hébergement, puis envoyez l'email de test.
+
 **Option B — compte SMTP** (boîte email OVHcloud ou service dédié) : utilisé dès que `SMTP_HOST`
 est renseigné.
 
@@ -160,7 +165,7 @@ déconnecter la première fois : le code de connexion d'un nouvel appareil part 
   - les envois `mail()` se suivent (statistiques, erreurs, déblocage) dans l'onglet *Scripts e-mail*
     de l'hébergement ; les envois SMTP n'y apparaissent pas : suivez le journal « Emails » de
     l'espace Pro.
-- Si `MAIL_FROM` est vide, l'envoi est désactivé. Les réservations aboutissent
+- Si `MAIL_FROM` est vide et qu'`APP_URL` n'indique pas de domaine réel, l'envoi est désactivé. Les réservations aboutissent
   quand même : chaque tentative est journalisée dans `appointment_notifications` avec le statut
   `failed` et un motif explicite, visible depuis le planning de l'espace Pro (bouton « Emails »).
 - Un échec d'envoi ne bloque jamais une réservation. Les boutons « Renvoyer » du journal
@@ -452,7 +457,7 @@ OVH fournit gratuitement des certificats SSL Let's Encrypt :
 ### Les emails ne partent pas
 
 - Ouvrez le journal « Emails » d'un rendez-vous dans l'espace Pro : le motif de l'échec y figure
-- « Envoi d'emails non configuré » : `MAIL_FROM` manque dans `api/.env`
+- « Envoi d'emails non configuré » : ni `MAIL_FROM` ni `APP_URL` (domaine réel) dans `api/.env`
 - « Envoi refusé par la fonction mail() » : domaine de `MAIL_FROM` non attaché à l'hébergement
   (*Multisite*), ou envoi bloqué (onglet *Scripts e-mail*)
 - Erreur d'authentification : vérifiez `SMTP_USER` / `SMTP_PASS` et le couple `SMTP_SECURE` / port
@@ -500,7 +505,8 @@ crenelio/
 
 ```bash
 npm install
-npm start          # MySQL + API PHP + Mailpit (Docker) et Vite
+npm start          # MySQL + API PHP + Mailpit (Docker) et Vite, puis ouvre le navigateur par défaut
+                   # npm start [chrome|safari|firefox|…|tous|aucun] [chemin]
 # ou pas à pas :
 docker compose up -d
 npm run dev

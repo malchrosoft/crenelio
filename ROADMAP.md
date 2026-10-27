@@ -28,7 +28,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 2. Theming, Matérialisation & Effets Graphiques (Pilotable via Admin)
+### 2. Theming, Matérialisation & Effets Graphiques (Pilotable via Admin) — 🚧 En cours
 - **Système de Theming dynamique :**
   - Variables CSS injectées dynamiquement (`--primary`, `--primary-hover`, `--radius`, etc.) depuis la table `config`.
   - Palette prédéfinie ou sélecteur de couleur personnalisée dans l'espace Pro.
@@ -140,7 +140,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 12. Sécurité & Authentification Renforcée Espace Pro (2FA Email OTP & Appareil de confiance 10 jours) ✅
+### 12. Sécurité & Authentification Renforcée Espace Pro (2FA Email OTP & Appareil de confiance 10 jours) — ✅ Terminée
 - **Objectif :**
   - Sécuriser l'accès à l'espace de gestion artisan sans complexité excessive ni dépendance externe lourde (standard conforme aux recommandations ANSSI / OWASP pour mono-utilisateur).
 - **Fonctionnement :**
@@ -179,7 +179,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 14. IHM de Configuration Complète (Espace Pro) ✅
+### 14. IHM de Configuration Complète (Espace Pro) — ✅ Terminée
 - **Constat :** l'onglet « Paramètres » n'édite que les 7 clés de déplacement (`travel_tier_*`, `travel_max_km`) ; `company_name` y est seulement affiché. Toutes les autres clés de `config` ne se modifient qu'en base.
 - **Objectif :** un formulaire par groupe dans l'espace Pro :
   - *Entreprise & coordonnées* : `company_name`, `pro_name`, `pro_email`, `pro_phone`, `service_area`.
@@ -195,7 +195,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 15. Header & Footer Communs au Tunnel de Réservation ✅
+### 15. Header & Footer Communs au Tunnel de Réservation — ✅ Terminée
 - **Constat :** le header sticky et le `Footer` ne sont rendus que sur la vitrine (`VitrinePage.tsx`) ; la page `/booking` en est dépourvue.
 - **Objectif :** conserver le header et le footer de la vitrine sur la partie réservation pour une navigation et une identité continues.
 - **Pistes :** extraire le header de `VitrinePage.tsx` en composant réutilisable (ou layout commun aux routes publiques) ; sur `/booking`, header affiché en permanence (sans déclenchement lié au bouton du Hero) ; réutiliser `Footer` tel quel.
@@ -203,20 +203,20 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 16. Horaires de Travail & Indisponibilités (Espace Pro) ✅
+### 16. Horaires de Travail & Indisponibilités (Espace Pro) — ✅ Terminée
 - **Constat :** le moteur de créneaux lisait déjà `schedules` et `unavailabilities`, mais rien ne permettait de les modifier hors base ; le calendrier client laissait choisir des jours sans aucun créneau, et `POST /appointments` ne vérifiait que les chevauchements (pas les horaires ni le délai minimal).
 - **Réalisé :** onglet « Horaires » (plage matin + après-midi par jour, jour travaillé ou non, validation serveur des plages) et gestion des indisponibilités (ajout, suppression). Calcul extrait dans `api/core/SlotEngine.php`, partagé par `GET /slots`, le nouveau `GET /slots/availability` (jours grisés dans le calendrier) et la validation de réservation. Espace Pro chargé à la demande (bundle client de 500 à 420 ko).
 - **Améliorations possibles :** plus de deux plages par jour ; horaires d'exception sur une date précise (ex. samedi après-midi ponctuel).
 
 ---
 
-### 17. Espace Artisan en Pleine Page ✅
+### 17. Espace Artisan en Pleine Page — ✅ Terminée
 - **Réalisé :** route dédiée `/admin` (les anciens liens `/booking?view=admin` y redirigent), header fixe « Espace Artisan » + nom de l'entreprise, déconnexion à droite, liens Accueil et Espace client ouverts dans un nouvel onglet ; menu latéral rétractable (icônes seules, état mémorisé dans le navigateur). Composant `src/components/admin/AdminShell.tsx`.
 - **Améliorations possibles :** conserver la session à l'actualisation de la page (aujourd'hui, retour à l'écran de connexion — à traiter avec l'Item 12) ; tableau des rendez-vous adapté au mobile.
 
 ---
 
-### 18. Zone d'Intervention Calculée & Mode « Sans Déplacement » ✅
+### 18. Zone d'Intervention Calculée & Mode « Sans Déplacement » — ✅ Terminée
 - **Réalisé :** onglet « Zone & déplacement » : mode d'intervention (déplacement chez le client / réception dans les locaux), adresse de l'entreprise par autocomplétion (fixe aussi le point de départ), option « communes limitrophes ». « Calculer les communes » interroge `geo.api.gouv.fr` (`src/utils/serviceArea.ts`) : commune de départ, limitrophes, communes au moins partiellement dans le rayon `travel_max_km` ; liste à cocher puis enregistrement dans `api/storage/zone/service-area.geojson` (`PUT /admin/zone`, `GET /zone`). Carte commune `ZoneMap` : bleu si entièrement dans le rayon, orange si partiellement, cercle en pointillés. Rayon d'intervention réglé au-dessus de la carte (paliers de frais en dessous) ; clic droit sur une commune pour la retirer (rouge, décochée) ou la réintégrer. Mode locaux : vitrine « Nous trouver » avec l'adresse, aucune adresse ni frais demandés à la réservation, le serveur impose l'adresse des locaux sur le rendez-vous.
 - **Organisation :** menu « Déplacement » (mode, adresse de l'entreprise, point de départ distinct possible par adresse ou coordonnées GPS, paliers de frais) et menu « Zone d'intervention » en pleine page (`ZoneWorkspace` : rayon, limitrophes, liste masquable avec distance au centre, carte sur toute la hauteur).
 - **Réservation :** dès qu'une zone est enregistrée, l'adresse du client doit être dans une commune cochée (`api/core/ServiceArea.php`, test point dans polygone), sinon blocage « hors zone » comme pour le rayon (`out_of_zone_reason` : `commune` / `radius`) ; l'adresse doit alors être choisie dans les suggestions.
@@ -226,7 +226,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 19. Saisie d'un Rendez-vous par l'Artisan ✅
+### 19. Saisie d'un Rendez-vous par l'Artisan — ✅ Terminée
 - **Réalisé :** bouton « Nouveau rendez-vous » du planning (`src/components/admin/NewAppointment.tsx`) réutilisant `ServiceSelector`, `SlotPicker` et `BookingForm` en mode `adminMode` : tous les jours ouverts, heure libre hors créneaux, email et adresse facultatifs, encart hors zone avec enregistrement forcé (`POST /admin/appointments`, `is_out_of_zone` conservé), envoi des confirmations optionnel. Capsules de statut du planning en français.
 - **Améliorations possibles :** changer le statut d'une demande « En attente » depuis le planning n'envoie pas les emails de décision (passer par le lien de l'email) ; route `/admin/appointments` ouverte comme les autres `/admin/*` (Item 12).
 
@@ -238,20 +238,6 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - **Verrouillage :** le code de connexion (Item 12) part par ce SMTP ; un réglage erroné saisi depuis l'espace Pro empêcherait toute connexion depuis un nouvel appareil, donc toute correction.
   - **Secret mal protégé :** chiffré, le mot de passe resterait déchiffrable avec une clé posée sur le même serveur ; une session volée suffirait à détourner tous les emails, codes de connexion compris.
   - **Peu utile :** un artisan seul ne change presque jamais de serveur d'envoi, et l'hébergement OVHcloud sait envoyer sans identifiants (`mail()`).
-
-### 24. Envoi Natif OVHcloud (`mail()`) & Contrôle de l'Envoi dans l'Espace Pro ✅
-- **Objectif :** ne plus exiger d'identifiants SMTP en production ; garder SMTP en option (Mailpit en local, ou compte dédié).
-- **Fonctionnement prévu :**
-  - Sans `SMTP_HOST` mais avec `MAIL_FROM` : envoi par la fonction PHP `mail()` de l'hébergement (même message MIME, pièce jointe `.ics` et logo intégré compris). Sans `MAIL_FROM` : envoi désactivé, comme aujourd'hui.
-  - Onglet Configuration : encart en lecture seule « Envoi des emails » (mode `mail()` / SMTP, serveur, expéditeur — jamais de mot de passe) et bouton « M'envoyer un email de test » vers `pro_email`.
-- **Règles OVHcloud à respecter** ([bonnes pratiques d'envoi d'e-mail](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices)) :
-  - domaine de `MAIL_FROM` attaché à l'hébergement (*Multisite*), sinon rejet ; en SMTP, `From:` identique au compte authentifié ;
-  - adresse d'un tiers uniquement en `Reply-To:` ; quota `mail()` par hébergement et par heure ; suivi et déblocage dans l'onglet *Scripts e-mail* ;
-  - SPF, DKIM et DMARC à jour (DKIM à activer).
-- **Réalisé (27/10/2026) :** `Mailer::transport()` (`smtp` / `mail` / `none`), envoi `mail()` du même message MIME (en-têtes `To` / `Subject` confiés à `mail()`, expéditeur d'enveloppe `-f` = `MAIL_FROM`), `MailController` (`GET /admin/mail`, `POST /admin/mail/test`, routes protégées), encart `MailStatus` sous le groupe Coordonnées. Vérifié : email de test reçu dans Mailpit (SMTP) ; message `mail()` capturé dans le conteneur (structure complète, sujet accentué, en-têtes non dupliqués) et cas de refus.
-- **Limites :** en local, rien ne change : Docker fournit `SMTP_HOST=mailpit`, donc tous les emails continuent d'arriver dans Mailpit. Seul le mode `mail()` n'est testable que sur l'hébergement (bouton d'email de test) ; `mail()` ne renvoie qu'un accepté / refusé, le motif d'échec du journal sera moins précis.
-
----
 
 ### 21. Exploitation des Interventions avec AG Grid (édition Community)
 - **Besoin :** une vue tabulaire des interventions dans l'espace Pro pour les exploiter au quotidien : tri, filtres par colonne, recherche, regroupement par statut ou par commune, export CSV.
@@ -268,21 +254,43 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Choix :** `@fullcalendar/react` avec les plugins **standard** (licence MIT : `daygrid`, `timegrid`, `interaction`, `list`). Les plugins Premium (vues ressources, timeline) sont payants et non nécessaires pour un artisan seul.
 - **Pistes :** affichage des rendez-vous, indisponibilités et horaires de travail ; glisser-déposer pour reprogrammer, validé par le `SlotEngine` (refus si le créneau n'est pas proposable) ; création d'un rendez-vous au clic (formulaire de l'Item 19) ; locale `fr`, fuseau `APP_TIMEZONE`.
 
+### 24. Envoi Natif OVHcloud (`mail()`) & Contrôle de l'Envoi dans l'Espace Pro — ✅ Terminée
+- **Objectif :** ne plus exiger d'identifiants SMTP en production ; garder SMTP en option (Mailpit en local, ou compte dédié).
+- **Fonctionnement prévu :**
+  - Sans `SMTP_HOST` mais avec `MAIL_FROM` : envoi par la fonction PHP `mail()` de l'hébergement (même message MIME, pièce jointe `.ics` et logo intégré compris). Sans `MAIL_FROM` : envoi désactivé, comme aujourd'hui.
+  - Onglet Configuration : encart en lecture seule « Envoi des emails » (mode `mail()` / SMTP, serveur, expéditeur — jamais de mot de passe) et bouton « M'envoyer un email de test » vers `pro_email`.
+- **Règles OVHcloud à respecter** ([bonnes pratiques d'envoi d'e-mail](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices)) :
+  - domaine de `MAIL_FROM` attaché à l'hébergement (*Multisite*), sinon rejet ; en SMTP, `From:` identique au compte authentifié ;
+  - adresse d'un tiers uniquement en `Reply-To:` ; quota `mail()` par hébergement et par heure ; suivi et déblocage dans l'onglet *Scripts e-mail* ;
+  - SPF, DKIM et DMARC à jour (DKIM à activer).
+- **Réalisé (27/10/2026) :** `Mailer::transport()` (`smtp` / `mail` / `none`), envoi `mail()` du même message MIME (en-têtes `To` / `Subject` confiés à `mail()`, expéditeur d'enveloppe `-f` = `MAIL_FROM`), `MailController` (`GET /admin/mail`, `POST /admin/mail/test`, routes protégées), encart `MailStatus` sous le groupe Coordonnées. Vérifié : email de test reçu dans Mailpit (SMTP) ; message `mail()` capturé dans le conteneur (structure complète, sujet accentué, en-têtes non dupliqués) et cas de refus.
+- **Limites :** en local, rien ne change : Docker fournit `SMTP_HOST=mailpit`, donc tous les emails continuent d'arriver dans Mailpit. Seul le mode `mail()` n'est testable que sur l'hébergement (bouton d'email de test) ; `mail()` ne renvoie qu'un accepté / refusé, le motif d'échec du journal sera moins précis.
+
+---
+
+### 25. Mot de Passe & Email Professionnel Sécurisés (Changement, Réinitialisation, Vérification)
+- **Constat (27/10/2026) :** aucun écran ne permet de changer le mot de passe (`admin123` par défaut, la clé `admin_password` n'est modifiable que par l'API) ; aucune procédure en cas d'oubli ; l'email professionnel, qui reçoit les codes de connexion (Item 12), se modifie sans vérification.
+- **Changement du mot de passe :** dans l'espace Pro, avec saisie de l'ancien mot de passe, règles de robustesse (longueur minimale, refus des mots de passe trop courants), et **changement obligatoire tant que `admin123` est actif**. Le changement ferme les autres sessions et oublie les appareils de confiance (déjà assuré par `Auth`).
+- **Mot de passe oublié :** lien sur l'écran de connexion ; envoi à `pro_email` d'un lien (ou code) à usage unique, valable 30 minutes, haché côté serveur ; réponse identique que l'adresse existe ou non ; limitation par IP comme pour la connexion ; à l'issue, toutes les sessions et appareils sont révoqués et un email de confirmation est envoyé.
+- **Vérification de l'email professionnel :** une nouvelle adresse n'est retenue qu'après saisie d'un code reçu sur cette adresse ; l'ancienne adresse est prévenue du changement. Évite de se couper soi-même des codes de connexion, ou qu'une session volée détourne la récupération du compte.
+- **Prérequis :** Item 12 ✅, envoi d'emails (Item 24 ✅). Sans envoi configuré, la réinitialisation est impossible : la documenter (procédure de secours via phpMyAdmin et `password_hash`).
+
 ---
 
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
 |---|---|---|---|---|---|
-| **1** | **Item 15** | **Header & footer communs au tunnel de réservation** | Vitrine / Navigation | ✅ *Terminé* | Extraction du header de `VitrinePage` |
-| **2** | **Item 12** | **Sécurité : vérification serveur des routes `/admin/*` + 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ✅ *Terminé* | Service mail disponible (Item 4) ✅ |
-| **3** | **Item 24** | **Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro** | Communication / Configuration | ✅ *Terminé* | Item 12 ✅ |
-| — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ *Abandonné* | Remplacé par l'Item 24 |
-| **4** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
-| **5** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
-| **6** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — |
-| **7** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ |
-| **8** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 |
+| **1** | **Item 2** | **Theming & effets visuels (Admin)** | Design / UI | 🚧 *En cours* | Variables CSS dynamiques |
+| **2** | **Item 25** | **Mot de passe & email professionnel sécurisés (changement, réinitialisation, vérification)** | Sécurité / Authentification | ⏳ *À faire* | Items 12 et 24 ✅ |
+| **3** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
+| **4** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — |
+| **5** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ |
+| **6** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ |
+| — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ **Abandonné** | Remplacé par l'Item 24 |
+| — | **Item 24** | Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro | Communication / Configuration | ✅ **Terminé** | — |
+| — | **Item 12** | Sécurité : routes de gestion vérifiées côté serveur, code par email, appareil de confiance 10 jours | Sécurité / Authentification | ✅ **Terminé** | — |
+| — | **Item 15** | Header & footer communs au tunnel de réservation (+ bouton d'abandon) | Vitrine / Navigation | ✅ **Terminé** | — |
 | — | **Item 19** | Saisie d'un rendez-vous par l'artisan (formulaires partagés, hors zone forçable) | Espace Pro / Planning | ✅ **Terminé** | — |
 | — | **Item 18** | Zone d'intervention calculée, mode sans déplacement, demandes hors zone validées par l'artisan | Zone / Réservation | ✅ **Terminé** | — |
 | — | **Item 17** | Espace Artisan en pleine page (`/admin`, menu rétractable) | Espace Pro / Navigation | ✅ **Terminé** | — |

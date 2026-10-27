@@ -53,9 +53,13 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
 
 - **Démarrage tout-en-un** (Docker DB + API PHP Docker + Frontend Vite) :
   ```bash
-  npm start
-  # ou directement : python scripts/start.py
+  npm start                     # ouvre ensuite le navigateur par défaut dès que Vite répond
+  npm start safari admin        # navigateur cité (+ chemin) ; « tous » pour comparer, « aucun » pour ne rien ouvrir
+  # ou directement : python3 scripts/start.py [navigateur] [chemin]
   ```
+  Serveur déjà lancé : `npm run ouvrir [navigateur|tous] [chemin]` (`scripts/ouvrir.mjs`).
+  ⚠️ Un agent qui teste `npm start` doit utiliser `aucun` et ne jamais arrêter un Vite qu'il n'a
+  pas lancé lui-même (l'humain peut avoir le sien sur 5173).
 - **Arrêt complet** (Conteneurs Docker + Processus Vite) :
   ```bash
   npm stop
@@ -134,7 +138,8 @@ abandonné : un mauvais réglage couperait l'envoi des codes de connexion). `GET
 `POST /admin/mail/test` n'exposent que le mode, le serveur et l'expéditeur.
 
 `SMTP_HOST` vide ⇒ fonction `mail()` de l'hébergement (mode de production recommandé chez OVHcloud,
-non testable en local). Sans `MAIL_FROM`, l'envoi est désactivé : les réservations aboutissent normalement et chaque
+non testable en local). `MAIL_FROM` vide ⇒ `noreply@` + domaine d'`APP_URL` (constantes
+`SITE_DOMAIN` / `MAIL_FROM_AUTO` dans `config/config.php`). Sans l'un ni l'autre, l'envoi est désactivé : les réservations aboutissent normalement et chaque
 tentative est journalisée en `failed` avec un motif explicite, visible via le bouton « Emails »
 du planning Pro.
 
@@ -222,7 +227,12 @@ documentation (`README.md`, `DEPLOYMENT.md` **et** `DEPLOYMENT.fr.md`) doit les 
 ---
 
 ## 6. Règles de Validation avant Commit / PR
-Avant de finaliser toute modification :
+**Ne jamais commiter sans l'accord explicite de l'humain pour ce commit précis.** Une fois la
+modification terminée, la résumer et demander « Je commite ? ». Un accord donné en enchaînant
+(« commit et on fait X ») ne vaut que pour le commit en cours, pas pour ceux que X produira.
+Le `push` reste à l'humain.
+
+Avant de proposer un commit :
 1. Vérifier que le build Vite s'exécute sans erreur : `npm run build`, **et** que le typage est sain : `npx tsc --noEmit`.
 2. Vérifier l'absence de fichiers temporaires ou orphelins : `git status`.
 3. S'assurer que les identifiants et tokens secrets ne sont jamais commités.

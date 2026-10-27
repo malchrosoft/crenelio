@@ -71,8 +71,12 @@ cd crenelio
 # 2. Installer les dépendances du frontend
 npm install
 
-# 3. Lancer l'environnement complet (MySQL, API PHP et Mailpit sous Docker + Vite)
+# 3. Lancer l'environnement complet (MySQL, API PHP et Mailpit sous Docker + Vite),
+#    puis ouvrir le site dans le navigateur par défaut dès que Vite répond
 npm start
+npm start safari admin      # /admin dans Safari
+npm start tous booking      # /booking dans tous les navigateurs installés (comparer le rendu)
+npm start aucun             # sans ouvrir de navigateur
 
 # Pour arrêter proprement l'ensemble des services :
 npm stop
@@ -84,6 +88,10 @@ npm stop
 | `http://localhost:5173/admin` | Espace Artisan (mot de passe de démonstration : `admin123`) |
 | `http://localhost:8000/api` | API PHP |
 | `http://localhost:8025` | **Mailpit** : tous les emails envoyés en local y sont capturés, rien ne sort de la machine |
+
+Navigateurs reconnus : `chrome`, `brave`, `edge`, `firefox`, `safari`, `opera`, `vivaldi`, `chromium`
+(macOS, Windows, Linux) ; ceux qui sont installés sont listés au démarrage. Serveur déjà lancé :
+`npm run ouvrir [navigateur|tous] [chemin]` (`scripts/ouvrir.mjs`).
 
 ### Build de Production
 
@@ -127,7 +135,8 @@ APP_TIMEZONE=Europe/Paris
 
 # -------------------------------------------------------------------
 # Envoi d'emails — SMTP_HOST vide : fonction mail() de l'hébergement
-# (recommandé chez OVHcloud, seuls MAIL_FROM et MAIL_FROM_NAME sont utiles)
+# (recommandé chez OVHcloud, seuls MAIL_FROM et MAIL_FROM_NAME sont utiles ;
+# MAIL_FROM vide ⇒ noreply@<domaine d'APP_URL>)
 # -------------------------------------------------------------------
 SMTP_HOST=ssl0.ovh.net
 SMTP_PORT=587
@@ -148,7 +157,7 @@ MAIL_FROM_NAME=Crénelio
 | `SMTP_HOST` / `SMTP_PORT` | *(vide)* / `587` | Serveur SMTP. **Vide ⇒ fonction `mail()` de l'hébergement** (aucun identifiant) |
 | `SMTP_USER` / `SMTP_PASS` | *(vide)* | Identifiants `AUTH LOGIN` ; laisser vide pour un relais sans authentification |
 | `SMTP_SECURE` | `starttls` | `starttls` (587), `tls` (465, TLS implicite) ou `none` |
-| `MAIL_FROM` / `MAIL_FROM_NAME` | *(vide)* / `Crénelio` | Expéditeur. Chez OVHcloud : domaine **attaché à l'hébergement** (*Multisite*) et adresse **identique à `SMTP_USER`**, sinon rejet |
+| `MAIL_FROM` / `MAIL_FROM_NAME` | *(vide)* / `Crénelio` | Expéditeur. **Vide ⇒ `noreply@` + domaine d'`APP_URL`** (sans `www.`), domaine forcément attaché à l'hébergement. Chez OVHcloud : domaine **attaché à l'hébergement** (*Multisite*) et, en SMTP, adresse **identique à `SMTP_USER`**, sinon rejet |
 
 **En local, Docker Compose fournit ces variables au conteneur PHP pour viser Mailpit** (elles
 priment sur `api/.env`) : l'envoi fonctionne sans rien configurer. Retirez-les du service `api`
@@ -160,7 +169,7 @@ Règles d'envoi propres à OVHcloud (expéditeur, `Reply-To`, SPF/DKIM/DMARC, qu
 
 L'onglet *Configuration* de l'espace Pro affiche le mode d'envoi et l'expéditeur (lecture seule) et propose un **email de test**.
 
-**Sans `MAIL_FROM`, l'envoi est simplement désactivé** : les réservations
+**Sans `MAIL_FROM` ni `APP_URL` exploitable (domaine réel), l'envoi est simplement désactivé** : les réservations
 aboutissent normalement et chaque tentative est journalisée en `failed` avec un motif explicite,
 consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relançable manuellement.
 

@@ -122,6 +122,11 @@ MAIL_FROM=contact@your-domain.com
 MAIL_FROM_NAME=Your Company Name
 ```
 
+Without `MAIL_FROM`, the sender becomes `noreply@` + the `APP_URL` domain (without `www.`): that
+domain serves the site, so it is attached to the hosting plan and meets the OVHcloud rule. If you
+pick an address on another domain, the Pro area's "Envoi des emails" panel flags it: check that
+the domain is attached to the hosting plan, then send the test email.
+
 **Option B — an SMTP account** (OVHcloud mailbox or a dedicated service): used as soon as
 `SMTP_HOST` is set.
 
@@ -159,7 +164,7 @@ Notes:
     maximum per message;
   - `mail()` sends are monitored (statistics, errors, unblocking) in the hosting plan's
     *Email scripts* tab; SMTP sends do not appear there: use the Pro area's "Emails" log instead.
-- Leaving `MAIL_FROM` empty disables sending. Bookings still succeed: every
+- If `MAIL_FROM` is empty and `APP_URL` has no real domain, sending is disabled. Bookings still succeed: every
   attempt is logged in `appointment_notifications` with an explicit `failed` status, visible from
   the Pro planning ("Emails" button).
 - A failed send never breaks a booking. Use the "Renvoyer" buttons in the notification log to
@@ -448,7 +453,7 @@ OVH provides free Let's Encrypt SSL certificates:
 ### Emails are not sent
 
 - Open the "Emails" log of an appointment in the Pro area: the failure reason is shown there
-- "Envoi d'emails non configuré": `MAIL_FROM` is missing from `api/.env`
+- "Envoi d'emails non configuré": neither `MAIL_FROM` nor `APP_URL` (real domain) in `api/.env`
 - "Envoi refusé par la fonction mail()": the `MAIL_FROM` domain is not attached to the hosting
   plan (*Multisite*), or sending is blocked (*Email scripts* tab)
 - Authentication errors: check `SMTP_USER` / `SMTP_PASS` and the `SMTP_SECURE` / port pair
@@ -496,7 +501,8 @@ crenelio/
 
 ```bash
 npm install
-npm start          # MySQL + PHP API + Mailpit (Docker) and Vite
+npm start          # MySQL + PHP API + Mailpit (Docker) and Vite, then opens the default browser
+                   # npm start [chrome|safari|firefox|…|tous|aucun] [path]
 # or step by step:
 docker compose up -d
 npm run dev
