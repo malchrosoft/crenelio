@@ -4,7 +4,8 @@ Crénelio - Démarrage multiplateforme (Windows, macOS, Linux).
 - Vérifie et prépare api/.env
 - Démarre les conteneurs Docker (crenelio-db & crenelio-api)
 - Vérifie la disponibilité de MySQL et de l'API HTTP
-- Lance le serveur Vite en avant-plan
+- Lance le serveur Vite en avant-plan, puis ouvre le navigateur dès qu'il répond :
+  npm start [navigateur|tous|aucun] [chemin]   (défaut : navigateur par défaut, page d'accueil)
 - Nettoie proprement à l'interruption (Ctrl+C)
 """
 
@@ -12,6 +13,7 @@ import os
 import shutil
 import subprocess
 import sys
+import threading
 import time
 import urllib.request
 import urllib.error
@@ -102,7 +104,38 @@ def print_urls(port: int):
     print()
 
 
-def run_vite():
+def open_browser_when_ready(port: int, args: list):
+    """Attend que Vite réponde, puis délègue l'ouverture à scripts/ouvrir.mjs."""
+    url = f"http://localhost:{port}"
+    for _ in range(60):
+        try:
+            with urllib.request.urlopen(url, timeout=1):
+                break
+        except Exception:
+            time.sleep(0.5)
+    else:
+        print_warn("Vite ne répond pas : navigateur non ouvert.")
+        return
+    subprocess.run(
+        ["node", os.path.join("scripts", "ouvrir.mjs"), *args],
+        env={**os.environ, "CRENELIO_URL": url},
+    )
+
+
+def port_in_use(port: int) -> bool:
+    import socket
+    for family, host in ((socket.AF_INET, "127.0.0.1"), (socket.AF_INET6, "::1")):
+        try:
+            with socket.socket(family, socket.SOCK_STREAM) as sock:
+                sock.settimeout(0.3)
+                if sock.connect_ex((host, port)) == 0:
+                    return True
+        except OSError:
+            continue
+    return False
+
+
+def run_vite(browser_args: list):
     import socket
     print("\n" + "=" * 55)
     print("💻 Lancement du serveur Vite...")
@@ -111,7 +144,10 @@ def run_vite():
     max_port = 5180
     selected_port = None
     for port in range(base_port, max_port + 1):
-        # Vérifier si le port est disponible
+        # Port occupé si un serveur y répond déjà (IPv4 ou IPv6 : Vite écoute souvent sur ::1),
+        # ou s'il ne peut pas être réservé
+        if port_in_use(port):
+            continue
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             try:
                 sock.bind(("127.0.0.1", port))
@@ -126,6 +162,7 @@ def run_vite():
     if selected_port != base_port:
         print_warn(f"Port {base_port} occupé : les liens des emails (APP_URL) pointeront vers {base_port}.")
     print_urls(selected_port)
+    subprocess.run(["node", os.path.join("scripts", "ouvrir.mjs"), "liste"])
     print("👉 Appuyez sur Ctrl+C pour arrêter le serveur.")
     print("=" * 55 + "\n", flush=True)
     # Utilise npx vite avec le port choisi, portable Windows/macOS/Linux
@@ -133,6 +170,7 @@ def run_vite():
     cmd = ["npx", "vite", "--port", str(selected_port), "--strictPort"]
     if sys.platform == "win32":
         cmd = ["npx.cmd", "vite", "--port", str(selected_port), "--strictPort"]
+    threading.Thread(target=open_browser_when_ready, args=(selected_port, browser_args), daemon=True).start()
     try:
         subprocess.run(cmd)
     except KeyboardInterrupt:
@@ -146,7 +184,8 @@ def main():
     start_docker()
     wait_for_mysql()
     wait_for_api()
-    run_vite()
+    # npm start safari admin → ["safari", "admin"]
+    run_vite(sys.argv[1:])
 
 if __name__ == "__main__":
     main()

@@ -8,6 +8,7 @@
     "dev": "vite",
     "start": "node scripts/run-python.mjs scripts/start.py",
     "stop": "node scripts/run-python.mjs scripts/stop.py",
+    "ouvrir": "node scripts/ouvrir.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "deploy:build": "node scripts/build.mjs"
