@@ -199,7 +199,7 @@ Les deux sens ont été réalignés.
 - Vérifier que `pro_email` en base est bien l'adresse de l'artisan avant toute mise en ligne :
   le code de connexion y part.
 - À la mise en ligne : `MAIL_FROM` sur un domaine attaché à l'hébergement, `SMTP_HOST` vide,
-  DKIM activé, puis bouton « M'envoyer un email de test » **avant** la première déconnexion.
+  DKIM activé, puis bouton « Envoyer un email de test » **avant** la première déconnexion.
 
 ### 🎯 1. Item 2 — Theming & effets visuels
 ### 2. Item 5 — RGPD & cookies

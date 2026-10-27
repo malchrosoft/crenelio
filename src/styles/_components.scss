@@ -1080,8 +1080,17 @@ $admin-sidebar-collapsed: 68px;
 }
 
 .admin-section-title {
+  // Icône éventuelle alignée sur le texte
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 1.1rem;
   margin-bottom: 12px;
+
+  svg {
+    flex-shrink: 0;
+    color: $primary;
+  }
 }
 
 .admin-services-grid {

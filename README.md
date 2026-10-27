@@ -144,7 +144,7 @@ SMTP_USER=contact@votre-domaine.com
 SMTP_PASS=
 SMTP_SECURE=starttls           # starttls (587) | tls (465, implicite) | none
 MAIL_FROM=contact@votre-domaine.com
-MAIL_FROM_NAME=Crénelio
+MAIL_FROM_NAME=                # facultatif : vide ⇒ nom de l'entreprise (espace Pro)
 ```
 
 | Variable | Défaut | Rôle |
@@ -157,7 +157,7 @@ MAIL_FROM_NAME=Crénelio
 | `SMTP_HOST` / `SMTP_PORT` | *(vide)* / `587` | Serveur SMTP. **Vide ⇒ fonction `mail()` de l'hébergement** (aucun identifiant) |
 | `SMTP_USER` / `SMTP_PASS` | *(vide)* | Identifiants `AUTH LOGIN` ; laisser vide pour un relais sans authentification |
 | `SMTP_SECURE` | `starttls` | `starttls` (587), `tls` (465, TLS implicite) ou `none` |
-| `MAIL_FROM` / `MAIL_FROM_NAME` | *(vide)* / `Crénelio` | Expéditeur. **Vide ⇒ `noreply@` + domaine d'`APP_URL`** (sans `www.`), domaine forcément attaché à l'hébergement. Chez OVHcloud : domaine **attaché à l'hébergement** (*Multisite*) et, en SMTP, adresse **identique à `SMTP_USER`**, sinon rejet |
+| `MAIL_FROM` / `MAIL_FROM_NAME` | *(vide)* / *(vide)* | Expéditeur. **`MAIL_FROM_NAME` vide ⇒ nom de l'entreprise** saisi dans l'espace Pro. **Vide ⇒ `noreply@` + domaine d'`APP_URL`** (sans `www.`), domaine forcément attaché à l'hébergement. Chez OVHcloud : domaine **attaché à l'hébergement** (*Multisite*) et, en SMTP, adresse **identique à `SMTP_USER`**, sinon rejet |
 
 **En local, Docker Compose fournit ces variables au conteneur PHP pour viser Mailpit** (elles
 priment sur `api/.env`) : l'envoi fonctionne sans rien configurer. Retirez-les du service `api`
@@ -188,7 +188,7 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 | `GET` | `/api/admin/session` | État de la session |
 | `POST` | `/api/admin/logout` | Déconnexion |
 | `GET` | `/api/admin/mail` | Mode d'envoi des emails et expéditeur (lecture seule) |
-| `POST` | `/api/admin/mail/test` | Email de test vers l'email professionnel |
+| `POST` | `/api/admin/mail/test` | Email de test vers `to` (testeur, développeur) ou, à défaut, l'email professionnel ; 5 envois / 10 min |
 
 ### Prestations & Créneaux
 | Méthode | Route | Description |

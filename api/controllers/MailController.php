@@ -25,19 +25,35 @@ class MailController
             // Déduit d'APP_URL (MAIL_FROM vide dans api/.env)
             'mail_from_auto' => MAIL_FROM_AUTO,
             'site_domain'    => SITE_DOMAIN !== '' ? SITE_DOMAIN : null,
-            'mail_from_name' => MAIL_FROM_NAME,
+            'mail_from_name' => Mailer::senderName(),
+            // Nom repris de la Configuration (MAIL_FROM_NAME vide dans api/.env)
+            'mail_from_name_auto' => MAIL_FROM_NAME === '',
             'recipient'      => Config::get('pro_email') ?: null,
         ]);
     }
 
-    /** POST /admin/mail/test — Envoie un email de test à l'email professionnel. */
+    /** Emails de test autorisés par session sur la fenêtre (destinataire libre : éviter le relais de spam). */
+    private const TEST_LIMIT  = 5;
+    private const TEST_WINDOW = 10 * 60;
+
+    /**
+     * POST /admin/mail/test — Email de test vers `to` (testeur, développeur…),
+     * à défaut vers l'email professionnel.
+     */
     public function test(): void
     {
         $config = Config::getAll();
-        $recipient = $config['pro_email'] ?? '';
+        $recipient = trim((string)(Response::body()['to'] ?? '')) ?: ($config['pro_email'] ?? '');
         if (!filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
-            Response::json(['error' => "Renseignez d'abord l'email professionnel (groupe Coordonnées)"], 400);
+            Response::json(['error' => 'Adresse du destinataire invalide (ou email de contact non renseigné)'], 400);
         }
+
+        // Session déjà ouverte par Auth::guard
+        $recent = array_filter($_SESSION['mail_tests'] ?? [], fn($t) => $t > time() - self::TEST_WINDOW);
+        if (count($recent) >= self::TEST_LIMIT) {
+            Response::json(['error' => 'Trop d\'emails de test : réessayez dans quelques minutes'], 429);
+        }
+        $_SESSION['mail_tests'] = [...$recent, time()];
 
         $message = EmailTemplates::mailTest(Mailer::transport(), $config);
         try {

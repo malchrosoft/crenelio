@@ -67,7 +67,8 @@ define('SITE_DOMAIN', (function (): string {
 })());
 define('MAIL_FROM_AUTO', env('MAIL_FROM', '') === '' && SITE_DOMAIN !== '');
 define('MAIL_FROM',      env('MAIL_FROM', '') ?: (SITE_DOMAIN !== '' ? 'noreply@' . SITE_DOMAIN : ''));
-define('MAIL_FROM_NAME', env('MAIL_FROM_NAME', 'Crénelio'));
+// Nom affiché de l'expéditeur : vide ⇒ nom de l'entreprise saisi dans l'espace Pro (cf. Mailer::senderName)
+define('MAIL_FROM_NAME', env('MAIL_FROM_NAME', ''));
 
 // CORS settings — adjust to your domain in production
 define('CORS_ORIGIN', env('CORS_ORIGIN', '*'));

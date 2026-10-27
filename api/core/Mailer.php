@@ -16,6 +16,8 @@
  * (`Notifier`) qui décide de journaliser sans interrompre le parcours.
  */
 
+require_once __DIR__ . '/../models/Config.php';
+
 class Mailer
 {
     /** Délai maximal d'ouverture de socket et de lecture, en secondes. */
@@ -38,6 +40,19 @@ class Mailer
             return 'smtp';
         }
         return function_exists('mail') ? 'mail' : 'none';
+    }
+
+    /** Nom affiché de l'expéditeur : `MAIL_FROM_NAME`, sinon le nom de l'entreprise (Configuration). */
+    public static function senderName(): string
+    {
+        if (MAIL_FROM_NAME !== '') {
+            return MAIL_FROM_NAME;
+        }
+        try {
+            return Config::get('company_name') ?: 'Crénelio';
+        } catch (Throwable) {
+            return 'Crénelio';
+        }
     }
 
     public static function isConfigured(): bool
@@ -280,7 +295,7 @@ class Mailer
         $headers = [
             'Date: ' . date('r'),
             'Message-ID: <' . bin2hex(random_bytes(16)) . '@' . $domain . '>',
-            'From: ' . self::formatAddress(MAIL_FROM_NAME, MAIL_FROM),
+            'From: ' . self::formatAddress(self::senderName(), MAIL_FROM),
             'To: ' . self::formatAddress($toName, $toEmail),
             'Subject: ' . self::encodeHeader($subject),
             'MIME-Version: 1.0',

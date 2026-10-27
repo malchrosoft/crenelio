@@ -57,6 +57,7 @@ export interface MailStatusInfo {
   mail_from_auto: boolean;
   site_domain: string | null;
   mail_from_name: string;
+  mail_from_name_auto: boolean;
   recipient: string | null;
 }
 
@@ -79,7 +80,8 @@ export const api = {
   adminSession: () => request<{ authenticated: boolean; two_factor: boolean }>('GET', '/admin/session'),
   adminLogout: () => request<{ success: boolean }>('POST', '/admin/logout'),
   getMailStatus: () => request<MailStatusInfo>('GET', '/admin/mail'),
-  sendTestMail: () => request<{ message: string }>('POST', '/admin/mail/test'),
+  /** Destinataire libre (testeur, développeur) ; à défaut, l'email professionnel. */
+  sendTestMail: (to?: string) => request<{ message: string }>('POST', '/admin/mail/test', { to: to || undefined }),
 
   // Prestations
   listServices: (all = false) => request<Service[]>('GET', `/services${all ? '?all=1' : ''}`),

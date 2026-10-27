@@ -119,6 +119,7 @@ Leave `SMTP_HOST` empty.
 
 ```env
 MAIL_FROM=contact@your-domain.com
+# Optional: empty ⇒ company name entered in the Pro area
 MAIL_FROM_NAME=Your Company Name
 ```
 
@@ -139,11 +140,13 @@ SMTP_PASS=your-mailbox-password
 SMTP_SECURE=starttls
 # Must be identical to SMTP_USER
 MAIL_FROM=contact@your-domain.com
+# Optional: empty ⇒ company name entered in the Pro area
 MAIL_FROM_NAME=Your Company Name
 ```
 
 **Check sending** from the Pro area: *Configuration* tab, "Envoi des emails" panel,
-"M'envoyer un email de test" button (to the contact email). Do it **before** signing out for the
+"Envoyer un email de test" button (to the professional email, or to a tester's address;
+5 sends per 10 minutes). Do it **before** signing out for the
 first time: a new device's sign-in code goes out the same way.
 
 Notes:

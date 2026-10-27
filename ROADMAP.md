@@ -258,7 +258,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Objectif :** ne plus exiger d'identifiants SMTP en production ; garder SMTP en option (Mailpit en local, ou compte dédié).
 - **Fonctionnement prévu :**
   - Sans `SMTP_HOST` mais avec `MAIL_FROM` : envoi par la fonction PHP `mail()` de l'hébergement (même message MIME, pièce jointe `.ics` et logo intégré compris). Sans `MAIL_FROM` : envoi désactivé, comme aujourd'hui.
-  - Onglet Configuration : encart en lecture seule « Envoi des emails » (mode `mail()` / SMTP, serveur, expéditeur — jamais de mot de passe) et bouton « M'envoyer un email de test » vers `pro_email`.
+  - Onglet Configuration : encart en lecture seule « Envoi des emails » (mode `mail()` / SMTP, serveur, expéditeur — jamais de mot de passe) et bouton « Envoyer un email de test » vers `pro_email` ou un destinataire libre (testeur, développeur ; 5 envois / 10 min par session).
 - **Règles OVHcloud à respecter** ([bonnes pratiques d'envoi d'e-mail](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices)) :
   - domaine de `MAIL_FROM` attaché à l'hébergement (*Multisite*), sinon rejet ; en SMTP, `From:` identique au compte authentifié ;
   - adresse d'un tiers uniquement en `Reply-To:` ; quota `mail()` par hébergement et par heure ; suivi et déblocage dans l'onglet *Scripts e-mail* ;
@@ -275,6 +275,25 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Vérification de l'email professionnel :** une nouvelle adresse n'est retenue qu'après saisie d'un code reçu sur cette adresse ; l'ancienne adresse est prévenue du changement. Évite de se couper soi-même des codes de connexion, ou qu'une session volée détourne la récupération du compte.
 - **Prérequis :** Item 12 ✅, envoi d'emails (Item 24 ✅). Sans envoi configuré, la réinitialisation est impossible : la documenter (procédure de secours via phpMyAdmin et `password_hash`).
 
+### 26. Adresse Publique du Site (`APP_URL`) Détectée Automatiquement
+- **Objectif :** supprimer `APP_URL` des réglages obligatoires de `api/.env` (liens des emails, expéditeur par défaut `noreply@` domaine). Facultatif si le déploiement passe par l'Item 27, qui demande l'adresse du site.
+- **Fonctionnement prévu :** à défaut d'`APP_URL`, l'adresse est relevée lors d'une requête de l'espace Pro authentifiée (schéma + hôte), **mémorisée une seule fois** puis figée ; affichée dans l'encart « Envoi des emails » avec un bouton pour la redéfinir (session Pro requise). `APP_URL` reste prioritaire s'il est renseigné.
+- **Risque à traiter :** l'en-tête `Host` est fourni par le visiteur ; le déduire à chaque requête permettrait d'empoisonner les liens envoyés par email. D'où la capture limitée à une session Pro et le figeage. Ne jamais utiliser l'hôte d'une requête publique.
+
+### 27. Déploiement Initial Interactif (`npm run deploy:init`)
+- **Objectif :** installer Crénelio sur un hébergement mutualisé sans éditer de fichier à la main, en préparant **depuis le poste local** tout ce que le serveur n'a pas encore.
+- **Choix (27/10/2026) : script local plutôt qu'assistant web.**
+  - Les assistants web (WordPress, PrestaShop, Matomo…) visent des produits installés par des non-développeurs ; ils imposent une page sensible exposée sur Internet jusqu'au verrouillage, un dossier de code accessible en écriture par PHP et un verrou à ne jamais rater.
+  - Ici, l'installation part du dépôt et de `npm run deploy:build` : la pratique courante des outils de déploiement (Deployer, Capistrano…) est de traiter `.env` et les fichiers propres à l'installation comme **partagés** : créés une seule fois sur le serveur, jamais écrasés ensuite. Le script reprend ce principe sans outil supplémentaire.
+- **Fonctionnement prévu :**
+  - Questions interactives (Node, sans dépendance, Windows / macOS / Linux) avec valeurs par défaut : adresse du site, accès à la base (tels qu'affichés dans l'espace client OVHcloud), expéditeur (défaut `noreply@` domaine), fuseau (`Europe/Paris`), compte SMTP facultatif (défaut : `mail()` de l'hébergement).
+  - **Le serveur est-il déjà installé ?** Interrogation de `https://<site>/api/health` (nouvelle route publique, sans aucun secret : `installed`, base joignable, version du schéma). Déjà installé ⇒ pas de `.env` dans le paquet, seulement le code et la liste des migrations à appliquer. Sinon ⇒ paquet initial.
+  - **Paquet initial :** build habituel + `api/.env` généré + fiche pas à pas : import `schema.sql` puis `seed_init.sql` (jamais sur une base qui contient déjà des tables), dossiers `api/storage/` à rendre accessibles en écriture, HTTPS, puis première connexion avec changement obligatoire de `admin123` et email de test (Items 25 et 24).
+  - Réponses conservées localement dans un fichier ignoré par Git (`.deploy/`, droits restreints) pour les déploiements suivants ; jamais de secret dans le dépôt ni dans un paquet de mise à jour.
+- **Reste à la main :** créer la base et l'hébergement chez OVHcloud, envoyer les fichiers (FTP ou Git, cf. `DEPLOYMENT*.md`), importer le SQL dans phpMyAdmin — le script les guide sans les faire.
+- **Prérequis :** Item 25 (changement obligatoire du mot de passe par défaut). L'Item 26 devient facultatif : l'adresse du site est demandée par le script.
+- **Pistes ultérieures :** envoi automatique par SFTP / `lftp` si les identifiants sont fournis ; vérification post-déploiement via `/api/health`.
+
 ---
 
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
@@ -287,6 +306,8 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 | **4** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — |
 | **5** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ |
 | **6** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ |
+| **7** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ |
+| **8** | **Item 27** | **Déploiement initial interactif (`npm run deploy:init`)** | Installation / Déploiement | ⏳ *À faire* | Item 25 |
 | — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ **Abandonné** | Remplacé par l'Item 24 |
 | — | **Item 24** | Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro | Communication / Configuration | ✅ **Terminé** | — |
 | — | **Item 12** | Sécurité : routes de gestion vérifiées côté serveur, code par email, appareil de confiance 10 jours | Sécurité / Authentification | ✅ **Terminé** | — |

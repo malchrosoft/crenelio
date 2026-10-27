@@ -16,7 +16,7 @@ const TRANSPORT_LABELS: Record<MailStatusInfo['transport'], string> = {
 
 /**
  * Envoi des emails : état en lecture seule (réglé dans `api/.env`, jamais depuis l'espace Pro)
- * et email de test vers l'email professionnel.
+ * et email de test (email professionnel ou destinataire libre : testeur, développeur).
  */
 /** L'expéditeur est-il sur le domaine du site (sous-domaines compris) ? */
 function onSiteDomain(mailFrom: string, siteDomain: string): boolean {
@@ -28,6 +28,8 @@ const MailStatus: React.FC<MailStatusProps> = ({ proEmail }) => {
   const [status, setStatus] = useState<MailStatusInfo | null>(null);
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null);
+  // Vide : email professionnel
+  const [testRecipient, setTestRecipient] = useState('');
 
   useEffect(() => {
     api.getMailStatus().then(setStatus).catch(() => setStatus(null));
@@ -37,7 +39,7 @@ const MailStatus: React.FC<MailStatusProps> = ({ proEmail }) => {
     setSending(true);
     setResult(null);
     try {
-      const res = await api.sendTestMail();
+      const res = await api.sendTestMail(testRecipient.trim());
       setResult({ ok: true, text: `${res.message}. Vérifiez aussi les indésirables.` });
     } catch (err: unknown) {
       setResult({ ok: false, text: err instanceof Error ? err.message : "Échec de l'envoi" });
@@ -70,10 +72,16 @@ const MailStatus: React.FC<MailStatusProps> = ({ proEmail }) => {
           <dt>Expéditeur</dt>
           <dd>
             {status.mail_from ? `${status.mail_from_name} <${status.mail_from}>` : 'Non renseigné (MAIL_FROM)'}
-            {status.mail_from_auto && <span className="mail-status__note">déduit de l'adresse du site</span>}
+            {(status.mail_from_auto || status.mail_from_name_auto) && (
+              <span className="mail-status__note">
+                {[status.mail_from_name_auto && "nom de l'entreprise", status.mail_from_auto && "adresse déduite du site"]
+                  .filter(Boolean)
+                  .join(', ')}
+              </span>
+            )}
           </dd>
-          <dt>Email de test envoyé à</dt>
-          <dd>{proEmail || status.recipient || "Email de contact à renseigner ci-dessus"}</dd>
+          <dt>Email professionnel</dt>
+          <dd>{proEmail || status.recipient || 'À renseigner ci-dessus (reçoit les fiches et les codes de connexion)'}</dd>
         </dl>
       )}
 
@@ -84,6 +92,19 @@ const MailStatus: React.FC<MailStatusProps> = ({ proEmail }) => {
         </p>
       )}
 
+      <div className="form-group">
+        <label className="form-label" htmlFor="mail-test-recipient">Destinataire du test</label>
+        <input
+          id="mail-test-recipient"
+          type="email"
+          className="form-input"
+          value={testRecipient}
+          onChange={(e) => setTestRecipient(e.target.value)}
+          placeholder={proEmail || status?.recipient || 'adresse@exemple.fr'}
+        />
+        <p className="form-hint">Laissez vide pour l'email professionnel, ou saisissez l'adresse d'un testeur.</p>
+      </div>
+
       <div className="admin-settings-actions">
         <button
           type="button"
@@ -92,7 +113,7 @@ const MailStatus: React.FC<MailStatusProps> = ({ proEmail }) => {
           disabled={sending || !status || status.transport === 'none'}
         >
           <PaperPlaneTiltIcon size={18} weight="fill" aria-hidden="true" />
-          {sending ? 'Envoi…' : "M'envoyer un email de test"}
+          {sending ? 'Envoi…' : 'Envoyer un email de test'}
         </button>
         {result && (
           <span className={result.ok ? 'admin-settings-message' : 'admin-settings-message admin-settings-message--error'} role="status">

@@ -119,6 +119,7 @@ Laissez `SMTP_HOST` vide.
 
 ```env
 MAIL_FROM=contact@votre-domaine.com
+# Facultatif : vide ⇒ nom de l'entreprise saisi dans l'espace Pro
 MAIL_FROM_NAME=Nom de votre entreprise
 ```
 
@@ -139,11 +140,13 @@ SMTP_PASS=mot-de-passe-de-la-boite
 SMTP_SECURE=starttls
 # Doit être identique à SMTP_USER
 MAIL_FROM=contact@votre-domaine.com
+# Facultatif : vide ⇒ nom de l'entreprise saisi dans l'espace Pro
 MAIL_FROM_NAME=Nom de votre entreprise
 ```
 
 **Vérifiez l'envoi** depuis l'espace Pro : onglet *Configuration*, encart « Envoi des emails »,
-bouton « M'envoyer un email de test » (vers l'email de contact). Faites-le **avant** de vous
+bouton « Envoyer un email de test » (vers l'email professionnel, ou vers l'adresse d'un testeur ;
+5 envois par tranche de 10 minutes). Faites-le **avant** de vous
 déconnecter la première fois : le code de connexion d'un nouvel appareil part par le même chemin.
 
 À savoir :
