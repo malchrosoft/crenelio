@@ -1,14 +1,50 @@
 # 📋 Fiche de Passation & Point d'Avancement — Crénelio
 
-**Date :** 21 Octobre 2026
+**Date :** 27 Octobre 2026
 **Dépôt :** `/Users/aymeric.malchrowicz/DEVELOPPEMENT/crenelio`
-**Dernier commit :** `b7bf2e4` (`main`, poussé) — *Administration de la zone et des rendez-vous*
+**Dernier commit :** `1ff45be` (`main`, poussé) — *bouton d'abandon du tunnel de réservation*
 **Statut Git :** commits directs sur `main` (projet solo), sans ligne d'attribution.
-**Non commité :** documentation (`DEPLOYMENT.fr.md`, `DEPLOYMENT.md`, `README.md`, `ROADMAP.md`, cette fiche) et Mailpit dans `docker-compose.yml`.
+**Non commité :** rien (hors cette fiche).
 
 ---
 
 ## 1. Ce qui est réellement achevé
+
+### Sessions du 21 au 23/10/2026 (`51564a4` → `1ff45be`)
+- **Item 12 — Sécurité de l'espace Pro (`14871c2`) :** `api/core/Auth.php`.
+  - Session PHP en cookie `HttpOnly` / `SameSite=Strict` (inactivité 2 h, 12 h max), `Secure` en HTTPS.
+  - Nouvel appareil ⇒ code à 6 chiffres envoyé à `pro_email` (haché en session, 15 min, 3 essais,
+    renvoi au plus toutes les 60 s) ; appareil de confiance 10 jours (cookie signé HMAC).
+    Changer le mot de passe ferme les sessions et oublie les appareils.
+  - 5 échecs de mot de passe en 15 min ⇒ IP bloquée (`api/storage/auth/throttle.json`).
+  - Clé de signature `api/storage/auth/secret.key`, générée au premier besoin, non versionnée.
+  - Toutes les routes de gestion enveloppées par `$admin(...)` dans `api/routes/api.php`
+    (401 sinon) ; `?all=1` sur `/services` réservé à l'espace Pro.
+  - Nouvelles routes : `POST /admin/login/code`, `GET /admin/session`, `POST /admin/logout`.
+  - Front : `src/components/admin/AdminLogin.tsx` (mot de passe puis code), session conservée au
+    rechargement, retour à la connexion sur tout 401 (`UNAUTHORIZED_EVENT`, `src/api.ts`).
+  - Sans `pro_email` ou sans SMTP : mot de passe seul + bandeau d'avertissement.
+  - Testé par l'API (routes refusées, code reçu dans Mailpit, essais, appareil reconnu,
+    déconnexion, blocage IP). **L'écran de connexion n'a pas été testé dans le navigateur.**
+- **Item 15 — Header & footer du tunnel (`3f4b31f`) :** composant `SiteHeader` partagé (vitrine :
+  apparaît après le CTA du hero ; `/booking` : permanent, sans bouton « Prendre rendez-vous »),
+  `Footer` sous le stepper. `/rdv/:token` garde son header allégé.
+- **Abandon de la réservation (`1ff45be`) :** « Annuler et revenir à l'accueil » sous le formulaire,
+  confirmation (`ConfirmDialog`) dès qu'une prestation est choisie.
+- **Logo dans les emails (`424bc5d`, `482d6f8`) :** image intégrée (`multipart/related`, `cid:`) en
+  en-tête sur fond blanc. À chaque envoi de logo, le navigateur génère `logo-email.png`
+  (512 px de large max) ; repli sur `logo.png`. **Le logo actuel doit être renvoyé une fois** depuis
+  la configuration pour créer cette copie (sinon 434 Ko par email).
+- **Déploiement (`51564a4`) :** `scripts/build.mjs` remplace `build.sh` (multiplateforme),
+  empaquetage OVH corrigé (`.htaccess` racine et `api/`), déploiement Git OVH documenté (branche
+  `deploy` contenant le build) et procédure de mise à jour d'un site en ligne.
+- **Scripts de lancement (`3d70c8a`, `46fa5cb`) :** `npm start` affiche les URLs utiles, Vite forcé
+  sur 5173 (port d'`APP_URL`) ; `scripts/run-python.mjs` choisit `python3` / `py` / `python` ;
+  message clair si `docker` est introuvable.
+- **Feuille de route (`a031f57`) :** Items 21 (AG Grid Community), 22 (factures, plus tard),
+  23 (FullCalendar).
+- **Poste de dev :** après la mise à jour macOS, Docker passe par **colima** ; la CLI `docker` avait
+  été délinkée (`brew unlink docker-completion && brew link docker`).
 
 ### Sessions du 20 et 21/10/2026 (`cfa99d1`, `506d59d`, `b7bf2e4`)
 - **Item 14 — Configuration :** onglet piloté par `src/config/configSchema.ts` (groupes Identité,
@@ -123,9 +159,10 @@
 - Migrations idempotentes, toutes appliquées en dev :
   `2026-10-11_item1_travel_fees.sql`, `2026-10-11_item4_notifications.sql`,
   `2026-10-21_item18_exception_requests.sql` (exécutée deux fois sans effet de bord).
-- **À appliquer en production** avant de déployer `b7bf2e4` : la migration du 21/10.
-- Fichiers hors base, non versionnés : `api/storage/branding/` et `api/storage/zone/`
-  (doivent être accessibles en écriture par PHP).
+- **À appliquer en production** avant le premier déploiement : la migration du 21/10. Aucune
+  évolution de schéma depuis (l'Item 12 n'utilise pas la base).
+- Fichiers hors base, non versionnés : `api/storage/branding/`, `api/storage/zone/` et
+  `api/storage/auth/` (doivent être accessibles en écriture par PHP).
 
 ### Écarts corrigés au passage
 La base dev avait dérivé des fichiers `sql/` : colonnes `travel_fee_*` présentes en base mais absentes de
@@ -134,19 +171,20 @@ Les deux sens ont été réalignés.
 
 ---
 
-## 3. Prochains chantiers prioritaires (ordre fixé le 21/10/2026)
+## 3. Prochains chantiers prioritaires (ordre de la feuille de route au 27/10/2026)
 
-### 🎯 1. Item 15 — Header & footer sur le tunnel de réservation
-Extraire le header de `VitrinePage.tsx` en composant réutilisable, l'afficher en permanence sur
-`/booking` (et `/rdv/:token`, `/decision/:token`), réutiliser `Footer`.
+### 🎯 0. Vérifications en attente
+- Tester l'écran de connexion de l'espace Pro dans le navigateur (`/admin`, code dans Mailpit).
+- Renvoyer le logo depuis la configuration pour générer `logo-email.png`.
+- Vérifier que `pro_email` en base est bien l'adresse de l'artisan avant toute mise en ligne :
+  le code de connexion y part.
 
-### 🎯 2. Item 12 — Sécurité de l'espace Pro
-Vérification serveur de **toutes** les routes `/admin/*` (aujourd'hui ouvertes), regroupement des
-routes d'écriture non préfixées (`/schedules/:day`, `/unavailabilities`), puis 2FA OTP par email
-(appareil de confiance 10 jours). Le Mailer est prêt et testable en local avec Mailpit.
+### 🎯 1. Item 20 — Compte SMTP configurable depuis l'espace Pro
+Débloqué par l'Item 12 : mot de passe chiffré hors table `config` (`api/storage/`), jamais renvoyé
+par l'API, bouton d'email de test, repli sur `api/.env`.
 
-### 3. Item 20 — Compte SMTP configurable depuis l'espace Pro (reporté)
-Dépend de l'Item 12 : mot de passe chiffré hors table `config`, jamais renvoyé par l'API.
+### 2. Item 2 — Theming & effets visuels · 3. Item 5 — RGPD & cookies
+### 4. Item 21 — AG Grid · 5. Item 23 — FullCalendar · 6. Item 22 — Factures (plus tard)
 
 ### Points d'attention issus des Items 18 et 19
 - Changer à la main le statut d'une demande « En attente » n'envoie pas les emails de décision.
@@ -156,7 +194,7 @@ Dépend de l'Item 12 : mot de passe chiffré hors table `config`, jamais renvoy�
 
 ### Contraintes et reliquats
 Consignés dans [`AGENTS.md`](AGENTS.md), section *5. Contraintes Connues & Dette Technique*
-(sécurité de l'espace Pro, fichiers `.env` hors de portée des agents, envoi d'emails désactivé
+(sécurité de l'espace Pro et règle `$admin(...)` pour toute nouvelle route de gestion, fichiers `.env` hors de portée des agents, envoi d'emails désactivé
 sans SMTP, fuseau horaire, absence de notification à l'annulation).
 
 ---
