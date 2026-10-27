@@ -147,11 +147,15 @@ MAIL_FROM_NAME=Crénelio
 | `SMTP_HOST` / `SMTP_PORT` | *(vide)* / `587` | Serveur d'envoi. **Vide ⇒ envoi désactivé** |
 | `SMTP_USER` / `SMTP_PASS` | *(vide)* | Identifiants `AUTH LOGIN` ; laisser vide pour un relais sans authentification |
 | `SMTP_SECURE` | `starttls` | `starttls` (587), `tls` (465, TLS implicite) ou `none` |
-| `MAIL_FROM` / `MAIL_FROM_NAME` | *(vide)* / `Crénelio` | Expéditeur. Doit appartenir au domaine, sinon rejet SPF/DKIM |
+| `MAIL_FROM` / `MAIL_FROM_NAME` | *(vide)* / `Crénelio` | Expéditeur. Chez OVHcloud : domaine **attaché à l'hébergement** (*Multisite*) et adresse **identique à `SMTP_USER`**, sinon rejet |
 
 **En local, Docker Compose fournit ces variables au conteneur PHP pour viser Mailpit** (elles
 priment sur `api/.env`) : l'envoi fonctionne sans rien configurer. Retirez-les du service `api`
 de `docker-compose.yml` pour tester un vrai serveur SMTP.
+
+Règles d'envoi propres à OVHcloud (expéditeur, `Reply-To`, SPF/DKIM/DMARC, quotas) : voir
+[DEPLOYMENT.fr.md, étape 4b](DEPLOYMENT.fr.md) et les
+[bonnes pratiques d'envoi d'e-mail](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices).
 
 **Sans `SMTP_HOST` ou `MAIL_FROM`, l'envoi est simplement désactivé** : les réservations
 aboutissent normalement et chaque tentative est journalisée en `failed` avec un motif explicite,

@@ -186,6 +186,25 @@ autre tâche, mais en tenir compte et les traiter dans l'item dédié.
   `Notifier` (il ne propage aucune exception vers les contrôleurs).
 - L'Item 12 (OTP par email) en dépend : sans SMTP configuré, aucun code ne partira.
 
+### ☁️ Hébergement OVHcloud mutualisé — règles générales
+Le projet cible un hébergement mutualisé OVHcloud. Toute évolution doit les respecter, et la
+documentation (`README.md`, `DEPLOYMENT.md` **et** `DEPLOYMENT.fr.md`) doit les rappeler.
+- **PHP natif, sans Composer ni extension optionnelle** (pas d'Imagick ; GD non garanti) : un
+  traitement d'image se fait côté navigateur (cf. `BrandingField`, `logo-email.png`).
+- **Aucun build côté serveur** : OVH sert les fichiers tels quels (bundle compilé en local, ou
+  branche `deploy` en déploiement Git).
+- **Fichiers propres à l'installation dans `api/storage/`** (accessible en écriture par PHP,
+  jamais servi directement, jamais versionné ni écrasé au déploiement).
+- **Emails** ([bonnes pratiques OVHcloud](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices)) :
+  - domaine de l'expéditeur (`MAIL_FROM`) **attaché à l'hébergement** (*Multisite*), sinon rejet ;
+  - en SMTP authentifié, adresse `From:` **identique au compte authentifié** (`SMTP_USER`) ;
+  - jamais l'adresse d'un client ou d'un visiteur en `From:` : la mettre en `Reply-To:` ;
+  - SPF, DKIM et DMARC à jour ; quotas horaires (≈ 200 / compte MX Plan, 300 / IP source) ;
+    10 Mo maximum par message ;
+  - `mail()` est suivi dans l'onglet *Scripts e-mail* de l'hébergement, les envois SMTP non.
+- **Avant d'affirmer une règle OVHcloud, la vérifier dans la documentation officielle**
+  (`docs.ovhcloud.com`) : elles évoluent.
+
 ### 🗓️ Fuseau horaire
 - Les datetimes sont stockés **naïfs** en base et s'interprètent dans `APP_TIMEZONE`
   (défaut `Europe/Paris`, appliqué globalement par `date_default_timezone_set()`

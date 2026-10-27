@@ -232,11 +232,23 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 20. Compte SMTP Configurable depuis l'Espace Pro
-- **Besoin :** saisir le compte d'envoi (hôte, port, chiffrement, identifiant, mot de passe, expéditeur) dans l'espace Pro, en remplacement de la configuration de déploiement (`api/.env`), et l'utiliser pour tous les envois.
-- **Reporté (21/10/2026) :** le mot de passe SMTP est un secret ; il ne doit pas aller dans la table `config` (exposée par `GET /admin/config`), et tant que les routes `/admin/*` ne sont pas protégées côté serveur, n'importe qui pourrait modifier le compte et détourner les emails. **Prérequis : Item 12.**
-- **Pistes :** mot de passe chiffré hors table `config` (`api/storage/`), champ en écriture seule jamais renvoyé par l'API, bouton « Envoyer un email de test », repli sur `api/.env` si rien n'est saisi.
-- **En attendant, en local :** Docker Compose fournit un serveur de capture **Mailpit** (`http://localhost:8025`) déjà branché sur le conteneur PHP.
+### 20. Compte SMTP Configurable depuis l'Espace Pro — ❌ Abandonné (27/10/2026)
+- **Besoin initial :** saisir le compte d'envoi (hôte, port, identifiant, mot de passe, expéditeur) dans l'espace Pro plutôt que dans `api/.env`.
+- **Abandonné, remplacé par l'Item 24 :**
+  - **Verrouillage :** le code de connexion (Item 12) part par ce SMTP ; un réglage erroné saisi depuis l'espace Pro empêcherait toute connexion depuis un nouvel appareil, donc toute correction.
+  - **Secret mal protégé :** chiffré, le mot de passe resterait déchiffrable avec une clé posée sur le même serveur ; une session volée suffirait à détourner tous les emails, codes de connexion compris.
+  - **Peu utile :** un artisan seul ne change presque jamais de serveur d'envoi, et l'hébergement OVHcloud sait envoyer sans identifiants (`mail()`).
+
+### 24. Envoi Natif OVHcloud (`mail()`) & Contrôle de l'Envoi dans l'Espace Pro
+- **Objectif :** ne plus exiger d'identifiants SMTP en production ; garder SMTP en option (Mailpit en local, ou compte dédié).
+- **Fonctionnement prévu :**
+  - Sans `SMTP_HOST` mais avec `MAIL_FROM` : envoi par la fonction PHP `mail()` de l'hébergement (même message MIME, pièce jointe `.ics` et logo intégré compris). Sans `MAIL_FROM` : envoi désactivé, comme aujourd'hui.
+  - Onglet Configuration : encart en lecture seule « Envoi des emails » (mode `mail()` / SMTP, serveur, expéditeur — jamais de mot de passe) et bouton « M'envoyer un email de test » vers `pro_email`.
+- **Règles OVHcloud à respecter** ([bonnes pratiques d'envoi d'e-mail](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices)) :
+  - domaine de `MAIL_FROM` attaché à l'hébergement (*Multisite*), sinon rejet ; en SMTP, `From:` identique au compte authentifié ;
+  - adresse d'un tiers uniquement en `Reply-To:` ; quota `mail()` par hébergement et par heure ; suivi et déblocage dans l'onglet *Scripts e-mail* ;
+  - SPF, DKIM et DMARC à jour (DKIM à activer).
+- **Limites :** en local, rien ne change : Docker fournit `SMTP_HOST=mailpit`, donc tous les emails continuent d'arriver dans Mailpit. Seul le mode `mail()` n'est testable que sur l'hébergement (bouton d'email de test) ; `mail()` ne renvoie qu'un accepté / refusé, le motif d'échec du journal sera moins précis.
 
 ---
 
@@ -263,7 +275,8 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 |---|---|---|---|---|---|
 | **1** | **Item 15** | **Header & footer communs au tunnel de réservation** | Vitrine / Navigation | ✅ *Terminé* | Extraction du header de `VitrinePage` |
 | **2** | **Item 12** | **Sécurité : vérification serveur des routes `/admin/*` + 2FA Email OTP (10 jours par appareil)** | Sécurité / Authentification | ✅ *Terminé* | Service mail disponible (Item 4) ✅ |
-| **3** | **Item 20** | **Compte SMTP configurable depuis l'espace Pro** | Communication / Configuration | 🕒 *Reporté* | Item 12 |
+| **3** | **Item 24** | **Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro** | Communication / Configuration | ⏳ *À faire* | Item 12 ✅ |
+| — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ *Abandonné* | Remplacé par l'Item 24 |
 | **4** | **Item 2** | **Theming & Effets visuels (Admin)** | Design / UI | ⏳ *À faire* | Variables CSS dynamiques |
 | **5** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
 | **6** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — |

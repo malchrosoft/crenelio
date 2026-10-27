@@ -129,8 +129,20 @@ Notes:
 
 - **Credentials never live in the database.** They are read from `.env` only, so the Pro area
   cannot leak them and they are not part of any backup dump.
-- `MAIL_FROM` should be a mailbox belonging to your domain — sending as a third-party address
-  (gmail.com, etc.) gets rejected by SPF/DKIM checks.
+- **OVHcloud sender rules** ([email sending best practices](https://docs.ovhcloud.com/en/guides/web-cloud/web-hosting/email-sending-best-practices)):
+  - the `MAIL_FROM` domain must be **attached to the hosting plan** (*Multisite* tab), otherwise
+    the email cannot be authenticated and is rejected. A third-party address (gmail.com, etc.)
+    never works;
+  - with authenticated SMTP, **`MAIL_FROM` must be identical to `SMTP_USER`** (the `From:` address
+    must match the authenticated account);
+  - a client's address never goes in `From:`, only in `Reply-To:` — already the case for
+    out-of-zone requests;
+  - keep SPF, DKIM and DMARC up to date in the domain's DNS zone (enable DKIM from the Control
+    Panel): Gmail and Yahoo now require them for bulk senders;
+  - quotas: about 200 emails per hour per MX Plan account, 300 per hour per source IP; 10 MB
+    maximum per message;
+  - SMTP sends do not appear in the hosting plan's *Email scripts* tab: use the Pro area's
+    "Emails" log instead.
 - Leaving `SMTP_HOST` or `MAIL_FROM` empty disables sending. Bookings still succeed: every
   attempt is logged in `appointment_notifications` with an explicit `failed` status, visible from
   the Pro planning ("Emails" button).

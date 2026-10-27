@@ -179,9 +179,11 @@ Les deux sens ont été réalignés.
 - Vérifier que `pro_email` en base est bien l'adresse de l'artisan avant toute mise en ligne :
   le code de connexion y part.
 
-### 🎯 1. Item 20 — Compte SMTP configurable depuis l'espace Pro
-Débloqué par l'Item 12 : mot de passe chiffré hors table `config` (`api/storage/`), jamais renvoyé
-par l'API, bouton d'email de test, repli sur `api/.env`.
+### 🎯 1. Item 24 — Envoi natif OVHcloud (`mail()`) & email de test
+L'Item 20 (SMTP saisi dans l'espace Pro) est abandonné le 27/10 : risque de se bloquer dehors (le
+code de connexion part par ce SMTP) et secret mal protégé. À la place : `mail()` de l'hébergement
+quand `SMTP_HOST` est vide, encart « Envoi des emails » en lecture seule et bouton d'email de test.
+Règles OVHcloud sur l'expéditeur consignées dans `AGENTS.md` (section 5) et `DEPLOYMENT*.md` (4b).
 
 ### 2. Item 2 — Theming & effets visuels · 3. Item 5 — RGPD & cookies
 ### 4. Item 21 — AG Grid · 5. Item 23 — FullCalendar · 6. Item 22 — Factures (plus tard)

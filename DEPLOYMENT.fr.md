@@ -129,8 +129,20 @@ MAIL_FROM_NAME=Nom de votre entreprise
 
 - **Les identifiants ne sont jamais stockés en base.** Ils sont lus uniquement dans `.env` :
   l'espace Pro ne peut pas les divulguer et ils n'apparaissent dans aucune sauvegarde de la base.
-- `MAIL_FROM` doit être une boîte de votre domaine : un envoi au nom d'une adresse tierce
-  (gmail.com…) est rejeté par les contrôles SPF/DKIM.
+- **Règles OVHcloud sur l'expéditeur** ([bonnes pratiques d'envoi d'e-mail](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices)) :
+  - le domaine de `MAIL_FROM` doit être **attaché à l'hébergement** (onglet *Multisite*), sinon
+    l'email ne peut pas être authentifié et il est rejeté. Une adresse tierce (gmail.com…) ne
+    passe jamais ;
+  - en SMTP authentifié, **`MAIL_FROM` doit être identique à `SMTP_USER`** (l'adresse `From:` doit
+    correspondre au compte authentifié) ;
+  - l'adresse d'un client ne va jamais dans `From:`, seulement dans `Reply-To:` — c'est déjà le
+    cas pour les demandes hors zone ;
+  - gardez SPF, DKIM et DMARC à jour dans la zone DNS du domaine (activez DKIM depuis l'espace
+    client) : Gmail et Yahoo les exigent désormais des expéditeurs à fort volume ;
+  - quotas : environ 200 emails par heure et par compte MX Plan, 300 par heure et par IP
+    source ; 10 Mo maximum par message.
+  - les envois SMTP n'apparaissent pas dans l'onglet *Scripts e-mail* de l'hébergement : suivez
+    le journal « Emails » de l'espace Pro.
 - Si `SMTP_HOST` ou `MAIL_FROM` est vide, l'envoi est désactivé. Les réservations aboutissent
   quand même : chaque tentative est journalisée dans `appointment_notifications` avec le statut
   `failed` et un motif explicite, visible depuis le planning de l'espace Pro (bouton « Emails »).
