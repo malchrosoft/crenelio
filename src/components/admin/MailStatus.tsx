@@ -80,6 +80,8 @@ const MailStatus: React.FC<MailStatusProps> = ({ proEmail }) => {
               </span>
             )}
           </dd>
+          <dt>Réponses des clients</dt>
+          <dd>{status.client_reply_to ?? "À l'expéditeur"}</dd>
           <dt>Email professionnel</dt>
           <dd>{proEmail || status.recipient || 'À renseigner ci-dessus (reçoit les fiches et les codes de connexion)'}</dd>
         </dl>

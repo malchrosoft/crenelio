@@ -294,6 +294,25 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Prérequis :** Item 25 (changement obligatoire du mot de passe par défaut). L'Item 26 devient facultatif : l'adresse du site est demandée par le script.
 - **Pistes ultérieures :** envoi automatique par SFTP / `lftp` si les identifiants sont fournis ; vérification post-déploiement via `/api/health`.
 
+### 28. Paquet d'Installation Téléchargeable (Release Prête à Déployer)
+- **Objectif :** installer Crénelio sans cloner le dépôt ni compiler : un artisan (ou son prestataire) télécharge un paquet prêt à déployer.
+- **Contenu de l'archive** (publiée à chaque version, ex. GitHub Releases) : bundle React déjà compilé, API PHP, `sql/` (schéma, socle, migrations), scripts d'installation (Item 27, ou équivalent sans Node), fiches de déploiement FR / EN, `CHANGELOG`.
+- **Exclus :** `.env`, contenu de `api/storage/`, données de démonstration (`seed_test_data.sql`).
+- **Intégrité :** somme de contrôle (SHA-256) et signature publiées avec chaque archive.
+- **Mise à jour sans l'Item 29 :** la même archive sert aux mises à jour manuelles (FTP ou Git), en suivant « Mettre à jour un site en ligne » de `DEPLOYMENT*.md` (sauvegarde, migrations, envoi du code).
+- **Prérequis :** Item 27.
+
+### 29. Mise à Jour depuis le Site Hébergé (Espace Pro) — sous réserve de l'hébergement
+- **Objectif :** mettre à jour Crénelio en un clic depuis l'espace Pro, à partir des paquets de l'Item 28.
+- **Étude de faisabilité d'abord**, sur l'offre Starter : `ZipArchive` (sinon `PharData`), téléchargement sortant (`allow_url_fopen` / cURL), temps d'exécution maximal, droits d'écriture de PHP sur le code. **Si l'hébergement ne le permet pas, l'item est abandonné** : la mise à jour manuelle de l'Item 28 reste la voie standard.
+- **Fonctionnement prévu :**
+  - Encart « Version » : version installée, dernière version disponible, notes de version.
+  - Téléchargement, **vérification de la signature** (clé publique embarquée), sauvegarde préalable (fichiers remplacés + export de la base), mode maintenance, remplacement du code uniquement (`api/.env` et `api/storage/` jamais touchés), migrations en attente, contrôle via `/api/health`, **retour arrière automatique** en cas d'échec.
+  - Version du schéma suivie en base pour savoir quelles migrations appliquer.
+- **Sécurité :** le code doit être accessible en écriture par PHP, ce qui permettrait à une faille PHP de le réécrire. Désactivable (`APP_SELF_UPDATE=off` dans `api/.env`) ; réservé à une session Pro authentifiée (Items 12 et 25) avec reconfirmation du mot de passe.
+- **Espace disque :** sauvegarde + archive + code doivent tenir dans 1 Go (Starter) ; purge des anciennes sauvegardes.
+- **Prérequis :** Item 28.
+
 ---
 
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
@@ -308,6 +327,8 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 | **6** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ |
 | **7** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ |
 | **8** | **Item 27** | **Déploiement initial interactif (`npm run deploy:init`)** | Installation / Déploiement | ⏳ *À faire* | Item 25 |
+| **9** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 |
+| **10** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement |
 | — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ **Abandonné** | Remplacé par l'Item 24 |
 | — | **Item 24** | Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro | Communication / Configuration | ✅ **Terminé** | — |
 | — | **Item 12** | Sécurité : routes de gestion vérifiées côté serveur, code par email, appareil de confiance 10 jours | Sécurité / Authentification | ✅ **Terminé** | — |

@@ -56,8 +56,7 @@ class Notifier
     }
 
     /**
-     * Demande exceptionnelle : accusé de réception au client, demande à valider à l'artisan
-     * (réponse directe au client via Reply-To).
+     * Demande exceptionnelle : accusé de réception au client, demande à valider à l'artisan.
      *
      * @return array<int, array{type: string, status: string}>
      */
@@ -80,9 +79,7 @@ class Notifier
                 'exception_pro_request',
                 $proEmail,
                 (string)($config['pro_name'] ?? ''),
-                EmailTemplates::exceptionProRequest($appointment, $config),
-                null,
-                $appointment['client_email']
+                EmailTemplates::exceptionProRequest($appointment, $config)
             );
         }
 
@@ -145,6 +142,25 @@ class Notifier
         throw new InvalidArgumentException("Type de notification inconnu : $type");
     }
 
+    /** Types adressés à l'artisan : on lui répond au client. Tous les autres vont au client. */
+    private const PRO_TYPES = ['pro_confirmation', 'exception_pro_request'];
+
+    /**
+     * Adresse de réponse : l'email professionnel pour les emails aux clients (l'expéditeur est
+     * souvent `noreply@`), l'adresse du client pour ceux adressés à l'artisan. Aucune si elle
+     * est vide ou identique à l'expéditeur.
+     */
+    public static function replyToFor(string $type, array $appointment): ?string
+    {
+        $address = in_array($type, self::PRO_TYPES, true)
+            ? trim((string)($appointment['client_email'] ?? ''))
+            : trim((string)(Config::get('pro_email') ?? ''));
+
+        return filter_var($address, FILTER_VALIDATE_EMAIL) && strcasecmp($address, MAIL_FROM) !== 0
+            ? $address
+            : null;
+    }
+
     /**
      * Journalise puis tente un envoi unitaire. Ne propage aucune exception.
      *
@@ -159,8 +175,7 @@ class Notifier
         string $recipient,
         string $recipientName,
         array $message,
-        ?array $attachment = null,
-        ?string $replyTo = null
+        ?array $attachment = null
     ): array {
         $notificationId = Notification::createPending(
             (int)$appointment['id'],
@@ -177,7 +192,7 @@ class Notifier
                 $message['html'],
                 $message['text'],
                 $attachment,
-                $replyTo,
+                self::replyToFor($type, $appointment),
                 EmailTemplates::inlineImages($message['html'])
             );
 

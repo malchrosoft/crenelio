@@ -50,7 +50,7 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 | **Backend** | PHP 8.2 natif (Architecture MVC propre, PDO requêtes préparées, sans dépendance lourde) |
 | **Base de données** | MySQL 8.0+ / MariaDB (InnoDB, UTF-8 mb4) |
 | **Géocodage & Cartes**| Base Adresse Nationale (BAN data.gouv.fr) + OpenStreetMap via Pigeon Maps (avec GeoJSON des communes) |
-| **Hébergement cible** | OVHcloud Hébergement Web mutualisé (Perso / Pro / Performance) ou serveur dédié |
+| **Hébergement cible** | OVHcloud Hébergement Web mutualisé, **Starter au minimum** (un seul site, une seule base de 250 Mo, 1 Go) ou supérieur, ou serveur dédié |
 
 ---
 

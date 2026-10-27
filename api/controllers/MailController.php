@@ -10,6 +10,7 @@
 require_once __DIR__ . '/../models/Config.php';
 require_once __DIR__ . '/../core/Mailer.php';
 require_once __DIR__ . '/../core/EmailTemplates.php';
+require_once __DIR__ . '/../core/Notifier.php';
 require_once __DIR__ . '/../core/Response.php';
 
 class MailController
@@ -29,6 +30,8 @@ class MailController
             // Nom repris de la Configuration (MAIL_FROM_NAME vide dans api/.env)
             'mail_from_name_auto' => MAIL_FROM_NAME === '',
             'recipient'      => Config::get('pro_email') ?: null,
+            // Adresse de réponse des emails aux clients (cf. Notifier::replyToFor)
+            'client_reply_to' => Notifier::replyToFor('client_confirmation', []),
         ]);
     }
 

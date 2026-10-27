@@ -3,13 +3,17 @@
 [🇬🇧 English](DEPLOYMENT.md) · 🇫🇷 Français
 
 Ce guide décrit le déploiement de Crénelio (React + PHP natif + MySQL) sur une offre
-d'hébergement mutualisé OVHcloud (Perso, Pro ou Performance).
+d'hébergement mutualisé OVHcloud (Starter au minimum, ou Perso, Pro, Performance).
 
 ---
 
 ## Prérequis
 
-- Une offre d'hébergement web OVHcloud (Perso ou supérieure)
+- Une offre d'hébergement web OVHcloud, **Starter au minimum** ([offre Starter](https://www.ovhcloud.com/fr/web-hosting/starter-offer/) :
+  **un seul site et une seule base de données** (250 Mo), 1 Go de stockage SSD, 2 adresses
+  email ; même version de PHP que les offres supérieures). Crénelio tient largement dans ces
+  limites : une seule base, code et bundle de quelques Mo, logo et favicon ≤ 2 Mo chacun.
+  Perso ou supérieure seulement pour héberger d'autres sites ou bases sur le même contrat.
 - Node.js 18+ installé en local (pour compiler React)
 - Un client FTP/SFTP (FileZilla, WinSCP, Cyberduck ou `lftp` en ligne de commande)
 - Vos identifiants FTP/SFTP OVH (dans l'espace client OVH)
@@ -159,8 +163,9 @@ déconnecter la première fois : le code de connexion d'un nouvel appareil part 
     passe jamais ;
   - en SMTP authentifié, **`MAIL_FROM` doit être identique à `SMTP_USER`** (l'adresse `From:` doit
     correspondre au compte authentifié) ;
-  - l'adresse d'un client ne va jamais dans `From:`, seulement dans `Reply-To:` — c'est déjà le
-    cas pour les demandes hors zone ;
+  - l'adresse d'un client ne va jamais dans `From:`, seulement dans `Reply-To:`. Crénelio le fait
+    automatiquement : emails aux clients ⇒ réponse à l'email professionnel ; emails à l'artisan ⇒
+    réponse au client ;
   - gardez SPF, DKIM et DMARC à jour dans la zone DNS du domaine (activez DKIM depuis l'espace
     client) : Gmail et Yahoo les exigent désormais des expéditeurs à fort volume ;
   - quotas : environ 200 emails par heure et par compte MX Plan, 300 par heure et par IP

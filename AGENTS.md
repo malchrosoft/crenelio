@@ -195,7 +195,10 @@ autre tâche, mais en tenir compte et les traiter dans l'item dédié.
 - L'Item 12 (OTP par email) en dépend : sans envoi configuré, aucun code ne partira.
 
 ### ☁️ Hébergement OVHcloud mutualisé — règles générales
-Le projet cible un hébergement mutualisé OVHcloud. Toute évolution doit les respecter, et la
+Le projet cible un hébergement mutualisé OVHcloud, **offre Starter au minimum** : **un seul
+site et une seule base** (250 Mo), 1 Go de stockage, 2 adresses email ; même PHP que les offres
+supérieures. Toute évolution doit tenir dans ces limites : jamais de seconde base ni de second
+site (sous-domaine applicatif séparé), pas de stockage lourd dans `api/storage/`. Toute évolution doit aussi respecter ces règles, et la
 documentation (`README.md`, `DEPLOYMENT.md` **et** `DEPLOYMENT.fr.md`) doit les rappeler.
 - **PHP natif, sans Composer ni extension optionnelle** (pas d'Imagick ; GD non garanti) : un
   traitement d'image se fait côté navigateur (cf. `BrandingField`, `logo-email.png`).
@@ -206,7 +209,8 @@ documentation (`README.md`, `DEPLOYMENT.md` **et** `DEPLOYMENT.fr.md`) doit les 
 - **Emails** ([bonnes pratiques OVHcloud](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices)) :
   - domaine de l'expéditeur (`MAIL_FROM`) **attaché à l'hébergement** (*Multisite*), sinon rejet ;
   - en SMTP authentifié, adresse `From:` **identique au compte authentifié** (`SMTP_USER`) ;
-  - jamais l'adresse d'un client ou d'un visiteur en `From:` : la mettre en `Reply-To:` ;
+  - jamais l'adresse d'un client ou d'un visiteur en `From:` : la mettre en `Reply-To:`
+    (`Notifier::replyToFor` : email pro pour les emails aux clients, client pour ceux à l'artisan) ;
   - SPF, DKIM et DMARC à jour ; quotas horaires (≈ 200 / compte MX Plan, 300 / IP source) ;
     10 Mo maximum par message ;
   - `mail()` est suivi dans l'onglet *Scripts e-mail* de l'hébergement, les envois SMTP non.

@@ -59,6 +59,8 @@ export interface MailStatusInfo {
   mail_from_name: string;
   mail_from_name_auto: boolean;
   recipient: string | null;
+  /** Réponses des clients envoyées à (null : à l'expéditeur lui-même). */
+  client_reply_to: string | null;
 }
 
 export const api = {

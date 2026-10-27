@@ -3,13 +3,17 @@
 🇬🇧 English · [🇫🇷 Français](DEPLOYMENT.fr.md)
 
 This guide walks you through deploying Crénelio (React + native PHP + MySQL) to an OVHcloud
-shared hosting plan (Perso, Pro, or Performance).
+shared hosting plan (Starter at minimum, or Perso, Pro, Performance).
 
 ---
 
 ## Prerequisites
 
-- An OVHcloud Web Hosting plan (Perso or higher)
+- An OVHcloud Web Hosting plan, **Starter at minimum** ([Starter plan](https://www.ovhcloud.com/fr/web-hosting/starter-offer/): 1 database of
+  250 MB — **a single website and a single database** —, 1 GB of SSD storage, 2 email
+  addresses; same PHP version as higher plans). Crénelio fits easily within these limits: one
+  database, code and bundle of a few MB, logo and favicon ≤ 2 MB each. Choose Perso or higher
+  only to host other sites or databases on the same plan.
 - Node.js 18+ installed locally (for building React)
 - An FTP/SFTP client (FileZilla, WinSCP, Cyberduck, or `lftp` CLI)
 - Your OVH FTP/SFTP credentials (found in the OVH control panel)
@@ -159,8 +163,9 @@ Notes:
     never works;
   - with authenticated SMTP, **`MAIL_FROM` must be identical to `SMTP_USER`** (the `From:` address
     must match the authenticated account);
-  - a client's address never goes in `From:`, only in `Reply-To:` — already the case for
-    out-of-zone requests;
+  - a client's address never goes in `From:`, only in `Reply-To:`. Crénelio does it
+    automatically: emails to clients ⇒ replies go to the professional email; emails to the
+    artisan ⇒ replies go to the client;
   - keep SPF, DKIM and DMARC up to date in the domain's DNS zone (enable DKIM from the Control
     Panel): Gmail and Yahoo now require them for bulk senders;
   - quotas: about 200 emails per hour per MX Plan account, 300 per hour per source IP; 10 MB
