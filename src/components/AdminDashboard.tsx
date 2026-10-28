@@ -43,6 +43,7 @@ import BrandingField from './admin/BrandingField';
 import AdminShell, { AdminTab } from './admin/AdminShell';
 import AdminLogin from './admin/AdminLogin';
 import MailStatus from './admin/MailStatus';
+import AppearanceEditor from './admin/AppearanceEditor';
 import { applyFavicon } from '../utils/favicon';
 import { applyDocumentTitle } from '../utils/documentTitle';
 import { format, isPast, isToday, parseISO } from 'date-fns';
@@ -1160,6 +1161,7 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   )}
                 </ConfigGroupForm>
+                {group.id === 'identity' && <AppearanceEditor config={config} onSaved={setConfig} />}
                 {group.id === 'vitrine' && <EngagementsEditor config={config} onSaved={setConfig} />}
                 {group.id === 'contact' && <MailStatus proEmail={config.pro_email} />}
                 </React.Fragment>

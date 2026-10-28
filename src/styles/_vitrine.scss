@@ -97,7 +97,7 @@
 // Section Hero
 // -------------------------------------------------------
 .vitrine-hero {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 40%, #e0f2fe 100%);
+  background: linear-gradient(135deg, primary-tint(7%) 0%, primary-tint(16%) 40%, primary-tint(11%) 100%);
   padding: 72px 24px 80px;
   text-align: center;
   position: relative;
@@ -112,7 +112,7 @@
     width: 300px;
     height: 300px;
     border-radius: 50%;
-    background: rgba(37, 99, 235, 0.06);
+    background: primary-alpha(6%);
     pointer-events: none;
   }
 
@@ -124,7 +124,7 @@
     width: 240px;
     height: 240px;
     border-radius: 50%;
-    background: rgba(37, 99, 235, 0.04);
+    background: primary-alpha(4%);
     pointer-events: none;
   }
 
@@ -186,12 +186,12 @@
     text-decoration: none;
     min-height: 60px;
     transition: $transition-base;
-    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35);
+    box-shadow: 0 4px 20px primary-alpha(35%);
 
     &:hover {
       background: $primary-hover;
       transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(37, 99, 235, 0.45);
+      box-shadow: 0 8px 28px primary-alpha(45%);
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -601,7 +601,7 @@ $engagement-gap: 24px;
     text-decoration: none;
     min-height: 60px;
     transition: $transition-base;
-    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 20px primary-alpha(30%);
 
     &:hover {
       background: $primary-hover;

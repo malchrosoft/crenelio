@@ -28,7 +28,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 2. Theming, Matérialisation & Effets Graphiques (Pilotable via Admin) — 🚧 En cours
+### 2. Theming, Matérialisation & Effets Graphiques (Pilotable via Admin) — ✅ Terminée
 - **Système de Theming dynamique :**
   - Variables CSS injectées dynamiquement (`--primary`, `--primary-hover`, `--radius`, etc.) depuis la table `config`.
   - Palette prédéfinie ou sélecteur de couleur personnalisée dans l'espace Pro.
@@ -37,6 +37,14 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
     - *Glassmorphism / Effets de flou d'arrière-plan* (`backdrop-filter`).
     - *Ombres douces / Neumorphisme léger*.
     - *Animations & micro-interactions* (transitions fluides, feedback visuel au survol et validation de formulaire).
+
+- **Réalisé (28/10/2026) :**
+  - Couleurs, arrondis et ombres en variables CSS (`src/styles/_theme.scss`) ; survol et fond pâle dérivés par `color-mix()` ; fonctions `primary-alpha()` / `primary-tint()` (`_mixins.scss`) à la place des bleus codés en dur (halos de focus, hero, CTA).
+  - Clés `theme_primary`, `theme_radius` (`compact` / `standard` / `rounded`), `theme_shadows` (`soft`), `theme_glass`, `theme_motion` ; appliquées par `src/utils/theme.ts` (variable `--color-primary`, attributs `data-*` sur `<html>`), mémorisées localement et reposées avant le premier rendu.
+  - Espace Pro, onglet Configuration : encart « Apparence » (6 couleurs lisibles + couleur libre, avertissement de contraste < 4,5:1, arrondis, 3 effets), aperçu en direct annulable.
+  - Effets, tous désactivés par défaut : ombres douces teintées, verre dépoli (header, barre Pro, stepper, fond des fenêtres), animations (cartes soulevées, boutons, sections de la vitrine révélées au défilement) respectant `prefers-reduced-motion`.
+  - Emails : couleur principale du thème.
+  - **Non repris :** carte de la zone d'intervention de l'espace Pro (couleurs bleu / orange de couverture, `ZoneMap.tsx`).
 
 ---
 
@@ -313,22 +321,35 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Espace disque :** sauvegarde + archive + code doivent tenir dans 1 Go (Starter) ; purge des anciennes sauvegardes.
 - **Prérequis :** Item 28.
 
+### 30. Effets Visuels Avancés (Optionnels) & Thème Sombre
+- **Prolonge l'Item 2** ✅ : mêmes réglages dans l'encart « Apparence », tous désactivés par défaut, et tous coupés si l'appareil demande moins d'animations (`prefers-reduced-motion`).
+- **Liserés animés :** bordure lumineuse qui tourne autour des cartes et du bouton principal (dégradé conique dérivé de `--color-primary`, angle animé via `@property`), au survol ou en continu sur le CTA. Repli statique si `@property` n'est pas pris en charge.
+- **Cartes 3D au survol :** soulèvement + inclinaison qui suit la position de la souris (`perspective`, `rotateX` / `rotateY` calculés en JS sur `pointermove`, reflet lumineux qui suit le curseur), retour en douceur à la sortie. Désactivé sur écran tactile (`hover: none`) et limité à quelques degrés pour rester lisible (public senior).
+- **Thème sombre avec la même couleur de marque :**
+  - Mode choisi par l'artisan : clair, sombre, ou automatique selon l'appareil (`prefers-color-scheme`) ; option d'un bouton de bascule pour les visiteurs (choix mémorisé dans le navigateur).
+  - La couleur principale est conservée, éclaircie automatiquement en mode sombre si son contraste sur fond sombre est insuffisant (`color-mix`), avec le même contrôle de contraste que l'Item 2.
+  - **Prérequis technique :** l'échelle des gris (`$gray-*`), les fonds blancs codés (`white`) et les couleurs d'état doivent passer en variables CSS, comme la couleur principale : chantier transversal sur tout le SCSS.
+  - Les emails restent en clair (rendu des messageries non maîtrisé) ; cartes OpenStreetMap à assombrir par filtre ou à laisser claires.
+- **Points d'attention :** performances sur mobile (limiter les animations continues, `will-change` ponctuel), lisibilité et contrastes vérifiés dans les deux thèmes, rendu Safari pour `backdrop-filter` et `@property`.
+- **Prérequis :** Item 2 ✅.
+
 ---
 
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
 |---|---|---|---|---|---|
-| **1** | **Item 2** | **Theming & effets visuels (Admin)** | Design / UI | 🚧 *En cours* | Variables CSS dynamiques |
-| **2** | **Item 25** | **Mot de passe & email professionnel sécurisés (changement, réinitialisation, vérification)** | Sécurité / Authentification | ⏳ *À faire* | Items 12 et 24 ✅ |
-| **3** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
-| **4** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — |
-| **5** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ |
-| **6** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ |
-| **7** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ |
-| **8** | **Item 27** | **Déploiement initial interactif (`npm run deploy:init`)** | Installation / Déploiement | ⏳ *À faire* | Item 25 |
-| **9** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 |
-| **10** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement |
+| **1** | **Item 25** | **Mot de passe & email professionnel sécurisés (changement, réinitialisation, vérification)** | Sécurité / Authentification | ⏳ *À faire* | Items 12 et 24 ✅ |
+| **2** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
+| **3** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — |
+| **4** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ |
+| **5** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ |
+| **6** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ |
+| **7** | **Item 27** | **Déploiement initial interactif (`npm run deploy:init`)** | Installation / Déploiement | ⏳ *À faire* | Item 25 |
+| **8** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 |
+| **9** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement |
+| **10** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ |
+| — | **Item 2** | Theming & effets visuels pilotables depuis l'espace Pro | Design / UI | ✅ **Terminé** | — |
 | — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ **Abandonné** | Remplacé par l'Item 24 |
 | — | **Item 24** | Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro | Communication / Configuration | ✅ **Terminé** | — |
 | — | **Item 12** | Sécurité : routes de gestion vérifiées côté serveur, code par email, appareil de confiance 10 jours | Sécurité / Authentification | ✅ **Terminé** | — |

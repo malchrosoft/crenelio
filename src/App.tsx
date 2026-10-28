@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { api } from './api';
 import { applyFavicon } from './utils/favicon';
 import { applyDocumentTitle } from './utils/documentTitle';
+import { applyTheme, themeFromConfig } from './utils/theme';
 import AdminPage from './pages/AdminPage';
 import DecisionPage from './pages/DecisionPage';
 import { Service, AppConfig } from './types';
@@ -31,6 +32,7 @@ export const App: React.FC = () => {
         setServices(servs);
         if (cfg.branding_favicon_url) applyFavicon(cfg.branding_favicon_url);
         applyDocumentTitle(cfg.company_name);
+        applyTheme(themeFromConfig(cfg));
       })
       .catch((err: Error) => {
         console.error('Erreur chargement initial:', err);

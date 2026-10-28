@@ -1,0 +1,105 @@
+// ===================================================================
+// Thème réglable depuis l'espace Pro (Item 2)
+// Valeurs par défaut sur :root ; src/utils/theme.ts les surcharge (--color-primary) et pose
+// les attributs data-* sur <html> : data-radius, data-shadows, data-glass, data-motion.
+// ===================================================================
+
+@use 'variables' as *;
+
+:root {
+  --color-primary: #{$default-primary};
+  // Déclinaisons calculées par le navigateur : suivent toute couleur choisie
+  --color-primary-hover: color-mix(in srgb, var(--color-primary) 82%, black);
+  --color-primary-light: color-mix(in srgb, var(--color-primary) 7%, white);
+
+  // Arrondis « standard »
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 16px;
+
+  // Ombres neutres « standard »
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+}
+
+// -------------------------------------------------------
+// Arrondis
+// -------------------------------------------------------
+:root[data-radius='compact'] {
+  --radius-sm: 3px;
+  --radius: 6px;
+  --radius-lg: 8px;
+}
+
+:root[data-radius='rounded'] {
+  --radius-sm: 10px;
+  --radius: 20px;
+  --radius-lg: 28px;
+}
+
+// -------------------------------------------------------
+// Ombres douces, légèrement teintées de la couleur principale
+// -------------------------------------------------------
+:root[data-shadows='soft'] {
+  --shadow-sm: 0 2px 6px -2px color-mix(in srgb, var(--color-primary) 14%, transparent);
+  --shadow: 0 10px 30px -12px color-mix(in srgb, var(--color-primary) 28%, transparent),
+    0 4px 10px -6px rgb(0 0 0 / 0.06);
+  --shadow-lg: 0 24px 48px -18px color-mix(in srgb, var(--color-primary) 32%, transparent),
+    0 8px 16px -8px rgb(0 0 0 / 0.08);
+}
+
+// -------------------------------------------------------
+// Verre dépoli : header de la vitrine, barre de l'espace Pro, fond des fenêtres
+// -------------------------------------------------------
+:root[data-glass='on'] {
+  .vitrine-header,
+  .admin-topbar {
+    background: color-mix(in srgb, white 70%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(1.6);
+    backdrop-filter: blur(14px) saturate(1.6);
+  }
+
+  .admin-modal-overlay {
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  .stepper {
+    background: color-mix(in srgb, white 75%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+
+// -------------------------------------------------------
+// Animations & micro-interactions (coupées si l'appareil demande moins d'animations)
+// -------------------------------------------------------
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-motion='on'] {
+    .card,
+    .vitrine-service-card,
+    .engagement-card {
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: $shadow-lg;
+      }
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    // Sections de la vitrine révélées au défilement (classe posée par VitrinePage)
+    .vitrine-reveal {
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+      &:not(.is-visible) {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+    }
+  }
+}

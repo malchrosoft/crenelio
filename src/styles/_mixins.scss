@@ -25,3 +25,16 @@
   align-items: center;
   justify-content: space-between;
 }
+
+// -------------------------------------------------------
+// Couleur principale du thème (variable CSS) : transparence et teintes
+// -------------------------------------------------------
+/// Couleur principale à $percent % d'opacité (remplace rgba($primary, x)).
+@function primary-alpha($percent) {
+  @return color-mix(in srgb, var(--color-primary) $percent, transparent);
+}
+
+/// Couleur principale mêlée de blanc : $percent % de couleur (fonds pâles, dégradés).
+@function primary-tint($percent) {
+  @return color-mix(in srgb, var(--color-primary) $percent, white);
+}

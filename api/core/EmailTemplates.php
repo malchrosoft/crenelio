@@ -14,6 +14,7 @@ require_once __DIR__ . '/Branding.php';
 
 class EmailTemplates
 {
+    /** Couleur principale par défaut ; le thème choisi dans l'espace Pro la remplace (theme_primary). */
     private const PRIMARY = '#2563eb';
     private const GRAY_50 = '#f8fafc';
     private const GRAY_200 = '#e2e8f0';
@@ -249,13 +250,13 @@ class EmailTemplates
                 'Téléphone' => sprintf(
                     '<a href="tel:%s" style="color:%s;text-decoration:none;">%s</a>',
                     self::escape(preg_replace('/\s+/', '', $appointment['client_phone'])),
-                    self::PRIMARY,
+                    self::primary($config),
                     self::escape($appointment['client_phone'])
                 ),
                 'Email'     => sprintf(
                     '<a href="mailto:%1$s" style="color:%2$s;text-decoration:none;">%1$s</a>',
                     self::escape($appointment['client_email']),
-                    self::PRIMARY
+                    self::primary($config)
                 ),
             ]
         );
@@ -321,6 +322,13 @@ class EmailTemplates
      * @param array<string, string>                 $rows
      * @param array{label: string, url: string}|null $button
      */
+    /** Couleur principale du thème (`theme_primary`, `#rrggbb`), sinon celle par défaut. */
+    private static function primary(array $config): string
+    {
+        $color = (string)($config['theme_primary'] ?? '');
+        return preg_match('/^#[0-9a-f]{6}$/i', $color) ? $color : self::PRIMARY;
+    }
+
     private static function layout(
         string $company,
         string $title,
@@ -354,7 +362,7 @@ class EmailTemplates
                         <a href="%s" style="display:inline-block;padding:13px 26px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;">%s</a>
                     </td></tr>
                 </table>',
-                self::PRIMARY,
+                self::primary($config),
                 self::escape($button['url']),
                 self::escape($button['label'])
             );
@@ -366,7 +374,7 @@ class EmailTemplates
         $headerHtml = $logo !== null
             ? sprintf(
                 '<tr><td style="background:#ffffff;padding:18px 28px;border-bottom:4px solid %s;"><img src="cid:%s" width="%d" height="%d" alt="%s" style="display:block;border:0;width:%3$dpx;height:%4$dpx;"></td></tr>',
-                self::PRIMARY,
+                self::primary($config),
                 Branding::EMAIL_LOGO_CID,
                 $logo['width'],
                 $logo['height'],
@@ -374,7 +382,7 @@ class EmailTemplates
             )
             : sprintf(
                 '<tr><td style="background:%s;padding:22px 28px;color:#ffffff;font-size:18px;font-weight:700;">%s</td></tr>',
-                self::PRIMARY,
+                self::primary($config),
                 self::escape($company)
             );
 
@@ -413,7 +421,7 @@ class EmailTemplates
             self::escape($title),
             self::GRAY_50,
             self::GRAY_200,
-            self::PRIMARY,
+            self::primary($config),
             $headerHtml,
             self::GRAY_800,
             self::GRAY_500,

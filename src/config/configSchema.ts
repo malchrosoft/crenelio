@@ -90,7 +90,7 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
 ];
 
 /** Clés gérées ailleurs (« Zone & déplacement », engagements, fichiers de branding) ou jamais éditables. */
-const EXCLUDED_KEY = /^(travel_|premises_|zone_|start_|default_(latitude|longitude)$|admin_password|branding_|vitrine_engagement_\d+(_icon)?$)/;
+const EXCLUDED_KEY = /^(travel_|premises_|zone_|start_|default_(latitude|longitude)$|admin_password|branding_|theme_|vitrine_engagement_\d+(_icon)?$)/;
 
 const DESCRIBED_KEYS = new Set(CONFIG_GROUPS.flatMap((group) => group.fields.map((f) => f.key)));
 

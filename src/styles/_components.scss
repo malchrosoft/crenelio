@@ -110,7 +110,7 @@
   &.selected {
     border-color: $primary;
     background-color: $primary-light;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 0 0 3px primary-alpha(20%);
   }
 
   .service-name {
@@ -328,7 +328,7 @@
   &:focus {
     outline: none;
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    box-shadow: 0 0 0 3px primary-alpha(15%);
   }
 }
 
@@ -2258,5 +2258,151 @@ $admin-sidebar-collapsed: 68px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+  }
+}
+
+// -------------------------------------------------------
+// Apparence (Item 2) : pastilles de couleur, arrondis, effets
+// -------------------------------------------------------
+.theme-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-swatch {
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-full;
+  border: 3px solid white;
+  box-shadow: 0 0 0 1px $gray-300;
+  color: white;
+  transition: $transition-fast;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+
+  &--active {
+    box-shadow: 0 0 0 2px $gray-800;
+  }
+
+  @each $name, $color in $theme-presets {
+    &--#{$name} {
+      background: $color;
+    }
+  }
+}
+
+.theme-custom-color {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 6px;
+  font-size: 0.9rem;
+  color: $gray-600;
+  cursor: pointer;
+
+  input[type='color'] {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid $gray-300;
+    border-radius: $radius-sm;
+    background: none;
+    cursor: pointer;
+  }
+
+  code {
+    color: $gray-500;
+  }
+}
+
+.theme-contrast-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: $radius-sm;
+  background: $warning-light;
+  color: $gray-800;
+  font-size: 0.85rem;
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: $warning;
+  }
+}
+
+.theme-radius {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.theme-radius__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid $gray-200;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  input {
+    accent-color: $primary;
+  }
+
+  &--active {
+    border-color: $primary;
+    background: $primary-light;
+  }
+}
+
+// Aperçu figé de chaque niveau (indépendant du thème en cours)
+.theme-radius__preview {
+  width: 22px;
+  height: 16px;
+  border: 2px solid $primary;
+
+  &--compact {
+    border-radius: 2px;
+  }
+
+  &--standard {
+    border-radius: 5px;
+  }
+
+  &--rounded {
+    border-radius: 9px;
+  }
+}
+
+.theme-effects {
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theme-effect {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+
+  input {
+    margin-top: 4px;
+    accent-color: $primary;
+  }
+
+  .form-hint {
+    display: block;
+    margin-top: 2px;
   }
 }

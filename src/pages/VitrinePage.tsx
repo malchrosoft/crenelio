@@ -41,6 +41,29 @@ const VitrinePage: React.FC<VitrinePageProps> = ({ config, services }) => {
     return () => observer.disconnect();
   }, []);
 
+  // Animations activées (thème) : sections révélées au défilement, sauf le hero
+  useEffect(() => {
+    const root = document.documentElement;
+    if (root.dataset.motion !== 'on' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('#main-content > section:not(.vitrine-hero)'));
+    sections.forEach((section) => section.classList.add('vitrine-reveal'));
+    const observer = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        }),
+      { threshold: 0.12 }
+    );
+    sections.forEach((section) => observer.observe(section));
+    return () => {
+      observer.disconnect();
+      sections.forEach((section) => section.classList.remove('vitrine-reveal', 'is-visible'));
+    };
+  }, [config.theme_motion]);
+
   return (
     <div className="vitrine-page">
       {/* Header fixe conditionnel (apparaît quand le bouton du hero disparaît) */}
