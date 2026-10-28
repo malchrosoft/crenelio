@@ -343,8 +343,19 @@ L'appareil est ensuite reconnu pendant **10 jours**.
 - **Prérequis :** l'email professionnel (onglet *Configuration*) et l'envoi d'emails (`SMTP_*` et
   `MAIL_FROM` dans `api/.env`). Sans eux, le mot de passe seul protège l'espace Pro et un bandeau
   l'indique après connexion. Testez l'envoi d'un email **avant** de vous déconnecter.
-- **Changez le mot de passe `admin123`** dès la mise en ligne. Le changement déconnecte toutes les
-  sessions et oublie tous les appareils reconnus.
+- **Mot de passe `admin123` : changement imposé.** À la première connexion, l'espace Pro n'affiche
+  que l'écran « Choisissez votre mot de passe » (12 caractères minimum, mots de passe courants
+  refusés) ; le serveur refuse toute autre action tant qu'il n'est pas changé. Ensuite :
+  *Configuration* → *Mot de passe*. Chaque changement ferme les autres sessions, oublie les
+  appareils reconnus et envoie un email de confirmation.
+- **Mot de passe oublié :** lien sur l'écran de connexion ; un code valable 30 minutes part à
+  l'email professionnel.
+- **Email professionnel :** *Configuration* → *Coordonnées* → *Modifier*. La nouvelle adresse n'est
+  retenue qu'après saisie du code qu'elle reçoit ; l'ancienne est prévenue.
+- **Secours, sans envoi d'emails possible :** dans phpMyAdmin, table `config`, remplacez la valeur
+  de `admin_password_hash` par celle livrée dans `sql/seed_init.sql`
+  (`$2y$10$qyk0/fef0o7Ic3vocJBAXOp18E.2J0UaQhC62vS98B9fAlfK7aCQi`) : le mot de passe redevient `admin123`, et son
+  changement sera de nouveau imposé à la connexion suivante.
 - **`api/storage/auth/`** contient la clé de signature (`secret.key`, créée automatiquement) et le
   compteur d'échecs de connexion (5 échecs en 15 minutes bloquent l'adresse IP). Ne la versionnez
   pas ; la supprimer déconnecte simplement tout le monde.

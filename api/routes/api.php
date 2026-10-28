@@ -32,6 +32,8 @@ $mailController        = new MailController();
 
 // Routes de l'espace Pro : refusées (401) sans session ouverte, cf. core/Auth.php
 $admin = fn(callable $handler) => Auth::guard($handler);
+// Routes accessibles avec le mot de passe par défaut : celles qui permettent de le changer
+$adminDefaultOk = fn(callable $handler) => Auth::guard($handler, true);
 
 // -------------------------------------------------------------------
 // 1. Configuration & Authentification Pro
@@ -43,6 +45,13 @@ $router->post('/admin/login',               [$configController, 'login']);
 $router->post('/admin/login/code',          [$configController, 'verifyCode']);
 $router->get('/admin/session',              [$configController, 'session']);
 $router->post('/admin/logout',              [$configController, 'logout']);
+
+// Mot de passe & email professionnel (Item 25)
+$router->post('/admin/password',            $adminDefaultOk([$configController, 'changePassword']));
+$router->post('/admin/password/forgot',     [$configController, 'forgotPassword']);
+$router->post('/admin/password/reset',      [$configController, 'resetPassword']);
+$router->post('/admin/pro-email',           $admin([$configController, 'requestProEmail']));
+$router->post('/admin/pro-email/confirm',   $admin([$configController, 'confirmProEmail']));
 
 // Envoi d'emails : état (lecture seule) et email de test vers l'email professionnel
 $router->get('/admin/mail',                 $admin([$mailController, 'status']));

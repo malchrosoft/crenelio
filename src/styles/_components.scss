@@ -2406,3 +2406,55 @@ $admin-sidebar-collapsed: 68px;
     margin-top: 2px;
   }
 }
+
+// -------------------------------------------------------
+// Mot de passe & email professionnel (Item 25)
+// -------------------------------------------------------
+.admin-login-card .admin-login-forgot {
+  padding: 8px 0;
+  min-height: 44px;
+  color: $primary;
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}
+
+.password-forced-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: $warning;
+  }
+}
+
+.pro-email-field {
+  margin-bottom: 20px;
+
+  .pro-email-field__current {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    color: $gray-800;
+  }
+
+  .pro-email-field__form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+
+    .form-input {
+      flex: 1 1 240px;
+      width: auto;
+    }
+  }
+}

@@ -40,12 +40,18 @@ class Auth
     // Garde des routes
     // -----------------------------------------------------------------
 
-    /** Enveloppe un gestionnaire de route : 401 si l'espace Pro n'est pas ouvert. */
-    public static function guard(callable $handler): callable
+    /**
+     * Enveloppe un gestionnaire de route : 401 si l'espace Pro n'est pas ouvert, 403 tant que le
+     * mot de passe par défaut n'a pas été changé (sauf `$allowDefaultPassword`, pour le changer).
+     */
+    public static function guard(callable $handler, bool $allowDefaultPassword = false): callable
     {
-        return function (array $params) use ($handler) {
+        return function (array $params) use ($handler, $allowDefaultPassword) {
             if (!self::isAuthenticated()) {
                 Response::json(['error' => 'Session expirée, reconnectez-vous'], 401);
+            }
+            if (!$allowDefaultPassword && self::mustChangePassword()) {
+                Response::json(['error' => 'Changez le mot de passe par défaut pour continuer', 'code' => 'password_change_required'], 403);
             }
             $handler($params);
         };
@@ -98,65 +104,15 @@ class Auth
             return ['status' => 'authenticated'];
         }
 
-        self::startSession();
-        $pending = $_SESSION['otp'] ?? null;
-        if ($pending && time() - $pending['sent_at'] < self::OTP_RESEND_SECONDS) {
-            // Code récent toujours valable : pas de nouvel envoi
-            return ['status' => 'otp_required', 'email_hint' => self::maskEmail(Config::get('pro_email'))];
-        }
-
-        $code = (string)random_int(100000, 999999);
-        $config = Config::getAll();
-        $message = EmailTemplates::adminCode($code, self::OTP_SECONDS / 60, $config);
-        try {
-            Mailer::send(
-                $config['pro_email'],
-                $config['company_name'] ?? '',
-                $message['subject'],
-                $message['html'],
-                $message['text'],
-                null,
-                null,
-                EmailTemplates::inlineImages($message['html'])
-            );
-        } catch (Throwable $e) {
-            error_log('[Crenelio] Envoi du code de connexion échoué : ' . $e->getMessage());
-            Response::json(['error' => "Envoi du code de connexion impossible. Réessayez dans quelques instants."], 503);
-        }
-
-        $_SESSION['otp'] = [
-            'hash'     => password_hash($code, PASSWORD_DEFAULT),
-            'expires'  => time() + self::OTP_SECONDS,
-            'attempts' => 0,
-            'sent_at'  => time(),
-        ];
-        return ['status' => 'otp_required', 'email_hint' => self::maskEmail($config['pro_email'])];
+        $email = (string)Config::get('pro_email');
+        self::issueCode('login', $email);
+        return ['status' => 'otp_required', 'email_hint' => self::maskEmail($email)];
     }
 
     /** Vérifie le code reçu par email ; ouvre la session et mémorise l'appareil. */
     public static function verifyCode(string $code): void
     {
-        self::startSession();
-        $pending = $_SESSION['otp'] ?? null;
-        if (!$pending) {
-            Response::json(['error' => 'Aucun code en attente, reconnectez-vous'], 400);
-        }
-        if (time() > $pending['expires']) {
-            unset($_SESSION['otp']);
-            Response::json(['error' => 'Code expiré, reconnectez-vous pour en recevoir un nouveau'], 400);
-        }
-
-        if (!password_verify($code, $pending['hash'])) {
-            $_SESSION['otp']['attempts']++;
-            $left = self::OTP_ATTEMPTS - $_SESSION['otp']['attempts'];
-            if ($left <= 0) {
-                unset($_SESSION['otp']);
-                Response::json(['error' => 'Trop de codes erronés, reconnectez-vous pour en recevoir un nouveau'], 429);
-            }
-            Response::json(['error' => "Code incorrect ($left essai" . ($left > 1 ? 's' : '') . ' restant' . ($left > 1 ? 's' : '') . ')'], 401);
-        }
-
-        unset($_SESSION['otp']);
+        self::checkCode('login', $code);
         self::open();
         self::trustDevice();
     }
@@ -167,6 +123,249 @@ class Auth
         $_SESSION = [];
         session_destroy();
         setcookie(self::SESSION_NAME, '', self::cookieOptions(time() - 3600));
+    }
+
+    // -----------------------------------------------------------------
+    // Mot de passe (Item 25)
+    // -----------------------------------------------------------------
+
+    /** Mot de passe livré par `seed_init.sql` : à changer avant toute utilisation réelle. */
+    private const DEFAULT_PASSWORD = 'admin123';
+    private const MIN_LENGTH = 12;
+    /** Durée de validité du code de réinitialisation. */
+    private const RESET_SECONDS = 30 * 60;
+
+    /** Mots de passe trop courants, refusés quelle que soit leur longueur. */
+    private const COMMON_PASSWORDS = [
+        'admin123', 'administrateur', 'motdepasse', 'motdepasse123', 'password', 'password123',
+        'azerty', 'azertyuiop', 'azerty123456', 'qwerty', 'qwertyuiop', '123456789012', '1234567890',
+        'soleil', 'bonjour', 'crenelio', 'crenelio123', 'changeme', 'letmein', 'iloveyou',
+    ];
+
+    public static function usesDefaultPassword(): bool
+    {
+        return Config::verifyPassword(self::DEFAULT_PASSWORD);
+    }
+
+    /**
+     * Changement imposé tant que le mot de passe par défaut est actif.
+     * Toléré en développement local (APP_ENV=development) pour ne pas gêner les tests.
+     */
+    public static function mustChangePassword(): bool
+    {
+        return APP_ENV !== 'development' && self::usesDefaultPassword();
+    }
+
+    /** Motif de refus d'un nouveau mot de passe, ou null s'il est acceptable. */
+    public static function passwordProblem(string $password): ?string
+    {
+        if (mb_strlen($password) < self::MIN_LENGTH) {
+            return sprintf('Le mot de passe doit comporter au moins %d caractères', self::MIN_LENGTH);
+        }
+        $normalized = mb_strtolower($password);
+        if (in_array($normalized, self::COMMON_PASSWORDS, true) || count(array_unique(mb_str_split($normalized))) < 4) {
+            return 'Mot de passe trop courant ou trop répétitif';
+        }
+        foreach (['company_name', 'pro_email', 'pro_name'] as $key) {
+            $value = mb_strtolower(trim((string)Config::get($key)));
+            if (mb_strlen($value) >= 4 && str_contains($normalized, explode('@', $value)[0])) {
+                return "Le mot de passe ne doit pas reprendre le nom de l'entreprise, de l'artisan ou l'email";
+            }
+        }
+        return null;
+    }
+
+    /** Changement depuis l'espace Pro : l'ancien mot de passe est redemandé. */
+    public static function changePassword(string $current, string $new): void
+    {
+        self::checkThrottle();
+        if (!Config::verifyPassword($current)) {
+            self::recordFailure();
+            Response::json(['error' => 'Mot de passe actuel incorrect'], 401);
+        }
+        if ($current === $new) {
+            Response::json(['error' => "Le nouveau mot de passe doit être différent de l'actuel"], 400);
+        }
+        self::storePassword($new, 'Mot de passe modifié', "Le mot de passe de l'espace Artisan vient d'être modifié. Les autres sessions ont été fermées et les appareils reconnus devront saisir un nouveau code.");
+    }
+
+    /**
+     * Mot de passe oublié : envoie un code à l'email professionnel.
+     * Réponse identique que l'envoi soit possible ou non (rien à apprendre pour un tiers).
+     */
+    public static function requestReset(): void
+    {
+        $key = 'reset:' . self::clientKey();
+        if (count(self::failures($key)) >= self::MAX_FAILURES) {
+            Response::json(['error' => 'Trop de demandes. Réessayez dans 15 min.'], 429);
+        }
+        self::updateThrottle(function (array $all) use ($key) {
+            $all[$key] = [...self::recent($all[$key] ?? []), time()];
+            return $all;
+        });
+
+        if (self::twoFactorAvailable()) {
+            self::issueCode('reset', (string)Config::get('pro_email'), self::RESET_SECONDS, false);
+        }
+    }
+
+    /** Code de réinitialisation + nouveau mot de passe : ouvre la session sur cet appareil. */
+    public static function completeReset(string $code, string $new): void
+    {
+        if (($problem = self::passwordProblem($new)) !== null) {
+            Response::json(['error' => $problem], 400);
+        }
+        self::checkCode('reset', $code);
+        self::clearFailures();
+        self::storePassword($new, 'Mot de passe réinitialisé', "Le mot de passe de l'espace Artisan vient d'être réinitialisé à l'aide d'un code envoyé à cette adresse. Toutes les autres sessions ont été fermées.");
+    }
+
+    /**
+     * Enregistre le mot de passe : le changement d'empreinte ferme toutes les autres sessions et
+     * oublie les appareils de confiance ; la session courante est rouverte et l'appareil reconnu.
+     */
+    private static function storePassword(string $new, string $noticeTitle, string $noticeMessage): void
+    {
+        if (($problem = self::passwordProblem($new)) !== null) {
+            Response::json(['error' => $problem], 400);
+        }
+        Config::set('admin_password_hash', password_hash($new, PASSWORD_BCRYPT));
+        self::open();
+        self::trustDevice();
+        self::notify((string)Config::get('pro_email'), $noticeTitle, $noticeMessage);
+    }
+
+    // -----------------------------------------------------------------
+    // Email professionnel vérifié (Item 25)
+    // -----------------------------------------------------------------
+
+    /**
+     * Nouvelle adresse : retenue seulement après saisie du code qu'elle reçoit.
+     * Sans envoi d'emails possible, elle est enregistrée directement (rien à vérifier).
+     *
+     * @return array{status: 'saved'|'code_sent'}
+     */
+    public static function requestEmailChange(string $email): array
+    {
+        if (!Mailer::isConfigured()) {
+            self::saveProEmail($email);
+            return ['status' => 'saved'];
+        }
+        self::issueCode('email', $email, self::OTP_SECONDS, true, ['email' => $email]);
+        return ['status' => 'code_sent'];
+    }
+
+    public static function confirmEmailChange(string $code): string
+    {
+        $data = self::checkCode('email', $code);
+        self::saveProEmail($data['email']);
+        return $data['email'];
+    }
+
+    /** Enregistre l'adresse et prévient l'ancienne, qui ne recevra plus les codes de connexion. */
+    private static function saveProEmail(string $email): void
+    {
+        $previous = trim((string)Config::get('pro_email'));
+        Config::set('pro_email', $email);
+        if ($previous !== '' && strcasecmp($previous, $email) !== 0) {
+            self::notify($previous, 'Email professionnel modifié', "L'email professionnel de l'espace Artisan a été remplacé par " . $email . ". Cette adresse ne recevra plus les fiches d'intervention ni les codes de connexion.");
+        }
+    }
+
+    // -----------------------------------------------------------------
+    // Codes à 6 chiffres par email (connexion, réinitialisation, email)
+    // -----------------------------------------------------------------
+
+    /**
+     * Envoie un code lié à la session courante. Un code encore récent pour le même usage et la
+     * même adresse n'est pas renvoyé. `$failLoudly` : 503 si l'envoi échoue (sinon silencieux,
+     * pour ne rien révéler lors d'une réinitialisation).
+     */
+    private static function issueCode(
+        string $purpose,
+        string $email,
+        int $ttl = self::OTP_SECONDS,
+        bool $failLoudly = true,
+        array $data = []
+    ): void {
+        self::startSession();
+        $pending = $_SESSION['codes'][$purpose] ?? null;
+        if ($pending && ($pending['email'] ?? '') === $email && time() - $pending['sent_at'] < self::OTP_RESEND_SECONDS) {
+            return;
+        }
+
+        $code = (string)random_int(100000, 999999);
+        $config = Config::getAll();
+        $message = EmailTemplates::adminCode($code, intdiv($ttl, 60), $config, $purpose);
+        try {
+            Mailer::send(
+                $email,
+                $config['company_name'] ?? '',
+                $message['subject'],
+                $message['html'],
+                $message['text'],
+                null,
+                null,
+                EmailTemplates::inlineImages($message['html'])
+            );
+        } catch (Throwable $e) {
+            error_log("[Crenelio] Envoi du code ($purpose) échoué : " . $e->getMessage());
+            if ($failLoudly) {
+                Response::json(['error' => "Envoi du code impossible. Réessayez dans quelques instants."], 503);
+            }
+            return;
+        }
+
+        $_SESSION['codes'][$purpose] = [
+            'hash'     => password_hash($code, PASSWORD_DEFAULT),
+            'expires'  => time() + $ttl,
+            'attempts' => 0,
+            'sent_at'  => time(),
+            'email'    => $email,
+            'data'     => $data,
+        ];
+    }
+
+    /** Vérifie un code (3 essais) et le consomme ; renvoie les données associées. */
+    private static function checkCode(string $purpose, string $code): array
+    {
+        self::startSession();
+        $pending = $_SESSION['codes'][$purpose] ?? null;
+        if (!$pending) {
+            Response::json(['error' => 'Aucun code en attente, recommencez la démarche'], 400);
+        }
+        if (time() > $pending['expires']) {
+            unset($_SESSION['codes'][$purpose]);
+            Response::json(['error' => 'Code expiré, recommencez pour en recevoir un nouveau'], 400);
+        }
+
+        if (!password_verify($code, $pending['hash'])) {
+            $_SESSION['codes'][$purpose]['attempts']++;
+            $left = self::OTP_ATTEMPTS - $_SESSION['codes'][$purpose]['attempts'];
+            if ($left <= 0) {
+                unset($_SESSION['codes'][$purpose]);
+                Response::json(['error' => 'Trop de codes erronés, recommencez pour en recevoir un nouveau'], 429);
+            }
+            Response::json(['error' => "Code incorrect ($left essai" . ($left > 1 ? 's' : '') . ' restant' . ($left > 1 ? 's' : '') . ')'], 401);
+        }
+
+        unset($_SESSION['codes'][$purpose]);
+        return $pending['data'] ?? [];
+    }
+
+    /** Avertissement de sécurité par email ; un échec d'envoi ne bloque jamais l'opération. */
+    private static function notify(string $email, string $title, string $message): void
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !Mailer::isConfigured()) {
+            return;
+        }
+        try {
+            $config = Config::getAll();
+            $mail = EmailTemplates::securityNotice($title, $message, $config);
+            Mailer::send($email, $config['company_name'] ?? '', $mail['subject'], $mail['html'], $mail['text'], null, null, EmailTemplates::inlineImages($mail['html']));
+        } catch (Throwable $e) {
+            error_log('[Crenelio] Avertissement de sécurité non envoyé : ' . $e->getMessage());
+        }
     }
 
     // -----------------------------------------------------------------

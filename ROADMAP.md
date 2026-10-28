@@ -276,12 +276,20 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 25. Mot de Passe & Email Professionnel Sécurisés (Changement, Réinitialisation, Vérification)
+### 25. Mot de Passe & Email Professionnel Sécurisés (Changement, Réinitialisation, Vérification) — ✅ Terminée
 - **Constat (27/10/2026) :** aucun écran ne permet de changer le mot de passe (`admin123` par défaut, la clé `admin_password` n'est modifiable que par l'API) ; aucune procédure en cas d'oubli ; l'email professionnel, qui reçoit les codes de connexion (Item 12), se modifie sans vérification.
 - **Changement du mot de passe :** dans l'espace Pro, avec saisie de l'ancien mot de passe, règles de robustesse (longueur minimale, refus des mots de passe trop courants), et **changement obligatoire tant que `admin123` est actif**. Le changement ferme les autres sessions et oublie les appareils de confiance (déjà assuré par `Auth`).
 - **Mot de passe oublié :** lien sur l'écran de connexion ; envoi à `pro_email` d'un lien (ou code) à usage unique, valable 30 minutes, haché côté serveur ; réponse identique que l'adresse existe ou non ; limitation par IP comme pour la connexion ; à l'issue, toutes les sessions et appareils sont révoqués et un email de confirmation est envoyé.
 - **Vérification de l'email professionnel :** une nouvelle adresse n'est retenue qu'après saisie d'un code reçu sur cette adresse ; l'ancienne adresse est prévenue du changement. Évite de se couper soi-même des codes de connexion, ou qu'une session volée détourne la récupération du compte.
 - **Prérequis :** Item 12 ✅, envoi d'emails (Item 24 ✅). Sans envoi configuré, la réinitialisation est impossible : la documenter (procédure de secours via phpMyAdmin et `password_hash`).
+- **Réalisé (28/10/2026) :**
+  - `Auth` : codes à 6 chiffres unifiés (`issueCode` / `checkCode` : connexion, réinitialisation 30 min, email), changement et réinitialisation du mot de passe (12 caractères min., mots de passe courants, nom de l'entreprise / email refusés), changement imposé de `admin123` par `Auth::guard` (403 `password_change_required`, sauf en développement), email de confirmation à chaque changement. Aucune évolution de schéma.
+  - Mot de passe oublié : réponse identique dans tous les cas, 5 demandes par IP en 15 min.
+  - Email professionnel : retenu après code reçu sur la nouvelle adresse, ancienne adresse prévenue ; enregistré directement si aucun envoi n'est possible.
+  - `PUT /admin/config` refuse désormais `admin_password` et toute modification de `pro_email`.
+  - Front : « Mot de passe oublié ? » (`AdminLogin`), écran de changement imposé, section *Mot de passe* et champ *Email professionnel* vérifié (onglet Configuration), bandeau en développement si `admin123` est actif.
+  - Procédure de secours documentée (`DEPLOYMENT*.md`, étape 5 ter) : rétablir le hash de `seed_init.sql` dans phpMyAdmin.
+  - Testé par l'API : changement (mauvais actuel, trop faible, accepté), fermeture des autres sessions, refus par la configuration générique, réinitialisation complète, changement d'email avec avis à l'ancienne adresse ; base remise dans son état initial. **Écrans non vus dans le navigateur.**
 
 ### 26. Adresse Publique du Site (`APP_URL`) Détectée Automatiquement
 - **Objectif :** supprimer `APP_URL` des réglages obligatoires de `api/.env` (liens des emails, expéditeur par défaut `noreply@` domaine). Facultatif si le déploiement passe par l'Item 27, qui demande l'adresse du site.
@@ -341,16 +349,16 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
 |---|---|---|---|---|---|---|
-| **1** | **Item 25** | **Mot de passe & email professionnel sécurisés (changement, réinitialisation, vérification)** | Sécurité / Authentification | ⏳ *À faire* | Items 12 et 24 ✅ | 🔴 Critique : `admin123` n'est modifiable depuis aucun écran ; aucune récupération en cas d'oubli |
-| **2** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires | 🔴 Obligation légale avant toute mise en ligne publique (données clients collectées) |
-| **3** | **Item 27** | **Déploiement initial interactif (`npm run deploy:init`)** | Installation / Déploiement | ⏳ *À faire* | Item 25 | 🟠 Lève le dernier frein à la mise en ligne (déploiement manuel aujourd'hui possible mais fastidieux) |
-| **4** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ | 🟢 Gain quotidien le plus fort pour l'artisan (vue semaine, glisser-déposer) |
-| **5** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — | 🟢 Gain réel (tri, filtres, export), la liste actuelle reste utilisable en attendant |
-| **6** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
-| **7** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
-| **8** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
-| **9** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
-| **10** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| **1** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires | 🔴 Obligation légale avant toute mise en ligne publique (données clients collectées) |
+| **2** | **Item 27** | **Déploiement initial interactif (`npm run deploy:init`)** | Installation / Déploiement | ⏳ *À faire* | Item 25 | 🟠 Lève le dernier frein à la mise en ligne (déploiement manuel aujourd'hui possible mais fastidieux) |
+| **3** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ | 🟢 Gain quotidien le plus fort pour l'artisan (vue semaine, glisser-déposer) |
+| **4** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — | 🟢 Gain réel (tri, filtres, export), la liste actuelle reste utilisable en attendant |
+| **5** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
+| **6** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
+| **7** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
+| **8** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
+| **9** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| — | **Item 25** | Mot de passe & email professionnel sécurisés (changement, réinitialisation, vérification) | Sécurité / Authentification | ✅ **Terminé** | — | — |
 | — | **Item 2** | Theming & effets visuels pilotables depuis l'espace Pro | Design / UI | ✅ **Terminé** | — | — |
 | — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ **Abandonné** | Remplacé par l'Item 24 | — |
 | — | **Item 24** | Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro | Communication / Configuration | ✅ **Terminé** | — | — |

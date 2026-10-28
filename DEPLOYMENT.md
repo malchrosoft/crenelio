@@ -341,8 +341,19 @@ is then remembered for **10 days**.
 - **Prerequisites:** the professional email (*Configuration* tab) and outgoing email (`SMTP_*` and
   `MAIL_FROM` in `api/.env`). Without them, the password alone protects the Pro area and a banner
   says so after sign-in. Test sending an email **before** signing out.
-- **Change the `admin123` password** as soon as the site is live. Changing it signs out every
-  session and forgets every remembered device.
+- **`admin123` password: change enforced.** On first sign-in, the Pro area only shows the
+  "Choisissez votre mot de passe" screen (12 characters minimum, common passwords refused); the
+  server refuses any other action until it is changed. Afterwards: *Configuration* →
+  *Mot de passe*. Each change signs out every other session, forgets remembered devices and sends
+  a confirmation email.
+- **Forgotten password:** link on the sign-in screen; a code valid for 30 minutes goes to the
+  professional email.
+- **Professional email:** *Configuration* → *Coordonnées* → *Modifier*. The new address is only
+  kept once the code it receives is entered; the previous address is notified.
+- **Fallback, when email cannot be sent:** in phpMyAdmin, `config` table, replace the
+  `admin_password_hash` value with the one shipped in `sql/seed_init.sql`
+  (`$2y$10$qyk0/fef0o7Ic3vocJBAXOp18E.2J0UaQhC62vS98B9fAlfK7aCQi`): the password becomes `admin123` again, and
+  changing it will be enforced again on the next sign-in.
 - **`api/storage/auth/`** holds the signing key (`secret.key`, created automatically) and the
   failed sign-in counter (5 failures in 15 minutes block the IP address). Do not version it;
   deleting it simply signs everyone out.

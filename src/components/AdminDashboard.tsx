@@ -44,6 +44,8 @@ import AdminShell, { AdminTab } from './admin/AdminShell';
 import AdminLogin from './admin/AdminLogin';
 import MailStatus from './admin/MailStatus';
 import AppearanceEditor from './admin/AppearanceEditor';
+import PasswordChange from './admin/PasswordChange';
+import ProEmailField from './admin/ProEmailField';
 import { applyFavicon } from '../utils/favicon';
 import { applyDocumentTitle } from '../utils/documentTitle';
 import { format, isPast, isToday, parseISO } from 'date-fns';
@@ -144,6 +146,9 @@ export const AdminDashboard: React.FC = () => {
   // `null` : session en cours de vérification (rechargement de page)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [twoFactor, setTwoFactor] = useState(true);
+  // Mot de passe par défaut (admin123) : changement imposé en production, signalé en développement
+  const [mustChangePassword, setMustChangePassword] = useState(false);
+  const [defaultPassword, setDefaultPassword] = useState(false);
   // Saisie d'un rendez-vous par l'artisan (formulaires partagés de la réservation)
   const [creatingAppointment, setCreatingAppointment] = useState(false);
 
@@ -202,6 +207,8 @@ export const AdminDashboard: React.FC = () => {
       .adminSession()
       .then((s) => {
         setTwoFactor(s.two_factor);
+        setMustChangePassword(s.must_change_password);
+        setDefaultPassword(s.default_password);
         setIsAuthenticated(s.authenticated);
       })
       .catch(() => setIsAuthenticated(false));
@@ -232,8 +239,18 @@ export const AdminDashboard: React.FC = () => {
     return () => document.removeEventListener('keydown', handleKey);
   }, [isAddModalOpen, reschedulingAppointment, notificationsAppointment]);
 
-  function handleAuthenticated(withTwoFactor: boolean) {
+  /** Relit l'état de la session (mot de passe par défaut encore actif ?). */
+  async function refreshSession() {
+    const s = await api.adminSession().catch(() => null);
+    if (!s) return;
+    setTwoFactor(s.two_factor);
+    setMustChangePassword(s.must_change_password);
+    setDefaultPassword(s.default_password);
+  }
+
+  async function handleAuthenticated(withTwoFactor: boolean) {
     setTwoFactor(withTwoFactor);
+    await refreshSession();
     setIsAuthenticated(true);
   }
 
@@ -522,6 +539,15 @@ export const AdminDashboard: React.FC = () => {
     );
   }
 
+  // Le serveur refuse toute autre route tant que le mot de passe par défaut est actif
+  if (mustChangePassword) {
+    return (
+      <AdminShell companyName={config.company_name} onLogout={handleLogout}>
+        <PasswordChange forced onChanged={refreshSession} />
+      </AdminShell>
+    );
+  }
+
   const navItems: { id: AdminTab; label: string; icon: React.ReactNode; count?: number }[] = [
     { id: 'appointments', label: 'Rendez-vous', icon: <CalendarBlankIcon {...NAV_ICON} />, count: appointments.length },
     { id: 'services', label: 'Prestations', icon: <WrenchIcon {...NAV_ICON} />, count: services.length },
@@ -540,6 +566,15 @@ export const AdminDashboard: React.FC = () => {
       onLogout={handleLogout}
       nav={{ items: navItems, active: activeTab, onSelect: setActiveTab }}
     >
+      {defaultPassword && (
+        <div className="admin-security-notice" role="status">
+          <WarningIcon size={20} weight="fill" aria-hidden="true" />
+          <span>
+            Mot de passe par défaut (<code>admin123</code>) encore actif : toléré en développement, il devra être changé
+            avant toute mise en ligne (Configuration → Mot de passe).
+          </span>
+        </div>
+      )}
       {!twoFactor && (
         <div className="admin-security-notice" role="status">
           <WarningIcon size={20} weight="fill" aria-hidden="true" />
@@ -1149,6 +1184,7 @@ export const AdminDashboard: React.FC = () => {
               group && (
                 <React.Fragment key={group.id}>
                 <ConfigGroupForm key={group.id} group={group} config={config} onSaved={setConfig}>
+                  {group.id === 'contact' && <ProEmailField config={config} onSaved={setConfig} />}
                   {group.id === 'identity' && (
                     <div className="admin-settings-form">
                       <BrandingField kind="logo" url={config.branding_logo_url} onChange={applyBranding} />
@@ -1164,6 +1200,7 @@ export const AdminDashboard: React.FC = () => {
                 {group.id === 'identity' && <AppearanceEditor config={config} onSaved={setConfig} />}
                 {group.id === 'vitrine' && <EngagementsEditor config={config} onSaved={setConfig} />}
                 {group.id === 'contact' && <MailStatus proEmail={config.pro_email} />}
+                {group.id === 'contact' && <PasswordChange onChanged={refreshSession} />}
                 </React.Fragment>
               )
           )}

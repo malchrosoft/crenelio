@@ -71,23 +71,65 @@ class EmailTemplates
      *
      * @return array{subject: string, html: string, text: string}
      */
-    public static function adminCode(string $code, int $minutes, array $config): array
+    public static function adminCode(string $code, int $minutes, array $config, string $purpose = 'login'): array
     {
         $company = $config['company_name'] ?? 'Crénelio';
+        // Libellé, phrase d'introduction et conséquence de la validation, selon l'usage du code
+        [$label, $lead, $after] = match ($purpose) {
+            'reset' => [
+                'Réinitialisation du mot de passe',
+                'Voici votre code pour réinitialiser le mot de passe de l\'espace Artisan :',
+                'Une fois validé, vous choisirez un nouveau mot de passe et toutes les autres sessions seront fermées.',
+            ],
+            'email' => [
+                'Confirmation de l\'email professionnel',
+                'Voici votre code pour confirmer cette adresse comme email professionnel de l\'espace Artisan :',
+                'Elle recevra ensuite les fiches d\'intervention et les codes de connexion.',
+            ],
+            default => [
+                'Code de connexion',
+                'Voici votre code de connexion à l\'espace Artisan :',
+                'Une fois validé, cet appareil sera reconnu pendant 10 jours.',
+            ],
+        };
         $intro = sprintf(
-            'Voici votre code de connexion à l\'espace Artisan :<br><strong style="display:inline-block;margin-top:12px;font-size:30px;letter-spacing:6px;color:%s;">%s</strong>',
+            '%s<br><strong style="display:inline-block;margin-top:12px;font-size:30px;letter-spacing:6px;color:%s;">%s</strong>',
+            self::escape($lead),
             self::GRAY_800,
             self::escape($code)
         );
         $outro = sprintf(
-            'Il est valable %d minutes. Une fois validé, cet appareil sera reconnu pendant 10 jours. Si vous n\'êtes pas à l\'origine de cette connexion, ne communiquez ce code à personne et changez votre mot de passe.',
-            $minutes
+            'Il est valable %d minutes. %s Si vous n\'êtes pas à l\'origine de cette demande, ne communiquez ce code à personne.',
+            $minutes,
+            $after
         );
 
         return [
-            'subject' => sprintf('%s — code de connexion : %s', $company, $code),
-            'html'    => self::layout($company, 'Code de connexion', $intro, [], $outro, null, $config),
-            'text'    => self::plainText('Code de connexion', "Votre code de connexion à l'espace Artisan : $code", [], self::stripHtml($outro), null, $config),
+            'subject' => sprintf('%s — %s : %s', $company, mb_strtolower($label), $code),
+            'html'    => self::layout($company, $label, $intro, [], $outro, null, $config),
+            'text'    => self::plainText($label, "$lead $code", [], self::stripHtml($outro), null, $config),
+        ];
+    }
+
+    /**
+     * Avertissement de sécurité (mot de passe changé ou réinitialisé, email professionnel modifié).
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function securityNotice(string $title, string $message, array $config): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $intro = self::escape($message);
+        $outro = sprintf(
+            'Ce message est envoyé le %s à %s. Si vous n\'êtes pas à l\'origine de ce changement, utilisez « Mot de passe oublié » sur l\'écran de connexion, puis vérifiez l\'email professionnel.',
+            self::formatDate(date('Y-m-d H:i:s')),
+            date('H:i')
+        );
+
+        return [
+            'subject' => sprintf('%s — %s', $company, $title),
+            'html'    => self::layout($company, $title, $intro, [], $outro, null, $config),
+            'text'    => self::plainText($title, $message, [], self::stripHtml($outro), null, $config),
         ];
     }
 

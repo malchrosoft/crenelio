@@ -39,6 +39,7 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 - **Zone d'intervention** (pleine page) : point de départ (adresse ou GPS), rayon, communes limitrophes, calcul des communes via `geo.api.gouv.fr` (bleu : entièrement dans le rayon, orange : partiellement), retrait d'une commune au clic droit.
 - **Configuration** : identité (nom, logo et favicon PNG/SVG avec recadrage), coordonnées, page vitrine, engagements, réservation, mentions légales ; bouton « Annuler » sur chaque formulaire.
 - **Apparence** (onglet Configuration) : couleur principale (palette lisible ou couleur libre, contrôle du contraste), arrondis, effets activables (ombres douces, verre dépoli, animations respectant « réduire les animations »), aperçu en direct ; reprise dans les emails.
+- **Mot de passe & email professionnel** : changement imposé tant que `admin123` est actif (toléré en développement, avec bandeau), changement depuis *Configuration* (ancien mot de passe requis, 12 caractères minimum, mots de passe courants refusés), « Mot de passe oublié » par code envoyé à l'email professionnel, email professionnel modifié seulement après vérification par code (l'ancienne adresse est prévenue). Chaque changement ferme les autres sessions et envoie un email de confirmation.
 - **Authentification** : mot de passe haché (Bcrypt), session serveur (cookie `HttpOnly`, `SameSite=Strict`) vérifiée sur toutes les routes de gestion. Sur un nouvel appareil, **code à 6 chiffres envoyé à l'email professionnel** (15 min, 3 essais), puis appareil reconnu 10 jours. 5 échecs de mot de passe en 15 min bloquent l'adresse IP. Sans email professionnel ni envoi d'emails (`MAIL_FROM`), le mot de passe seul protège l'espace (bandeau d'avertissement). En local, le code arrive dans Mailpit (`http://localhost:8025`).
 
 ---
@@ -188,6 +189,11 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 | `POST` | `/api/admin/login/code` | Validation du code à 6 chiffres |
 | `GET` | `/api/admin/session` | État de la session |
 | `POST` | `/api/admin/logout` | Déconnexion |
+| `POST` | `/api/admin/password` | Changement du mot de passe (ancien mot de passe requis) |
+| `POST` | `/api/admin/password/forgot` | Code de réinitialisation vers l'email professionnel (réponse identique dans tous les cas) |
+| `POST` | `/api/admin/password/reset` | Code + nouveau mot de passe ; ouvre la session |
+| `POST` | `/api/admin/pro-email` | Nouvel email professionnel : envoi d'un code à cette adresse |
+| `POST` | `/api/admin/pro-email/confirm` | Validation du code ; l'ancienne adresse est prévenue |
 | `GET` | `/api/admin/mail` | Mode d'envoi des emails et expéditeur (lecture seule) |
 | `POST` | `/api/admin/mail/test` | Email de test vers `to` (testeur, développeur) ou, à défaut, l'email professionnel ; 5 envois / 10 min |
 

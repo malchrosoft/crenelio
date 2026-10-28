@@ -173,6 +173,12 @@ autre tâche, mais en tenir compte et les traiter dans l'item dédié.
 - Restent publiques : config publique, prestations actives, créneaux, zone, devis de déplacement,
   réservation, demande hors zone, et les routes à token (`/appointments/token/:token`,
   `/appointments/decision/:token`). `GET /schedules` reste public (horaires d'ouverture).
+- **Mot de passe & email professionnel (Item 25)** : `admin_password` et `pro_email` ne passent
+  plus par `PUT /admin/config` (refusés) mais par les routes dédiées (`/admin/password*`,
+  `/admin/pro-email*`). Tant que `admin123` est actif, `Auth::guard` répond 403
+  (`password_change_required`) hors `APP_ENV=development` ; une route nécessaire au changement
+  s'enregistre avec `$adminDefaultOk(...)`. Les codes à 6 chiffres (connexion, réinitialisation,
+  email) passent tous par `Auth::issueCode` / `Auth::checkCode`.
 - Sans `pro_email` ou sans envoi d'emails (`MAIL_FROM`), le second facteur est inactif (mot de passe seul, bandeau d'avertissement).
 
 ### 🔑 Fichiers `.env` — hors de portée des agents

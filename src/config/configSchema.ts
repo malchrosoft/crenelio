@@ -36,7 +36,6 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
     intro: 'Informations affichées sur la vitrine, dans les emails et sur la fiche de confirmation.',
     fields: [
       { key: 'pro_name', label: "Nom de l'artisan", type: 'text' },
-      { key: 'pro_email', label: 'Email de contact', type: 'email', hint: 'Reçoit les fiches intervention.' },
       { key: 'pro_phone', label: 'Téléphone', type: 'tel' },
       { key: 'service_area', label: 'Zone couverte (texte affiché)', type: 'text' },
     ],

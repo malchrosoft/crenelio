@@ -24,7 +24,7 @@ const BASE_URL = '/api';
 export const UNAUTHORIZED_EVENT = 'crenelio:unauthorized';
 
 /** Routes de connexion : un 401 y signale une erreur de saisie, pas une session expirée. */
-const LOGIN_PATHS = ['/admin/login', '/admin/login/code'];
+const LOGIN_PATHS = ['/admin/login', '/admin/login/code', '/admin/password', '/admin/password/reset'];
 
 async function request<T>(method: string, path: string, body: unknown = null): Promise<T> {
   // FormData (envoi de fichiers) : le navigateur fixe lui-même l'en-tête multipart
@@ -79,7 +79,23 @@ export const api = {
     ),
   adminVerifyCode: (code: string) =>
     request<{ status: 'authenticated'; two_factor: boolean }>('POST', '/admin/login/code', { code }),
-  adminSession: () => request<{ authenticated: boolean; two_factor: boolean }>('GET', '/admin/session'),
+  adminSession: () =>
+    request<{ authenticated: boolean; two_factor: boolean; default_password: boolean; must_change_password: boolean }>(
+      'GET',
+      '/admin/session'
+    ),
+  /** Changement depuis l'espace Pro : ferme les autres sessions. */
+  changePassword: (current: string, password: string) =>
+    request<{ message: string }>('POST', '/admin/password', { current, password }),
+  /** Mot de passe oublié : code envoyé à l'email professionnel (réponse identique dans tous les cas). */
+  forgotPassword: () => request<{ message: string }>('POST', '/admin/password/forgot'),
+  resetPassword: (code: string, password: string) =>
+    request<{ status: 'authenticated'; two_factor: boolean }>('POST', '/admin/password/reset', { code, password }),
+  /** Nouvel email professionnel : retenu après saisie du code reçu sur cette adresse. */
+  requestProEmail: (email: string) =>
+    request<{ status: 'saved' | 'code_sent'; pro_email: string | null }>('POST', '/admin/pro-email', { email }),
+  confirmProEmail: (code: string) =>
+    request<{ status: 'saved'; pro_email: string }>('POST', '/admin/pro-email/confirm', { code }),
   adminLogout: () => request<{ success: boolean }>('POST', '/admin/logout'),
   getMailStatus: () => request<MailStatusInfo>('GET', '/admin/mail'),
   /** Destinataire libre (testeur, développeur) ; à défaut, l'email professionnel. */
