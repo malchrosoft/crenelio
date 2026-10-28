@@ -18,6 +18,7 @@ import {
   MapTrifoldIcon,
   PlusIcon,
   WarningIcon,
+  EraserIcon,
 } from '@phosphor-icons/react';
 import { api, UNAUTHORIZED_EVENT } from '../api';
 import {
@@ -30,6 +31,7 @@ import {
   BrandingUrls,
 } from '../types';
 import { formatEuro } from '../utils/format';
+import { ANONYMIZED_NAME } from '../utils/privacy';
 import { CONFIG_GROUPS, buildOtherGroup } from '../config/configSchema';
 import ConfigGroupForm from './admin/ConfigGroupForm';
 import EngagementsEditor from './admin/EngagementsEditor';
@@ -42,6 +44,7 @@ import NewAppointment from './admin/NewAppointment';
 import BrandingField from './admin/BrandingField';
 import AdminShell, { AdminTab } from './admin/AdminShell';
 import AdminLogin from './admin/AdminLogin';
+import ConfirmDialog from './admin/ConfirmDialog';
 import MailStatus from './admin/MailStatus';
 import AppearanceEditor from './admin/AppearanceEditor';
 import PasswordChange from './admin/PasswordChange';
@@ -189,6 +192,9 @@ export const AdminDashboard: React.FC = () => {
   // Erreurs par prestation (ex: suppression impossible)
   const [serviceErrors, setServiceErrors] = useState<Record<number, string>>({});
 
+  // Demande d'effacement RGPD en cours de confirmation
+  const [anonymizing, setAnonymizing] = useState<Appointment | null>(null);
+
   // Journal des notifications email du rendez-vous consulté
   const [notificationsAppointment, setNotificationsAppointment] = useState<Appointment | null>(null);
   const [notifications, setNotifications] = useState<AppointmentNotification[]>([]);
@@ -275,6 +281,18 @@ export const AdminDashboard: React.FC = () => {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function confirmAnonymize() {
+    if (!anonymizing) return;
+    const target = anonymizing;
+    setAnonymizing(null);
+    try {
+      const res = await api.anonymizeAppointment(target.id);
+      setAppointments((prev) => prev.map((a) => (a.id === target.id ? { ...a, ...res.appointment } : a)));
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Erreur lors de l'effacement");
     }
   }
 
@@ -575,6 +593,18 @@ export const AdminDashboard: React.FC = () => {
           </span>
         </div>
       )}
+      {anonymizing && (
+        <ConfirmDialog
+          title="Effacer les données du client ?"
+          confirmLabel="Effacer définitivement"
+          onConfirm={confirmAnonymize}
+          onCancel={() => setAnonymizing(null)}
+        >
+          Le nom, l'email, le téléphone, l'adresse et les notes de <strong>{anonymizing.client_name}</strong> seront
+          effacés, ainsi que les adresses du journal des emails. Le rendez-vous reste dans le planning (prestation,
+          date, montant, commune). Cette action est irréversible : à utiliser pour une demande d'effacement.
+        </ConfirmDialog>
+      )}
       {!twoFactor && (
         <div className="admin-security-notice" role="status">
           <WarningIcon size={20} weight="fill" aria-hidden="true" />
@@ -770,6 +800,17 @@ export const AdminDashboard: React.FC = () => {
                             <EnvelopeSimpleIcon size={14} weight="bold" />
                             Emails
                           </button>
+                          {a.client_name !== ANONYMIZED_NAME && (
+                            <button
+                              type="button"
+                              className="btn btn-secondary admin-btn-reschedule"
+                              onClick={() => setAnonymizing(a)}
+                              title="Demande d'effacement (RGPD) : efface le nom, l'email, le téléphone, l'adresse et les notes du client"
+                            >
+                              <EraserIcon size={14} weight="bold" />
+                              Effacer le client
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

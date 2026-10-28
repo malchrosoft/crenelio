@@ -87,12 +87,20 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 5. Conformité RGPD & Gestion des Cookies
+### 5. Conformité RGPD & Gestion des Cookies — ✅ Terminée
 - **Protection des données personnelles :**
   - Mention explicite du consentement sur la collecte des coordonnées lors de la prise de rendez-vous.
   - Politique de conservation des données et droit d'accès/suppression.
 - **Cookies & Traceurs :**
   - Bandeau d'information et consentement cookies si nécessaire (l'application étant sans traceurs tiers intrusifs, documenter l'exemption ou prévoir la bannière en cas d'ajout d'analytics).
+- **Réalisé (28/10/2026) :**
+  - **Information plutôt que consentement :** la prise de rendez-vous repose sur l'exécution du contrat (RGPD art. 6.1.b), pas sur le consentement ; une case à cocher serait inexacte. Notice d'information (art. 13) sous le formulaire de réservation et de demande hors zone (`PrivacyNotice`), avec lien vers la politique.
+  - **Politique de confidentialité** générée depuis la configuration (`PrivacyPolicy`, fenêtre « Mentions légales & confidentialité ») : responsable, données et finalités, base légale, destinataires, services tiers (Base Adresse Nationale, tuiles OpenStreetMap), durée de conservation, droits et réclamation CNIL, cookies.
+  - **Cookies :** aucun traceur (ni mesure d'audience, ni publicité, ni réseau social) ⇒ pas de bandeau ; les cookies de l'espace Pro et le stockage du thème sont strictement nécessaires (exemptés) et listés dans la politique. **À revoir si un outil d'audience est ajouté.**
+  - **Conservation :** `rgpd_retention_months` (36 par défaut, groupe Mentions légales) ; purge automatique une fois par jour à l'ouverture du planning (`Appointment::purgeOlderThan`), sans tâche planifiée.
+  - **Effacement :** bouton « Effacer le client » du planning (`POST /appointments/:id/anonymize`) : nom, email, téléphone, adresse, notes, motif d'annulation et adresses du journal des emails effacés ; restent prestation, date, montant, code postal et commune. Aucune évolution de schéma.
+  - **Non fait :** export des données d'un client (droit d'accès / portabilité) : l'artisan répond à partir de la fiche du rendez-vous ; à outiller si les demandes deviennent fréquentes.
+  - Textes à faire relire par l'artisan, responsable du traitement : modèle, pas un avis juridique.
 
 ---
 
@@ -344,6 +352,17 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Points d'attention :** performances sur mobile (limiter les animations continues, `will-change` ponctuel), lisibilité et contrastes vérifiés dans les deux thèmes, rendu Safari pour `backdrop-filter` et `@property`.
 - **Prérequis :** Item 2 ✅.
 
+### 31. Traduction du Site (Multilingue)
+- **Objectif :** proposer la vitrine, la réservation et les emails clients en plusieurs langues (français par défaut, anglais d'abord), pour la clientèle non francophone.
+- **Périmètre :**
+  - Textes de l'interface publique (vitrine, tunnel de réservation, page de gestion `/rdv/:token`, notice et politique de confidentialité) extraits dans des fichiers de traduction, sur le modèle de `src/data/legalCreditsI18n.json` ; aucune dépendance lourde.
+  - Sélecteur de langue discret (header de la vitrine), langue proposée selon le navigateur, choix mémorisé localement.
+  - Emails et fichier `.ics` dans la langue du client (langue mémorisée avec le rendez-vous : évolution de schéma + migration).
+  - Textes saisis par l'artisan (accroche, présentation, engagements, prestations) : traduction facultative par langue dans l'espace Pro, repli sur le français.
+  - Dates, heures et montants formatés selon la langue (`Intl`).
+- **Hors périmètre :** l'espace Pro reste en français.
+- **Points d'attention :** langues écrites de droite à gauche (déjà gérées pour les crédits), longueur des textes traduits dans les boutons, référencement (`lang`, `hreflang`).
+
 ---
 
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
@@ -352,15 +371,16 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
 |---|---|---|---|---|---|---|
-| **1** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires | 🔴 Obligation légale avant toute mise en ligne publique (données clients collectées) |
-| **2** | **Item 27** | **Déploiement initial interactif (`npm run deploy:init`)** | Installation / Déploiement | ⏳ *À faire* | Item 25 | 🟠 Lève le dernier frein à la mise en ligne (déploiement manuel aujourd'hui possible mais fastidieux) |
-| **3** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ | 🟢 Gain quotidien le plus fort pour l'artisan (vue semaine, glisser-déposer) |
-| **4** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — | 🟢 Gain réel (tri, filtres, export), la liste actuelle reste utilisable en attendant |
-| **5** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
-| **6** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
-| **7** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
-| **8** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
-| **9** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| **1** | **Item 27** | **Déploiement initial interactif (`npm run deploy:init`)** | Installation / Déploiement | ⏳ *À faire* | Item 25 | 🟠 Lève le dernier frein à la mise en ligne (déploiement manuel aujourd'hui possible mais fastidieux) |
+| **2** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ | 🟢 Gain quotidien le plus fort pour l'artisan (vue semaine, glisser-déposer) |
+| **3** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — | 🟢 Gain réel (tri, filtres, export), la liste actuelle reste utilisable en attendant |
+| **4** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
+| **5** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
+| **6** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
+| **7** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
+| **8** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| **9** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
+| — | **Item 5** | Conformité RGPD & cookies (notice, politique, conservation, effacement) | Légal / Conformité | ✅ **Terminé** | — | — |
 | — | **Item 25** | Mot de passe & email professionnel sécurisés (changement, réinitialisation, vérification) | Sécurité / Authentification | ✅ **Terminé** | — | — |
 | — | **Item 2** | Theming & effets visuels pilotables depuis l'espace Pro | Design / UI | ✅ **Terminé** | — | — |
 | — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ **Abandonné** | Remplacé par l'Item 24 | — |

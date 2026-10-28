@@ -105,6 +105,9 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
   - **Éviter de contourner le style inline avec des micro-classes atomiques / utilitaires ad hoc (ex: `text-95`, `mb-5`, `p-3`)** qui reviennent exactement au même. Définir de vraies **classes sémantiques BEM / de composant** dans les fichiers SCSS dédiés (`_components.scss`, `_vitrine.scss`, etc.) en réutilisant les variables SCSS (`$primary`, `$gray-500`, etc.).
   - Les styles ou micro-utilitaires ne sont tolérés que dans des **composants de base** réutilisables (design system).
   - Ne jamais coder en dur des valeurs hexadécimales de couleurs dans le SCSS : toujours utiliser les constantes/variables de `_variables.scss`.
+  - **Constantes :** interlignes (`$line-height-tight` … `$line-height-loose`), durées d'animation (`$duration-*`) et espacements (`$space-*`) viennent de `_variables.scss` ; ne pas réécrire de valeur littérale.
+  - **Fenêtres et encarts :** une fenêtre utilise les mixins `modal-*` (`_mixins.scss`) ; un encart titré utilise le composant `Panel` (fond gris clair, en-tête légèrement soutenu). Ne pas recréer d'en-tête ou de cadre à part.
+  - **Liens :** jamais soulignés au repos (règle globale de `_base.scss`) ; un lien de texte sans classe se souligne au survol et au focus clavier. Un lien-composant (avec classe) gère son propre survol : ne pas lui ajouter de soulignement permanent.
   - **Boutons :** tout élément d'aspect bouton (`<button>`, `<a>`, `<Link>`, `<span>` dans une carte cliquable) utilise `.btn` + `.btn-primary` / `.btn-secondary` / `.btn-danger`, et au besoin `.btn--lg` / `.btn--xl`. Jamais de classe dupliquée qui imite un bouton : elle échapperait au style de boutons du thème.
   - **Thème (Item 2) :** `$primary`, `$primary-hover`, `$primary-light`, `$radius*` et `$shadow*` sont des **variables CSS** (`_theme.scss`), pilotées par `src/utils/theme.ts`. Ne jamais les passer à une fonction de couleur Sass (`rgba()`, `lighten()`…) : utiliser `primary-alpha(20%)` / `primary-tint(10%)` (`_mixins.scss`). Toute nouvelle couleur liée à la marque doit dériver de `--color-primary`.
 - **Icônes :** Utiliser la librairie `@phosphor-icons/react` avec le style `weight="fill"`. Pour une identification immédiate et sans ambiguïté, **toujours utiliser les imports suffixés par `Icon`** (ex : `CalendarCheckIcon`, `MapPinIcon`, `ClockIcon`, `PhoneIcon`, `LockKeyIcon`).
@@ -224,6 +227,15 @@ documentation (`README.md`, `DEPLOYMENT.md` **et** `DEPLOYMENT.fr.md`) doit les 
   - `mail()` est suivi dans l'onglet *Scripts e-mail* de l'hébergement, les envois SMTP non.
 - **Avant d'affirmer une règle OVHcloud, la vérifier dans la documentation officielle**
   (`docs.ovhcloud.com`) : elles évoluent.
+
+### 🛡️ RGPD (Item 5)
+- Toute **nouvelle donnée personnelle** (colonne, champ de formulaire, service tiers, cookie ou
+  stockage navigateur) doit être ajoutée à `Appointment::anonymizeWhere` (effacement et purge) **et**
+  décrite dans `src/components/PrivacyPolicy.tsx`.
+- Aucun traceur (audience, publicité, réseau social) sans bandeau de consentement : l'absence de
+  bandeau repose sur l'absence de traceurs.
+- La purge des rendez-vous expirés est déclenchée par `GET /appointments` (une fois par jour,
+  clé `rgpd_last_purge`) : ne pas la déplacer dans une route publique.
 
 ### 🗓️ Fuseau horaire
 - Les datetimes sont stockés **naïfs** en base et s'interprètent dans `APP_TIMEZONE`

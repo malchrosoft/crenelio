@@ -59,3 +59,92 @@
     transition: $in;
   }
 }
+
+// -------------------------------------------------------
+// Fenêtres (modales) : un seul rendu pour l'espace Pro, les confirmations et les mentions légales
+// -------------------------------------------------------
+@mixin modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: color-mix(in srgb, #{$gray-900} 55%, transparent);
+  backdrop-filter: blur(3px);
+
+  @media (prefers-reduced-motion: reduce) {
+    backdrop-filter: none;
+  }
+}
+
+/// Panneau : bordure régulière sur les quatre côtés, halo discret de la couleur principale,
+/// ombre portée marquée. Colonne fixe (en-tête + corps) : seul le corps défile, et sa barre de
+/// défilement est découpée par les coins arrondis du panneau.
+@mixin modal-panel($max-width) {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: $max-width;
+  max-height: 88vh;
+  overflow: hidden;
+  background: white;
+  border: 1px solid $gray-200;
+  border-radius: $radius-lg;
+  box-shadow: 0 0 0 5px primary-alpha(10%), $shadow-modal;
+}
+
+/// En-tête fortement contrasté : bandeau de la couleur principale, texte blanc (contraste ≥ 4,5:1
+/// garanti par le contrôle de la couleur dans l'encart Apparence). Hors de la zone de défilement.
+@mixin modal-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: $modal-header-padding;
+  background: $primary;
+  color: white;
+  border-bottom: 1px solid $primary-hover;
+}
+
+@mixin modal-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: $line-height-snug;
+  color: white;
+}
+
+@mixin modal-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  // Sur le bandeau coloré : bouton blanc translucide
+  border: 1px solid rgb(255 255 255 / 0.4);
+  background: rgb(255 255 255 / 0.14);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  @include hover-transition(background-color border-color, $duration-fast);
+
+  &:hover,
+  &:focus-visible {
+    background: rgb(255 255 255 / 0.28);
+    border-color: rgb(255 255 255 / 0.7);
+  }
+}
+
+/// Seule zone qui défile ; `min-height: 0` lui permet de rétrécir dans la colonne flex.
+@mixin modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: $modal-padding;
+}

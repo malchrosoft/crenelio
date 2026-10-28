@@ -86,7 +86,8 @@
     backdrop-filter: blur(14px) saturate(1.6);
   }
 
-  .admin-modal-overlay {
+  .admin-modal-overlay,
+  .legal-modal-overlay {
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
   }
@@ -103,9 +104,12 @@
 // -------------------------------------------------------
 @media (prefers-reduced-motion: no-preference) {
   :root[data-motion='on'] {
-    .card,
+    // Petites cartes uniquement : jamais les conteneurs (formulaires, panneaux .card), qu'un
+    // déplacement rendrait instables et qui deviendraient le repère des fenêtres qu'ils contiennent
+    .service-card,
     .vitrine-service-card,
-    .engagement-card {
+    .engagement-card,
+    .contact-card {
       @include hover-transition(transform box-shadow, $duration-lift, $ease-out-expo);
 
       &:hover {

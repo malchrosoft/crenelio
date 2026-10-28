@@ -111,7 +111,7 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
               className="footer-legal-btn"
               onClick={() => setShowLegal(true)}
             >
-              Mentions légales
+              Mentions légales & confidentialité
             </button>
             <Link
               to="/admin"

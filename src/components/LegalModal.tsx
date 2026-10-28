@@ -1,7 +1,11 @@
+import { createPortal } from 'react-dom';
 import React, { useState } from 'react';
 import { GithubLogoIcon, TranslateIcon } from '@phosphor-icons/react';
 import { AppConfig } from '../types';
-import { premisesLabel } from '../utils/zone';
+import { legalAddressLines, postalLines, premisesLabel } from '../utils/zone';
+import PrivacyPolicy from './PrivacyPolicy';
+import PostalContact from './PostalContact';
+import Panel from './Panel';
 import legalCreditsI18n from '../data/legalCreditsI18n.json';
 
 type LangKey = keyof typeof legalCreditsI18n;
@@ -9,14 +13,21 @@ type LangKey = keyof typeof legalCreditsI18n;
 interface LegalModalProps {
   config: AppConfig;
   onClose: () => void;
+  /** Ouvre directement sur la politique de confidentialité (lien du formulaire de réservation). */
+  section?: 'privacy';
 }
 
 /**
  * Modal affichant les mentions légales configurées dans l'espace Pro.
  * Accessible : focus piégé, fermeture sur Echap et clic overlay.
  */
-const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
+const LegalModal: React.FC<LegalModalProps> = ({ config, onClose, section }) => {
   const [selectedLang, setSelectedLang] = useState<LangKey>('fr');
+  const privacyRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (section === 'privacy') privacyRef.current?.scrollIntoView({ block: 'start' });
+  }, [section]);
 
   // Fermeture sur Echap
   React.useEffect(() => {
@@ -35,7 +46,8 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
     config.legal_siret ||
     legalAddress;
 
-  return (
+  // Portail vers <body> : la fenêtre ne dépend jamais du conteneur qui l'ouvre (transformations, flou)
+  return createPortal(
     <div
       className="legal-modal-overlay"
       role="dialog"
@@ -49,7 +61,7 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
       >
         <div className="legal-modal__header">
           <h2 className="legal-modal__title" id="legal-modal-title">
-            Mentions légales
+            Mentions légales et confidentialité
           </h2>
           <button
             className="legal-modal__close"
@@ -66,16 +78,12 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
               {config.legal_raison_sociale && (
                 <div className="legal-section">
                   <h3>Éditeur du site</h3>
-                  <address>
-                    <strong>{config.legal_raison_sociale}</strong>
-                    {legalAddress && <><br />{legalAddress}</>}
-                    {config.pro_phone && (
-                      <><br />Tél. : <a href={`tel:${config.pro_phone}`}>{config.pro_phone}</a></>
-                    )}
-                    {config.pro_email && (
-                      <><br />E-mail : <a href={`mailto:${config.pro_email}`}>{config.pro_email}</a></>
-                    )}
-                  </address>
+                  <PostalContact
+                    name={config.legal_raison_sociale}
+                    addressLines={legalAddressLines(config)}
+                    phone={config.pro_phone}
+                    email={config.pro_email}
+                  />
                 </div>
               )}
 
@@ -93,44 +101,41 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
               {config.legal_hebergeur && (
                 <div className="legal-section">
                   <h3>Hébergement</h3>
-                  <p>{config.legal_hebergeur}</p>
+                  {(() => {
+                    // Première ligne saisie = nom de l'hébergeur, comme pour l'éditeur du site
+                    const [name, ...lines] = postalLines(config.legal_hebergeur);
+                    return <PostalContact name={name} addressLines={lines} />;
+                  })()}
                 </div>
               )}
             </>
           ) : (
             <div className="legal-section">
-              <p>
-                Ce site est édité par <strong>{config.pro_name || companyName}</strong>.
-                {config.pro_phone && <> Tél. : <a href={`tel:${config.pro_phone}`}>{config.pro_phone}</a>.</>}
-                {config.pro_email && <> E-mail : <a href={`mailto:${config.pro_email}`}>{config.pro_email}</a>.</>}
-              </p>
+              <p>Ce site est édité par :</p>
+              <PostalContact
+                name={config.pro_name || companyName}
+                addressLines={legalAddressLines(config)}
+                phone={config.pro_phone}
+                email={config.pro_email}
+              />
               <p className="legal-section-pending">
                 Les informations légales complètes (SIRET, assurance...) sont en cours de configuration.
               </p>
             </div>
           )}
 
-          <div className="legal-section">
-            <h3>Données personnelles</h3>
-            <p>
-              Les données collectées lors de la prise de rendez-vous (nom, téléphone, adresse d'intervention)
-              sont utilisées exclusivement pour la gestion des interventions et ne sont jamais transmises
-              à des tiers. Conformément au RGPD, vous pouvez exercer vos droits d'accès et de suppression
-              en contactant directement {config.pro_name || companyName}.
-            </p>
+          <div className="legal-section legal-section--privacy" id="confidentialite" ref={privacyRef}>
+            <PrivacyPolicy config={config} />
           </div>
 
-          <div
-            className="legal-section legal-section--opensource"
-            dir={legalCreditsI18n[selectedLang]?.dir || 'ltr'}
-          >
-            <div className="legal-opensource-header">
-              <h3>{legalCreditsI18n[selectedLang]?.title || legalCreditsI18n.fr.title}</h3>
-              <div className="legal-lang-selector" dir="ltr">
+          <Panel
+            className="legal-section legal-credits"
+            dir={legalCreditsI18n[selectedLang]?.dir === 'rtl' ? 'rtl' : 'ltr'}
+            title={legalCreditsI18n[selectedLang]?.title || legalCreditsI18n.fr.title}
+            actions={
+              <label className="legal-lang-selector">
                 <TranslateIcon size={16} weight="fill" aria-hidden="true" />
-                <label htmlFor="legal-credits-lang" className="legal-lang-label">
-                  Langue :
-                </label>
+                <span className="legal-lang-label">Langue :</span>
                 <select
                   id="legal-credits-lang"
                   className="legal-lang-select"
@@ -144,9 +149,9 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
                     </option>
                   ))}
                 </select>
-              </div>
-            </div>
-
+              </label>
+            }
+          >
             <p>
               {legalCreditsI18n[selectedLang]?.poweredBy || legalCreditsI18n.fr.poweredBy}{' '}
               <a
@@ -173,10 +178,11 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose }) => {
               </a>
               . {legalCreditsI18n[selectedLang]?.licenseSuffix || legalCreditsI18n.fr.licenseSuffix}
             </p>
-          </div>
+          </Panel>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

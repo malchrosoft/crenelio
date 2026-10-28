@@ -22,6 +22,8 @@ interface BookingFormProps {
   onBack: () => void;
   loading: boolean;
   error: string | null;
+  /** Information RGPD affichée juste avant la validation (parcours client uniquement). */
+  privacyNotice?: React.ReactNode;
 }
 
 export const BookingForm: React.FC<BookingFormProps> = ({
@@ -36,6 +38,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   onBack,
   loading,
   error,
+  privacyNotice,
 }) => {
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
@@ -415,6 +418,8 @@ export const BookingForm: React.FC<BookingFormProps> = ({
             fichier agenda)
           </label>
         )}
+
+        {!adminMode && privacyNotice}
 
         <div className="form-actions-between">
           <button

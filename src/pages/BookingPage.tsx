@@ -11,6 +11,7 @@ import BookingConfirmation from '../components/BookingConfirmation';
 import SiteHeader from '../components/SiteHeader';
 import Footer from '../components/vitrine/Footer';
 import ConfirmDialog from '../components/admin/ConfirmDialog';
+import PrivacyNotice from '../components/PrivacyNotice';
 import { isPremisesOnly, premisesLabel } from '../utils/zone';
 
 interface BookingPageProps {
@@ -179,6 +180,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
                   onBack={() => setStep(2)}
                   loading={loading}
                   error={error}
+                  privacyNotice={<PrivacyNotice config={config} />}
                 />
               );
             })()}

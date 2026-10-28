@@ -24,6 +24,7 @@ class AppointmentController
         $endDate   = $_GET['end_date'] ?? null;
         $status    = $_GET['status'] ?? null;
 
+        self::purgeExpiredOncePerDay();
         $appointments = Appointment::all($startDate, $endDate, $status);
         Response::json($appointments);
     }
@@ -501,5 +502,36 @@ class AppointmentController
 
         Response::json(Appointment::find($id));
     }
-}
 
+    /**
+     * POST /appointments/:id/anonymize — Efface les données du client (demande d'effacement RGPD).
+     */
+    public function anonymize(array $params): void
+    {
+        $id = (int)($params['id'] ?? 0);
+        if (!Appointment::find($id)) {
+            Response::json(['error' => 'Rendez-vous non trouvé'], 404);
+        }
+        Appointment::anonymize($id);
+        Response::json(['message' => 'Données du client effacées', 'appointment' => Appointment::find($id)]);
+    }
+
+    /**
+     * Purge RGPD : anonymise les rendez-vous au-delà de la durée de conservation
+     * (`rgpd_retention_months`, 36 par défaut). Lancée à l'ouverture du planning, une fois par jour
+     * au plus : pas de tâche planifiée nécessaire sur un hébergement mutualisé.
+     */
+    private static function purgeExpiredOncePerDay(): void
+    {
+        $today = date('Y-m-d');
+        if (Config::get('rgpd_last_purge') === $today) {
+            return;
+        }
+        $months = (int)(Config::get('rgpd_retention_months') ?: Appointment::DEFAULT_RETENTION_MONTHS);
+        $count = Appointment::purgeOlderThan(max(1, $months));
+        Config::set('rgpd_last_purge', $today);
+        if ($count > 0) {
+            error_log("[Crenelio] RGPD : $count rendez-vous anonymisés (conservation $months mois)");
+        }
+    }
+}

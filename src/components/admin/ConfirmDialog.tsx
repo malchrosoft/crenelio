@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import React, { useEffect } from 'react';
 import { XIcon } from '@phosphor-icons/react';
 
@@ -17,7 +18,8 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ title, children, confirmL
     return () => document.removeEventListener('keydown', onKey);
   }, [onCancel]);
 
-  return (
+  // Portail vers <body> : la fenêtre ne dépend jamais du conteneur qui l'ouvre (transformations, flou)
+  return createPortal(
     <div className="admin-modal-overlay" role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title">
       <div className="admin-modal">
         <div className="admin-modal__header">
@@ -41,7 +43,8 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ title, children, confirmL
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

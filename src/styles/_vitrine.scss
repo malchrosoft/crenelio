@@ -137,14 +137,14 @@
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 800;
     color: $gray-900;
-    line-height: 1.2;
+    line-height: $line-height-snug;
     margin-bottom: 20px;
   }
 
   .hero__subtitle {
     font-size: 1.15rem;
     color: $gray-600;
-    line-height: 1.7;
+    line-height: $line-height-relaxed;
     margin-bottom: 40px;
     max-width: 560px;
     margin-left: auto;
@@ -159,10 +159,12 @@
     color: $primary;
     font-size: 1.05rem;
     font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 3px;
 
-    &:hover { color: $primary-hover; }
+    &:hover,
+    &:focus-visible {
+      color: $primary-hover;
+      text-decoration: underline;
+    }
 
     @include mobile {
       display: block;
@@ -208,14 +210,14 @@
     font-size: clamp(1.6rem, 3vw, 2.2rem);
     font-weight: 800;
     color: $gray-900;
-    line-height: 1.25;
+    line-height: $line-height-snug;
     margin-bottom: 14px;
   }
 
   .section-subtitle {
     font-size: 1.05rem;
     color: $gray-500;
-    line-height: 1.7;
+    line-height: $line-height-relaxed;
     max-width: 560px;
     margin: 0 auto;
   }
@@ -282,7 +284,7 @@
   .about-text {
     font-size: 1.05rem;
     color: $gray-600;
-    line-height: 1.8;
+    line-height: $line-height-loose;
     margin-bottom: 28px;
   }
 
@@ -369,7 +371,7 @@
   .vitrine-service-card__desc {
     font-size: 0.95rem;
     color: $gray-500;
-    line-height: 1.6;
+    line-height: $line-height-relaxed;
     margin-bottom: 0;
   }
 
@@ -443,7 +445,7 @@ $engagement-gap: 24px;
     font-size: 1.05rem;
     font-weight: 600;
     color: $gray-800;
-    line-height: 1.4;
+    line-height: $line-height-base;
   }
 }
 
@@ -558,7 +560,7 @@ $engagement-gap: 24px;
     .footer-brand__tagline {
       font-size: 0.95rem;
       color: $gray-400;
-      line-height: 1.6;
+      line-height: $line-height-relaxed;
       margin-bottom: 0;
     }
   }
@@ -729,69 +731,53 @@ $engagement-gap: 24px;
 // Modal Mentions Légales
 // -------------------------------------------------------
 .legal-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 200;
-  @include flex-center;
-  padding: 20px;
-  backdrop-filter: blur(2px);
-
-  @media (prefers-reduced-motion: reduce) {
-    backdrop-filter: none;
-  }
+  @include modal-overlay;
 }
 
 .legal-modal {
-  background: white;
-  border-radius: $radius-lg;
-  max-width: 640px;
-  width: 100%;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: $shadow-lg;
+  @include modal-panel(640px);
 
   .legal-modal__header {
-    @include flex-between;
-    padding: 24px 28px 16px;
-    border-bottom: 1px solid $gray-100;
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 1;
+    @include modal-header;
   }
 
   .legal-modal__title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: $gray-900;
+    @include modal-title;
   }
 
   .legal-modal__close {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: $gray-100;
-    color: $gray-600;
-    font-size: 1.2rem;
-    @include flex-center;
-    cursor: pointer;
-    border: none;
-    transition: $transition-fast;
-    flex-shrink: 0;
-
-    &:hover {
-      background: $gray-200;
-      color: $gray-900;
-    }
+    @include modal-close;
   }
 
   .legal-modal__body {
-    padding: 24px 28px 32px;
+    @include modal-body;
   }
 
   .legal-section {
     margin-bottom: 28px;
+
+    // Politique de confidentialité : sous-rubriques et listes
+    h4 {
+      margin: 16px 0 6px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: $gray-800;
+    }
+
+    ul {
+      margin: 0 0 10px 18px;
+      color: $gray-600;
+      font-size: 0.9rem;
+      line-height: $line-height-relaxed;
+
+      li + li {
+        margin-top: 6px;
+      }
+    }
+
+    code {
+      font-size: 0.85em;
+    }
 
     h3 {
       font-size: 1rem;
@@ -805,38 +791,18 @@ $engagement-gap: 24px;
     p, address {
       font-size: 0.95rem;
       color: $gray-600;
-      line-height: 1.7;
+      line-height: $line-height-relaxed;
       font-style: normal;
     }
 
-    &--opensource {
-      background: $gray-50;
-      padding: 16px;
-      border-radius: $radius;
-      border: 1px solid $gray-200;
-
-      .legal-opensource-header {
-        @include flex-between;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 10px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid $gray-200;
-
-        h3 {
-          margin-bottom: 0;
-          padding-bottom: 0;
-          border-bottom: none;
-        }
-      }
-
+    // Crédits open source : contenu de l'encart Panel (le cadre et l'en-tête viennent de .panel)
+    &.legal-credits {
       .legal-lang-selector {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        color: $gray-500;
         font-size: 0.8rem;
+        cursor: pointer;
       }
 
       .legal-lang-label {
@@ -851,30 +817,23 @@ $engagement-gap: 24px;
         font-size: 0.8rem;
         color: $gray-700;
         cursor: pointer;
-        outline: none;
-        transition: $transition-fast;
+        @include hover-transition(border-color, $duration-fast);
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           border-color: $primary;
         }
       }
 
       .legal-opensource-link {
-        color: $primary;
-        text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 4px;
         font-weight: 600;
         vertical-align: middle;
 
-        svg {
-          display: inline-block;
-          vertical-align: middle;
-          flex-shrink: 0;
-        }
-
-        &:hover {
+        &:hover,
+        &:focus-visible {
           text-decoration: underline;
         }
       }
@@ -883,12 +842,6 @@ $engagement-gap: 24px;
         font-size: 0.85rem;
         color: $gray-500;
         margin-top: 8px;
-
-        a {
-          color: $primary;
-          text-decoration: none;
-          &:hover { text-decoration: underline; }
-        }
       }
     }
   }
@@ -985,5 +938,94 @@ $engagement-gap: 24px;
 
   .footer-brand__name & {
     height: 48px;
+  }
+}
+
+// -------------------------------------------------------
+// Coordonnées au format postal (PostalContact) : adresse ligne par ligne, puis « Contact »
+// -------------------------------------------------------
+.postal-contact {
+  font-size: 0.95rem;
+  color: $gray-600;
+  // Lignes d'un même bloc resserrées ; l'aération vient de l'espace entre adresse et contact
+  line-height: $line-height-tight;
+
+  // Balises qualifiées : l'emporte sur `.legal-section p, address` (interligne 1.7) des mentions légales
+  address.postal-contact__address,
+  p.postal-contact__contact {
+    font-style: normal;
+    line-height: $line-height-tight;
+  }
+
+  .postal-contact__name {
+    display: block;
+    margin-bottom: $space-2xs;
+    color: $gray-900;
+  }
+
+  .postal-contact__line {
+    display: block;
+  }
+
+  p.postal-contact__contact {
+    margin-top: $space-block;
+  }
+
+  .postal-contact__label {
+    display: block;
+    margin-bottom: $space-2xs;
+    color: $gray-500;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  // Bloc seul (sans adresse) : pas d'espace en tête
+  p.postal-contact__contact:first-child {
+    margin-top: 0;
+  }
+}
+
+// -------------------------------------------------------
+// Encart titré (Panel) : fond gris clair, en-tête légèrement plus soutenu, cadre régulier
+// -------------------------------------------------------
+.panel {
+  overflow: hidden;
+  border: 1px solid $gray-200;
+  border-radius: $radius;
+  background: $gray-50;
+
+  .panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $space-block;
+    padding: 10px 16px;
+    background: $gray-100;
+    border-bottom: 1px solid $gray-300;
+  }
+
+  // h3 qualifié : l'emporte sur les titres de section du contexte (ex. `.legal-section h3`)
+  h3.panel__title {
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: $line-height-snug;
+    color: $gray-900;
+  }
+
+  .panel__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    color: $gray-600;
+  }
+
+  .panel__body {
+    padding: 16px;
   }
 }

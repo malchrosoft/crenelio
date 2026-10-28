@@ -155,6 +155,9 @@ export const api = {
   getAppointment: (id: number) => request<Appointment>('GET', `/appointments/${id}`),
   updateAppointmentStatus: (id: number, status: string, reason: string | null = null) =>
     request<Appointment>('PUT', `/appointments/${id}/status`, { status, reason }),
+  /** Demande d'effacement (RGPD) : données du client effacées, rendez-vous conservé. */
+  anonymizeAppointment: (id: number) =>
+    request<{ message: string; appointment: Appointment }>('POST', `/appointments/${id}/anonymize`),
   rescheduleAppointment: (id: number, start_datetime: string, status?: string) =>
     request<Appointment>('PUT', `/appointments/${id}/reschedule`, { start_datetime, status }),
 

@@ -167,4 +167,56 @@ class Appointment
             [$startDatetime, $endDatetime, $id]
         ) > 0;
     }
+
+    // -----------------------------------------------------------------
+    // RGPD (Item 5) : anonymisation et durée de conservation
+    // -----------------------------------------------------------------
+
+    /** Nom affiché à la place du client une fois ses données effacées. */
+    public const ANONYMIZED_NAME = 'Client anonymisé';
+
+    /** Durée de conservation par défaut après l'intervention (mois). */
+    public const DEFAULT_RETENTION_MONTHS = 36;
+
+    /**
+     * Efface les données personnelles du client (nom, email, téléphone, adresse, notes, motif
+     * d'annulation) et celles du journal des emails. Restent : prestation, date, statut, montants,
+     * code postal et commune (statistiques de la zone d'intervention).
+     */
+    public static function anonymize(int $id): bool
+    {
+        return self::anonymizeWhere('a.id = ?', [$id]) > 0;
+    }
+
+    /**
+     * Anonymise les rendez-vous terminés depuis plus de $months mois.
+     * Les demandes « En attente » à venir ne sont jamais concernées.
+     *
+     * @return int Nombre de rendez-vous anonymisés.
+     */
+    public static function purgeOlderThan(int $months): int
+    {
+        return self::anonymizeWhere('a.end_datetime < DATE_SUB(NOW(), INTERVAL ? MONTH)', [$months]);
+    }
+
+    private static function anonymizeWhere(string $condition, array $params): int
+    {
+        // Journal des emails : adresses des clients et sujets (ceux de l'artisan citent le client)
+        Database::execute(
+            "UPDATE `appointment_notifications` n
+             JOIN `appointments` a ON a.id = n.appointment_id
+             SET n.recipient = IF(n.type IN ('pro_confirmation', 'exception_pro_request'), n.recipient, ''),
+                 n.subject = '(données anonymisées)'
+             WHERE a.client_name <> ? AND $condition",
+            [self::ANONYMIZED_NAME, ...$params]
+        );
+
+        return Database::execute(
+            "UPDATE `appointments` a
+             SET a.client_name = ?, a.client_email = '', a.client_phone = '', a.address = '',
+                 a.notes = NULL, a.cancellation_reason = NULL
+             WHERE a.client_name <> ? AND $condition",
+            [self::ANONYMIZED_NAME, self::ANONYMIZED_NAME, ...$params]
+        );
+    }
 }

@@ -106,6 +106,7 @@ $router->post('/appointments/decision/:token', [$appointmentController, 'decide'
 $router->get('/appointments/token/:token',  [$appointmentController, 'showByToken']);
 $router->post('/appointments/token/:token/cancel', [$appointmentController, 'cancelByToken']);
 $router->put('/appointments/:id/status',    $admin([$appointmentController, 'updateStatus']));
+$router->post('/appointments/:id/anonymize', $admin([$appointmentController, 'anonymize']));
 $router->put('/appointments/:id/reschedule',$admin([$appointmentController, 'reschedule']));
 $router->get('/appointments/:id/notifications', $admin([$appointmentController, 'notifications']));
 $router->post('/appointments/:id/notifications/resend', $admin([$appointmentController, 'resendNotification']));

@@ -83,13 +83,26 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
       { key: 'legal_siret', label: 'SIRET', type: 'text' },
       { key: 'legal_naf', label: 'Code NAF / APE', type: 'text' },
       { key: 'legal_assurance', label: 'Assurance professionnelle', type: 'text', hint: 'Assureur et numéro de contrat.' },
-      { key: 'legal_hebergeur', label: 'Hébergeur du site', type: 'textarea' },
+      {
+        key: 'legal_hebergeur',
+        label: 'Hébergeur du site',
+        type: 'textarea',
+        hint: 'Nom, puis adresse : une ligne par élément, ou séparés par des virgules (ex. « OVH SAS, 2 rue Kellermann, 59100 Roubaix »).',
+      },
+      {
+        key: 'rgpd_retention_months',
+        label: 'Conservation des données clients',
+        type: 'number',
+        unit: 'mois',
+        hint: "Après la date de l'intervention, les données du client sont effacées automatiquement (36 mois si vide). Affiché dans la politique de confidentialité.",
+      },
     ],
   },
 ];
 
 /** Clés gérées ailleurs (« Zone & déplacement », engagements, fichiers de branding) ou jamais éditables. */
-const EXCLUDED_KEY = /^(travel_|premises_|zone_|start_|default_(latitude|longitude)$|admin_password|branding_|theme_|vitrine_engagement_\d+(_icon)?$)/;
+// Clés gérées par un écran dédié (déplacement, zone, logo, thème, email professionnel vérifié…)
+const EXCLUDED_KEY = /^(travel_|premises_|zone_|start_|default_(latitude|longitude)$|admin_password|pro_email$|branding_|theme_|rgpd_last_purge|vitrine_engagement_\d+(_icon)?$)/;
 
 const DESCRIBED_KEYS = new Set(CONFIG_GROUPS.flatMap((group) => group.fields.map((f) => f.key)));
 
