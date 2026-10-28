@@ -337,36 +337,38 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
-| Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis |
-|---|---|---|---|---|---|
-| **1** | **Item 25** | **Mot de passe & email professionnel sécurisés (changement, réinitialisation, vérification)** | Sécurité / Authentification | ⏳ *À faire* | Items 12 et 24 ✅ |
-| **2** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires |
-| **3** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — |
-| **4** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ |
-| **5** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ |
-| **6** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ |
-| **7** | **Item 27** | **Déploiement initial interactif (`npm run deploy:init`)** | Installation / Déploiement | ⏳ *À faire* | Item 25 |
-| **8** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 |
-| **9** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement |
-| **10** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ |
-| — | **Item 2** | Theming & effets visuels pilotables depuis l'espace Pro | Design / UI | ✅ **Terminé** | — |
-| — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ **Abandonné** | Remplacé par l'Item 24 |
-| — | **Item 24** | Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro | Communication / Configuration | ✅ **Terminé** | — |
-| — | **Item 12** | Sécurité : routes de gestion vérifiées côté serveur, code par email, appareil de confiance 10 jours | Sécurité / Authentification | ✅ **Terminé** | — |
-| — | **Item 15** | Header & footer communs au tunnel de réservation (+ bouton d'abandon) | Vitrine / Navigation | ✅ **Terminé** | — |
-| — | **Item 19** | Saisie d'un rendez-vous par l'artisan (formulaires partagés, hors zone forçable) | Espace Pro / Planning | ✅ **Terminé** | — |
-| — | **Item 18** | Zone d'intervention calculée, mode sans déplacement, demandes hors zone validées par l'artisan | Zone / Réservation | ✅ **Terminé** | — |
-| — | **Item 17** | Espace Artisan en pleine page (`/admin`, menu rétractable) | Espace Pro / Navigation | ✅ **Terminé** | — |
-| — | **Item 16** | Horaires de travail, indisponibilités, moteur de créneaux partagé | Espace Pro / Planning | ✅ **Terminé** | — |
-| — | **Item 14** | IHM de configuration complète (Espace Pro) | Espace Pro / Configuration | ✅ **Terminé** | — |
-| — | **Item 6** | Identité visuelle : logo & favicon (recadrage, replis) | Design / Personnalisation | ✅ **Terminé** | — |
-| — | **Item 4** | Notifications email, iCal & logs d'envoi IHM | Communication / Traçabilité | ✅ **Terminé** | — |
-| — | **Item 1** | Frais de déplacement hybrides & gestion hors-zone | Tunnel / Tarification | ✅ **Terminé** | — |
-| — | **Item 3** | Page Vitrine par Défaut (Homepage Artisan) | Vitrine / Navigation | ✅ **Terminé** | — |
-| — | **Item 7** | Footer Complet & Mentions Légales | Légal / Footer | ✅ **Terminé** | — |
-| — | **Item 8** | Dette Technique & Harmonisation Styles SCSS | Qualité Code / SCSS | ✅ **Terminé** | — |
-| — | **Item 9** | Modernisation Sass (Dart Sass Modern Compiler) | Outillage / Build | ✅ **Terminé** | — |
-| — | **Item 10**| Gestion Propre des Classes Conditionnelles (`clsx`) | Qualité Code / React | ✅ **Terminé** | — |
-| — | **Item 11**| Gestion des Prestations (Création pop-up, Édition, Delete)| Espace Pro / Catalogue | ✅ **Terminé** | — |
-| — | **Item 13**| Recherche, filtres, RDV échus & reprogrammation datetime | Espace Pro / Planning | ✅ **Terminé** | — |
+Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légale, blocage de la mise en ligne) puis **le gain** (usage quotidien de l'artisan, effort).
+
+| Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
+|---|---|---|---|---|---|---|
+| **1** | **Item 25** | **Mot de passe & email professionnel sécurisés (changement, réinitialisation, vérification)** | Sécurité / Authentification | ⏳ *À faire* | Items 12 et 24 ✅ | 🔴 Critique : `admin123` n'est modifiable depuis aucun écran ; aucune récupération en cas d'oubli |
+| **2** | **Item 5** | **Conformité RGPD & Cookies** | Légal / Conformité | ⏳ *À faire* | Documentation & consentement formulaires | 🔴 Obligation légale avant toute mise en ligne publique (données clients collectées) |
+| **3** | **Item 27** | **Déploiement initial interactif (`npm run deploy:init`)** | Installation / Déploiement | ⏳ *À faire* | Item 25 | 🟠 Lève le dernier frein à la mise en ligne (déploiement manuel aujourd'hui possible mais fastidieux) |
+| **4** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ | 🟢 Gain quotidien le plus fort pour l'artisan (vue semaine, glisser-déposer) |
+| **5** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — | 🟢 Gain réel (tri, filtres, export), la liste actuelle reste utilisable en attendant |
+| **6** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
+| **7** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
+| **8** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
+| **9** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
+| **10** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| — | **Item 2** | Theming & effets visuels pilotables depuis l'espace Pro | Design / UI | ✅ **Terminé** | — | — |
+| — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ **Abandonné** | Remplacé par l'Item 24 | — |
+| — | **Item 24** | Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro | Communication / Configuration | ✅ **Terminé** | — | — |
+| — | **Item 12** | Sécurité : routes de gestion vérifiées côté serveur, code par email, appareil de confiance 10 jours | Sécurité / Authentification | ✅ **Terminé** | — | — |
+| — | **Item 15** | Header & footer communs au tunnel de réservation (+ bouton d'abandon) | Vitrine / Navigation | ✅ **Terminé** | — | — |
+| — | **Item 19** | Saisie d'un rendez-vous par l'artisan (formulaires partagés, hors zone forçable) | Espace Pro / Planning | ✅ **Terminé** | — | — |
+| — | **Item 18** | Zone d'intervention calculée, mode sans déplacement, demandes hors zone validées par l'artisan | Zone / Réservation | ✅ **Terminé** | — | — |
+| — | **Item 17** | Espace Artisan en pleine page (`/admin`, menu rétractable) | Espace Pro / Navigation | ✅ **Terminé** | — | — |
+| — | **Item 16** | Horaires de travail, indisponibilités, moteur de créneaux partagé | Espace Pro / Planning | ✅ **Terminé** | — | — |
+| — | **Item 14** | IHM de configuration complète (Espace Pro) | Espace Pro / Configuration | ✅ **Terminé** | — | — |
+| — | **Item 6** | Identité visuelle : logo & favicon (recadrage, replis) | Design / Personnalisation | ✅ **Terminé** | — | — |
+| — | **Item 4** | Notifications email, iCal & logs d'envoi IHM | Communication / Traçabilité | ✅ **Terminé** | — | — |
+| — | **Item 1** | Frais de déplacement hybrides & gestion hors-zone | Tunnel / Tarification | ✅ **Terminé** | — | — |
+| — | **Item 3** | Page Vitrine par Défaut (Homepage Artisan) | Vitrine / Navigation | ✅ **Terminé** | — | — |
+| — | **Item 7** | Footer Complet & Mentions Légales | Légal / Footer | ✅ **Terminé** | — | — |
+| — | **Item 8** | Dette Technique & Harmonisation Styles SCSS | Qualité Code / SCSS | ✅ **Terminé** | — | — |
+| — | **Item 9** | Modernisation Sass (Dart Sass Modern Compiler) | Outillage / Build | ✅ **Terminé** | — | — |
+| — | **Item 10**| Gestion Propre des Classes Conditionnelles (`clsx`) | Qualité Code / React | ✅ **Terminé** | — | — |
+| — | **Item 11**| Gestion des Prestations (Création pop-up, Édition, Delete)| Espace Pro / Catalogue | ✅ **Terminé** | — | — |
+| — | **Item 13**| Recherche, filtres, RDV échus & reprogrammation datetime | Espace Pro / Planning | ✅ **Terminé** | — | — |
 
