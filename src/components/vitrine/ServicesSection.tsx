@@ -105,7 +105,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ services }) => {
                   )}
                 </div>
 
-                <span className="vitrine-service-card__cta">
+                <span className="btn btn-secondary vitrine-service-card__cta">
                   Prendre rendez-vous
                   <ArrowRightIcon size={16} weight="bold" aria-hidden="true" />
                 </span>

@@ -1,3 +1,5 @@
+@use 'sass:list';
+@use 'variables' as *;
 // ===================================================================
 // Mixins SCSS de Crénelio
 // ===================================================================
@@ -37,4 +39,23 @@
 /// Couleur principale mêlée de blanc : $percent % de couleur (fonds pâles, dégradés).
 @function primary-tint($percent) {
   @return color-mix(in srgb, var(--color-primary) $percent, white);
+}
+
+// -------------------------------------------------------
+// Survol : aller rapide, retour $hover-return-factor fois plus lent (l'effet se dissipe en douceur)
+// -------------------------------------------------------
+/// $properties : liste de propriétés CSS ; $duration : durée de l'aller.
+@mixin hover-transition($properties, $duration: $duration-base, $easing: ease) {
+  $out: ();
+  $in: ();
+  @each $property in $properties {
+    $out: list.append($out, $property ($duration * $hover-return-factor) $easing, $separator: comma);
+    $in: list.append($in, $property $duration $easing, $separator: comma);
+  }
+  transition: $out;
+
+  &:hover,
+  &:focus-visible {
+    transition: $in;
+  }
 }

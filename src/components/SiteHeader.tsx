@@ -41,7 +41,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
         <BrandMark config={config} iconSize={28} />
       </Link>
       {showCta && (
-        <Link to="/booking" className="vitrine-header__cta">
+        <Link to="/booking" className="btn btn-primary btn--lg">
           <CalendarCheckIcon size={20} weight="fill" aria-hidden="true" />
           Prendre rendez-vous
         </Link>

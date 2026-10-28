@@ -4,16 +4,20 @@
 // les attributs data-* sur <html> : data-radius, data-shadows, data-glass, data-motion.
 // ===================================================================
 
+@use 'sass:map';
 @use 'variables' as *;
+@use 'mixins' as *;
 
 :root {
   --color-primary: #{$default-primary};
   // Déclinaisons calculées par le navigateur : suivent toute couleur choisie
   --color-primary-hover: color-mix(in srgb, var(--color-primary) 82%, black);
   --color-primary-light: color-mix(in srgb, var(--color-primary) 7%, white);
+  --color-background: #{map.get($background-presets, 'slate')};
 
   // Arrondis « standard »
   --radius-sm: 6px;
+  --radius-md: 8px;
   --radius: 12px;
   --radius-lg: 16px;
 
@@ -24,16 +28,38 @@
 }
 
 // -------------------------------------------------------
+// Fond des pages (data-background) : palette claire, ou teinte légère de la couleur principale
+// -------------------------------------------------------
+@each $name, $color in $background-presets {
+  :root[data-background='#{$name}'] {
+    --color-background: #{$color};
+  }
+}
+
+:root[data-background='tint'] {
+  --color-background: color-mix(in srgb, var(--color-primary) 5%, white);
+}
+
+// -------------------------------------------------------
 // Arrondis
 // -------------------------------------------------------
+:root[data-radius='none'] {
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius: 0;
+  --radius-lg: 0;
+}
+
 :root[data-radius='compact'] {
   --radius-sm: 3px;
+  --radius-md: 4px;
   --radius: 6px;
   --radius-lg: 8px;
 }
 
 :root[data-radius='rounded'] {
   --radius-sm: 10px;
+  --radius-md: 14px;
   --radius: 20px;
   --radius-lg: 28px;
 }
@@ -80,7 +106,7 @@
     .card,
     .vitrine-service-card,
     .engagement-card {
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+      @include hover-transition(transform box-shadow, $duration-lift, $ease-out-expo);
 
       &:hover {
         transform: translateY(-3px);
@@ -94,11 +120,109 @@
 
     // Sections de la vitrine révélées au défilement (classe posée par VitrinePage)
     .vitrine-reveal {
-      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity $duration-reveal ease, transform $duration-reveal $ease-out-expo;
 
       &:not(.is-visible) {
         opacity: 0;
         transform: translateY(24px);
+      }
+    }
+  }
+}
+
+// -------------------------------------------------------
+// Style des boutons (data-buttons) : standard (défaut), rounded, flat, relief.
+// Un seul composant visé : .btn (application et vitrine), cf. _components.scss.
+// -------------------------------------------------------
+
+// Pilule : tous les boutons entièrement arrondis
+:root[data-buttons='rounded'] .btn {
+  border-radius: 9999px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+// Plat : aucune ombre ; la forme suit le réglage des arrondis
+:root[data-buttons='flat'] .btn {
+  box-shadow: none;
+}
+
+// Material : angles droits quel que soit le réglage des arrondis, capitales, élévation par l'ombre
+:root[data-buttons='material'] .btn {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.85rem;
+
+  &.btn--lg {
+    font-size: 0.9rem;
+  }
+
+  &.btn--xl {
+    font-size: 1.05rem;
+  }
+
+  &.btn-primary,
+  &.btn-secondary {
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 1px 4px rgb(0 0 0 / 0.12);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 3px 6px rgb(0 0 0 / 0.2), 0 6px 14px rgb(0 0 0 / 0.14);
+    }
+
+    &:active:not(:disabled) {
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+    }
+  }
+}
+
+// Relief : dégradé brillant, reflet en haut, tranche sombre en bas, enfoncement au clic
+:root[data-buttons='relief'] {
+  .btn-primary {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-primary) 72%, white) 0%,
+      var(--color-primary) 52%,
+      var(--color-primary-hover) 100%
+    );
+    border-color: var(--color-primary-hover);
+    text-shadow: 0 -1px 0 rgb(0 0 0 / 0.25);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.45),
+      0 3px 0 color-mix(in srgb, var(--color-primary) 60%, black),
+      0 8px 16px -6px color-mix(in srgb, var(--color-primary) 55%, transparent);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-primary) 62%, white) 0%,
+        var(--color-primary) 52%,
+        var(--color-primary-hover) 100%
+      );
+    }
+  }
+
+  .btn-secondary {
+    background: linear-gradient(180deg, white 0%, $gray-100 100%);
+    border-color: $gray-300;
+    box-shadow:
+      inset 0 1px 0 white,
+      0 2px 0 $gray-300;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(180deg, white 0%, $gray-200 100%);
+    }
+  }
+
+  // Enfoncement : déplacement vers le bas au clic seulement, jamais au survol
+  @media (prefers-reduced-motion: no-preference) {
+    .btn-primary,
+    .btn-secondary {
+      @include hover-transition(background-color box-shadow transform, $duration-press);
+
+      &:active:not(:disabled) {
+        transform: translateY(2px);
+        box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.2);
       }
     }
   }

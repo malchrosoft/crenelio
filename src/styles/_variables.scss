@@ -11,6 +11,26 @@ $default-primary: #2563eb;
 // primary-alpha() / primary-tint() de _mixins.scss.
 $primary: var(--color-primary);
 
+// Fond des pages (corps, sections alternées de la vitrine) : variable CSS réglée par le thème
+$background: var(--color-background);
+
+// Fonds clairs proposés dans l'espace Pro (pas de couleur libre : lisibilité garantie).
+// Clés reprises par BACKGROUND_OPTIONS (src/utils/theme.ts) ; « tint » est calculé à part.
+$background-presets: (
+  'slate': #f8fafc,
+  'white': #ffffff,
+  'ivory': #fdfbf5,
+  'linen': #f9f6ef,
+  'sand': #f6f1e7,
+  'stone': #f5f5f4,
+  'sage': #f2f6f1,
+  'mint': #eff8f5,
+  'sky': #eff6fb,
+  'lavender': #f5f4fb,
+  'blush': #fbf4f5,
+  'peach': #fcf4ec,
+);
+
 // Palette proposée dans l'espace Pro (pastilles) : garder synchronisée avec THEME_PRESETS
 // (src/utils/theme.ts). Toutes lisibles avec un texte blanc (contraste ≥ 4,5:1).
 $theme-presets: (
@@ -56,6 +76,8 @@ $space-md: 16px;
 
 // Rayons et ombres : variables CSS, réglables par le thème (arrondis, ombres douces)
 $radius-sm: var(--radius-sm);
+// Boutons, champs, créneaux, calendrier, listes déroulantes
+$radius-md: var(--radius-md);
 $radius: var(--radius);
 $radius-lg: var(--radius-lg);
 $radius-full: 9999px;
@@ -64,6 +86,18 @@ $shadow-sm: var(--shadow-sm);
 $shadow: var(--shadow);
 $shadow-lg: var(--shadow-lg);
 
+// Durées d'animation (aller ; le retour d'un survol vaut $hover-return-factor fois plus)
+$duration-press: 0.1s;   // enfoncement d'un bouton au clic
+$duration-fast: 0.15s;   // couleurs, ombres des boutons et petites cartes
+$duration-base: 0.2s;    // cartes, bordures
+$duration-lift: 0.25s;   // soulèvement des cartes (effet « Animations »)
+$duration-slide: 0.3s;   // apparition du header fixe de la vitrine
+$duration-reveal: 0.6s;  // sections de la vitrine révélées au défilement
+$hover-return-factor: 3;
+
+// Courbe « sortie rapide » : démarrage vif, arrivée en douceur
+$ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
 // Transitions
-$transition-fast: all 0.15s ease-in-out;
-$transition-base: all 0.2s ease-in-out;
+$transition-fast: all $duration-fast ease-in-out;
+$transition-base: all $duration-base ease-in-out;

@@ -187,7 +187,7 @@
     background: $gray-100;
     width: 32px;
     height: 32px;
-    border-radius: 8px;
+    border-radius: $radius-md;
     @include flex-center;
     font-weight: bold;
     transition: $transition-fast;
@@ -220,7 +220,7 @@
   .calendar-day-btn {
     height: 40px;
     border: 1px solid transparent;
-    border-radius: 8px;
+    border-radius: $radius-md;
     font-size: 0.9rem;
     transition: $transition-fast;
 
@@ -284,7 +284,7 @@
 .slot-btn {
   padding: 10px 8px;
   border: 1px solid $gray-300;
-  border-radius: 8px;
+  border-radius: $radius-md;
   background: white;
   text-align: center;
   font-size: 0.9rem;
@@ -321,9 +321,9 @@
   width: 100%;
   padding: 10px 14px;
   border: 1px solid $gray-300;
-  border-radius: 8px;
+  border-radius: $radius-md;
   font-size: 0.95rem;
-  transition: border-color 0.15s;
+  transition: border-color $duration-fast;
 
   &:focus {
     outline: none;
@@ -343,23 +343,36 @@
 }
 
 /* Boutons */
+// Bouton unique de l'application ET de la vitrine (<button>, <a>, <Link>, <span> dans une carte).
+// Tailles : défaut, --lg (header), --xl (appels principaux de la vitrine). Le style (standard,
+// pilule, plat, relief) vient du thème : _theme.scss, attribut data-buttons sur <html>.
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 10px 20px;
-  border-radius: 8px;
+  // Bordure transparente : un style qui en ajoute une ne change pas la taille du bouton
+  border: 1px solid transparent;
+  border-radius: $radius-md;
   font-size: 0.95rem;
   font-weight: 600;
-  transition: background 0.15s;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  // Propriétés listées (jamais « all ») : aucun déplacement ni changement de taille au survol ;
+  // retour trois fois plus lent que l'aller
+  @include hover-transition(background-color color box-shadow filter, $duration-fast);
 
   &-primary {
     background: $primary;
     color: white;
+    box-shadow: 0 2px 8px primary-alpha(25%);
 
     &:hover:not(:disabled) {
       background: $primary-hover;
+      color: white;
     }
   }
 
@@ -369,12 +382,39 @@
 
     &:hover:not(:disabled) {
       background: $gray-200;
+      color: $gray-700;
     }
   }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  &--lg {
+    padding: 14px 24px;
+    min-height: 52px;
+    font-size: 1rem;
+    font-weight: 700;
+
+    @include mobile {
+      padding: 12px 16px;
+      font-size: 0.9rem;
+    }
+  }
+
+  &--xl {
+    gap: 10px;
+    padding: 18px 36px;
+    min-height: 60px;
+    font-size: 1.2rem;
+    font-weight: 700;
+
+    @include mobile {
+      padding: 16px 24px;
+      font-size: 1.05rem;
+      white-space: normal;
+    }
   }
 }
 
@@ -391,7 +431,7 @@
   z-index: 50;
   background: white;
   border: 1px solid $gray-300;
-  border-radius: 8px;
+  border-radius: $radius-md;
   box-shadow: $shadow-lg;
   max-height: 220px;
   overflow-y: auto;
@@ -794,7 +834,7 @@ $admin-sidebar-collapsed: 68px;
   overflow-y: auto;
   background: white;
   border-right: 1px solid $gray-200;
-  transition: width 0.2s ease-in-out;
+  transition: width $duration-base ease-in-out;
 
   .admin-sidebar__list {
     list-style: none;
@@ -856,7 +896,7 @@ $admin-sidebar-collapsed: 68px;
 .admin-main {
   margin-left: $admin-sidebar-width;
   padding: 28px 32px;
-  transition: margin-left 0.2s ease-in-out;
+  transition: margin-left $duration-base ease-in-out;
 
   @include mobile {
     padding: 20px 16px;
@@ -1035,7 +1075,7 @@ $admin-sidebar-collapsed: 68px;
 
 .admin-time-select {
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: $radius-md;
   font-size: 0.85rem;
   border: 1px solid $gray-300;
   background: white;
@@ -2294,6 +2334,26 @@ $admin-sidebar-collapsed: 68px;
       background: $color;
     }
   }
+
+  // Fonds clairs : coche foncée, liseré visible même sur le blanc
+  &--background {
+    color: $gray-800;
+    box-shadow: 0 0 0 1px $gray-400;
+
+    &.theme-swatch--active {
+      box-shadow: 0 0 0 2px $gray-800;
+    }
+  }
+
+  @each $name, $color in $background-presets {
+    &--bg-#{$name} {
+      background: $color;
+    }
+  }
+
+  &--bg-tint {
+    background: primary-tint(5%);
+  }
 }
 
 .theme-custom-color {
@@ -2370,6 +2430,10 @@ $admin-sidebar-collapsed: 68px;
   height: 16px;
   border: 2px solid $primary;
 
+  &--none {
+    border-radius: 0;
+  }
+
   &--compact {
     border-radius: 2px;
   }
@@ -2380,6 +2444,38 @@ $admin-sidebar-collapsed: 68px;
 
   &--rounded {
     border-radius: 9px;
+  }
+}
+
+.theme-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.theme-buttons__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid $gray-200;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  input {
+    margin-top: 3px;
+    accent-color: $primary;
+  }
+
+  .form-hint {
+    display: block;
+    margin-top: 2px;
+  }
+
+  &--active {
+    border-color: $primary;
+    background: $primary-light;
   }
 }
 

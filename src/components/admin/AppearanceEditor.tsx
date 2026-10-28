@@ -4,6 +4,8 @@ import { CheckIcon, PaletteIcon, WarningIcon } from '@phosphor-icons/react';
 import { api } from '../../api';
 import { AppConfig } from '../../types';
 import {
+  BACKGROUND_OPTIONS,
+  BUTTON_OPTIONS,
   RADIUS_OPTIONS,
   THEME_PRESETS,
   ThemeSettings,
@@ -129,6 +131,35 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ config, onSaved }) 
         </div>
 
         <div className="form-group">
+          <span className="form-label" id="theme-background-label">Fond des pages</span>
+          <div className="theme-swatches" role="radiogroup" aria-labelledby="theme-background-label">
+            {BACKGROUND_OPTIONS.map(({ value, label }) => {
+              const active = values.background === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  aria-label={label}
+                  title={label}
+                  className={clsx('theme-swatch', 'theme-swatch--background', `theme-swatch--bg-${value}`, {
+                    'theme-swatch--active': active,
+                  })}
+                  onClick={() => update({ background: value })}
+                >
+                  {active && <CheckIcon size={16} weight="bold" aria-hidden="true" />}
+                </button>
+              );
+            })}
+          </div>
+          <p className="form-hint">
+            {BACKGROUND_OPTIONS.find((o) => o.value === values.background)?.label} — fond clair uniquement, pour garder
+            la lisibilité ; le thème sombre est prévu à part.
+          </p>
+        </div>
+
+        <div className="form-group">
           <span className="form-label" id="theme-radius-label">Arrondis</span>
           <div className="theme-radius" role="radiogroup" aria-labelledby="theme-radius-label">
             {RADIUS_OPTIONS.map(({ value, label }) => (
@@ -145,6 +176,28 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ config, onSaved }) 
               </label>
             ))}
           </div>
+        </div>
+
+        <div className="form-group">
+          <span className="form-label" id="theme-buttons-label">Boutons</span>
+          <div className="theme-buttons" role="radiogroup" aria-labelledby="theme-buttons-label">
+            {BUTTON_OPTIONS.map(({ value, label, hint }) => (
+              <label key={value} className={clsx('theme-buttons__option', { 'theme-buttons__option--active': values.buttons === value })}>
+                <input
+                  type="radio"
+                  name="theme-buttons"
+                  value={value}
+                  checked={values.buttons === value}
+                  onChange={() => update({ buttons: value })}
+                />
+                <span>
+                  <strong>{label}</strong>
+                  <span className="form-hint">{hint}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+          <p className="form-hint">L'aperçu s'applique aux boutons de cette page, comme « Enregistrer » ci-dessous.</p>
         </div>
 
         <fieldset className="form-group theme-effects">

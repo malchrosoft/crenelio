@@ -36,7 +36,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ config, ctaRef }) => {
         </p>
 
         <div>
-          <Link ref={ctaRef} to="/booking" className="hero__cta-primary">
+          <Link ref={ctaRef} to="/booking" className="btn btn-primary btn--xl">
             <CalendarCheckIcon size={24} weight="fill" aria-hidden="true" />
             Prendre rendez-vous en ligne
           </Link>
@@ -48,23 +48,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ config, ctaRef }) => {
             </a>
           )}
         </div>
-
-        {(config.pro_phone || config.pro_email) && (
-          <p className="hero__contact-quick">
-            Contact direct&nbsp;:
-            {config.pro_phone && (
-              <>
-                {' '}<a href={`tel:${config.pro_phone}`}>{config.pro_phone}</a>
-              </>
-            )}
-            {config.pro_phone && config.pro_email && <span>•</span>}
-            {config.pro_email && (
-              <>
-                {' '}<a href={`mailto:${config.pro_email}`}>{config.pro_email}</a>
-              </>
-            )}
-          </p>
-        )}
       </div>
     </section>
   );

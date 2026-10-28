@@ -44,6 +44,8 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - Espace Pro, onglet Configuration : encart « Apparence » (6 couleurs lisibles + couleur libre, avertissement de contraste < 4,5:1, arrondis, 3 effets), aperçu en direct annulable.
   - Effets, tous désactivés par défaut : ombres douces teintées, verre dépoli (header, barre Pro, stepper, fond des fenêtres), animations (cartes soulevées, boutons, sections de la vitrine révélées au défilement) respectant `prefers-reduced-motion`.
   - Emails : couleur principale du thème.
+  - Fond des pages `theme_background` : 12 fonds clairs prédéfinis (gris bleuté par défaut, blanc, ivoire, lin, sable, pierre, sauge, menthe, ciel, lavande, rose poudré, pêche) ou teinte légère de la couleur principale ; pas de couleur libre, pour garantir la lisibilité.
+  - Ajouts du 28/10 : style des boutons `theme_buttons` (standard et plat selon le réglage des arrondis, pilule, material : angles droits et capitales, relief : dégradé brillant et enfoncement au clic) ; arrondis `none` (sans arrondi) en plus de compact / standard / arrondi, appliqué à tous les boutons, désormais unifiés sur `.btn` (tailles `--lg` / `--xl`) : les copies `hero__cta-primary`, `vitrine-header__cta`, `contact-cta-btn` et `vitrine-service-card__cta` sont supprimées, plus aucun mouvement au survol ; arrondi intermédiaire `--radius-md` (boutons, champs, créneaux, calendrier) qui suit désormais le réglage des arrondis.
   - **Non repris :** carte de la zone d'intervention de l'espace Pro (couleurs bleu / orange de couverture, `ZoneMap.tsx`).
 
 ---
@@ -337,6 +339,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - Mode choisi par l'artisan : clair, sombre, ou automatique selon l'appareil (`prefers-color-scheme`) ; option d'un bouton de bascule pour les visiteurs (choix mémorisé dans le navigateur).
   - La couleur principale est conservée, éclaircie automatiquement en mode sombre si son contraste sur fond sombre est insuffisant (`color-mix`), avec le même contrôle de contraste que l'Item 2.
   - **Prérequis technique :** l'échelle des gris (`$gray-*`), les fonds blancs codés (`white`) et les couleurs d'état doivent passer en variables CSS, comme la couleur principale : chantier transversal sur tout le SCSS.
+  - **Fond sombre :** pendant de la palette claire de l'Item 2 (`theme_background`) : une palette de fonds sombres prédéfinis (anthracite, nuit, ardoise, brun, forêt…) associée au fond clair choisi, ou teinte sombre dérivée de la couleur principale ; pas de couleur libre, contraste du texte vérifié.
   - Les emails restent en clair (rendu des messageries non maîtrisé) ; cartes OpenStreetMap à assombrir par filtre ou à laisser claires.
 - **Points d'attention :** performances sur mobile (limiter les animations continues, `will-change` ponctuel), lisibilité et contrastes vérifiés dans les deux thèmes, rendu Safari pour `backdrop-filter` et `@property`.
 - **Prérequis :** Item 2 ✅.
