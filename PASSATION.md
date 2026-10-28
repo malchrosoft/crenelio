@@ -1,14 +1,41 @@
 # 📋 Fiche de Passation & Point d'Avancement — Crénelio
 
-**Date :** 27 Octobre 2026
+**Date :** 28 Octobre 2026
 **Dépôt :** `/Users/aymeric.malchrowicz/DEVELOPPEMENT/crenelio`
-**Dernier commit :** `40086a9` (`main`, poussé) — *envoi par `mail()` et email de test (Item 24)*
-**Statut Git :** commits directs sur `main` (projet solo), sans ligne d'attribution.
+**Dernier commit :** `8d58e14` (`main`, poussé) — *RGPD (Item 5), fenêtres et encarts harmonisés, Item 31*
+**Statut Git :** commits directs sur `main` (projet solo), sans ligne d'attribution, **uniquement après accord explicite** (cf. `AGENTS.md`, section 6) ; le push reste à l'humain.
 **Non commité :** rien (hors cette fiche).
 
 ---
 
 ## 1. Ce qui est réellement achevé
+
+### Session du 28/10/2026 (`c70a0a4` → `8d58e14`)
+- **Emails :** adresse de réponse automatique (`Notifier::replyToFor` : email pro pour les clients,
+  client pour l'artisan), testée dans Mailpit ; email de test vers un destinataire libre (5 envois
+  par 10 min) ; nom d'expéditeur par défaut = nom de l'entreprise ; `MAIL_FROM` par défaut =
+  `noreply@` domaine d'`APP_URL`.
+- **Hébergement :** offre OVHcloud **Starter** au minimum (un seul site, une seule base de 250 Mo,
+  même PHP que les offres supérieures) ; règle inscrite dans `AGENTS.md`.
+- **Item 2 — Thème (`784ef2a`, `e471d1d`) :** couleur principale (palette lisible ou libre, contrôle
+  du contraste), fond des pages (12 teintes claires ou teinte de la couleur), arrondis (sans,
+  compact, standard, arrondi), boutons (standard, pilule, plat, material, relief), effets (ombres
+  douces, verre dépoli, animations). Clés `theme_*`, variables CSS (`_theme.scss`), appliqué par
+  `src/utils/theme.ts` et mémorisé localement. Tous les boutons unifiés sur `.btn` (tailles
+  `--lg` / `--xl`). Retour de survol 3 fois plus lent ; durées, interlignes et espacements en
+  constantes (`_variables.scss`).
+- **Item 25 — Mot de passe & email pro (`0314e1b`) :** changement imposé de `admin123` (hors
+  développement), changement depuis Configuration, « Mot de passe oublié » par code, email
+  professionnel vérifié par code, ancienne adresse prévenue ; codes unifiés
+  (`Auth::issueCode` / `checkCode`). Procédure de secours documentée (`DEPLOYMENT*.md`, 5 ter).
+- **Item 5 — RGPD (`8d58e14`) :** notice d'information (pas de case de consentement : base légale =
+  exécution du contrat), politique de confidentialité générée, pas de bandeau (aucun traceur),
+  conservation 36 mois réglable avec purge quotidienne, bouton « Effacer le client ».
+- **Interface :** fenêtres harmonisées (mixins `modal-*`, rendues par portail, seul le corps défile),
+  encart `Panel`, coordonnées au format postal (`PostalContact`), liens soulignés au survol
+  seulement, section Contact à deux cartes, plus de coordonnées dans le hero.
+- **Feuille de route :** priorités réordonnées selon la criticité puis le gain ; ajouts des
+  Items 25 à 31 ; Item 20 (SMTP dans l'espace Pro) abandonné au profit de l'Item 24.
 
 ### Session du 27/10/2026 (`fdb9b73` → `40086a9`)
 - **Règles OVHcloud sur l'expéditeur (`ad6358d`)**, vérifiées dans la
@@ -179,7 +206,9 @@
   `2026-10-11_item1_travel_fees.sql`, `2026-10-11_item4_notifications.sql`,
   `2026-10-21_item18_exception_requests.sql` (exécutée deux fois sans effet de bord).
 - **À appliquer en production** avant le premier déploiement : la migration du 21/10. Aucune
-  évolution de schéma depuis (l'Item 12 n'utilise pas la base).
+  évolution de schéma depuis (Items 12, 2, 25 et 5 : clés `config` et fichiers seulement).
+- Nouvelles clés `config` (créées à la demande) : `theme_*`, `rgpd_retention_months`,
+  `rgpd_last_purge`.
 - Fichiers hors base, non versionnés : `api/storage/branding/`, `api/storage/zone/` et
   `api/storage/auth/` (doivent être accessibles en écriture par PHP).
 
@@ -190,20 +219,25 @@ Les deux sens ont été réalignés.
 
 ---
 
-## 3. Prochains chantiers prioritaires (ordre de la feuille de route au 27/10/2026)
+## 3. Prochains chantiers prioritaires (ordre de la feuille de route au 28/10/2026)
 
 ### 🎯 0. Vérifications en attente
-- Tester dans le navigateur l'écran de connexion de l'espace Pro (`/admin`, code dans Mailpit) et
-  l'encart « Envoi des emails » (onglet Configuration).
 - Renvoyer le logo depuis la configuration pour générer `logo-email.png`.
 - Vérifier que `pro_email` en base est bien l'adresse de l'artisan avant toute mise en ligne :
-  le code de connexion y part.
+  le code de connexion et la réinitialisation du mot de passe y partent.
+- Faire relire la politique de confidentialité par l'artisan (modèle, pas un avis juridique).
 - À la mise en ligne : `MAIL_FROM` sur un domaine attaché à l'hébergement, `SMTP_HOST` vide,
-  DKIM activé, puis bouton « Envoyer un email de test » **avant** la première déconnexion.
+  DKIM activé, bouton « Envoyer un email de test » **avant** la première déconnexion, puis
+  changement imposé de `admin123`.
 
-### 🎯 1. Item 2 — Theming & effets visuels
-### 2. Item 5 — RGPD & cookies
-### 3. Item 21 — AG Grid · 4. Item 23 — FullCalendar · 5. Item 22 — Factures (plus tard)
+### 🎯 1. Item 27 — Déploiement initial interactif (`npm run deploy:init`) — prévu le 29/10 au soir
+Estimé à 2-3 h. Questions interactives (Node, Windows / macOS / Linux), route publique
+`/api/health` sans secret, **suivi de la version du schéma** (point délicat : sans doute une
+migration), paquet initial avec `.env` généré seulement si le serveur n'est pas installé,
+réponses conservées hors Git, fiche pas à pas FR / EN.
+
+### 2. Item 23 — FullCalendar · 3. Item 21 — AG Grid · 4. Item 28 — Paquet téléchargeable
+### 5. Item 22 — Factures · 6. Item 30 — Effets avancés & thème sombre · 7. Item 26 · 8. Item 29 · 9. Item 31 — Traduction
 
 ### Points d'attention issus des Items 18 et 19
 - Changer à la main le statut d'une demande « En attente » n'envoie pas les emails de décision.
@@ -213,8 +247,10 @@ Les deux sens ont été réalignés.
 
 ### Contraintes et reliquats
 Consignés dans [`AGENTS.md`](AGENTS.md), section *5. Contraintes Connues & Dette Technique*
-(sécurité de l'espace Pro et règle `$admin(...)` pour toute nouvelle route de gestion, fichiers `.env` hors de portée des agents, envoi d'emails désactivé
-sans SMTP, fuseau horaire, absence de notification à l'annulation).
+(sécurité de l'espace Pro et règle `$admin(...)` pour toute nouvelle route de gestion, mot de passe et
+email pro hors de `PUT /admin/config`, RGPD (toute nouvelle donnée personnelle → effacement + politique),
+hébergement OVHcloud Starter, fichiers `.env` hors de portée des agents, fuseau horaire, absence de
+notification à l'annulation).
 
 ---
 
@@ -224,3 +260,5 @@ sans SMTP, fuseau horaire, absence de notification à l'annulation).
 - **Icônes :** `@phosphor-icons/react`, imports suffixés `Icon`, `weight="fill"`.
 - **Validation avant commit :** `npm run build` **et** `npx tsc --noEmit` — `vite build` ne vérifie pas les types.
 - **Schéma :** toute évolution va dans `sql/schema.sql` *et* dans une migration idempotente de `sql/migrations/`.
+- **Styles :** un seul bouton (`.btn`), fenêtres par les mixins `modal-*`, encarts par `Panel`, couleurs de
+  marque dérivées de `--color-primary`, constantes pour durées, interlignes et espacements.
