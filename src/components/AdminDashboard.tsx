@@ -4,11 +4,9 @@ import {
   ClockIcon,
   CurrencyEurIcon,
   MagnifyingGlassIcon,
-  WarningCircleIcon,
   CalendarBlankIcon,
   XIcon,
   CarIcon,
-  EnvelopeSimpleIcon,
   CheckCircleIcon,
   XCircleIcon,
   HourglassIcon,
@@ -18,7 +16,6 @@ import {
   MapTrifoldIcon,
   PlusIcon,
   WarningIcon,
-  EraserIcon,
   CalendarDotsIcon,
 } from '@phosphor-icons/react';
 import { api, UNAUTHORIZED_EVENT } from '../api';
@@ -32,7 +29,6 @@ import {
   BrandingUrls,
 } from '../types';
 import { formatEuro } from '../utils/format';
-import { ANONYMIZED_NAME } from '../utils/privacy';
 import { CONFIG_GROUPS, buildOtherGroup } from '../config/configSchema';
 import ConfigGroupForm from './admin/ConfigGroupForm';
 import EngagementsEditor from './admin/EngagementsEditor';
@@ -47,6 +43,8 @@ import AdminShell, { AdminTab } from './admin/AdminShell';
 
 // Calendrier (FullCalendar) chargé seulement à l'ouverture de son onglet
 const AppointmentCalendar = lazy(() => import('./admin/AppointmentCalendar'));
+// Liste des interventions (AG Grid Community) chargée à l'ouverture du planning
+const InterventionsGrid = lazy(() => import('./admin/InterventionsGrid'));
 import AdminLogin from './admin/AdminLogin';
 import ConfirmDialog from './admin/ConfirmDialog';
 import MailStatus from './admin/MailStatus';
@@ -59,14 +57,6 @@ import { format, isPast, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const NAV_ICON = { size: 20, weight: 'fill' as const, 'aria-hidden': true };
-
-/** Libellés des statuts de rendez-vous (capsules du planning). */
-const STATUS_LABELS: Record<Appointment['status'], string> = {
-  pending: 'En attente',
-  confirmed: 'Confirmé',
-  completed: 'Terminé',
-  cancelled: 'Annulé',
-};
 
 /** Libellés lisibles des emails journalisés. */
 const NOTIFICATION_LABELS: Record<NotificationType, string> = {
@@ -672,35 +662,8 @@ export const AdminDashboard: React.FC = () => {
         </Suspense>
       ) : activeTab === 'appointments' ? (
         <div>
-          <div className="admin-planning-toolbar">
-            <button type="button" className="btn btn-primary" onClick={() => setCreatingAppointment(true)}>
-              <PlusIcon size={18} weight="fill" aria-hidden="true" />
-              Nouveau rendez-vous
-            </button>
-          </div>
           {/* ── Barre de recherche et filtres multi-critères ── */}
           <div className="admin-filters-bar">
-            <div className="admin-search-wrapper">
-              <MagnifyingGlassIcon size={18} weight="bold" className="admin-search-icon" aria-hidden="true" />
-              <input
-                type="text"
-                className="form-input admin-search-input"
-                placeholder="Rechercher par client, téléphone, email, prestation, adresse, ville…"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  className="admin-search-clear"
-                  onClick={() => setSearchQuery('')}
-                  aria-label="Effacer la recherche"
-                >
-                  <XIcon size={16} weight="bold" />
-                </button>
-              )}
-            </div>
-
             <div className="admin-filters-groups">
               <div className="admin-filter-pills" role="radiogroup" aria-label="Filtre de statut">
                 <button
@@ -785,111 +748,45 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          {filteredAppointments.length === 0 ? (
-            <p className="admin-empty-state">
-              {appointments.length === 0
-                ? 'Aucun rendez-vous enregistré pour le moment.'
-                : 'Aucun rendez-vous ne correspond aux critères de recherche.'}
-            </p>
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Date &amp; Heure</th>
-                  <th>Prestation</th>
-                  <th>Client</th>
-                  <th>Adresse d'intervention</th>
-                  <th>Statut</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredAppointments.map((a) => {
-                  const startObj = parseISO(a.start_datetime);
-                  const dateStr = format(startObj, 'dd/MM/yyyy HH:mm', { locale: fr });
-                  const isAppointmentPast = isPast(startObj) && !isToday(startObj);
-                  const isOverdue = isAppointmentPast && (a.status === 'confirmed' || a.status === 'pending');
-
-                  return (
-                    <tr
-                      key={a.id}
-                      className={clsx({ 'admin-row-overdue': isOverdue, 'admin-row--highlighted': a.id === highlightedId })}
-                      ref={a.id === highlightedId ? (row) => row?.scrollIntoView({ block: 'center' }) : undefined}
-                    >
-                      <td className="admin-row-date">
-                        <div>{dateStr}</div>
-                        {isOverdue && (
-                          <span className="badge-overdue" title="Rendez-vous arrivé à échéance et non clôturé">
-                            <WarningCircleIcon size={13} weight="fill" />
-                            Échu à traiter
-                          </span>
-                        )}
-                      </td>
-                      <td>{a.service_name}</td>
-                      <td>
-                        <strong>{a.client_name}</strong>
-                        <div className="admin-row-phone">
-                          <a href={`tel:${a.client_phone}`} className="admin-contact-link">{a.client_phone}</a>
-                        </div>
-                        <div className="admin-row-email">
-                          <a href={`mailto:${a.client_email}`} className="admin-contact-link">{a.client_email}</a>
-                        </div>
-                      </td>
-                      <td className="admin-row-address">
-                        {a.address}, {a.postal_code} {a.city}
-                      </td>
-                      <td>
-                        <span className={`status-badge status-${a.status}`}>{STATUS_LABELS[a.status] ?? a.status}</span>
-                      </td>
-                      <td>
-                        <div className="admin-table-actions">
-                          <select
-                            className="form-input admin-status-select"
-                            value={a.status}
-                            onChange={(e) => handleStatusChange(a.id, e.target.value)}
-                          >
-                            <option value="pending">En attente</option>
-                            <option value="confirmed">Confirmé</option>
-                            <option value="completed">Terminé</option>
-                            <option value="cancelled">Annulé</option>
-                          </select>
-                          <button
-                            type="button"
-                            className="btn btn-secondary admin-btn-reschedule"
-                            onClick={() => startReschedule(a)}
-                            title="Déplacer ou reprogrammer la date/heure de l'intervention"
-                          >
-                            <CalendarBlankIcon size={14} weight="bold" />
-                            Reprogrammer
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-secondary admin-btn-reschedule"
-                            onClick={() => openNotifications(a)}
-                            title="Consulter le journal des emails envoyés pour ce rendez-vous"
-                          >
-                            <EnvelopeSimpleIcon size={14} weight="bold" />
-                            Emails
-                          </button>
-                          {a.client_name !== ANONYMIZED_NAME && (
-                            <button
-                              type="button"
-                              className="btn btn-secondary admin-btn-reschedule"
-                              onClick={() => setAnonymizing(a)}
-                              title="Demande d'effacement (RGPD) : efface le nom, l'email, le téléphone, l'adresse et les notes du client"
-                            >
-                              <EraserIcon size={14} weight="bold" />
-                              Effacer le client
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
+            <Suspense fallback={<p>Chargement de la liste…</p>}>
+              <InterventionsGrid
+                appointments={filteredAppointments}
+                totalCount={appointments.length}
+                toolbarStart={
+                  <>
+                    <button type="button" className="btn btn-primary" onClick={() => setCreatingAppointment(true)}>
+                      <PlusIcon size={18} weight="fill" aria-hidden="true" />
+                      Nouveau rendez-vous
+                    </button>
+                    <div className="admin-search-wrapper">
+                      <MagnifyingGlassIcon size={18} weight="bold" className="admin-search-icon" aria-hidden="true" />
+                      <input
+                        type="text"
+                        className="form-input admin-search-input"
+                        placeholder="Rechercher par client, téléphone, email, prestation, adresse, ville…"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                      {searchQuery && (
+                        <button
+                          type="button"
+                          className="admin-search-clear"
+                          onClick={() => setSearchQuery('')}
+                          aria-label="Effacer la recherche"
+                        >
+                          <XIcon size={16} weight="bold" />
+                        </button>
+                      )}
+                    </div>
+                  </>
+                }
+                highlightedId={highlightedId}
+                onStatusChange={handleStatusChange}
+                onReschedule={startReschedule}
+                onEmails={openNotifications}
+                onAnonymize={setAnonymizing}
+              />
+            </Suspense>
 
           {/* ── Pop-up / Modale de reprogrammation (champ unique datetime-local) ── */}
           {reschedulingAppointment && (

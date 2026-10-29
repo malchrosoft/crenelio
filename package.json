@@ -15,6 +15,7 @@
     "deploy:init": "node scripts/deploy-init.mjs"
   },
   "dependencies": {
+    "@ag-grid-community/locale": "^36.2.0",
     "@fullcalendar/core": "^6.1.22",
     "@fullcalendar/daygrid": "^6.1.22",
     "@fullcalendar/interaction": "^6.1.22",
@@ -22,6 +23,8 @@
     "@fullcalendar/react": "^6.1.22",
     "@fullcalendar/timegrid": "^6.1.22",
     "@phosphor-icons/react": "^2.1.10",
+    "ag-grid-community": "^36.2.0",
+    "ag-grid-react": "^36.2.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
     "pigeon-maps": "^0.22.1",

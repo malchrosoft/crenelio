@@ -18,6 +18,7 @@ require_once __DIR__ . '/../controllers/TravelFeeController.php';
 require_once __DIR__ . '/../controllers/BrandingController.php';
 require_once __DIR__ . '/../controllers/MailController.php';
 require_once __DIR__ . '/../controllers/HealthController.php';
+require_once __DIR__ . '/../controllers/UiStateController.php';
 
 $router = new Router();
 
@@ -31,6 +32,7 @@ $brandingController    = new BrandingController();
 $zoneController        = new ZoneController();
 $mailController        = new MailController();
 $healthController      = new HealthController();
+$uiStateController     = new UiStateController();
 
 // Routes de l'espace Pro : refusées (401) sans session ouverte, cf. core/Auth.php
 $admin = fn(callable $handler) => Auth::guard($handler);
@@ -58,6 +60,10 @@ $router->post('/admin/pro-email',           $admin([$configController, 'requestP
 $router->post('/admin/pro-email/confirm',   $admin([$configController, 'confirmProEmail']));
 
 // Envoi d'emails : état (lecture seule) et email de test vers l'email professionnel
+// Préférences d'affichage de l'espace Pro (disposition des grilles), une clé par élément
+$router->get('/admin/ui-state/:id',         $admin([$uiStateController, 'show']));
+$router->put('/admin/ui-state/:id',         $admin([$uiStateController, 'update']));
+$router->delete('/admin/ui-state/:id',      $admin([$uiStateController, 'destroy']));
 $router->get('/admin/mail',                 $admin([$mailController, 'status']));
 $router->post('/admin/mail/test',           $admin([$mailController, 'test']));
 

@@ -39,6 +39,7 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 - **Zone d'intervention** (pleine page) : point de départ (adresse ou GPS), rayon, communes limitrophes, calcul des communes via `geo.api.gouv.fr` (bleu : entièrement dans le rayon, orange : partiellement), retrait d'une commune au clic droit.
 - **Configuration** : identité (nom, logo et favicon PNG/SVG avec recadrage), coordonnées, page vitrine, engagements, réservation, mentions légales ; bouton « Annuler » sur chaque formulaire.
 - **Apparence** (onglet Configuration) : couleur principale (palette lisible ou couleur libre, contrôle du contraste), arrondis, fond des pages (12 teintes claires ou teinte de la couleur principale), arrondis (sans, compact, standard, arrondi), style des boutons (standard, pilule, plat, material, relief), effets activables (ombres douces, verre dépoli, animations respectant « réduire les animations »), aperçu en direct ; reprise dans les emails.
+- **Liste des interventions** (onglet Rendez-vous, AG Grid Community MIT) : colonnes triables et filtrables, pagination, export CSV, actions par ligne (statut, reprogrammation, emails, effacement).
 - **Calendrier** (onglet de l'espace Pro, FullCalendar MIT) : vues mois / semaine / jour / liste, horaires de travail et indisponibilités affichés, glisser-déposer d'un rendez-vous validé par le moteur de créneaux (forçable sur confirmation), création d'un rendez-vous au clic sur un jour.
 - **RGPD** : notice d'information sous le formulaire de réservation, politique de confidentialité générée depuis la configuration (fenêtre « Mentions légales & confidentialité »), aucun cookie de traçage donc pas de bandeau, durée de conservation réglable (36 mois par défaut) avec effacement automatique, bouton « Effacer le client » pour les demandes d'effacement.
 - **Mot de passe & email professionnel** : changement imposé tant que `admin123` est actif (toléré en développement, avec bandeau), changement depuis *Configuration* (ancien mot de passe requis, 12 caractères minimum, mots de passe courants refusés), « Mot de passe oublié » par code envoyé à l'email professionnel, email professionnel modifié seulement après vérification par code (l'ancienne adresse est prévenue). Chaque changement ferme les autres sessions et envoie un email de confirmation.
@@ -201,6 +202,7 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 | `POST` | `/api/admin/pro-email` | Nouvel email professionnel : envoi d'un code à cette adresse |
 | `POST` | `/api/appointments/:id/anonymize` | Efface les données du client d'un rendez-vous (demande RGPD) |
 | `POST` | `/api/admin/pro-email/confirm` | Validation du code ; l'ancienne adresse est prévenue |
+| `GET` / `PUT` / `DELETE` | `/api/admin/ui-state/:id` | Préférences d'affichage d'une grille de l'espace Pro (disposition des colonnes, tri, taille de page) |
 | `GET` | `/api/admin/mail` | Mode d'envoi des emails et expéditeur (lecture seule) |
 | `POST` | `/api/admin/mail/test` | Email de test vers `to` (testeur, développeur) ou, à défaut, l'email professionnel ; 5 envois / 10 min |
 

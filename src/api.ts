@@ -97,6 +97,10 @@ export const api = {
   confirmProEmail: (code: string) =>
     request<{ status: 'saved'; pro_email: string }>('POST', '/admin/pro-email/confirm', { code }),
   adminLogout: () => request<{ success: boolean }>('POST', '/admin/logout'),
+  /** Préférences d'affichage de l'espace Pro (disposition d'une grille), `null` si aucune. */
+  getUiState: <T>(id: string) => request<{ state: T | null }>('GET', `/admin/ui-state/${id}`),
+  saveUiState: <T>(id: string, state: T) => request<{ state: T }>('PUT', `/admin/ui-state/${id}`, { state }),
+  resetUiState: (id: string) => request<{ state: null }>('DELETE', `/admin/ui-state/${id}`),
   getMailStatus: () => request<MailStatusInfo>('GET', '/admin/mail'),
   /** Destinataire libre (testeur, développeur) ; à défaut, l'email professionnel. */
   sendTestMail: (to?: string) => request<{ message: string }>('POST', '/admin/mail/test', { to: to || undefined }),

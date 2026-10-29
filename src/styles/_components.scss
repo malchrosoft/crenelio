@@ -510,32 +510,15 @@
 }
 
 /* Table Dashboard Pro */
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-  font-size: 0.9rem;
-
-  th, td {
-    padding: 12px 14px;
-    text-align: left;
-    border-bottom: 1px solid $gray-200;
-  }
-
-  th {
-    background: $gray-50;
-    font-weight: 600;
-    color: $gray-600;
-  }
-
-  tr:hover {
-    background: $gray-50;
-  }
-}
-
 .status-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   padding: 4px 10px;
+  // Interligne propre : dans une cellule de grille, l'interligne hérité vaut la hauteur de ligne
+  // (72 px) et étirait la pastille en ovale
+  line-height: $line-height-snug;
+  white-space: nowrap;
+  vertical-align: middle;
   border-radius: $radius-full;
   font-size: 0.75rem;
   font-weight: 600;
@@ -1083,12 +1066,12 @@ $admin-sidebar-collapsed: 68px;
   cursor: pointer;
 }
 
-/* Lignes de rendez-vous échus */
+/* Lignes de rendez-vous échus (grille des interventions) */
 .admin-row-overdue {
-  background-color: rgba(234, 88, 12, 0.08) !important;
+  background-color: color-mix(in srgb, #{$warning} 9%, white) !important;
 
   &:hover {
-    background-color: rgba(234, 88, 12, 0.14) !important;
+    background-color: color-mix(in srgb, #{$warning} 16%, white) !important;
   }
 }
 
@@ -2707,11 +2690,180 @@ $calendar-statuses: (
   gap: $space-sm;
 }
 
-.data-table tr.admin-row--highlighted td {
-  background: $primary-light;
-  box-shadow: inset 0 1px 0 primary-alpha(35%), inset 0 -1px 0 primary-alpha(35%);
-}
 
-.data-table tr.admin-row--highlighted td:first-child {
-  box-shadow: inset 3px 0 0 $primary, inset 0 1px 0 primary-alpha(35%), inset 0 -1px 0 primary-alpha(35%);
+// -------------------------------------------------------
+// Liste des interventions (Item 21, AG Grid Community)
+// -------------------------------------------------------
+.interventions-grid {
+  margin-top: $space-md;
+
+  // Une seule ligne d'actions générales : nouveau rendez-vous, recherche, puis options de la grille
+  .interventions-grid__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-block;
+    margin-bottom: $space-sm;
+  }
+
+  .interventions-grid__start {
+    display: flex;
+    flex: 1 1 420px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-block;
+
+    .admin-search-wrapper {
+      flex: 1 1 260px;
+      margin: 0;
+    }
+  }
+
+  // Barre d'état accolée sous la grille : même cadre, coins arrondis seulement en bas
+  .ag-root-wrapper {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .interventions-grid__status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-sm;
+    padding: 8px 14px;
+    border: 1px solid $gray-200;
+    border-top: none;
+    border-radius: 0 0 $radius $radius;
+    background: $background;
+    color: $gray-600;
+    font-size: 0.85rem;
+  }
+
+  .interventions-grid__status-note {
+    color: $warning;
+    font-weight: 600;
+  }
+
+  .interventions-grid__options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-block;
+  }
+
+  .interventions-grid__save {
+    min-width: 11em;
+    color: $gray-400;
+    font-size: 0.8rem;
+    text-align: right;
+  }
+
+  .interventions-grid__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: $gray-600;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    input {
+      accent-color: $primary;
+    }
+  }
+
+  // Barre d'actions de la ligne sélectionnée, au-dessus de la grille : même place avec ou sans
+  // sélection (contrôles désactivés), pour que la grille ne se décale jamais
+  .interventions-grid__selection {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-block;
+    min-height: 58px;
+    margin-bottom: $space-sm;
+    padding: 10px 14px;
+    background: $primary-light;
+    border: 1px solid primary-alpha(30%);
+    border-radius: $radius-sm;
+
+    &--empty {
+      background: $gray-50;
+      border-color: $gray-200;
+
+      .interventions-grid__selection-label {
+        color: $gray-400;
+      }
+    }
+
+    .admin-table-actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: $space-sm;
+    }
+  }
+
+  .interventions-grid__selection-label {
+    flex: 1 1 220px;
+    color: $gray-700;
+    font-size: 0.9rem;
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+
+  .interventions-grid__deselect {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: $gray-500;
+    @include hover-transition(background-color color, $duration-fast);
+
+    &:hover,
+    &:focus-visible {
+      background: white;
+      color: $gray-900;
+    }
+  }
+
+  .grid-cell-muted {
+    color: $gray-500;
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ag-row {
+    cursor: pointer;
+  }
+
+  // Rendez-vous ouvert depuis le calendrier
+  .ag-row.admin-row--highlighted {
+    background-color: $primary-light !important;
+    box-shadow: inset 3px 0 0 $primary;
+  }
+
+  // Cellules sur deux lignes (date + badge, client + téléphone)
+  .grid-cell-stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: $space-2xs;
+    height: 100%;
+    line-height: $line-height-snug;
+  }
+
+  // Actions sur une seule ligne dans la grille (empilées dans l'ancienne liste)
+  .ag-cell .admin-table-actions {
+    flex-direction: row;
+    align-items: center;
+    gap: $space-sm;
+    height: 100%;
+  }
 }

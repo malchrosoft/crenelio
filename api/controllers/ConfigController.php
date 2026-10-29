@@ -41,7 +41,8 @@ class ConfigController
         // Clés libres (ex. vitrine_engagement_N) au format strict de `config_key` VARCHAR(64) ;
         // `branding_*` est calculé à la lecture (cf. Branding::urls), jamais stocké
         foreach (array_keys($body) as $key) {
-            if (!preg_match('/^[a-z][a-z0-9_]{0,63}$/', (string)$key) || str_starts_with((string)$key, 'branding_')) {
+            if (!preg_match('/^[a-z][a-z0-9_]{0,63}$/', (string)$key) || str_starts_with((string)$key, 'branding_')
+                || str_starts_with((string)$key, Config::UI_STATE_PREFIX)) {
                 Response::json(['error' => "Clé de configuration invalide : $key"], 400);
             }
         }

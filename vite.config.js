@@ -18,6 +18,9 @@ export default defineConfig(({ command }) => ({
   build: {
     outDir: 'api/public/assets',
     emptyOutDir: true,
+    // La grille AG Grid (≈ 1 Mo, ≈ 280 ko compressés, chargée seulement dans l'espace Pro) dépasse
+    // le seuil par défaut
+    chunkSizeWarningLimit: 1100,
     // Use relative paths so assets work under subdirectories.
     assetsDir: '',
     rollupOptions: {

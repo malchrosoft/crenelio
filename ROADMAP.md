@@ -257,10 +257,24 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - **Secret mal protégé :** chiffré, le mot de passe resterait déchiffrable avec une clé posée sur le même serveur ; une session volée suffirait à détourner tous les emails, codes de connexion compris.
   - **Peu utile :** un artisan seul ne change presque jamais de serveur d'envoi, et l'hébergement OVHcloud sait envoyer sans identifiants (`mail()`).
 
-### 21. Exploitation des Interventions avec AG Grid (édition Community)
+### 21. Exploitation des Interventions avec AG Grid (édition Community) — 🚧 Partie 1/2 livrée, finitions à reprendre
 - **Besoin :** une vue tabulaire des interventions dans l'espace Pro pour les exploiter au quotidien : tri, filtres par colonne, recherche, regroupement par statut ou par commune, export CSV.
 - **Choix :** `ag-grid-react` en **édition Community** (licence MIT). Ne pas utiliser les fonctionnalités Enterprise (export Excel natif, regroupement de lignes avancé, tableaux croisés) qui exigent une licence payante.
 - **Pistes :** remplacer ou compléter la liste actuelle du planning ; thème AG Grid aligné sur les variables SCSS ; colonnes : date, client, prestation, adresse, frais de déplacement, statut ; actions de ligne réutilisant les appels existants (statut, reprogrammation, emails).
+- **Réalisé (29/10/2026) :**
+  - La liste du planning est remplacée par `InterventionsGrid` (AG Grid Community 36.2.0, licence MIT, chargée à la demande), toujours alimentée par la barre de filtres existante (recherche, statut, période, jour précis).
+  - Colonnes triables, filtrables (texte, nombre, date), redimensionnables et déplaçables : date (badge « Échu à traiter »), prestation, « Client & lieu » (nom, téléphone cliquable, adresse et commune réunis ; filtre sur l'ensemble), frais de déplacement, statut. Colonnes séparées masquées, reprises à l'export CSV.
+  - Sélection d'une ligne au clic (mode simple) : barre d'actions au-dessus de la grille (statut, Reprogrammer, Emails, Effacer) ; actions sur chaque ligne en option (colonne épinglée à droite, préférence mémorisée dans le navigateur).
+  - Disposition mémorisée en base après chaque modification (ordre, largeur, visibilité, épinglage des colonnes, tri, taille de page ; jamais les valeurs de filtre, qui peuvent contenir un nom de client) : clé `config.ui_state_interventions` via `GET` / `PUT` / `DELETE /admin/ui-state/:id`, restaurée au chargement, bouton « Réglages par défaut ». Ces clés sont exclues de la configuration publique et refusées par `PUT /admin/config`.
+  - Barre d'outils unique au-dessus de la grille : « Nouveau rendez-vous », recherche globale, actions sur chaque ligne, réglages par défaut, export ; barre d'actions de la sélection toujours présente à hauteur fixe (contrôles désactivés sans sélection) ; barre d'état accolée sous la grille (interventions affichées, total, filtres de colonnes actifs) — le composant natif `StatusBarModule` est réservé à l'édition Enterprise (vérifié dans les types d'AG Grid 36.2.0).
+  - Pagination (20 / 50 / 100), traduction française (`@ag-grid-community/locale`), export CSV au séparateur `;` (lu directement par Excel en français), lignes échues teintées, rendez-vous ouvert depuis le calendrier mis en évidence et amené à l'écran.
+  - Thème AG Grid branché sur les variables du thème (couleur principale, fond, arrondis).
+  - Modules enregistrés un par un (liste client, filtres, pagination, CSV, styles de ligne, défilement, traduction) : ≈ 270 ko compressés au lieu de 350 avec `AllCommunityModule`.
+  - **Écart avec la fiche :** le regroupement de lignes (par statut ou commune) est réservé à l'édition Enterprise, payante : remplacé par le tri et les filtres de colonnes.
+- **Partie 2/2 — finitions à reprendre (29/10/2026) :**
+  - Peaufiner le rendu dans le navigateur (non vérifié de bout en bout) : barre d'outils, barre d'actions de la sélection, barre d'état accolée, hauteur des lignes, colonne Actions optionnelle.
+  - Parcourir toutes les fonctions (filtres de colonnes, export, pagination, préférences, sélection depuis le calendrier) pour détecter un éventuel module AG Grid manquant (erreur #200 en développement).
+  - Revoir le poids de la grille (≈ 281 ko compressés) si besoin.
 
 ### 22. Génération des Factures (plus tard)
 - **Besoin :** générer une facture à partir d'une intervention réalisée, depuis la grille de l'Item 21.
@@ -384,7 +398,7 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
 |---|---|---|---|---|---|---|
-| **1** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — | 🟢 Gain réel (tri, filtres, export), la liste actuelle reste utilisable en attendant |
+| **1** | **Item 21** | **Liste des interventions AG Grid — finitions (partie 2/2)** | Espace Pro / Exploitation | 🚧 *Partie 1/2 livrée* | — | 🟢 Fonctionnelle ; rendu et modules à vérifier dans le navigateur |
 | **2** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
 | **3** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
 | **4** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |

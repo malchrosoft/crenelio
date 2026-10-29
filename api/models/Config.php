@@ -27,7 +27,21 @@ class Config
     {
         $all = self::getAll();
         unset($all['admin_password_hash']);
+        // Préférences d'affichage de l'espace Pro (grilles…) : jamais exposées aux visiteurs
+        foreach (array_keys($all) as $key) {
+            if (str_starts_with($key, self::UI_STATE_PREFIX)) {
+                unset($all[$key]);
+            }
+        }
         return $all;
+    }
+
+    /** Préfixe des préférences d'interface de l'espace Pro, une clé par élément (`ui_state_<id>`). */
+    public const UI_STATE_PREFIX = 'ui_state_';
+
+    public static function delete(string $key): void
+    {
+        Database::execute('DELETE FROM `config` WHERE config_key = ?', [$key]);
     }
 
     /**
