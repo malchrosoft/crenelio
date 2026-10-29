@@ -7,6 +7,31 @@ d'hébergement mutualisé OVHcloud (Starter au minimum, ou Perso, Pro, Performan
 
 ---
 
+## Méthode recommandée : `npm run deploy:init`
+
+Le script prépare depuis votre poste tout ce qu'il faut envoyer, sans éditer de fichier à la main :
+
+```bash
+npm run deploy:init
+```
+
+1. Il demande l'adresse du site, puis interroge `https://<site>/api/health` (route publique, sans
+   aucun secret) pour savoir si Crénelio y est déjà installé.
+2. **Premier déploiement** (site injoignable ou base vide) : il pose les questions utiles (base
+   de données telle qu'affichée dans l'espace client OVHcloud, adresse d'expédition — par défaut
+   `noreply@` votre domaine —, compte SMTP facultatif, fuseau horaire) et génère `api/.env`.
+3. **Mise à jour** (Crénelio répond) : le paquet ne contient **ni `api/.env` ni `api/storage/`**,
+   et seules les migrations SQL postérieures à la version du serveur (`schema_version`) sont jointes.
+4. Il compile (`npm run deploy:build`) et crée `deploy/<date>-…/` : `www/` à envoyer tel quel,
+   `sql/` à appliquer dans phpMyAdmin, et `INSTRUCTIONS.md`, la marche à suivre pas à pas.
+
+Les réponses sont mémorisées dans `.deploy/answers.json` pour la fois suivante, **sans aucun mot
+de passe**. `deploy/` et `.deploy/` sont ignorés par Git ; supprimez le paquet une fois envoyé
+(il contient `api/.env` lors d'un premier déploiement). Les étapes ci-dessous détaillent ce que le
+script prépare, pour un déploiement entièrement manuel.
+
+---
+
 ## Prérequis
 
 - Une offre d'hébergement web OVHcloud, **Starter au minimum** ([offre Starter](https://www.ovhcloud.com/fr/web-hosting/starter-offer/) :
@@ -320,7 +345,8 @@ Chaque `push` sur `deploy` met alors le site à jour ; un `push` sur `main` ne d
 
 ## Mettre à jour un site en ligne (FTP ou Git)
 
-Ordre à respecter lorsqu'une version modifie la base (nouveau fichier dans `sql/migrations/`) :
+`npm run deploy:init` prépare ce paquet de mise à jour et liste les migrations à appliquer. Ordre à
+respecter lorsqu'une version modifie la base (nouveau fichier dans `sql/migrations/`) :
 
 1. **Sauvegarder** la base (export phpMyAdmin ou *Sauvegardes* OVH) et `api/storage/`.
 2. **Appliquer les migrations** nouvelles, dans l'ordre des dates, via phpMyAdmin (onglet *SQL*,

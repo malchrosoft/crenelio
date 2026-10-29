@@ -14,6 +14,10 @@ api/storage/zone/*
 api/storage/auth/*
 !api/storage/auth/.gitkeep
 
+# Paquets et réponses de npm run deploy:init (contiennent api/.env)
+/deploy/
+/.deploy/
+
 # Environment & secrets
 # Ignore ALL .env* files EXCEPT api/.env.example
 .env*

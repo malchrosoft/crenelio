@@ -55,3 +55,8 @@ INSERT INTO `schedules` (`day_of_week`, `is_active`, `morning_start`, `morning_e
 (5, 1, '08:30:00', '12:00:00', '13:30:00', '17:30:00'), -- Vendredi
 (6, 1, '09:00:00', '12:30:00', NULL, NULL),               -- Samedi matin
 (7, 0, NULL, NULL, NULL, NULL);                            -- Dimanche fermé
+
+-- Version du schéma : nom de la dernière migration de sql/migrations/ (Item 27, cf. GET /api/health).
+-- À mettre à jour à chaque nouvelle migration.
+INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-10-29_item27_schema_version')
+ON DUPLICATE KEY UPDATE `config_value` = VALUES(`config_value`);

@@ -23,6 +23,7 @@ Le schéma et les données sont montés en lecture seule dans `/docker-entrypoin
 - `sql/seed_init.sql` : **DML socle applicatif** (clés indispensables de la table `config`, horaires hebdomadaires standards).
 - `sql/seed_test_data.sql` : **DML de test / démo** (prestations d'exemple, congés/indisponibilités de test, rendez-vous récents et à venir).
 - `sql/migrations/` : **Migrations idempotentes** à appliquer sur une base existante lorsqu'un item modifie le schéma. `schema.sql` reste la source de vérité : toute colonne ajoutée en migration doit y figurer également, sans quoi un `docker compose down -v` la ferait disparaître.
+  **Version du schéma (Item 27) :** chaque nouvelle migration se termine par la mise à jour de `config.schema_version` avec son propre nom de fichier (sans `.sql`), et `seed_init.sql` reprend cette même valeur. `GET /api/health` l'expose, et `npm run deploy:init` en déduit les migrations à joindre à une mise à jour.
   ```bash
   docker compose exec -T db mysql -ucrenelio -pcrenelio_dev crenelio < sql/migrations/<fichier>.sql
   ```

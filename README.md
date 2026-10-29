@@ -104,6 +104,9 @@ npm run build
 
 Le bundle optimisé est généré directement dans `api/public/assets/`, prêt à être distribué par le serveur web.
 
+Pour préparer un déploiement complet (premier déploiement ou mise à jour, `api/.env` généré au besoin,
+migrations SQL en attente) : `npm run deploy:init` — voir [DEPLOYMENT.fr.md](DEPLOYMENT.fr.md).
+
 > `vite build` ne contrôle pas les types (esbuild se contente de les effacer).
 > Lancer `npx tsc --noEmit` en complément avant tout commit.
 
@@ -183,6 +186,7 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 ### Configuration & Authentification
 | Méthode | Route | Description |
 |---|---|---|
+| `GET` | `/api/health` | État d'installation, public et sans secret (`installed`, `database`, `schema_version`) — lu par `npm run deploy:init` |
 | `GET` | `/api/config` | Configuration publique (nom pro, coordonnées, centrage carte) |
 | `GET` | `/api/admin/config` | Configuration complète (espace pro) |
 | `PUT` | `/api/admin/config` | Mise à jour des réglages artisan |

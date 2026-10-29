@@ -7,6 +7,31 @@ shared hosting plan (Starter at minimum, or Perso, Pro, Performance).
 
 ---
 
+## Recommended Method: `npm run deploy:init`
+
+The script prepares everything to upload from your machine, without editing any file by hand:
+
+```bash
+npm run deploy:init
+```
+
+1. It asks for the site address, then queries `https://<site>/api/health` (public route, no
+   secret at all) to find out whether Crénelio is already installed there.
+2. **First deployment** (site unreachable or empty database): it asks what is needed (database as
+   shown in the OVHcloud Control Panel, sender address — by default `noreply@` your domain —,
+   optional SMTP account, time zone) and generates `api/.env`.
+3. **Update** (Crénelio answers): the package contains **neither `api/.env` nor `api/storage/`**,
+   and only the SQL migrations newer than the server version (`schema_version`) are included.
+4. It builds (`npm run deploy:build`) and creates `deploy/<date>-…/`: `www/` to upload as is,
+   `sql/` to apply in phpMyAdmin, and `INSTRUCTIONS.md`, the step-by-step procedure (in French).
+
+Answers are remembered in `.deploy/answers.json` for next time, **without any password**.
+`deploy/` and `.deploy/` are ignored by Git; delete the package once uploaded (it contains
+`api/.env` on a first deployment). The steps below detail what the script prepares, for a fully
+manual deployment.
+
+---
+
 ## Prerequisites
 
 - An OVHcloud Web Hosting plan, **Starter at minimum** ([Starter plan](https://www.ovhcloud.com/fr/web-hosting/starter-offer/): 1 database of
@@ -319,7 +344,8 @@ Every `push` to `deploy` then updates the site; a `push` to `main` deploys nothi
 
 ## Updating a Live Site (FTP or Git)
 
-Order to follow when a release changes the database (new file in `sql/migrations/`):
+`npm run deploy:init` prepares this update package and lists the migrations to apply. Order to
+follow when a release changes the database (new file in `sql/migrations/`):
 
 1. **Back up** the database (phpMyAdmin export or OVH *Backups*) and `api/storage/`.
 2. **Apply the new migrations**, in date order, through phpMyAdmin (*SQL* tab, paste the file) or

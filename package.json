@@ -11,7 +11,8 @@
     "ouvrir": "node scripts/ouvrir.mjs",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy:build": "node scripts/build.mjs"
+    "deploy:build": "node scripts/build.mjs",
+    "deploy:init": "node scripts/deploy-init.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

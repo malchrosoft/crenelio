@@ -17,6 +17,7 @@ require_once __DIR__ . '/../controllers/AppointmentController.php';
 require_once __DIR__ . '/../controllers/TravelFeeController.php';
 require_once __DIR__ . '/../controllers/BrandingController.php';
 require_once __DIR__ . '/../controllers/MailController.php';
+require_once __DIR__ . '/../controllers/HealthController.php';
 
 $router = new Router();
 
@@ -29,6 +30,7 @@ $travelFeeController   = new TravelFeeController();
 $brandingController    = new BrandingController();
 $zoneController        = new ZoneController();
 $mailController        = new MailController();
+$healthController      = new HealthController();
 
 // Routes de l'espace Pro : refusées (401) sans session ouverte, cf. core/Auth.php
 $admin = fn(callable $handler) => Auth::guard($handler);
@@ -38,6 +40,8 @@ $adminDefaultOk = fn(callable $handler) => Auth::guard($handler, true);
 // -------------------------------------------------------------------
 // 1. Configuration & Authentification Pro
 // -------------------------------------------------------------------
+// État d'installation (public, sans secret) : lu par npm run deploy:init
+$router->get('/health',                     [$healthController, 'show']);
 $router->get('/config',                     [$configController, 'getPublic']);
 $router->get('/admin/config',               $admin([$configController, 'getAll']));
 $router->put('/admin/config',               $admin([$configController, 'update']));

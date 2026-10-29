@@ -306,7 +306,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Fonctionnement prévu :** à défaut d'`APP_URL`, l'adresse est relevée lors d'une requête de l'espace Pro authentifiée (schéma + hôte), **mémorisée une seule fois** puis figée ; affichée dans l'encart « Envoi des emails » avec un bouton pour la redéfinir (session Pro requise). `APP_URL` reste prioritaire s'il est renseigné.
 - **Risque à traiter :** l'en-tête `Host` est fourni par le visiteur ; le déduire à chaque requête permettrait d'empoisonner les liens envoyés par email. D'où la capture limitée à une session Pro et le figeage. Ne jamais utiliser l'hôte d'une requête publique.
 
-### 27. Déploiement Initial Interactif (`npm run deploy:init`)
+### 27. Déploiement Initial Interactif (`npm run deploy:init`) — ✅ Terminée
 - **Objectif :** installer Crénelio sur un hébergement mutualisé sans éditer de fichier à la main, en préparant **depuis le poste local** tout ce que le serveur n'a pas encore.
 - **Choix (27/10/2026) : script local plutôt qu'assistant web.**
   - Les assistants web (WordPress, PrestaShop, Matomo…) visent des produits installés par des non-développeurs ; ils imposent une page sensible exposée sur Internet jusqu'au verrouillage, un dossier de code accessible en écriture par PHP et un verrou à ne jamais rater.
@@ -319,6 +319,12 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Reste à la main :** créer la base et l'hébergement chez OVHcloud, envoyer les fichiers (FTP ou Git, cf. `DEPLOYMENT*.md`), importer le SQL dans phpMyAdmin — le script les guide sans les faire.
 - **Prérequis :** Item 25 (changement obligatoire du mot de passe par défaut). L'Item 26 devient facultatif : l'adresse du site est demandée par le script.
 - **Pistes ultérieures :** envoi automatique par SFTP / `lftp` si les identifiants sont fournis ; vérification post-déploiement via `/api/health`.
+- **Réalisé (29/10/2026) :**
+  - `scripts/deploy-init.mjs` (Node, sans dépendance) : questions avec valeurs par défaut et contrôle des saisies, mot de passe masqué, réponses mémorisées sans mot de passe (`.deploy/answers.json`), compilation, paquet `deploy/<date>-premier-deploiement|mise-a-jour/` (`www/`, `sql/`, `INSTRUCTIONS.md`).
+  - `GET /api/health` (public, sans secret) : `installed`, `database` (`ok` / `empty` / `error`), `schema_version` ; connexion dédiée qui n'interrompt pas la requête en cas d'échec.
+  - Version du schéma : clé `config.schema_version` (migration `2026-10-29_item27_schema_version.sql` + `seed_init.sql`) ; une mise à jour ne joint que les migrations postérieures.
+  - Premier déploiement : `api/.env` (droits 600) et squelette `api/storage/` (jamais leur contenu) ; mise à jour : ni `.env` ni `storage/`.
+  - Testé : premier déploiement (site injoignable), mise à jour contre l'API locale avec une version de schéma antérieure (une migration jointe), absence de mot de passe dans les réponses mémorisées.
 
 ### 28. Paquet d'Installation Téléchargeable (Release Prête à Déployer)
 - **Objectif :** installer Crénelio sans cloner le dépôt ni compiler : un artisan (ou son prestataire) télécharge un paquet prêt à déployer.
@@ -371,15 +377,15 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
 |---|---|---|---|---|---|---|
-| **1** | **Item 27** | **Déploiement initial interactif (`npm run deploy:init`)** | Installation / Déploiement | ⏳ *À faire* | Item 25 | 🟠 Lève le dernier frein à la mise en ligne (déploiement manuel aujourd'hui possible mais fastidieux) |
-| **2** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ | 🟢 Gain quotidien le plus fort pour l'artisan (vue semaine, glisser-déposer) |
-| **3** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — | 🟢 Gain réel (tri, filtres, export), la liste actuelle reste utilisable en attendant |
-| **4** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
-| **5** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
-| **6** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
-| **7** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
-| **8** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
-| **9** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
+| **1** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ | 🟢 Gain quotidien le plus fort pour l'artisan (vue semaine, glisser-déposer) |
+| **2** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — | 🟢 Gain réel (tri, filtres, export), la liste actuelle reste utilisable en attendant |
+| **3** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
+| **4** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
+| **5** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
+| **6** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
+| **7** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| **8** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
+| — | **Item 27** | Déploiement initial interactif (`npm run deploy:init`, `/api/health`, version du schéma) | Installation / Déploiement | ✅ **Terminé** | — | — |
 | — | **Item 5** | Conformité RGPD & cookies (notice, politique, conservation, effacement) | Légal / Conformité | ✅ **Terminé** | — | — |
 | — | **Item 25** | Mot de passe & email professionnel sécurisés (changement, réinitialisation, vérification) | Sécurité / Authentification | ✅ **Terminé** | — | — |
 | — | **Item 2** | Theming & effets visuels pilotables depuis l'espace Pro | Design / UI | ✅ **Terminé** | — | — |
