@@ -267,10 +267,17 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Pistes :** numérotation chronologique continue et sans trou, mentions légales obligatoires (SIRET, TVA ou mention d'exonération), montant prestation + frais de déplacement, export PDF, facture non modifiable une fois émise (avoir pour corriger).
 - **Prérequis :** Item 21 ; Item 12 (données comptables à protéger côté serveur).
 
-### 23. Calendrier des Interventions avec FullCalendar
+### 23. Calendrier des Interventions avec FullCalendar — ✅ Terminée
 - **Besoin :** gérer le calendrier d'intervention dans l'espace Pro avec des vues jour / semaine / mois.
 - **Choix :** `@fullcalendar/react` avec les plugins **standard** (licence MIT : `daygrid`, `timegrid`, `interaction`, `list`). Les plugins Premium (vues ressources, timeline) sont payants et non nécessaires pour un artisan seul.
 - **Pistes :** affichage des rendez-vous, indisponibilités et horaires de travail ; glisser-déposer pour reprogrammer, validé par le `SlotEngine` (refus si le créneau n'est pas proposable) ; création d'un rendez-vous au clic (formulaire de l'Item 19) ; locale `fr`, fuseau `APP_TIMEZONE`.
+- **Réalisé (29/10/2026) :**
+  - Onglet « Calendrier » de l'espace Pro (`AppointmentCalendar`, chargé à la demande : FullCalendar 6.1.22, plugins MIT `daygrid`, `timegrid`, `interaction`, `list` ; adaptateur React aligné en 6.x). Vues mois / semaine / jour / liste, locale `fr`, indicateur de l'heure courante.
+  - Horaires de travail (plages matin / après-midi) en zones ouvertes, indisponibilités en bandes grises, rendez-vous colorés par statut (légende), annulés masqués par défaut.
+  - Glisser-déposer des rendez-vous à venir (en attente / confirmés) : `PUT /appointments/:id/reschedule` avec `check` → validation par `SlotEngine` en ignorant le rendez-vous déplacé (`excludeId`) ; refus 409 `slot_unavailable`, puis « Déplacer quand même » (`force`) ou retour à la place d'origine. La fenêtre « Reprogrammer » du planning reste libre.
+  - Clic sur un jour : nouveau rendez-vous à cette date (formulaire de l'Item 19) ; clic sur un rendez-vous : planning filtré sur ce jour (nouveau filtre « jour précis », aussi disponible à la main), rendez-vous mis en évidence et amené à l'écran (statut, emails, effacement).
+  - Couleurs reprises du thème (variables CSS de FullCalendar). Datetimes envoyés en heure locale naïve (cohérent avec `APP_TIMEZONE`).
+  - Testé par l'API : refus d'un dimanche, déplacement forcé, créneau proposé accepté, rendez-vous sur son propre créneau accepté, reprogrammation libre inchangée. **Interface non vue dans le navigateur.**
 
 ### 24. Envoi Natif OVHcloud (`mail()`) & Contrôle de l'Envoi dans l'Espace Pro — ✅ Terminée
 - **Objectif :** ne plus exiger d'identifiants SMTP en production ; garder SMTP en option (Mailpit en local, ou compte dédié).
@@ -377,14 +384,14 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
 |---|---|---|---|---|---|---|
-| **1** | **Item 23** | **Calendrier des interventions avec FullCalendar** | Espace Pro / Planning | ⏳ *À faire* | `SlotEngine` (Item 16) ✅ | 🟢 Gain quotidien le plus fort pour l'artisan (vue semaine, glisser-déposer) |
-| **2** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — | 🟢 Gain réel (tri, filtres, export), la liste actuelle reste utilisable en attendant |
-| **3** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
-| **4** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
-| **5** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
-| **6** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
-| **7** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
-| **8** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
+| **1** | **Item 21** | **Exploitation des interventions avec AG Grid (Community)** | Espace Pro / Exploitation | ⏳ *À faire* | — | 🟢 Gain réel (tri, filtres, export), la liste actuelle reste utilisable en attendant |
+| **2** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
+| **3** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
+| **4** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
+| **5** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
+| **6** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| **7** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
+| — | **Item 23** | Calendrier des interventions (FullCalendar : vues, glisser-déposer validé, création au clic) | Espace Pro / Planning | ✅ **Terminé** | — | — |
 | — | **Item 27** | Déploiement initial interactif (`npm run deploy:init`, `/api/health`, version du schéma) | Installation / Déploiement | ✅ **Terminé** | — | — |
 | — | **Item 5** | Conformité RGPD & cookies (notice, politique, conservation, effacement) | Légal / Conformité | ✅ **Terminé** | — | — |
 | — | **Item 25** | Mot de passe & email professionnel sécurisés (changement, réinitialisation, vérification) | Sécurité / Authentification | ✅ **Terminé** | — | — |

@@ -7,7 +7,7 @@ import {
   SignOutIcon,
 } from '@phosphor-icons/react';
 
-export type AdminTab = 'appointments' | 'services' | 'hours' | 'settings' | 'zone' | 'config';
+export type AdminTab = 'appointments' | 'calendar' | 'services' | 'hours' | 'settings' | 'zone' | 'config';
 
 interface NavItem {
   id: AdminTab;

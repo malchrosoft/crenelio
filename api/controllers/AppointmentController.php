@@ -486,6 +486,16 @@ class AppointmentController
 
         // Calcul de la nouvelle heure de fin selon la durée de la prestation
         $service = Service::find((int)$appointment['service_id']);
+
+        // Glisser-déposer du calendrier : le créneau doit être proposable (mêmes règles que la
+        // réservation en ligne, le rendez-vous déplacé étant ignoré) ; `force` permet de passer outre
+        if (!empty($body['check']) && empty($body['force']) && $service
+            && !SlotEngine::isAvailable($service, date('Y-m-d H:i:s', $startTime), Config::getAll(), $id)) {
+            Response::json([
+                'error' => "Ce créneau n'est pas proposable (hors horaires, indisponibilité, délai minimal ou chevauchement avec un autre rendez-vous)",
+                'code'  => 'slot_unavailable',
+            ], 409);
+        }
         $durationMinutes = $service ? (int)$service['duration_minutes'] : 60;
         $endTime = $startTime + ($durationMinutes * 60);
 

@@ -28,9 +28,15 @@ class SlotEngine
     /**
      * Créneaux libres du jour `$date` (YYYY-MM-DD) pour `$service`.
      * `$schedules` (indexés par jour 1..7) évite de relire la table jour après jour.
+     * `$excludeId` : rendez-vous ignoré (celui qu'on déplace ne bloque pas son propre créneau).
      */
-    public static function forDate(array $service, string $date, array $config, ?array $schedules = null): array
-    {
+    public static function forDate(
+        array $service,
+        string $date,
+        array $config,
+        ?array $schedules = null,
+        ?int $excludeId = null
+    ): array {
         $settings = self::settings($config);
         $targetDate = strtotime($date);
         $today = strtotime(date('Y-m-d'));
@@ -55,7 +61,8 @@ class SlotEngine
         $dayEnd = "$date 23:59:59";
         $booked = Appointment::getOverlapping(
             date('Y-m-d H:i:s', strtotime("-$buffer minutes", strtotime($dayStart))),
-            date('Y-m-d H:i:s', strtotime("+$buffer minutes", strtotime($dayEnd)))
+            date('Y-m-d H:i:s', strtotime("+$buffer minutes", strtotime($dayEnd))),
+            $excludeId
         );
         $unavailabilities = Unavailability::getForRange($dayStart, $dayEnd);
 
@@ -89,14 +96,14 @@ class SlotEngine
     }
 
     /** Vrai si `$startDatetime` correspond exactement à un créneau proposé. */
-    public static function isAvailable(array $service, string $startDatetime, array $config): bool
+    public static function isAvailable(array $service, string $startDatetime, array $config, ?int $excludeId = null): bool
     {
         $time = strtotime($startDatetime);
         if ($time === false) {
             return false;
         }
         $wanted = date('Y-m-d H:i:00', $time);
-        foreach (self::forDate($service, date('Y-m-d', $time), $config) as $slot) {
+        foreach (self::forDate($service, date('Y-m-d', $time), $config, null, $excludeId) as $slot) {
             if ($slot['start_datetime'] === $wanted) {
                 return true;
             }

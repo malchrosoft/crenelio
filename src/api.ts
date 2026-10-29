@@ -158,8 +158,16 @@ export const api = {
   /** Demande d'effacement (RGPD) : données du client effacées, rendez-vous conservé. */
   anonymizeAppointment: (id: number) =>
     request<{ message: string; appointment: Appointment }>('POST', `/appointments/${id}/anonymize`),
-  rescheduleAppointment: (id: number, start_datetime: string, status?: string) =>
-    request<Appointment>('PUT', `/appointments/${id}/reschedule`, { start_datetime, status }),
+  /**
+   * Reprogrammation. `check` (calendrier) : refus 409 `slot_unavailable` si le créneau n'est pas
+   * proposable ; `force` : enregistrement malgré tout, sur confirmation de l'artisan.
+   */
+  rescheduleAppointment: (
+    id: number,
+    start_datetime: string,
+    status?: string,
+    options: { check?: boolean; force?: boolean } = {}
+  ) => request<Appointment>('PUT', `/appointments/${id}/reschedule`, { start_datetime, status, ...options }),
 
   // Journal des notifications email
   listNotifications: (appointmentId: number) =>

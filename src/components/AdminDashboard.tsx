@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useMemo } from 'react';
 import clsx from 'clsx';
 import {
   ClockIcon,
@@ -19,6 +19,7 @@ import {
   PlusIcon,
   WarningIcon,
   EraserIcon,
+  CalendarDotsIcon,
 } from '@phosphor-icons/react';
 import { api, UNAUTHORIZED_EVENT } from '../api';
 import {
@@ -43,6 +44,9 @@ import ResetButton from './admin/ResetButton';
 import NewAppointment from './admin/NewAppointment';
 import BrandingField from './admin/BrandingField';
 import AdminShell, { AdminTab } from './admin/AdminShell';
+
+// Calendrier (FullCalendar) chargé seulement à l'ouverture de son onglet
+const AppointmentCalendar = lazy(() => import('./admin/AppointmentCalendar'));
 import AdminLogin from './admin/AdminLogin';
 import ConfirmDialog from './admin/ConfirmDialog';
 import MailStatus from './admin/MailStatus';
@@ -154,6 +158,8 @@ export const AdminDashboard: React.FC = () => {
   const [defaultPassword, setDefaultPassword] = useState(false);
   // Saisie d'un rendez-vous par l'artisan (formulaires partagés de la réservation)
   const [creatingAppointment, setCreatingAppointment] = useState(false);
+  // Date présélectionnée quand le nouveau rendez-vous vient d'un clic dans le calendrier
+  const [newAppointmentDate, setNewAppointmentDate] = useState<string | null>(null);
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -165,6 +171,10 @@ export const AdminDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled'>('all');
   const [timeFilter, setTimeFilter] = useState<'all' | 'upcoming' | 'today' | 'overdue' | 'past'>('all');
+  // Jour précis (YYYY-MM-DD), posé notamment par un clic sur un rendez-vous du calendrier
+  const [dateFilter, setDateFilter] = useState('');
+  // Rendez-vous mis en évidence dans la liste (ouvert depuis le calendrier)
+  const [highlightedId, setHighlightedId] = useState<number | null>(null);
 
   // Reprogrammation de rendez-vous (champ datetime-local unique)
   const [reschedulingAppointment, setReschedulingAppointment] = useState<Appointment | null>(null);
@@ -425,7 +435,12 @@ export const AdminDashboard: React.FC = () => {
         return false;
       }
 
-      // 3. Filtre temporel
+      // 3. Jour précis
+      if (dateFilter && !a.start_datetime.startsWith(dateFilter)) {
+        return false;
+      }
+
+      // 4. Filtre temporel
       const startDate = parseISO(a.start_datetime);
       const isAppointmentPast = isPast(startDate) && !isToday(startDate);
       const isAppointmentToday = isToday(startDate);
@@ -443,7 +458,7 @@ export const AdminDashboard: React.FC = () => {
 
       return true;
     });
-  }, [appointments, searchQuery, statusFilter, timeFilter]);
+  }, [appointments, searchQuery, statusFilter, timeFilter, dateFilter]);
 
   // Nombre de rendez-vous échus non honorés
   const overdueCount = useMemo(() => {
@@ -568,6 +583,7 @@ export const AdminDashboard: React.FC = () => {
 
   const navItems: { id: AdminTab; label: string; icon: React.ReactNode; count?: number }[] = [
     { id: 'appointments', label: 'Rendez-vous', icon: <CalendarBlankIcon {...NAV_ICON} />, count: appointments.length },
+    { id: 'calendar', label: 'Calendrier', icon: <CalendarDotsIcon {...NAV_ICON} /> },
     { id: 'services', label: 'Prestations', icon: <WrenchIcon {...NAV_ICON} />, count: services.length },
     { id: 'hours', label: 'Horaires', icon: <ClockIcon {...NAV_ICON} /> },
     { id: 'settings', label: 'Déplacement', icon: <CarIcon {...NAV_ICON} /> },
@@ -620,12 +636,40 @@ export const AdminDashboard: React.FC = () => {
         <NewAppointment
           config={config}
           services={services}
-          onCancel={() => setCreatingAppointment(false)}
+          initialDate={newAppointmentDate}
+          onCancel={() => {
+            setCreatingAppointment(false);
+            setNewAppointmentDate(null);
+          }}
           onDone={() => {
             setCreatingAppointment(false);
+            setNewAppointmentDate(null);
             loadData();
           }}
         />
+      ) : activeTab === 'calendar' ? (
+        <Suspense fallback={<p>Chargement du calendrier…</p>}>
+          <AppointmentCalendar
+            appointments={appointments}
+            onChanged={(updated) =>
+              setAppointments((prev) => prev.map((a) => (a.id === updated.id ? { ...a, ...updated } : a)))
+            }
+            onOpen={(appointment) => {
+              // Actions complètes (statut, emails, effacement) : planning du jour, rendez-vous en évidence
+              setSearchQuery('');
+              setStatusFilter('all');
+              setTimeFilter('all');
+              setDateFilter(appointment.start_datetime.slice(0, 10));
+              setHighlightedId(appointment.id);
+              setActiveTab('appointments');
+            }}
+            onCreate={(date) => {
+              setNewAppointmentDate(date);
+              setCreatingAppointment(true);
+              setActiveTab('appointments');
+            }}
+          />
+        </Suspense>
       ) : activeTab === 'appointments' ? (
         <div>
           <div className="admin-planning-toolbar">
@@ -696,6 +740,32 @@ export const AdminDashboard: React.FC = () => {
                 </button>
               </div>
 
+              <div className="admin-date-filter">
+                <input
+                  type="date"
+                  className="admin-time-select"
+                  value={dateFilter}
+                  onChange={(e) => {
+                    setDateFilter(e.target.value);
+                    setHighlightedId(null);
+                  }}
+                  aria-label="Jour précis"
+                />
+                {dateFilter && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary admin-btn-sm"
+                    onClick={() => {
+                      setDateFilter('');
+                      setHighlightedId(null);
+                    }}
+                    aria-label="Retirer le filtre de date"
+                  >
+                    Tous les jours
+                  </button>
+                )}
+              </div>
+
               <div>
                 <select
                   className="admin-time-select"
@@ -743,7 +813,8 @@ export const AdminDashboard: React.FC = () => {
                   return (
                     <tr
                       key={a.id}
-                      className={clsx({ 'admin-row-overdue': isOverdue })}
+                      className={clsx({ 'admin-row-overdue': isOverdue, 'admin-row--highlighted': a.id === highlightedId })}
+                      ref={a.id === highlightedId ? (row) => row?.scrollIntoView({ block: 'center' }) : undefined}
                     >
                       <td className="admin-row-date">
                         <div>{dateStr}</div>

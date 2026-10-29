@@ -12,6 +12,8 @@ interface NewAppointmentProps {
   services: Service[];
   onDone: () => void;
   onCancel: () => void;
+  /** Date présélectionnée (YYYY-MM-DD), depuis un clic dans le calendrier. */
+  initialDate?: string | null;
 }
 
 /**
@@ -19,10 +21,10 @@ interface NewAppointmentProps {
  * Toute saisie est enregistrable : tous les jours et une heure libre, email et adresse facultatifs,
  * hors zone signalé mais forçable.
  */
-const NewAppointment: React.FC<NewAppointmentProps> = ({ config, services, onDone, onCancel }) => {
+const NewAppointment: React.FC<NewAppointmentProps> = ({ config, services, onDone, onCancel, initialDate = null }) => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [service, setService] = useState<Service | null>(null);
-  const [date, setDate] = useState<string | null>(null);
+  const [date, setDate] = useState<string | null>(initialDate);
   const [slot, setSlot] = useState<Slot | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);

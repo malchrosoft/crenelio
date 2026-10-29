@@ -131,6 +131,7 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
   - `Service` / `ServiceController` : CRUD des prestations.
   - `Schedule` / `ScheduleController` : Horaires d'ouverture hebdomadaires et indisponibilités.
   - `SlotEngine` (`api/core/`) : calcul des créneaux d'une journée (horaires hebdomadaires, durée de la prestation, indisponibilités, rendez-vous existants + temps de trajet, délai minimal, horizon). Source unique : sert à proposer les créneaux **et** à valider une réservation (`POST /appointments` refuse tout créneau non proposé).
+  - **Calendrier (Item 23)** : `src/components/admin/AppointmentCalendar.tsx` (FullCalendar 6, plugins MIT uniquement — pas de plugin Premium). Le glisser-déposer appelle `PUT /appointments/:id/reschedule` avec `check` (validation `SlotEngine::isAvailable(..., $excludeId)`, 409 `slot_unavailable`) puis `force` sur confirmation ; garder les paquets `@fullcalendar/*` sur la même version majeure.
   - `SlotController` : `GET /slots` (créneaux d'un jour) et `GET /slots/availability` (jours réservables de la fenêtre, pour griser le calendrier).
   - `Appointment` / `AppointmentController` : Réservation, annulation par token, changement de statut, reprogrammation, journal des notifications.
   - `Notification` : Journal `appointment_notifications` (une ligne par tentative d'envoi, consultable depuis l'IHM Pro).

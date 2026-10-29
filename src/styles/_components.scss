@@ -2552,3 +2552,166 @@ $admin-sidebar-collapsed: 68px;
     }
   }
 }
+
+// -------------------------------------------------------
+// Calendrier des interventions (Item 23, FullCalendar) : couleurs du thème via ses variables CSS
+// -------------------------------------------------------
+$calendar-statuses: (
+  'confirmed': $primary,
+  'pending': $warning,
+  'completed': $success,
+  'cancelled': $gray-400,
+);
+
+.appointment-calendar {
+  --fc-border-color: #{$gray-200};
+  --fc-page-bg-color: white;
+  --fc-neutral-bg-color: #{$gray-50};
+  --fc-today-bg-color: #{$primary-light};
+  --fc-now-indicator-color: #{$danger};
+  --fc-non-business-color: color-mix(in srgb, #{$gray-400} 12%, transparent);
+  --fc-button-bg-color: white;
+  --fc-button-text-color: #{$gray-700};
+  --fc-button-border-color: #{$gray-300};
+  --fc-button-hover-bg-color: #{$gray-100};
+  --fc-button-hover-border-color: #{$gray-300};
+  --fc-button-active-bg-color: #{$primary};
+  --fc-button-active-border-color: #{$primary};
+  --fc-event-bg-color: #{$primary};
+  --fc-event-border-color: #{$primary};
+
+  padding: 16px;
+  background: white;
+  border: 1px solid $gray-200;
+  border-radius: $radius;
+
+  .fc .fc-toolbar-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: $gray-900;
+    text-transform: capitalize;
+  }
+
+  .fc .fc-button {
+    border-radius: $radius-md;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    box-shadow: none;
+  }
+
+  // Bouton de vue actif : texte blanc sur la couleur principale
+  .fc .fc-button-primary:not(:disabled).fc-button-active {
+    color: white;
+  }
+
+  .fc .fc-col-header-cell-cushion,
+  .fc .fc-daygrid-day-number {
+    color: $gray-700;
+    text-transform: capitalize;
+  }
+
+  .calendar-event {
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+
+  @each $status, $color in $calendar-statuses {
+    .calendar-event--#{$status} {
+      background-color: $color;
+      border-color: $color;
+    }
+  }
+
+  .calendar-event--cancelled .fc-event-title {
+    text-decoration: line-through;
+  }
+
+  // Indisponibilités : bandes grises en arrière-plan
+  .calendar-unavailability {
+    background: repeating-linear-gradient(
+      -45deg,
+      color-mix(in srgb, $gray-500 14%, transparent) 0 6px,
+      color-mix(in srgb, $gray-500 5%, transparent) 6px 12px
+    );
+    opacity: 1;
+
+    .fc-event-title {
+      color: $gray-600;
+      font-size: 0.75rem;
+      font-style: normal;
+    }
+  }
+}
+
+.appointment-calendar__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-block;
+  margin-bottom: $space-block;
+  font-size: 0.85rem;
+  color: $gray-600;
+}
+
+.appointment-calendar__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+
+  input {
+    accent-color: $primary;
+  }
+}
+
+.appointment-calendar__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px $space-block;
+  list-style: none;
+}
+
+.appointment-calendar__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  @each $status, $color in $calendar-statuses {
+    &--#{$status}::before {
+      background: $color;
+    }
+  }
+
+  &--unavailable::before {
+    background: repeating-linear-gradient(
+      -45deg,
+      color-mix(in srgb, $gray-500 40%, transparent) 0 3px,
+      color-mix(in srgb, $gray-500 12%, transparent) 3px 6px
+    );
+  }
+}
+
+// Planning : filtre par jour et rendez-vous ouvert depuis le calendrier
+.admin-date-filter {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+}
+
+.data-table tr.admin-row--highlighted td {
+  background: $primary-light;
+  box-shadow: inset 0 1px 0 primary-alpha(35%), inset 0 -1px 0 primary-alpha(35%);
+}
+
+.data-table tr.admin-row--highlighted td:first-child {
+  box-shadow: inset 3px 0 0 $primary, inset 0 1px 0 primary-alpha(35%), inset 0 -1px 0 primary-alpha(35%);
+}
