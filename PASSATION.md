@@ -1,14 +1,36 @@
 # 📋 Fiche de Passation & Point d'Avancement — Crénelio
 
-**Date :** 28 Octobre 2026
+**Date :** 29 Octobre 2026
 **Dépôt :** `/Users/aymeric.malchrowicz/DEVELOPPEMENT/crenelio`
-**Dernier commit :** `8d58e14` (`main`, poussé) — *RGPD (Item 5), fenêtres et encarts harmonisés, Item 31*
+**Dernier commit :** `6ea2d98` (`main`, **non poussé**, avec `8949682`, `52834fe` et `751caed`) — *liste des interventions AG Grid (Item 21, 1/2)*
 **Statut Git :** commits directs sur `main` (projet solo), sans ligne d'attribution, **uniquement après accord explicite** (cf. `AGENTS.md`, section 6) ; le push reste à l'humain.
 **Non commité :** rien (hors cette fiche).
 
 ---
 
 ## 1. Ce qui est réellement achevé
+
+### Session du 29/10/2026 (`52834fe` → `6ea2d98`)
+- **Item 27 — Déploiement interactif (`52834fe`) :** `npm run deploy:init` (`scripts/deploy-init.mjs`,
+  Node sans dépendance) interroge `https://<site>/api/health` ; premier déploiement → questions
+  (base OVHcloud, expéditeur, SMTP facultatif, fuseau), `api/.env` généré (droits 600) et squelette
+  `api/storage/` ; mise à jour → ni `.env` ni `storage/`, seules les migrations postérieures à
+  `schema_version` jointes. Paquet `deploy/<date>-…/` (`www/`, `sql/`, `INSTRUCTIONS.md`), réponses
+  sans mot de passe dans `.deploy/answers.json` (ignorés par Git). **Saisie clavier non testée.**
+- **Version du schéma :** `config.schema_version` (migration `2026-10-29_item27_schema_version.sql`,
+  reprise dans `seed_init.sql`) ; **chaque nouvelle migration doit la mettre à jour** (`AGENTS.md`).
+- **Item 23 — Calendrier (`751caed`) :** onglet « Calendrier » (FullCalendar 6.1.22, plugins MIT,
+  chargé à la demande) : vues mois / semaine / jour / liste, horaires et indisponibilités, couleurs
+  par statut ; glisser-déposer validé par `SlotEngine` (`check`, `excludeId`), refus 409 puis
+  « Déplacer quand même » (`force`) ; clic sur un jour → nouveau rendez-vous à cette date ; clic sur
+  un rendez-vous → planning filtré sur ce jour, rendez-vous mis en évidence. Filtre « jour précis ».
+- **Item 21 — Liste AG Grid, partie 1/2 (`6ea2d98`) :** AG Grid Community 36.2.0 (MIT, chargée à la
+  demande, modules enregistrés un par un) : colonnes triables / filtrables, « Client & lieu »
+  fusionnée, sélection d'une ligne → barre d'actions à hauteur fixe, actions par ligne en option,
+  export CSV (`;`), barre d'outils unique (nouveau rendez-vous, recherche…), barre d'état accolée
+  (le module natif est Enterprise). Disposition enregistrée en base (`config.ui_state_<id>`,
+  `/admin/ui-state/:id`, jamais les filtres), bouton « Réglages par défaut ». Regroupement de
+  lignes (Enterprise) remplacé par tri et filtres. **Finitions : partie 2/2.**
 
 ### Session du 28/10/2026 (`c70a0a4` → `8d58e14`)
 - **Emails :** adresse de réponse automatique (`Notifier::replyToFor` : email pro pour les clients,
@@ -205,10 +227,12 @@
 - Migrations idempotentes, toutes appliquées en dev :
   `2026-10-11_item1_travel_fees.sql`, `2026-10-11_item4_notifications.sql`,
   `2026-10-21_item18_exception_requests.sql` (exécutée deux fois sans effet de bord).
-- **À appliquer en production** avant le premier déploiement : la migration du 21/10. Aucune
-  évolution de schéma depuis (Items 12, 2, 25 et 5 : clés `config` et fichiers seulement).
-- Nouvelles clés `config` (créées à la demande) : `theme_*`, `rgpd_retention_months`,
-  `rgpd_last_purge`.
+- Migration du 29/10 (`2026-10-29_item27_schema_version.sql`) : appliquée en dev (rejouée sans
+  effet de bord) ; elle n'ajoute qu'une clé `config`, pas de colonne.
+- **À appliquer en production** avant le premier déploiement : les migrations du 21/10 et du 29/10
+  (`npm run deploy:init` les liste automatiquement selon `schema_version`).
+- Clés `config` créées à la demande : `theme_*`, `rgpd_retention_months`, `rgpd_last_purge`,
+  `schema_version`, `ui_state_<id>` (préférences d'affichage, exclues de la configuration publique).
 - Fichiers hors base, non versionnés : `api/storage/branding/`, `api/storage/zone/` et
   `api/storage/auth/` (doivent être accessibles en écriture par PHP).
 
@@ -219,7 +243,7 @@ Les deux sens ont été réalignés.
 
 ---
 
-## 3. Prochains chantiers prioritaires (ordre de la feuille de route au 28/10/2026)
+## 3. Prochains chantiers prioritaires (ordre de la feuille de route au 29/10/2026)
 
 ### 🎯 0. Vérifications en attente
 - Renvoyer le logo depuis la configuration pour générer `logo-email.png`.
@@ -230,14 +254,17 @@ Les deux sens ont été réalignés.
   DKIM activé, bouton « Envoyer un email de test » **avant** la première déconnexion, puis
   changement imposé de `admin123`.
 
-### 🎯 1. Item 27 — Déploiement initial interactif (`npm run deploy:init`) — prévu le 29/10 au soir
-Estimé à 2-3 h. Questions interactives (Node, Windows / macOS / Linux), route publique
-`/api/health` sans secret, **suivi de la version du schéma** (point délicat : sans doute une
-migration), paquet initial avec `.env` généré seulement si le serveur n'est pas installé,
-réponses conservées hors Git, fiche pas à pas FR / EN.
+### 🎯 1. Item 21 — Liste AG Grid, partie 2/2 (finitions)
+- Peaufiner le rendu dans le navigateur (non vérifié de bout en bout) : barre d'outils, barre
+  d'actions de la sélection, barre d'état accolée, hauteur des lignes, colonne Actions optionnelle.
+- Parcourir toutes les fonctions (filtres de colonnes, export, pagination, préférences, sélection
+  depuis le calendrier) : une erreur AG Grid #200 en développement signale un module à enregistrer.
+- Revoir le poids de la grille (≈ 281 ko compressés) si besoin.
+- Tester aussi au clavier `npm run deploy:init` (saisie masquée du mot de passe) et le
+  glisser-déposer du calendrier.
 
-### 2. Item 23 — FullCalendar · 3. Item 21 — AG Grid · 4. Item 28 — Paquet téléchargeable
-### 5. Item 22 — Factures · 6. Item 30 — Effets avancés & thème sombre · 7. Item 26 · 8. Item 29 · 9. Item 31 — Traduction
+### 2. Item 28 — Paquet téléchargeable · 3. Item 22 — Factures · 4. Item 30 — Effets avancés & thème sombre
+### 5. Item 26 — `APP_URL` automatique · 6. Item 29 — Mise à jour sur site · 7. Item 31 — Traduction
 
 ### Points d'attention issus des Items 18 et 19
 - Changer à la main le statut d'une demande « En attente » n'envoie pas les emails de décision.
@@ -262,3 +289,5 @@ notification à l'annulation).
 - **Schéma :** toute évolution va dans `sql/schema.sql` *et* dans une migration idempotente de `sql/migrations/`.
 - **Styles :** un seul bouton (`.btn`), fenêtres par les mixins `modal-*`, encarts par `Panel`, couleurs de
   marque dérivées de `--color-primary`, constantes pour durées, interlignes et espacements.
+- **Bibliothèques :** FullCalendar et AG Grid en éditions gratuites (MIT) uniquement, chargées à la demande ;
+  jamais de plugin ou module Premium / Enterprise.
