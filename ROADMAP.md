@@ -413,6 +413,18 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - **Agendas (iTIP) :** le fichier du client devient une invitation (`METHOD:REQUEST` puis `CANCEL`, organisateur = entreprise, client participant `PARTSTAT=ACCEPTED;RSVP=FALSE`) pour que les messageries mettent à jour ou retirent l'événement au lieu de créer des doublons ; l'agenda de l'artisan est aussi mis à jour quand il déplace (`reschedule_pro`) ou annule lui-même (`cancellation_pro`), même sans prévenir le client. Chaque email concerné rappelle la limite : seul un événement ajouté depuis un email est relié (sinon, modification manuelle). **Synchronisation non garantie** (dépend de la messagerie) : fiabilisée par l'Item 33.
   - Testé par l'API et Mailpit : reprogrammation (avec et sans email), annulation par l'artisan, annulation par le client (deux emails, `.ics` CANCEL), demande confirmée et refusée depuis le planning, plafond (6ᵉ envoi refusé) ; suite création → déplacement (client prévenu, puis non) → annulation : même UID par destinataire, `SEQUENCE` croissante, `REQUEST` puis `CANCEL`, organisateur et participant présents. Rendez-vous de test supprimés.
 
+### 33. Abonnement d'Agenda de l'Artisan (Flux iCal Privé)
+- **Constat (31/10/2026) :** les invitations par email (Item 32) ne **garantissent** pas la synchronisation avec Google Agenda, Outlook ou l'iPhone : elles dépendent de la messagerie, de l'ajout initial depuis l'email et de la lecture des messages. Le pilotage reste dans Crénelio, il faut donc un miroir fiable et à sens unique.
+- **Optionnel :** désactivé par défaut. Tant que l'artisan ne l'active pas dans l'espace Pro, aucune adresse n'existe et la route répond 404 ; le désactiver supprime le jeton (l'adresse cesse aussitôt de fonctionner). Les invitations par email (Item 32) fonctionnent sans lui.
+- **Fonctionnement prévu :**
+  - Adresse d'agenda privée et secrète (`webcal://<site>/api/calendar/<jeton>.ics`, jeton aléatoire long, jamais devinable), à laquelle l'artisan s'abonne une fois dans son agenda ; Crénelio en reste la source unique.
+  - Flux iCal (RFC 5545) généré à la volée : rendez-vous à venir et récents (fenêtre limitée), mêmes UID que les invitations de l'Item 32 (pas de doublon), statut, coordonnées du client et notes d'accès ; indisponibilités en option.
+  - Espace Pro (Configuration) : interrupteur « Abonnement d'agenda » (activer / désactiver), adresse à copier, boutons « Ajouter à Google Agenda / Outlook / Apple », **régénération du jeton** (l'ancienne adresse cesse de fonctionner), date du dernier accès au flux.
+- **Limites à afficher :** délai de rafraîchissement fixé par chaque agenda, pas par Crénelio (Apple réglable jusqu'à 5 min, Outlook quelques heures, Google jusqu'à ≈ 24 h) ; les invitations par email restent la mise à jour immédiate, le flux en est le filet de sécurité. Sens unique : une modification faite dans l'agenda externe ne revient pas dans Crénelio.
+- **Sécurité et RGPD :** le flux contient des données clients : jeton secret (comparaison à temps constant), en-têtes anti-cache et anti-indexation, aucune donnée au-delà de la fenêtre, données anonymisées exclues ; flux décrit dans la politique de confidentialité ; jeton stocké hors de la configuration publique.
+- **Hors périmètre :** synchronisation bidirectionnelle par les API Google / Microsoft (OAuth, jetons, conflits) — contraire au pilotage depuis Crénelio et trop lourde pour l'offre Starter.
+- **Prérequis :** Item 32 ✅.
+
 ---
 
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
@@ -421,13 +433,14 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
 |---|---|---|---|---|---|---|
-| **1** | **Item 21** | **Liste des interventions AG Grid — finitions (partie 2/2)** | Espace Pro / Exploitation | 🚧 *Partie 1/2 livrée* | — | 🟢 Fonctionnelle ; rendu et modules à vérifier dans le navigateur |
-| **2** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
-| **3** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
-| **4** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
-| **5** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
-| **6** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
-| **7** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
+| **1** | **Item 33** | **Abonnement d'agenda de l'artisan (flux iCal privé, optionnel)** | Planning / Synchronisation | ⏳ *À faire* | Item 32 ✅ | 🟠 Garantit l'agenda de l'artisan conforme à Crénelio (les emails ne le garantissent pas) |
+| **2** | **Item 21** | **Liste des interventions AG Grid — finitions (partie 2/2)** | Espace Pro / Exploitation | 🚧 *Partie 1/2 livrée* | — | 🟢 Fonctionnelle ; rendu et modules à vérifier dans le navigateur |
+| **3** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
+| **4** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
+| **5** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
+| **6** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
+| **7** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| **8** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
 | — | **Item 32** | Fiabilité des notifications (annulation, reprogrammation, décision, anti-abus) | Communication / Fiabilité | ✅ **Terminé** | — | — |
 | — | **Item 23** | Calendrier des interventions (FullCalendar : vues, glisser-déposer validé, création au clic) | Espace Pro / Planning | ✅ **Terminé** | — | — |
 | — | **Item 27** | Déploiement initial interactif (`npm run deploy:init`, `/api/health`, version du schéma) | Installation / Déploiement | ✅ **Terminé** | — | — |
