@@ -2585,9 +2585,39 @@ $calendar-statuses: (
   }
 
   @each $status, $color in $calendar-statuses {
-    .calendar-event--#{$status} {
+    // :hover : FullCalendar éclaircit le fond des pastilles au survol
+    .calendar-event--#{$status},
+    .calendar-event--#{$status}:hover {
       background-color: $color;
       border-color: $color;
+    }
+  }
+
+  // Vue mois : FullCalendar dessine les rendez-vous horaires en « pastille » (texte couleur de lien,
+  // fond transparent) ; avec le fond plein du statut, texte blanc et pastille superflue
+  .fc-daygrid-dot-event.calendar-event {
+    color: white;
+
+    &:hover,
+    &:focus {
+      filter: brightness(0.92);
+    }
+
+    .fc-daygrid-event-dot {
+      display: none;
+    }
+
+    // L'heure reste entière, seul le titre est tronqué
+    .fc-event-time {
+      flex-shrink: 0;
+      color: inherit;
+    }
+
+    .fc-event-title {
+      min-width: 0;
+      overflow: hidden;
+      color: inherit;
+      text-overflow: ellipsis;
     }
   }
 
@@ -2671,6 +2701,7 @@ $calendar-statuses: (
 // Planning : filtre par jour et rendez-vous ouvert depuis le calendrier
 .admin-date-filter {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: $space-sm;
 }
@@ -2683,122 +2714,226 @@ $calendar-statuses: (
 $data-grid-fill: '(min-width: 768px) and (min-height: 600px)';
 // Hauteur du panneau de pagination d'AG Grid (thème Quartz) : le compteur s'y superpose
 $data-grid-footer-height: 48px;
+// Hauteur commune des boutons et champs de la barre d'outils
+$data-grid-control-height: 34px;
+// Largeur des indications superposées au panneau de pagination (compteur, filtres, enregistrement)
+$data-grid-status-width: 13em;
 
 .data-grid {
+  --data-grid-border: #{$gray-200};
   display: flex;
   flex-direction: column;
   gap: $space-sm;
 
-  // Une seule ligne d'actions générales : ajout et recherche prioritaires, options dessous si
-  // la place manque (option de colonne à gauche, boutons à droite)
+  // Barre d'outils : actions (ordre CRUD), recherche et filtres, outils (export, réglages) ; un
+  // seul flux qui ne passe à la ligne que faute de place. Contrôles tous à la même hauteur.
   .data-grid__toolbar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: $space-block;
+    gap: $space-sm;
+
+    .btn,
+    .form-input,
+    .admin-time-select,
+    .admin-pill-btn {
+      height: $data-grid-control-height;
+    }
+
+    .btn {
+      padding-block: 0;
+      font-size: 0.8rem;
+    }
   }
 
-  .data-grid__start {
+  .data-grid__actions,
+  .data-grid__tools {
     display: flex;
-    flex: 999 1 560px;
+    align-items: center;
+    gap: $space-2xs;
+  }
+
+  // Les filtres prennent la place laissée par les actions et les outils, et passent à la ligne
+  // entre eux plutôt que de rejeter les actions sur une ligne à part
+  .data-grid__filters {
+    display: flex;
+    flex: 1 1 360px;
+    min-width: 0;
     flex-wrap: wrap;
     align-items: center;
-    gap: $space-block;
+    gap: $space-sm;
 
     .admin-search-wrapper {
-      flex: 1 1 260px;
+      flex: 1 1 200px;
+      min-width: 180px;
       margin: 0;
     }
   }
 
-  .data-grid__options {
+  .data-grid__tools {
+    margin-left: auto;
+  }
+
+
+  // Menu « roue dentée » des réglages de la grille
+  .data-grid__menu {
+    position: relative;
+  }
+
+  .data-grid__menu-panel {
+    position: absolute;
+    top: calc(100% + #{$space-2xs});
+    right: 0;
+    z-index: 30;
     display: flex;
-    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 240px;
+    padding: $space-2xs;
+    border: 1px solid var(--data-grid-border);
+    border-radius: $radius-md;
+    background: white;
+    box-shadow: $shadow-lg;
+  }
+
+  // Entonnoir et filtres appliqués, en étiquettes retirables
+  .data-grid__quick-filters {
+    display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-end;
-    gap: $space-block;
+    gap: $space-2xs;
+  }
 
-    .data-grid__toggle {
-      margin-right: auto;
+  .data-grid__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2xs;
+    height: 26px;
+    padding: 0 $space-2xs 0 $space-xs;
+    border: 1px solid primary-alpha(30%);
+    border-radius: $radius-full;
+    background: $primary-light;
+    color: $primary;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .data-grid__chip-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: primary-alpha(15%);
     }
   }
 
-  .data-grid__save {
-    min-width: 11em;
-    color: $gray-400;
-    font-size: 0.8rem;
-    text-align: right;
-  }
-
-  .data-grid__toggle {
-    display: inline-flex;
+  .data-grid__menu-item {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    color: $gray-600;
-    font-size: 0.85rem;
+    gap: $space-xs;
+    width: 100%;
+    padding: $space-xs $space-sm;
+    border: 0;
+    border-radius: $radius-sm;
+    background: none;
+    color: $gray-700;
+    font: inherit;
+    font-size: 0.9rem;
+    text-align: left;
     cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: $gray-100;
+    }
 
     input {
       accent-color: $primary;
     }
+
+    // Réinitialisation séparée des bascules
+    &:is(button) {
+      margin-top: $space-2xs;
+      border-top: 1px solid $gray-200;
+      border-radius: 0 0 $radius-sm $radius-sm;
+    }
   }
 
-  // Barre d'actions de la ligne sélectionnée : même place avec ou sans sélection
-  .data-grid__selection {
+  // Bouton de menu signalant un état actif (filtres appliqués) : teinte et pastille
+  .data-grid__icon-btn--active {
+    position: relative;
+    border-color: $primary;
+    color: $primary;
+  }
+
+  .data-grid__badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 $space-2xs;
+    border-radius: $radius-full;
+    background: $primary;
+    color: white;
+    font-size: 0.7rem;
+    line-height: 18px;
+    text-align: center;
+  }
+
+  // Filtres rapides : en ligne dans la barre (intitulé lu seulement par les lecteurs d'écran),
+  // empilés avec intitulé visible dans le menu « entonnoir »
+  .toggle-group {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: $space-block;
-    min-height: 58px;
-    padding: 10px 14px;
-    background: $primary-light;
-    border: 1px solid primary-alpha(30%);
-    border-radius: $radius-sm;
-
-    &--empty {
-      background: $gray-50;
-      border-color: $gray-200;
-
-      .data-grid__selection-label {
-        color: $gray-400;
-      }
-    }
-
-    .admin-table-actions {
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: $space-sm;
-    }
   }
 
-  .data-grid__selection-label {
-    flex: 1 1 220px;
-    color: $gray-700;
-    font-size: 0.9rem;
+  // Seulement dans la barre (enfants directs), pas dans le menu « entonnoir » qu'elle contient
+  .data-grid__filters > .toggle-group .toggle-group__label {
+    @include visually-hidden;
+  }
 
-    &::first-letter {
+  .data-grid__menu-panel--filters {
+    gap: $space-sm;
+    width: max-content;
+    max-width: min(520px, 90vw);
+    padding: $space-sm;
+
+    .toggle-group {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $space-2xs;
+    }
+
+    .toggle-group__label {
+      color: $gray-500;
+      font-size: 0.75rem;
+      font-weight: 600;
       text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .admin-pill-btn,
+    .admin-time-select,
+    .btn {
+      height: $data-grid-control-height;
     }
   }
 
-  .data-grid__deselect {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    color: $gray-500;
-    @include hover-transition(background-color color, $duration-fast);
-
-    &:hover:not(:disabled),
-    &:focus-visible {
-      background: white;
-      color: $gray-900;
-    }
+  .data-grid__save {
+    color: $gray-400;
+    font-size: 0.8rem;
+    text-align: right;
   }
 
   .data-grid__body {
@@ -2878,12 +3013,67 @@ $data-grid-footer-height: 48px;
     }
 
     .data-grid__status {
+      flex-wrap: nowrap;
+      height: $data-grid-footer-height;
+      padding: 0 16px;
+      white-space: nowrap;
+    }
+
+    // Pagination : indications superposées à gauche du panneau de pagination (aligné à droite par
+    // AG Grid), bornées en largeur pour ne jamais recouvrir ses contrôles
+    &.data-grid--paged .data-grid__status {
       position: absolute;
       left: 0;
       bottom: 0;
-      height: $data-grid-footer-height;
-      padding: 0 16px;
+      width: $data-grid-status-width;
+      overflow: hidden;
       pointer-events: none;
+
+      .data-grid__status-note,
+      .data-grid__save {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    // Place réservée aux indications : le panneau de pagination ne passe jamais dessous
+    &.data-grid--paged .ag-paging-panel {
+      padding-left: $data-grid-status-width;
+    }
+
+    // Faute de largeur, le sélecteur de taille de page perd son libellé
+    @include tablet {
+      &.data-grid--paged .ag-paging-page-size .ag-label {
+        display: none;
+      }
+    }
+
+    // Défilement continu : pied de grille simulé, dans le prolongement du cadre d'AG Grid
+    &:not(.data-grid--paged) {
+      .data-grid__body {
+        display: flex;
+        flex-direction: column;
+
+        > div:first-child {
+          flex: 1;
+          min-height: 0;
+          height: auto;
+        }
+      }
+
+      .ag-root-wrapper {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      .data-grid__status {
+        flex-shrink: 0;
+        padding-top: 0;
+        border: 1px solid var(--data-grid-border);
+        border-top-width: 0;
+        border-radius: 0 0 $radius $radius;
+        background: white; // fond du panneau de pagination d'AG Grid
+      }
     }
   }
 }
@@ -3093,3 +3283,11 @@ $data-grid-footer-height: 48px;
     .form-input { flex: 1; }
   }
 }
+
+// Bouton à icône seule, carré (barres d'outils des grilles, tableau de bord…)
+.data-grid__icon-btn {
+  width: $data-grid-control-height;
+  height: $data-grid-control-height;
+  padding: 0;
+}
+

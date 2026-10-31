@@ -3,9 +3,9 @@ import type { CustomCellRendererProps } from 'ag-grid-react';
 import type { ColDef, CsvExportParams } from 'ag-grid-community';
 import {
   ArrowSquareOutIcon,
-  CalendarBlankIcon,
   EnvelopeSimpleIcon,
   EraserIcon,
+  PlusIcon,
   WarningCircleIcon,
 } from '@phosphor-icons/react';
 import { format, isPast, isToday, parseISO } from 'date-fns';
@@ -13,7 +13,7 @@ import { fr } from 'date-fns/locale';
 import { Appointment } from '../../types';
 import { formatEuro } from '../../utils/format';
 import { ANONYMIZED_NAME } from '../../utils/privacy';
-import DataGrid from './DataGrid';
+import DataGrid, { ActiveFilter, GridSettingToggle } from './DataGrid';
 import { STATUS_LABELS } from './AppointmentDialog';
 
 /** Actions sur un rendez-vous ; « Reprogrammer » et « Ouvrir » ouvrent la fenêtre du rendez-vous. */
@@ -29,8 +29,12 @@ interface InterventionsGridProps extends InterventionActions {
   appointments: Appointment[];
   /** Nombre total de rendez-vous, avant tout filtre (pied de grille). */
   totalCount: number;
-  /** Actions générales en tête de la barre d'outils (nouveau rendez-vous, recherche…). */
-  toolbarStart?: React.ReactNode;
+  /** Recherche et filtres rapides du planning. */
+  filters?: React.ReactNode;
+  /** Filtres rapides (statut, période, jour) et filtres appliqués, cf. `DataGrid`. */
+  quickFilters?: React.ReactNode;
+  activeFilters?: ActiveFilter[];
+  onCreate: () => void;
 }
 
 const isOverdue = (a: Appointment) => {
@@ -41,24 +45,20 @@ const isOverdue = (a: Appointment) => {
 const placeLabel = (a: Appointment) => [a.address, `${a.postal_code} ${a.city}`.trim()].filter(Boolean).join(', ');
 
 /**
- * Statut, reprogrammation, emails, effacement : barre de la ligne sélectionnée ou cellule de ligne.
- * Sans rendez-vous (aucune sélection), les mêmes contrôles sont affichés désactivés.
+ * Statut, reprogrammation, emails, effacement : colonne d'actions optionnelle.
  */
-const AppointmentActions: React.FC<{ appointment: Appointment | null; actions: InterventionActions }> = ({
+const AppointmentActions: React.FC<{ appointment: Appointment; actions: InterventionActions }> = ({
   appointment,
   actions,
 }) => {
-  const disabled = appointment === null;
   return (
     <div className="admin-table-actions">
       <select
         className="form-input admin-status-select"
-        value={appointment?.status ?? ''}
-        disabled={disabled}
-        onChange={(e) => appointment && actions.onStatusChange(appointment.id, e.target.value)}
+        value={appointment.status}
+        onChange={(e) => actions.onStatusChange(appointment.id, e.target.value)}
         aria-label="Statut"
       >
-        {disabled && <option value="">Statut</option>}
         {(Object.keys(STATUS_LABELS) as Appointment['status'][]).map((status) => (
           <option key={status} value={status}>
             {STATUS_LABELS[status]}
@@ -67,33 +67,31 @@ const AppointmentActions: React.FC<{ appointment: Appointment | null; actions: I
       </select>
       <button
         type="button"
-        className="btn btn-secondary admin-btn-reschedule"
-        disabled={disabled}
-        onClick={() => appointment && actions.onOpen(appointment)}
-        title="Consulter, déplacer ou modifier le rendez-vous"
+        className="btn btn-secondary admin-btn-sm data-grid__icon-btn"
+        onClick={() => actions.onOpen(appointment)}
+        title="Ouvrir : consulter, déplacer ou modifier le rendez-vous"
+        aria-label="Ouvrir"
       >
-        <CalendarBlankIcon size={14} weight="bold" aria-hidden="true" />
-        Reprogrammer
+        <ArrowSquareOutIcon size={16} weight="bold" aria-hidden="true" />
       </button>
       <button
         type="button"
-        className="btn btn-secondary admin-btn-reschedule"
-        disabled={disabled}
-        onClick={() => appointment && actions.onEmails(appointment)}
-        title="Consulter le journal des emails envoyés pour ce rendez-vous"
+        className="btn btn-secondary admin-btn-sm data-grid__icon-btn"
+        onClick={() => actions.onEmails(appointment)}
+        title="Journal des emails envoyés pour ce rendez-vous"
+        aria-label="Emails"
       >
-        <EnvelopeSimpleIcon size={14} weight="bold" aria-hidden="true" />
-        Emails
+        <EnvelopeSimpleIcon size={16} weight="bold" aria-hidden="true" />
       </button>
       <button
         type="button"
-        className="btn btn-secondary admin-btn-reschedule"
-        disabled={disabled || appointment.client_name === ANONYMIZED_NAME}
-        onClick={() => appointment && actions.onAnonymize(appointment)}
+        className="btn btn-danger admin-btn-sm data-grid__icon-btn"
+        disabled={appointment.client_name === ANONYMIZED_NAME}
+        onClick={() => actions.onAnonymize(appointment)}
         title="Demande d'effacement (RGPD) : efface le nom, l'email, le téléphone, l'adresse et les notes du client"
+        aria-label="Effacer le client"
       >
-        <EraserIcon size={14} weight="bold" aria-hidden="true" />
-        Effacer
+        <EraserIcon size={16} weight="bold" aria-hidden="true" />
       </button>
     </div>
   );
@@ -147,10 +145,18 @@ const CSV_EXPORT: CsvExportParams = {
 
 /**
  * Liste des interventions (Item 21) sur `DataGrid` : colonnes du planning, actions de la ligne
- * sélectionnée (barre au-dessus de la grille), colonne d'actions optionnelle, export CSV, ouverture
- * de la fenêtre du rendez-vous (bouton « Ouvrir » ou double-clic).
+ * sélectionnée par la fenêtre du rendez-vous (bouton « Ouvrir » ou double-clic), colonne d'actions
+ * optionnelle, export CSV.
  */
-const InterventionsGrid: React.FC<InterventionsGridProps> = ({ appointments, totalCount, toolbarStart, ...actions }) => {
+const InterventionsGrid: React.FC<InterventionsGridProps> = ({
+  appointments,
+  totalCount,
+  filters,
+  quickFilters,
+  activeFilters,
+  onCreate,
+  ...actions
+}) => {
   // Colonne d'actions visible : reflet de la disposition (enregistrée avec les autres colonnes)
   const [rowActions, setRowActions] = useState(false);
   const [toggleActions, setToggleActions] = useState<((visible: boolean) => void) | null>(null);
@@ -217,7 +223,7 @@ const InterventionsGrid: React.FC<InterventionsGridProps> = ({ appointments, tot
         filter: false,
         resizable: false,
         pinned: 'right',
-        width: 470,
+        width: 290,
       },
     ],
     // Définitions figées : les recalculer réinitialiserait la disposition choisie par l'artisan
@@ -232,13 +238,52 @@ const InterventionsGrid: React.FC<InterventionsGridProps> = ({ appointments, tot
       getRowId={(a) => String(a.id)}
       entityLabel={['intervention', 'interventions']}
       totalCount={totalCount}
-      toolbarStart={toolbarStart}
-      toolbarEnd={
-        <label className="data-grid__toggle">
-          <input type="checkbox" checked={rowActions} onChange={(e) => toggleActions?.(e.target.checked)} />
-          Actions sur chaque ligne
-        </label>
-      }
+      // Création, puis les actions de la ligne sélectionnée ; le statut se change dans sa fenêtre
+      actions={(selected) => (
+        <>
+          <button type="button" className="btn btn-primary admin-btn-sm" onClick={onCreate} title="Nouveau rendez-vous">
+            <PlusIcon size={16} weight="bold" aria-hidden="true" />
+            Nouveau
+          </button>
+          {selected && (
+            <>
+              <button
+                type="button"
+                className="btn btn-secondary admin-btn-sm data-grid__icon-btn"
+                onClick={() => actions.onOpen(selected)}
+                title="Ouvrir : consulter, changer le statut, déplacer (ou double-clic sur la ligne)"
+                aria-label="Ouvrir"
+              >
+                <ArrowSquareOutIcon size={16} weight="bold" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary admin-btn-sm data-grid__icon-btn"
+                onClick={() => actions.onEmails(selected)}
+                title="Journal des emails envoyés pour ce rendez-vous"
+                aria-label="Emails"
+              >
+                <EnvelopeSimpleIcon size={16} weight="bold" aria-hidden="true" />
+              </button>
+              {selected.client_name !== ANONYMIZED_NAME && (
+                <button
+                  type="button"
+                  className="btn btn-danger admin-btn-sm data-grid__icon-btn"
+                  onClick={() => actions.onAnonymize(selected)}
+                  title="Effacer les données du client (demande RGPD)"
+                  aria-label="Effacer le client"
+                >
+                  <EraserIcon size={16} weight="bold" aria-hidden="true" />
+                </button>
+              )}
+            </>
+          )}
+        </>
+      )}
+      filters={filters}
+      quickFilters={quickFilters}
+      activeFilters={activeFilters}
+      settings={<GridSettingToggle label="Actions sur chaque ligne" checked={rowActions} onChange={(v) => toggleActions?.(v)} />}
       csvExport={CSV_EXPORT}
       context={actions}
       rowHeight={72}
@@ -249,30 +294,6 @@ const InterventionsGrid: React.FC<InterventionsGridProps> = ({ appointments, tot
         setRowActions(grid.getColumnState().some((c) => c.colId === 'actions' && !c.hide));
         setToggleActions(() => (visible: boolean) => grid.setColumnsVisible(['actions'], visible));
       }}
-      renderSelection={(selected) => (
-        <>
-          <span className="data-grid__selection-label">
-            {selected ? (
-              <>
-                <strong>{selected.client_name}</strong> —{' '}
-                {format(parseISO(selected.start_datetime), 'EEEE d MMMM yyyy, HH:mm', { locale: fr })}
-              </>
-            ) : (
-              'Aucune intervention sélectionnée : cliquez sur une ligne (double-clic pour l’ouvrir).'
-            )}
-          </span>
-          <AppointmentActions appointment={selected} actions={actions} />
-          <button
-            type="button"
-            className="btn btn-primary admin-btn-reschedule"
-            disabled={!selected}
-            onClick={() => selected && actions.onOpen(selected)}
-          >
-            <ArrowSquareOutIcon size={14} weight="bold" aria-hidden="true" />
-            Ouvrir
-          </button>
-        </>
-      )}
     />
   );
 };

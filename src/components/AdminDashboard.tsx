@@ -7,14 +7,9 @@ import {
   CalendarBlankIcon,
   XIcon,
   CarIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  HourglassIcon,
-  ArrowClockwiseIcon,
   WrenchIcon,
   GearSixIcon,
   MapTrifoldIcon,
-  PlusIcon,
   CalendarDotsIcon,
 } from '@phosphor-icons/react';
 import { api, UNAUTHORIZED_EVENT } from '../api';
@@ -23,8 +18,6 @@ import {
   Service,
   AppConfig,
   TravelFeeMode,
-  AppointmentNotification,
-  NotificationType,
   BrandingUrls,
 } from '../types';
 import { formatEuro } from '../utils/format';
@@ -47,7 +40,9 @@ const UnavailabilitiesGrid = lazy(() => import('./admin/UnavailabilitiesGrid'));
 import AdminLogin from './admin/AdminLogin';
 import type { AdminNotice } from './admin/AdminNotices';
 import AppointmentDialog from './admin/AppointmentDialog';
+import NotificationsDialog from './admin/NotificationsDialog';
 import ConfirmDialog from './admin/ConfirmDialog';
+import ToggleGroup from './admin/ToggleGroup';
 import MailStatus from './admin/MailStatus';
 import CalendarFeedSettings from './admin/CalendarFeedSettings';
 import AppearanceEditor from './admin/AppearanceEditor';
@@ -56,22 +51,8 @@ import ProEmailField from './admin/ProEmailField';
 import { applyFavicon } from '../utils/favicon';
 import { applyDocumentTitle } from '../utils/documentTitle';
 import { format, isPast, isToday, parseISO } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 const NAV_ICON = { size: 20, weight: 'fill' as const, 'aria-hidden': true };
-
-/** Libellés lisibles des emails journalisés. */
-const NOTIFICATION_LABELS: Record<NotificationType, string> = {
-  client_confirmation: 'Confirmation client',
-  pro_confirmation: 'Fiche intervention (artisan)',
-  exception_client_ack: 'Demande hors zone : accusé de réception client',
-  exception_pro_request: 'Demande hors zone : à valider (artisan)',
-  exception_client_refused: 'Demande hors zone : refus envoyé au client',
-  cancellation_client: 'Annulation (client)',
-  cancellation_pro: 'Annulation (agenda de l\'artisan)',
-  reschedule_client: 'Rendez-vous déplacé (client)',
-  reschedule_pro: 'Rendez-vous déplacé (agenda de l\'artisan)',
-};
 
 /** Paliers kilométriques modifiables depuis l'espace Pro (cf. `config.travel_tier_*`). */
 const TRAVEL_TIER_INDEXES = [1, 2, 3] as const;
@@ -169,6 +150,10 @@ export const AdminDashboard: React.FC = () => {
   const [timeFilter, setTimeFilter] = useState<'all' | 'upcoming' | 'today' | 'overdue' | 'past'>('all');
   // Jour précis (YYYY-MM-DD), posé notamment par un clic sur un rendez-vous du calendrier
   const [dateFilter, setDateFilter] = useState('');
+  // Filtre de date : un jour (dateFilter) ou une plage du dateFilter au dateEndFilter (bornes incluses,
+  // chacune facultative)
+  const [dateMode, setDateMode] = useState<'day' | 'range'>('day');
+  const [dateEndFilter, setDateEndFilter] = useState('');
   // Onglet Horaires : semaine type ou indisponibilités (grille)
   const [hoursView, setHoursView] = useState<'week' | 'unavailabilities'>('week');
   // Rendez-vous ouvert dans la fenêtre de consultation / modification (calendrier ou liste)
@@ -198,12 +183,8 @@ export const AdminDashboard: React.FC = () => {
   // Demande d'effacement RGPD en cours de confirmation
   const [anonymizing, setAnonymizing] = useState<Appointment | null>(null);
 
-  // Journal des notifications email du rendez-vous consulté
-  const [notificationsAppointment, setNotificationsAppointment] = useState<Appointment | null>(null);
-  const [notifications, setNotifications] = useState<AppointmentNotification[]>([]);
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
-  const [notificationsError, setNotificationsError] = useState<string | null>(null);
-  const [resendingType, setResendingType] = useState<NotificationType | null>(null);
+  // Journal des emails ouvert (depuis la liste, le calendrier ou la fenêtre du rendez-vous)
+  const [emailsFor, setEmailsFor] = useState<{ appointment: Appointment; fromDialog: boolean } | null>(null);
 
   // Paliers kilométriques & rayon maximal d'intervention
   const [travelSettings, setTravelSettings] = useState<Record<string, string>>({});
@@ -240,12 +221,11 @@ export const AdminDashboard: React.FC = () => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (isAddModalOpen) setIsAddModalOpen(false);
-        if (notificationsAppointment) setNotificationsAppointment(null);
       }
     };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
-  }, [isAddModalOpen, notificationsAppointment]);
+  }, [isAddModalOpen]);
 
   /** Relit l'état de la session (mot de passe par défaut encore actif ?). */
   async function refreshSession() {
@@ -298,36 +278,7 @@ export const AdminDashboard: React.FC = () => {
     }
   }
 
-  async function openNotifications(appointment: Appointment) {
-    setNotificationsAppointment(appointment);
-    setNotifications([]);
-    setNotificationsError(null);
-    setNotificationsLoading(true);
-    try {
-      setNotifications(await api.listNotifications(appointment.id));
-    } catch (err: unknown) {
-      setNotificationsError(err instanceof Error ? err.message : 'Erreur lors du chargement du journal');
-    } finally {
-      setNotificationsLoading(false);
-    }
-  }
-
-  async function handleResendNotification(type: NotificationType) {
-    if (!notificationsAppointment) return;
-    setResendingType(type);
-    setNotificationsError(null);
-    try {
-      const res = await api.resendNotification(notificationsAppointment.id, type);
-      setNotifications(res.notifications);
-      if (res.result.status === 'failed') {
-        setNotificationsError("L'envoi a de nouveau échoué — le motif figure dans le journal ci-dessous.");
-      }
-    } catch (err: unknown) {
-      setNotificationsError(err instanceof Error ? err.message : "Erreur lors du renvoi");
-    } finally {
-      setResendingType(null);
-    }
-  }
+  const openNotifications = (appointment: Appointment) => setEmailsFor({ appointment, fromDialog: false });
 
   function updateTravelSetting(key: string, value: string) {
     setTravelSettings((prev) => ({ ...prev, [key]: value }));
@@ -403,8 +354,11 @@ export const AdminDashboard: React.FC = () => {
         return false;
       }
 
-      // 3. Jour précis
-      if (dateFilter && !a.start_datetime.startsWith(dateFilter)) {
+      // 3. Jour précis ou plage de dates (comparaison de chaînes AAAA-MM-JJ)
+      const day = a.start_datetime.slice(0, 10);
+      if (dateMode === 'day') {
+        if (dateFilter && day !== dateFilter) return false;
+      } else if ((dateFilter && day < dateFilter) || (dateEndFilter && day > dateEndFilter)) {
         return false;
       }
 
@@ -426,7 +380,7 @@ export const AdminDashboard: React.FC = () => {
 
       return true;
     });
-  }, [appointments, searchQuery, statusFilter, timeFilter, dateFilter]);
+  }, [appointments, searchQuery, statusFilter, timeFilter, dateFilter, dateMode, dateEndFilter]);
 
   // Nombre de rendez-vous échus non honorés
   const overdueCount = useMemo(() => {
@@ -435,6 +389,35 @@ export const AdminDashboard: React.FC = () => {
       return isPast(startDate) && !isToday(startDate) && (a.status === 'confirmed' || a.status === 'pending');
     }).length;
   }, [appointments]);
+
+  // Filtres rapides du planning (boutons à bascule et étiquettes des filtres appliqués)
+  const statusOptions: { value: typeof statusFilter; label: string }[] = [
+    { value: 'all', label: `Tous (${appointments.length})` },
+    { value: 'confirmed', label: 'Confirmés' },
+    { value: 'pending', label: 'En attente' },
+    { value: 'completed', label: 'Terminés' },
+    { value: 'cancelled', label: 'Annulés' },
+  ];
+  const periodOptions: { value: typeof timeFilter; label: string }[] = [
+    { value: 'all', label: 'Toutes dates' },
+    { value: 'upcoming', label: 'À venir' },
+    { value: 'today', label: "Aujourd'hui" },
+    { value: 'overdue', label: overdueCount > 0 ? `Échus (${overdueCount})` : 'Échus' },
+    { value: 'past', label: 'Passés' },
+  ];
+  const clearDates = () => {
+    setDateFilter('');
+    setDateEndFilter('');
+  };
+  const shortDate = (iso: string) => format(parseISO(iso), 'dd/MM/yyyy');
+  const dateLabel =
+    dateMode === 'day'
+      ? dateFilter && shortDate(dateFilter)
+      : dateFilter && dateEndFilter
+        ? `Du ${shortDate(dateFilter)} au ${shortDate(dateEndFilter)}`
+        : dateFilter
+          ? `Depuis le ${shortDate(dateFilter)}`
+          : dateEndFilter && `Jusqu'au ${shortDate(dateEndFilter)}`;
 
   async function handleAddService(e: React.FormEvent) {
     e.preventDefault();
@@ -603,19 +586,33 @@ export const AdminDashboard: React.FC = () => {
       onLogout={handleLogout}
       nav={{ items: navItems, active: activeTab, onSelect: setActiveTab }}
       notices={notices}
-      fill={!loading && ((activeTab === 'appointments' && !creatingAppointment) || (activeTab === 'hours' && hoursView === 'unavailabilities'))}
+      fill={!loading && ((activeTab === 'appointments' && !creatingAppointment) || activeTab === 'calendar' || (activeTab === 'hours' && hoursView === 'unavailabilities'))}
     >
       {openedId !== null && appointments.some((a) => a.id === openedId) && (
         <AppointmentDialog
           appointment={appointments.find((a) => a.id === openedId)!}
           onClose={() => setOpenedId(null)}
           onChanged={replaceAppointment}
-          // Le journal s'ouvre à la place de la fenêtre (pas de fenêtres empilées)
+          // Le journal remplace la fenêtre (pas de fenêtres empilées), avec retour possible
           onEmails={(appointment) => {
             setOpenedId(null);
-            openNotifications(appointment);
+            setEmailsFor({ appointment, fromDialog: true });
           }}
           onAnonymize={setAnonymizing}
+        />
+      )}
+      {emailsFor && (
+        <NotificationsDialog
+          appointment={emailsFor.appointment}
+          onClose={() => setEmailsFor(null)}
+          onBack={
+            emailsFor.fromDialog
+              ? () => {
+                  setOpenedId(emailsFor.appointment.id);
+                  setEmailsFor(null);
+                }
+              : undefined
+          }
         />
       )}
       {anonymizing && (
@@ -663,102 +660,21 @@ export const AdminDashboard: React.FC = () => {
         </Suspense>
       ) : activeTab === 'appointments' ? (
         <div className="admin-page">
-          {/* ── Barre de recherche et filtres multi-critères ── */}
-          <div className="admin-filters-bar">
-            <div className="admin-filters-groups">
-              <div className="admin-filter-pills" role="radiogroup" aria-label="Filtre de statut">
-                <button
-                  type="button"
-                  className={clsx('admin-pill-btn', { 'admin-pill-btn--active': statusFilter === 'all' })}
-                  onClick={() => setStatusFilter('all')}
-                >
-                  Tous ({appointments.length})
-                </button>
-                <button
-                  type="button"
-                  className={clsx('admin-pill-btn', { 'admin-pill-btn--active': statusFilter === 'confirmed' })}
-                  onClick={() => setStatusFilter('confirmed')}
-                >
-                  Confirmés
-                </button>
-                <button
-                  type="button"
-                  className={clsx('admin-pill-btn', { 'admin-pill-btn--active': statusFilter === 'pending' })}
-                  onClick={() => setStatusFilter('pending')}
-                >
-                  En attente
-                </button>
-                <button
-                  type="button"
-                  className={clsx('admin-pill-btn', { 'admin-pill-btn--active': statusFilter === 'completed' })}
-                  onClick={() => setStatusFilter('completed')}
-                >
-                  Terminés
-                </button>
-                <button
-                  type="button"
-                  className={clsx('admin-pill-btn', { 'admin-pill-btn--active': statusFilter === 'cancelled' })}
-                  onClick={() => setStatusFilter('cancelled')}
-                >
-                  Annulés
-                </button>
-              </div>
-
-              <div className="admin-date-filter">
-                <input
-                  type="date"
-                  className="admin-time-select"
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
-                  aria-label="Jour précis"
-                />
-                {dateFilter && (
-                  <button
-                    type="button"
-                    className="btn btn-secondary admin-btn-sm"
-                    onClick={() => setDateFilter('')}
-                    aria-label="Retirer le filtre de date"
-                  >
-                    Tous les jours
-                  </button>
-                )}
-              </div>
-
-              <div>
-                <select
-                  className="admin-time-select"
-                  value={timeFilter}
-                  onChange={(e) => setTimeFilter(e.target.value as typeof timeFilter)}
-                  aria-label="Filtre temporel"
-                >
-                  <option value="all">Toutes dates</option>
-                  <option value="upcoming">À venir</option>
-                  <option value="today">Aujourd'hui</option>
-                  <option value="overdue">
-                    Échus non clôturés {overdueCount > 0 ? `(${overdueCount})` : ''}
-                  </option>
-                  <option value="past">Historique passé</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
             <Suspense fallback={<p>Chargement de la liste…</p>}>
               <InterventionsGrid
                 appointments={filteredAppointments}
                 totalCount={appointments.length}
-                toolbarStart={
+                onCreate={() => setCreatingAppointment(true)}
+                filters={
                   <>
-                    <button type="button" className="btn btn-primary" onClick={() => setCreatingAppointment(true)}>
-                      <PlusIcon size={18} weight="fill" aria-hidden="true" />
-                      Nouveau rendez-vous
-                    </button>
                     <div className="admin-search-wrapper">
                       <MagnifyingGlassIcon size={18} weight="bold" className="admin-search-icon" aria-hidden="true" />
                       <input
                         type="text"
                         className="form-input admin-search-input"
-                        placeholder="Rechercher : client, téléphone, adresse, prestation…"
+                        placeholder="Rechercher…"
+                        title="Client, téléphone, adresse, prestation"
+                        aria-label="Rechercher : client, téléphone, adresse, prestation"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                       />
@@ -775,6 +691,86 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </>
                 }
+                activeFilters={[
+                  ...(statusFilter !== 'all'
+                    ? [{ id: 'status', label: statusOptions.find((o) => o.value === statusFilter)!.label, onClear: () => setStatusFilter('all') }]
+                    : []),
+                  ...(timeFilter !== 'all'
+                    ? [{ id: 'period', label: periodOptions.find((o) => o.value === timeFilter)!.label, onClear: () => setTimeFilter('all') }]
+                    : []),
+                  ...(dateLabel ? [{ id: 'date', label: dateLabel, onClear: clearDates }] : []),
+                ]}
+                quickFilters={
+                  <>
+                    <ToggleGroup
+                      label="Statut"
+                      value={statusFilter}
+                      onChange={setStatusFilter}
+                      options={statusOptions}
+                    />
+                    <ToggleGroup
+                      label="Période"
+                      value={timeFilter}
+                      onChange={setTimeFilter}
+                      options={periodOptions}
+                    />
+                    <div className="toggle-group" role="group" aria-label="Date">
+                      <span className="toggle-group__label">Date</span>
+                      <div className="admin-date-filter">
+                        <div className="admin-filter-pills">
+                          {(
+                            [
+                              ['day', 'Jour'],
+                              ['range', 'Du … au …'],
+                            ] as const
+                          ).map(([mode, label]) => (
+                            <button
+                              key={mode}
+                              type="button"
+                              className={clsx('admin-pill-btn', { 'admin-pill-btn--active': dateMode === mode })}
+                              aria-pressed={dateMode === mode}
+                              onClick={() => {
+                                setDateMode(mode);
+                                setDateEndFilter('');
+                              }}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                        <input
+                          type="date"
+                          className="admin-time-select"
+                          value={dateFilter}
+                          max={dateMode === 'range' ? dateEndFilter || undefined : undefined}
+                          onChange={(e) => setDateFilter(e.target.value)}
+                          aria-label={dateMode === 'day' ? 'Jour précis' : 'Début de la période'}
+                        />
+                        {dateMode === 'range' && (
+                          <input
+                            type="date"
+                            className="admin-time-select"
+                            value={dateEndFilter}
+                            min={dateFilter || undefined}
+                            onChange={(e) => setDateEndFilter(e.target.value)}
+                            aria-label="Fin de la période"
+                          />
+                        )}
+                        {(dateFilter || dateEndFilter) && (
+                          <button
+                            type="button"
+                            className="btn btn-secondary admin-btn-sm data-grid__icon-btn"
+                            onClick={clearDates}
+                            title="Toutes les dates"
+                            aria-label="Retirer le filtre de date"
+                          >
+                            <XIcon size={16} weight="bold" aria-hidden="true" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                }
                 onOpen={(appointment) => setOpenedId(appointment.id)}
                 onStatusChange={handleStatusChange}
                 onEmails={openNotifications}
@@ -782,90 +778,6 @@ export const AdminDashboard: React.FC = () => {
               />
             </Suspense>
 
-          {/* ── Journal des notifications email ── */}
-          {notificationsAppointment && (
-            <div
-              className="admin-modal-overlay"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="notifications-modal-title"
-              onClick={() => setNotificationsAppointment(null)}
-            >
-              <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="admin-modal__header">
-                  <h3 className="admin-modal__title" id="notifications-modal-title">
-                    Emails du rendez-vous #{notificationsAppointment.id}
-                  </h3>
-                  <button
-                    className="admin-modal__close"
-                    onClick={() => setNotificationsAppointment(null)}
-                    aria-label="Fermer"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <div className="admin-modal__body">
-                  <p className="admin-modal-hint">
-                    Client : <strong>{notificationsAppointment.client_name}</strong> (
-                    {notificationsAppointment.client_email})
-                  </p>
-
-                  {notificationsError && <div className="form-alert-error">{notificationsError}</div>}
-
-                  {notificationsLoading ? (
-                    <p className="slots-loading">Chargement du journal…</p>
-                  ) : notifications.length === 0 ? (
-                    <p className="notification-empty">
-                      Aucun email n'a encore été journalisé pour ce rendez-vous.
-                    </p>
-                  ) : (
-                    <ul className="notification-list">
-                      {notifications.map((n) => (
-                        <li key={n.id} className={clsx('notification-item', `notification-item--${n.status}`)}>
-                          <div className="notification-item__head">
-                            <span className="notification-item__status" aria-hidden="true">
-                              {n.status === 'sent' ? (
-                                <CheckCircleIcon size={18} weight="fill" />
-                              ) : n.status === 'failed' ? (
-                                <XCircleIcon size={18} weight="fill" />
-                              ) : (
-                                <HourglassIcon size={18} weight="fill" />
-                              )}
-                            </span>
-                            <span className="notification-item__label">{NOTIFICATION_LABELS[n.type]}</span>
-                            <span className="notification-item__date">
-                              {format(parseISO(n.sent_at ?? n.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
-                            </span>
-                          </div>
-                          <div className="notification-item__recipient">{n.recipient}</div>
-                          <div className="notification-item__subject">{n.subject}</div>
-                          {n.error_message && (
-                            <div className="notification-item__error">{n.error_message}</div>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <div className="notification-resend">
-                    <span className="notification-resend__label">Renvoyer :</span>
-                    {(Object.keys(NOTIFICATION_LABELS) as NotificationType[]).map((type) => (
-                      <button
-                        key={type}
-                        type="button"
-                        className="btn btn-secondary admin-btn-sm"
-                        onClick={() => handleResendNotification(type)}
-                        disabled={resendingType !== null}
-                      >
-                        <ArrowClockwiseIcon size={14} weight="bold" />
-                        {resendingType === type ? 'Envoi…' : NOTIFICATION_LABELS[type]}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       ) : activeTab === 'services' ? (
         <div>

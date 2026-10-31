@@ -25,7 +25,7 @@ import {
   themeQuartz,
 } from 'ag-grid-community';
 import { AG_GRID_LOCALE_FR } from '@ag-grid-community/locale';
-import { ArrowCounterClockwiseIcon, DownloadSimpleIcon, XIcon } from '@phosphor-icons/react';
+import { ArrowCounterClockwiseIcon, DownloadSimpleIcon, FunnelIcon, GearSixIcon, XIcon } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { api as appApi } from '../../api';
 import { useMediaQuery } from '../../utils/useMediaQuery';
@@ -61,13 +61,16 @@ const gridTheme = themeQuartz.withParams({
   headerBackgroundColor: 'var(--color-background)',
   borderRadius: 'var(--radius-sm)',
   wrapperBorderRadius: 'var(--radius)',
+  // Partagée avec le pied de grille simulé (défilement continu)
+  borderColor: 'var(--data-grid-border)',
 });
 
 /**
  * Hauteur pleine page (la grille remplit l'espace restant, la page ne défile plus) à partir d'un
- * écran de tablette assez haut ; en dessous, la grille prend la hauteur de ses lignes.
+ * écran de tablette assez haut ; en dessous, la grille prend la hauteur de ses lignes. Même seuil
+ * que `$data-grid-fill` (SCSS), repris par le calendrier.
  */
-const FILL_QUERY = '(min-width: 768px) and (min-height: 600px)';
+export const FILL_QUERY = '(min-width: 768px) and (min-height: 600px)';
 
 const DEFAULT_PAGE_SIZE = 20;
 /** Délai avant enregistrement : une seule écriture pour une rafale de réglages (redimensionnement…). */
@@ -75,12 +78,23 @@ const SAVE_DELAY_MS = 800;
 
 /**
  * Préférences enregistrées en base (`config.ui_state_<gridId>`) : disposition des colonnes (ordre,
- * largeur, visibilité, épinglage, tri) et taille de page. Jamais les valeurs de filtre (elles
+ * largeur, visibilité, épinglage, tri), mode de défilement et taille de page. Jamais les valeurs de filtre (elles
  * peuvent contenir un nom de client).
  */
 interface GridPreferences {
   columns: ColumnState[];
   pageSize: number;
+  /** Pagination plutôt que défilement continu (absent : défilement continu). */
+  paged?: boolean;
+  /** Filtres rapides affichés dans la barre plutôt que rangés dans le menu « entonnoir ». */
+  filtersInline?: boolean;
+}
+
+/** Filtre rapide appliqué (étiquette à côté du menu « entonnoir »). */
+export interface ActiveFilter {
+  id: string;
+  label: string;
+  onClear: () => void;
 }
 
 export interface DataGridProps<T> {
@@ -93,17 +107,25 @@ export interface DataGridProps<T> {
   entityLabel: [string, string];
   /** Nombre total avant les filtres extérieurs à la grille (pied de grille « sur N »). */
   totalCount?: number;
-  /** Actions générales en tête de barre d'outils (bouton d'ajout, recherche…). */
-  toolbarStart?: React.ReactNode;
-  /** Options supplémentaires à droite de la barre d'outils. */
-  toolbarEnd?: React.ReactNode;
+  /**
+   * Actions, en tête de barre et dans l'ordre CRUD : création, puis seulement les actions utiles à
+   * la ligne sélectionnée (`null` : aucune). Boutons `.btn admin-btn-sm`, icône seule
+   * (`data-grid__icon-btn`, avec `title` et `aria-label`) sauf l'action principale.
+   */
+  actions?: (selected: T | null) => React.ReactNode;
+  /** Recherche (toujours dans la barre), après les actions. */
+  filters?: React.ReactNode;
+  /**
+   * Filtres rapides (`ToggleGroup`…) : dans un menu « entonnoir » (par défaut) ou dans la barre selon
+   * le réglage de la grille. `activeFilters` : filtres appliqués, affichés en étiquettes à côté de
+   * l'entonnoir (retrait d'un clic) et comptés sur son bouton.
+   */
+  quickFilters?: React.ReactNode;
+  activeFilters?: ActiveFilter[];
+  /** Réglages propres à la grille, ajoutés au menu « roue dentée » (`GridSettingToggle`). */
+  settings?: React.ReactNode;
   /** Export CSV (bouton affiché si fourni). */
   csvExport?: CsvExportParams;
-  /**
-   * Barre d'actions de la ligne sélectionnée, toujours présente à hauteur fixe ; reçoit `null`
-   * quand rien n'est sélectionné (afficher alors les contrôles désactivés).
-   */
-  renderSelection?: (selected: T | null) => React.ReactNode;
   /** Ligne sélectionnée de l'extérieur (ex. après une création). */
   selectedRowId?: string | null;
   onRowDoubleClicked?: (row: T) => void;
@@ -118,7 +140,8 @@ export interface DataGridProps<T> {
 
 /**
  * Liste de l'espace Pro sur AG Grid Community : thème, traduction, modules, préférences enregistrées
- * en base, sélection simple avec barre d'actions, export CSV, hauteur pleine page sur ordinateur et
+ * en base, barre d'outils (actions contextuelles à la sélection, filtres, export, menu de réglages),
+ * export CSV, hauteur pleine page sur ordinateur et
  * tablette, et nombre de lignes affiché dans le pied de la grille (le module natif de barre d'état
  * est réservé à l'édition Enterprise : surcouche positionnée à gauche de la pagination).
  */
@@ -129,10 +152,12 @@ function DataGrid<T>({
   getRowId,
   entityLabel,
   totalCount,
-  toolbarStart,
-  toolbarEnd,
+  actions,
+  filters,
+  quickFilters,
+  activeFilters = [],
+  settings,
   csvExport,
-  renderSelection,
   selectedRowId = null,
   onRowDoubleClicked,
   rowClassRules,
@@ -143,6 +168,17 @@ function DataGrid<T>({
 }: DataGridProps<T>) {
   const gridRef = useRef<GridApi<T> | null>(null);
   const fill = useMediaQuery(FILL_QUERY);
+  // Défilement continu par défaut : le modèle client n'affiche que les lignes visibles. Sans pleine
+  // hauteur (mobile), la grille prend la hauteur de ses lignes : pagination imposée.
+  const [pagedChoice, setPagedChoice] = useState(false);
+  const paged = pagedChoice || !fill;
+  // Filtres rapides dans le menu par défaut : la barre reste sur une ligne
+  const [filtersInline, setFiltersInline] = useState(false);
+  // Valeurs lues par l'enregistrement différé (jamais celles d'un rendu antérieur)
+  const pagedRef = useRef(pagedChoice);
+  pagedRef.current = pagedChoice;
+  const filtersInlineRef = useRef(filtersInline);
+  filtersInlineRef.current = filtersInline;
   const [selectedId, setSelectedId] = useState<string | null>(selectedRowId);
   const [displayedCount, setDisplayedCount] = useState(rows.length);
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -184,6 +220,8 @@ function DataGrid<T>({
         await appApi.saveUiState<GridPreferences>(gridId, {
           columns: grid.getColumnState(),
           pageSize: grid.paginationGetPageSize(),
+          paged: pagedRef.current,
+          filtersInline: filtersInlineRef.current,
         });
         setSaveState('saved');
       } catch {
@@ -196,6 +234,8 @@ function DataGrid<T>({
     try {
       const { state } = await appApi.getUiState<GridPreferences>(gridId);
       if (state?.columns?.length) grid.applyColumnState({ state: state.columns, applyOrder: true });
+      setPagedChoice(state?.paged === true);
+      setFiltersInline(state?.filtersInline === true);
       if (state?.pageSize) grid.setGridOption('paginationPageSize', state.pageSize);
     } catch {
       // Préférences illisibles : réglages par défaut
@@ -212,6 +252,8 @@ function DataGrid<T>({
     if (saveTimer.current) clearTimeout(saveTimer.current);
     grid.resetColumnState();
     grid.setGridOption('paginationPageSize', DEFAULT_PAGE_SIZE);
+    setPagedChoice(false);
+    setFiltersInline(false);
     onColumnsChanged?.(grid);
     releaseLater();
     try {
@@ -220,6 +262,18 @@ function DataGrid<T>({
     } catch {
       setSaveState('error');
     }
+  }
+
+  function togglePaged(value: boolean) {
+    setPagedChoice(value);
+    pagedRef.current = value;
+    scheduleSave();
+  }
+
+  function toggleFiltersInline(value: boolean) {
+    setFiltersInline(value);
+    filtersInlineRef.current = value;
+    scheduleSave();
   }
 
   function clearSelection() {
@@ -234,58 +288,104 @@ function DataGrid<T>({
   );
   const defaultColDef = useMemo<ColDef<T>>(() => ({ sortable: true, resizable: true, flex: 1 }), []);
   const total = totalCount ?? rows.length;
+  // Texte complet des indications, tronquées en mode paginé
+  const statusTitle = [
+    `${displayedCount} ${displayedCount > 1 ? entityLabel[1] : entityLabel[0]}${displayedCount !== total ? ` sur ${total}` : ''}`,
+    displayedCount !== rows.length && 'filtres de colonnes actifs',
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
-    <div className={clsx('data-grid', { 'data-grid--fill': fill })}>
+    <div className={clsx('data-grid', { 'data-grid--fill': fill, 'data-grid--paged': paged })}>
       <div className="data-grid__toolbar">
-        {toolbarStart && <div className="data-grid__start">{toolbarStart}</div>}
-        <div className="data-grid__options">
-          {toolbarEnd}
-          <span className="data-grid__save" role="status">
-            {saveState === 'saving'
-              ? 'Enregistrement…'
-              : saveState === 'saved'
-                ? 'Disposition enregistrée'
-                : saveState === 'error'
-                  ? 'Disposition non enregistrée'
-                  : ''}
-          </span>
-          <button type="button" className="btn btn-secondary admin-btn-sm" onClick={resetPreferences}>
-            <ArrowCounterClockwiseIcon size={14} weight="bold" aria-hidden="true" />
-            Réglages par défaut
-          </button>
+        {actions && (
+          <div className="data-grid__actions" role="group" aria-label="Actions">
+            {actions(selected)}
+            {selected && (
+              <button
+                type="button"
+                className="btn btn-secondary admin-btn-sm data-grid__icon-btn"
+                onClick={clearSelection}
+                title="Désélectionner"
+                aria-label="Désélectionner"
+              >
+                <XIcon size={16} weight="bold" aria-hidden="true" />
+              </button>
+            )}
+          </div>
+        )}
+        {(filters || quickFilters) && (
+          <div className="data-grid__filters">
+            {filters}
+            {quickFilters && filtersInline && quickFilters}
+            {quickFilters && !filtersInline && (
+              <div className="data-grid__quick-filters">
+                <ToolbarMenu
+                  icon={<FunnelIcon size={16} weight="fill" aria-hidden="true" />}
+                  label="Filtres rapides"
+                  badge={activeFilters.length}
+                  panelClassName="data-grid__menu-panel--filters"
+                  keepOpen
+                >
+                  {quickFilters}
+                </ToolbarMenu>
+                {/* Sélections courantes, visibles sans ouvrir le menu */}
+                {activeFilters.map((filter) => (
+                  <span key={filter.id} className="data-grid__chip">
+                    {filter.label}
+                    <button
+                      type="button"
+                      className="data-grid__chip-clear"
+                      onClick={filter.onClear}
+                      title={`Retirer le filtre « ${filter.label} »`}
+                      aria-label={`Retirer le filtre « ${filter.label} »`}
+                    >
+                      <XIcon size={12} weight="bold" aria-hidden="true" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        <div className="data-grid__tools">
           {csvExport && (
             <button
               type="button"
-              className="btn btn-secondary admin-btn-sm"
+              className="btn btn-secondary admin-btn-sm data-grid__icon-btn"
               onClick={() => gridRef.current?.exportDataAsCsv(csvExport)}
+              title="Exporter les lignes affichées (CSV, lisible par Excel)"
+              aria-label="Exporter (CSV)"
             >
-              <DownloadSimpleIcon size={14} weight="bold" aria-hidden="true" />
-              Exporter (CSV)
+              <DownloadSimpleIcon size={16} weight="bold" aria-hidden="true" />
             </button>
           )}
+          <ToolbarMenu icon={<GearSixIcon size={16} weight="fill" aria-hidden="true" />} label="Réglages de la grille">
+            {fill && (
+              <GridSettingToggle
+                label="Pagination"
+                hint="Sinon, défilement continu de toutes les lignes"
+                checked={pagedChoice}
+                onChange={togglePaged}
+              />
+            )}
+            {quickFilters && (
+              <GridSettingToggle
+                label="Filtres rapides dans la barre"
+                hint="Sinon, rangés sous le bouton « entonnoir », les sélections en cours restant affichées à côté"
+                checked={filtersInline}
+                onChange={toggleFiltersInline}
+              />
+            )}
+            {settings}
+            <button type="button" role="menuitem" className="data-grid__menu-item" onClick={resetPreferences}>
+              <ArrowCounterClockwiseIcon size={16} weight="bold" aria-hidden="true" />
+              Réglages par défaut
+            </button>
+          </ToolbarMenu>
         </div>
       </div>
-
-      {renderSelection && (
-        <div
-          className={clsx('data-grid__selection', { 'data-grid__selection--empty': !selected })}
-          role="region"
-          aria-label="Ligne sélectionnée"
-        >
-          {renderSelection(selected)}
-          <button
-            type="button"
-            className="data-grid__deselect"
-            onClick={clearSelection}
-            disabled={!selected}
-            aria-label="Désélectionner"
-            title="Désélectionner"
-          >
-            <XIcon size={16} weight="bold" aria-hidden="true" />
-          </button>
-        </div>
-      )}
 
       <div className="data-grid__body">
         <AgGridReact<T>
@@ -304,7 +404,7 @@ function DataGrid<T>({
           onRowDoubleClicked={(e: RowDoubleClickedEvent<T>) => e.data && onRowDoubleClicked?.(e.data)}
           rowClassRules={rowClassRules}
           domLayout={fill ? 'normal' : 'autoHeight'}
-          pagination
+          pagination={paged}
           paginationPageSize={DEFAULT_PAGE_SIZE}
           paginationPageSizeSelector={[20, 50, 100]}
           onGridReady={(e) => {
@@ -323,14 +423,94 @@ function DataGrid<T>({
 
         {/* Nombre de lignes dans le pied de la grille, à gauche de la pagination (surcouche :
             le composant natif de barre d'état est réservé à l'édition Enterprise) */}
-        <div className="data-grid__status" role="status">
-          <strong>{displayedCount}</strong>&nbsp;{displayedCount > 1 ? entityLabel[1] : entityLabel[0]}
-          {displayedCount !== total && <>&nbsp;sur {total}</>}
+        <div className="data-grid__status" role="status" title={statusTitle}>
+          <span>
+            <strong>{displayedCount}</strong> {displayedCount > 1 ? entityLabel[1] : entityLabel[0]}
+            {displayedCount !== total && <> sur {total}</>}
+          </span>
           {displayedCount !== rows.length && <span className="data-grid__status-note">filtres de colonnes actifs</span>}
+          <span className="data-grid__save" role="status">
+            {saveState === 'saving'
+              ? 'Enregistrement…'
+              : saveState === 'saved'
+                ? 'Disposition enregistrée'
+                : saveState === 'error'
+                  ? 'Disposition non enregistrée'
+                  : ''}
+          </span>
         </div>
       </div>
     </div>
   );
 }
+
+/**
+ * Menu déroulant de la barre d'outils (réglages, filtres rapides) ; se ferme au clic extérieur et
+ * sur Échap, et au choix d'un bouton sauf `keepOpen` (filtres : plusieurs choix d'affilée).
+ */
+const ToolbarMenu: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  /** Pastille sur le bouton (ex. nombre de filtres actifs), masquée à 0. */
+  badge?: number;
+  panelClassName?: string;
+  keepOpen?: boolean;
+  children: React.ReactNode;
+}> = ({ icon, label, badge = 0, panelClassName, keepOpen = false, children }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e: MouseEvent) => ref.current && !ref.current.contains(e.target as Node) && setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', onClick);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="data-grid__menu" ref={ref}>
+      <button
+        type="button"
+        className={clsx('btn btn-secondary admin-btn-sm data-grid__icon-btn', { 'data-grid__icon-btn--active': badge > 0 })}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+        title={badge > 0 ? `${label} (${badge} actif${badge > 1 ? 's' : ''})` : label}
+        aria-label={label}
+      >
+        {icon}
+        {badge > 0 && <span className="data-grid__badge">{badge}</span>}
+      </button>
+      {open && (
+        <div
+          className={clsx('data-grid__menu-panel', panelClassName)}
+          role="menu"
+          aria-label={label}
+          onClick={(e) => !keepOpen && (e.target as HTMLElement).closest('button') && setOpen(false)}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/** Réglage à bascule du menu de la grille. */
+export const GridSettingToggle: React.FC<{
+  label: string;
+  hint?: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}> = ({ label, hint, checked, onChange }) => (
+  <label className="data-grid__menu-item" role="menuitemcheckbox" aria-checked={checked} title={hint}>
+    <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+    {label}
+  </label>
+);
 
 export default DataGrid;

@@ -114,38 +114,26 @@ const UnavailabilitiesGrid: React.FC = () => {
         getRowId={(u) => String(u.id)}
         entityLabel={['indisponibilité', 'indisponibilités']}
         emptyMessage="Aucune indisponibilité : tous les créneaux des horaires de travail sont proposés."
-        toolbarStart={
+        actions={(selected) => (
           <>
-            <button type="button" className="btn btn-primary" onClick={() => setAdding(true)}>
-              <PlusIcon size={18} weight="fill" aria-hidden="true" />
-              Nouvelle indisponibilité
+            <button type="button" className="btn btn-primary admin-btn-sm" onClick={() => setAdding(true)} title="Nouvelle indisponibilité">
+              <PlusIcon size={16} weight="bold" aria-hidden="true" />
+              Nouvelle
             </button>
-            <p className="data-grid__hint">Congés, formation, rendez-vous personnel… aucun créneau n'est proposé pendant ces périodes.</p>
-          </>
-        }
-        renderSelection={(selected) => (
-          <>
-            <span className="data-grid__selection-label">
-              {selected ? (
-                <>
-                  <strong>{selected.title}</strong> — du {format(toDate(selected.start_datetime), 'd MMM yyyy HH:mm', { locale: fr })} au{' '}
-                  {format(toDate(selected.end_datetime), 'd MMM yyyy HH:mm', { locale: fr })}
-                </>
-              ) : (
-                'Aucune indisponibilité sélectionnée : cliquez sur une ligne.'
-              )}
-            </span>
-            <button
-              type="button"
-              className="btn btn-danger admin-btn-reschedule"
-              disabled={!selected}
-              onClick={() => selected && setDeleting(selected)}
-            >
-              <TrashIcon size={14} weight="fill" aria-hidden="true" />
-              Supprimer
-            </button>
+            {selected && (
+              <button
+                type="button"
+                className="btn btn-danger admin-btn-sm data-grid__icon-btn"
+                onClick={() => setDeleting(selected)}
+                title={`Supprimer « ${selected.title} »`}
+                aria-label="Supprimer"
+              >
+                <TrashIcon size={16} weight="bold" aria-hidden="true" />
+              </button>
+            )}
           </>
         )}
+        filters={<p className="data-grid__hint">Congés, formation, rendez-vous personnel… aucun créneau n'est proposé pendant ces périodes.</p>}
       />
 
       {adding && (

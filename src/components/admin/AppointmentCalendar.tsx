@@ -9,6 +9,8 @@ import type { BusinessHoursInput, EventDropArg, EventInput } from '@fullcalendar
 import { api } from '../../api';
 import { Appointment, Schedule, Unavailability } from '../../types';
 import ConfirmDialog from './ConfirmDialog';
+import { FILL_QUERY } from './DataGrid';
+import { useMediaQuery } from '../../utils/useMediaQuery';
 
 interface AppointmentCalendarProps {
   appointments: Appointment[];
@@ -59,6 +61,8 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ appointments,
   // Déplacement refusé par le moteur de créneaux, en attente de la décision de l'artisan
   const [refused, setRefused] = useState<{ drop: EventDropArg; message: string } | null>(null);
   const calendarRef = useRef<FullCalendar>(null);
+  // Pleine hauteur aux mêmes seuils que les grilles ; hauteur naturelle (page défilante) sur mobile
+  const fill = useMediaQuery(FILL_QUERY);
 
   useEffect(() => {
     Promise.all([api.getSchedules(), api.listUnavailabilities()])
@@ -116,7 +120,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ appointments,
   }
 
   return (
-    <div className="appointment-calendar">
+    <div className="appointment-calendar admin-page">
       <div className="appointment-calendar__toolbar">
         <label className="appointment-calendar__toggle">
           <input type="checkbox" checked={showCancelled} onChange={(e) => setShowCancelled(e.target.checked)} />
@@ -144,7 +148,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ appointments,
         locale={frLocale}
         initialView="timeGridWeek"
         headerToolbar={{ left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' }}
-        height="auto"
+        height={fill ? '100%' : 'auto'}
         nowIndicator
         allDaySlot={false}
         slotMinTime="07:00:00"
