@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { GeoJson, Map, Marker } from 'pigeon-maps';
 import { ArrowsInIcon } from '@phosphor-icons/react';
-import { boundsOf, circleRing, LatLng, rings, ZoneFeature } from '../utils/serviceArea';
+import { boundsOf, circleRing, fitBounds, LatLng, rings, ZoneFeature } from '../utils/serviceArea';
 
 interface ZoneMapProps {
   center: LatLng;
@@ -29,20 +29,6 @@ const COLORS = {
   marker: '#dc2626',
 };
 
-// Projection Web Mercator en pixels au zoom 0 (tuile de 256 px), celle des tuiles OpenStreetMap
-const toPixel = ([lat, lng]: LatLng): [number, number] => {
-  const sin = Math.sin((lat * Math.PI) / 180);
-  return [((lng + 180) / 360) * 256, (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * 256];
-};
-
-/** Centre et zoom cadrant l'emprise dans une carte de la taille donnée (marge de 10 %). */
-function fit([sw, ne]: [LatLng, LatLng], width: number, height: number): { center: LatLng; zoom: number } {
-  const [x1, y1] = toPixel(sw);
-  const [x2, y2] = toPixel(ne);
-  const zoom = Math.log2(Math.min(width / Math.max(x2 - x1, 1e-9), height / Math.max(y1 - y2, 1e-9)) * 0.9);
-  return { center: [(sw[0] + ne[0]) / 2, (sw[1] + ne[1]) / 2], zoom: Math.min(16, zoom) };
-}
-
 /**
  * Carte de la zone d'intervention : communes en bleu si entièrement dans le rayon,
  * en orange si partiellement, cercle du rayon en pointillés, bouton de recadrage.
@@ -65,7 +51,7 @@ const ZoneMap: React.FC<ZoneMapProps> = ({ center, zoom, features, radiusKm, aut
 
   function recenter() {
     const el = wrapperRef.current;
-    if (el && bounds) setView(fit(bounds, el.clientWidth, el.clientHeight));
+    if (el && bounds) setView(fitBounds(bounds, el.clientWidth, el.clientHeight));
   }
 
   useEffect(() => {

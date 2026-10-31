@@ -40,9 +40,9 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ config }) => {
       <h4>Données collectées et finalités</h4>
       <ul>
         <li>
-          <strong>Prise de rendez-vous :</strong> nom, email, téléphone, adresse d'intervention et précisions
-          d'accès que vous saisissez. Elles servent uniquement à organiser l'intervention, calculer les frais de
-          déplacement, vous envoyer la confirmation et vous permettre de gérer ou d'annuler le rendez-vous. Base
+          <strong>Prise de rendez-vous :</strong> nom, email, téléphone, adresse d'intervention (et sa position
+          sur la carte) et précisions d'accès que vous saisissez. Elles servent uniquement à organiser
+          l'intervention et les trajets de l'artisan, calculer les frais de déplacement, vous envoyer la confirmation et vous permettre de gérer ou d'annuler le rendez-vous. Base
           légale : mesures précontractuelles et exécution du contrat (RGPD, art. 6.1.b).
         </li>
         <li>
@@ -67,7 +67,8 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ config }) => {
       <ul>
         <li>
           <strong>Base Adresse Nationale</strong> (api-adresse.data.gouv.fr, État français) : reçoit l'adresse en
-          cours de saisie pour proposer des suggestions.
+          cours de saisie pour proposer des suggestions et la localiser ; l'espace de gestion de l'artisan peut
+          aussi lui demander la position d'une adresse déjà enregistrée.
         </li>
         <li>
           <strong>OpenStreetMap</strong> (fonds de carte) : votre navigateur télécharge les images de la carte ; le

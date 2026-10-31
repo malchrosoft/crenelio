@@ -207,6 +207,31 @@ export function boundsOf(ringsList: Ring[]): [LatLng, LatLng] | null {
   ];
 }
 
+/** Emprise [sud-ouest, nord-est] d'un ensemble de points [lat, lng]. */
+export function boundsOfPoints(points: LatLng[]): [LatLng, LatLng] | null {
+  if (!points.length) return null;
+  const lats = points.map((p) => p[0]);
+  const lngs = points.map((p) => p[1]);
+  return [
+    [Math.min(...lats), Math.min(...lngs)],
+    [Math.max(...lats), Math.max(...lngs)],
+  ];
+}
+
+// Projection Web Mercator en pixels au zoom 0 (tuile de 256 px), celle des tuiles OpenStreetMap
+const toPixel = ([lat, lng]: LatLng): [number, number] => {
+  const sin = Math.sin((lat * Math.PI) / 180);
+  return [((lng + 180) / 360) * 256, (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * 256];
+};
+
+/** Centre et zoom cadrant l'emprise dans une carte de la taille donnée (marge de 10 %). */
+export function fitBounds([sw, ne]: [LatLng, LatLng], width: number, height: number): { center: LatLng; zoom: number } {
+  const [x1, y1] = toPixel(sw);
+  const [x2, y2] = toPixel(ne);
+  const zoom = Math.log2(Math.min(width / Math.max(x2 - x1, 1e-9), height / Math.max(y1 - y2, 1e-9)) * 0.9);
+  return { center: [(sw[0] + ne[0]) / 2, (sw[1] + ne[1]) / 2], zoom: Math.min(16, zoom) };
+}
+
 /** Arrondi à 5 décimales (~1 m) : allège le fichier enregistré. */
 export function compactFeature(feature: ZoneFeature): ZoneFeature {
   const round = (v: unknown): unknown => (Array.isArray(v) ? v.map(round) : Math.round((v as number) * 1e5) / 1e5);

@@ -85,6 +85,9 @@ CREATE TABLE `appointments` (
     `postal_code`         VARCHAR(20)     NOT NULL,
     `city`                VARCHAR(100)    NOT NULL,
     -- Frais de déplacement figés au moment de la réservation (traçabilité tarifaire)
+    -- Position du lieu d'intervention (calculée à la réservation ; carte, tournées)
+    `latitude`            DECIMAL(9,6)    NULL,
+    `longitude`           DECIMAL(9,6)    NULL,
     `travel_fee`          DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
     `distance_km`         DECIMAL(6,2)    NULL,
     `is_out_of_zone`      BOOLEAN         NOT NULL DEFAULT FALSE,

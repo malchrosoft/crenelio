@@ -95,6 +95,9 @@ export interface Appointment {
   address: string;
   postal_code: string;
   city: string;
+  /** Position du lieu d'intervention (DECIMAL : chaîne), null si non localisé. */
+  latitude?: string | number | null;
+  longitude?: string | number | null;
   travel_fee: string | number;
   distance_km: string | number | null;
   is_out_of_zone: number | boolean;

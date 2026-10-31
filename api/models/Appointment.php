@@ -118,10 +118,10 @@ class Appointment
         Database::execute(
             'INSERT INTO `appointments` (
                 service_id, client_name, client_email, client_phone,
-                address, postal_code, city,
+                address, postal_code, city, latitude, longitude,
                 travel_fee, distance_km, is_out_of_zone, notes,
                 start_datetime, end_datetime, status, cancel_token, decision_token
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 (int)$data['service_id'],
                 trim($data['client_name']),
@@ -130,6 +130,9 @@ class Appointment
                 trim($data['address']),
                 trim($data['postal_code']),
                 trim($data['city']),
+                // Position calculée à la réservation (frais de déplacement), conservée pour la carte
+                isset($data['latitude']) ? (float)$data['latitude'] : null,
+                isset($data['longitude']) ? (float)$data['longitude'] : null,
                 (float)($data['travel_fee'] ?? 0),
                 isset($data['distance_km']) ? $data['distance_km'] : null,
                 !empty($data['is_out_of_zone']) ? 1 : 0,
@@ -144,6 +147,12 @@ class Appointment
 
         $id = (int)Database::lastInsertId();
         return self::find($id);
+    }
+
+    /** Position du lieu d'intervention (localisation après coup, cf. AppointmentController::locate). */
+    public static function setCoordinates(int $id, float $latitude, float $longitude): void
+    {
+        Database::execute('UPDATE `appointments` SET latitude = ?, longitude = ? WHERE id = ?', [$latitude, $longitude, $id]);
     }
 
     /**
@@ -214,6 +223,7 @@ class Appointment
         return Database::execute(
             "UPDATE `appointments` a
              SET a.client_name = ?, a.client_email = '', a.client_phone = '', a.address = '',
+                 a.latitude = NULL, a.longitude = NULL,
                  a.notes = NULL, a.cancellation_reason = NULL
              WHERE a.client_name <> ? AND $condition",
             [self::ANONYMIZED_NAME, self::ANONYMIZED_NAME, ...$params]

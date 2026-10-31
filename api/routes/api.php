@@ -127,6 +127,7 @@ $router->post('/appointments/token/:token/cancel', [$appointmentController, 'can
 $router->put('/appointments/:id/status',    $admin([$appointmentController, 'updateStatus']));
 $router->post('/appointments/:id/anonymize', $admin([$appointmentController, 'anonymize']));
 $router->put('/appointments/:id/reschedule',$admin([$appointmentController, 'reschedule']));
+$router->put('/appointments/:id/coordinates', $admin([$appointmentController, 'locate']));
 $router->get('/appointments/:id/notifications', $admin([$appointmentController, 'notifications']));
 $router->post('/appointments/:id/notifications/resend', $admin([$appointmentController, 'resendNotification']));
 

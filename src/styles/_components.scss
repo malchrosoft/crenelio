@@ -3291,3 +3291,181 @@ $data-grid-status-width: 13em;
   padding: 0;
 }
 
+// -------------------------------------------------------
+// Tableau de bord (Item 35) : jours en cartes, carte du jour
+// -------------------------------------------------------
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
+  gap: $space-block;
+  align-items: start;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard__days {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: $space-block;
+}
+
+.dashboard-day {
+  display: flex;
+  flex-direction: column;
+
+  .panel__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: $space-sm;
+    padding: $space-sm;
+  }
+}
+
+.dashboard-day--today {
+  border-color: $primary;
+
+  .panel__header {
+    background: $primary-light;
+  }
+}
+
+.dashboard-day--previous {
+  opacity: 0.85;
+}
+
+.dashboard-day--mapped .panel__header {
+  box-shadow: inset 4px 0 0 $primary;
+}
+
+.dashboard-day__empty {
+  flex: 1;
+  margin: 0;
+  color: $gray-500;
+  font-size: 0.9rem;
+}
+
+.dashboard-day__list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: $space-2xs;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-day__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-sm;
+  color: $gray-600;
+  font-size: 0.85rem;
+}
+
+// Une intervention : numéro (repris sur la carte), horaire, client, prestation et commune, statut
+.dashboard-visit {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: $space-xs;
+  width: 100%;
+  padding: $space-xs;
+  border: 1px solid $gray-200;
+  border-radius: $radius-sm;
+  background: white;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  @include hover-transition(border-color box-shadow, $duration-fast);
+
+  &:hover,
+  &:focus-visible {
+    border-color: $primary;
+    box-shadow: $shadow-sm;
+  }
+
+  .dashboard-visit__time {
+    color: $gray-700;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dashboard-visit__main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: $line-height-snug;
+
+    > * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    span {
+      color: $gray-500;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+// Numéros : mêmes couleurs que les statuts du calendrier, sur la liste comme sur la carte
+.dashboard-visit__number,
+.dashboard-pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+@each $status, $color in $calendar-statuses {
+  .dashboard-visit__number--#{$status},
+  .dashboard-pin--#{$status} {
+    background: $color;
+  }
+}
+
+.dashboard-pin {
+  width: 28px;
+  height: 28px;
+  border: 2px solid white;
+  box-shadow: $shadow;
+}
+
+// Plusieurs interventions au même endroit : pastille allongée « 1, 2 »
+.dashboard-pin--group {
+  width: auto;
+  min-width: 28px;
+  padding: 0 $space-2xs;
+  border-radius: $radius-full;
+}
+
+.dashboard-pin--start {
+  background: $gray-800;
+}
+
+.dashboard-map {
+  position: sticky;
+  top: $space-block;
+
+  .panel__body {
+    padding: 0;
+  }
+}
+
+.dashboard-map__missing {
+  margin: 0;
+  padding: $space-xs $space-sm;
+  color: $gray-600;
+  font-size: 0.85rem;
+}

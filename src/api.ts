@@ -176,6 +176,9 @@ export const api = {
   updateAppointmentStatus: (id: number, status: string, reason: string | null = null) =>
     request<Appointment>('PUT', `/appointments/${id}/status`, { status, reason }),
   /** Demande d'effacement (RGPD) : données du client effacées, rendez-vous conservé. */
+  /** Position d'un rendez-vous localisé après coup (tableau de bord). */
+  locateAppointment: (id: number, latitude: number, longitude: number) =>
+    request<Appointment>('PUT', `/appointments/${id}/coordinates`, { latitude, longitude }),
   anonymizeAppointment: (id: number) =>
     request<{ message: string; appointment: Appointment }>('POST', `/appointments/${id}/anonymize`),
   /**

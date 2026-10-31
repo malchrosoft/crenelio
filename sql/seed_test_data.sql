@@ -110,3 +110,8 @@ INSERT INTO `appointments` (
     'completed',
     'token_test_sophie_003'
 );
+
+-- Position des lieux d'intervention (Base Adresse Nationale), comme à une réservation en ligne
+UPDATE `appointments` SET `latitude` = 48.800987, `longitude` = 2.263813 WHERE `cancel_token` = 'token_test_claire_001';
+UPDATE `appointments` SET `latitude` = 48.800895, `longitude` = 2.260827 WHERE `cancel_token` = 'token_test_marc_002';
+UPDATE `appointments` SET `latitude` = 48.801191, `longitude` = 2.265053 WHERE `cancel_token` = 'token_test_sophie_003';

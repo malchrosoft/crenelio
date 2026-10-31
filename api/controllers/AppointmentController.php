@@ -148,6 +148,8 @@ class AppointmentController
             'address'        => $body['address'],
             'postal_code'    => $body['postal_code'],
             'city'           => $body['city'],
+            'latitude'       => $latitude,
+            'longitude'      => $longitude,
             'travel_fee'     => $travelQuote['travel_fee'],
             'distance_km'    => $travelQuote['distance_km'],
             'is_out_of_zone' => $travelQuote['is_out_of_zone'],
@@ -266,6 +268,8 @@ class AppointmentController
             'address'        => $address,
             'postal_code'    => mb_substr($postalCode, 0, 20),
             'city'           => mb_substr($city, 0, 100),
+            'latitude'       => $latitude,
+            'longitude'      => $longitude,
             'travel_fee'     => $quote['travel_fee'],
             'distance_km'    => $quote['distance_km'],
             'is_out_of_zone' => $quote['is_out_of_zone'],
@@ -336,6 +340,8 @@ class AppointmentController
             'address'        => (string)$body['address'],
             'postal_code'    => mb_substr((string)$body['postal_code'], 0, 20),
             'city'           => mb_substr((string)$body['city'], 0, 100),
+            'latitude'       => $latitude,
+            'longitude'      => $longitude,
             'travel_fee'     => $quote['travel_fee'],
             'distance_km'    => $quote['distance_km'],
             'is_out_of_zone' => true,
@@ -581,6 +587,29 @@ class AppointmentController
         }
         Appointment::anonymize($id);
         Response::json(['message' => 'Données du client effacées', 'appointment' => Appointment::find($id)]);
+    }
+
+    /**
+     * PUT /appointments/:id/coordinates — Position d'un rendez-vous sans coordonnées (antérieur à
+     * l'Item 35, ou adresse saisie sans suggestion), localisée par le tableau de bord. Une adresse
+     * effacée (RGPD) ne se relocalise pas.
+     */
+    public function locate(array $params): void
+    {
+        $id = (int)($params['id'] ?? 0);
+        $appointment = Appointment::find($id);
+        if (!$appointment) {
+            Response::json(['error' => 'Rendez-vous non trouvé'], 404);
+        }
+        if (trim((string)$appointment['address']) === '') {
+            Response::json(['error' => 'Adresse effacée : position non enregistrée'], 409);
+        }
+        [$latitude, $longitude] = TravelFeeController::readCoordinates(Response::body());
+        if ($latitude === null) {
+            Response::json(['error' => 'Coordonnées GPS manquantes'], 400);
+        }
+        Appointment::setCoordinates($id, $latitude, $longitude);
+        Response::json(Appointment::find($id));
     }
 
     /**

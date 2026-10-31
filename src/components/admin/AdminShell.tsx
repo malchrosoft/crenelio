@@ -8,7 +8,7 @@ import {
 } from '@phosphor-icons/react';
 import AdminNotices, { AdminNotice } from './AdminNotices';
 
-export type AdminTab = 'appointments' | 'calendar' | 'services' | 'hours' | 'settings' | 'zone' | 'config';
+export type AdminTab = 'dashboard' | 'appointments' | 'calendar' | 'services' | 'hours' | 'settings' | 'zone' | 'config';
 
 interface NavItem {
   id: AdminTab;

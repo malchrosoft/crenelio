@@ -11,6 +11,7 @@ import {
   GearSixIcon,
   MapTrifoldIcon,
   CalendarDotsIcon,
+  SquaresFourIcon,
 } from '@phosphor-icons/react';
 import { api, UNAUTHORIZED_EVENT } from '../api';
 import {
@@ -37,6 +38,7 @@ const AppointmentCalendar = lazy(() => import('./admin/AppointmentCalendar'));
 // Liste des interventions (AG Grid Community) chargée à l'ouverture du planning
 const InterventionsGrid = lazy(() => import('./admin/InterventionsGrid'));
 const UnavailabilitiesGrid = lazy(() => import('./admin/UnavailabilitiesGrid'));
+const DashboardOverview = lazy(() => import('./admin/DashboardOverview'));
 import AdminLogin from './admin/AdminLogin';
 import type { AdminNotice } from './admin/AdminNotices';
 import AppointmentDialog from './admin/AppointmentDialog';
@@ -142,7 +144,7 @@ export const AdminDashboard: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [config, setConfig] = useState<AppConfig>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<AdminTab>('appointments');
+  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
 
   // Recherche & Filtres planning
   const [searchQuery, setSearchQuery] = useState('');
@@ -568,6 +570,7 @@ export const AdminDashboard: React.FC = () => {
   ];
 
   const navItems: { id: AdminTab; label: string; icon: React.ReactNode; count?: number }[] = [
+    { id: 'dashboard', label: 'Tableau de bord', icon: <SquaresFourIcon {...NAV_ICON} /> },
     { id: 'appointments', label: 'Rendez-vous', icon: <CalendarBlankIcon {...NAV_ICON} />, count: appointments.length },
     { id: 'calendar', label: 'Calendrier', icon: <CalendarDotsIcon {...NAV_ICON} /> },
     { id: 'services', label: 'Prestations', icon: <WrenchIcon {...NAV_ICON} />, count: services.length },
@@ -644,6 +647,20 @@ export const AdminDashboard: React.FC = () => {
             loadData();
           }}
         />
+      ) : activeTab === 'dashboard' ? (
+        <Suspense fallback={<p>Chargement du tableau de bord…</p>}>
+          <DashboardOverview
+            appointments={appointments}
+            config={config}
+            onOpen={(appointment) => setOpenedId(appointment.id)}
+            onCreate={(date) => {
+              setNewAppointmentDate(date);
+              setCreatingAppointment(true);
+              setActiveTab('appointments');
+            }}
+            onLocated={replaceAppointment}
+          />
+        </Suspense>
       ) : activeTab === 'calendar' ? (
         <Suspense fallback={<p>Chargement du calendrier…</p>}>
           <AppointmentCalendar

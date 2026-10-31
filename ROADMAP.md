@@ -466,6 +466,37 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Points d'attention :** contrastes vérifiés dans les deux thèmes (WCAG AA, public senior), logo pensé pour fond clair (variante ou fond derrière le logo), images et illustrations, pas de flash clair au chargement (appliqué avant le premier rendu comme le thème actuel).
 - **Prérequis :** Item 2 ✅.
 
+### 35. Tableau de Bord de l'Espace Pro (Jours en Cartes & Carte du Jour) — ✅ Terminée
+- **Demandé le 31/10/2026** : page d'accueil de l'espace Pro, en tête du menu.
+- **Jours affichés** (`DashboardOverview`) : le jour travaillé précédent, aujourd'hui (même non travaillé) et les deux jours travaillés suivants, d'après les horaires hebdomadaires. Une carte (`Panel`) par jour : interventions non annulées dans l'ordre horaire, numérotées, couleur du statut, horaire, client, prestation et commune ; nombre et montant du jour ; ajout d'un rendez-vous à cette date. Un clic ouvre la fenêtre du rendez-vous (`AppointmentDialog`).
+- **Carte du jour :** point de départ de l'artisan et interventions numérotées comme dans la liste (même adresse : un repère « 1, 2 »), cadrage automatique ; le bouton de chaque carte de jour change le jour affiché.
+- **Positions enregistrées :** la position calculée à la réservation (frais de déplacement) est désormais conservée (`appointments.latitude` / `longitude`, migration `2026-10-31_item35_appointment_coordinates`). Les rendez-vous antérieurs sont localisés une fois par la Base Adresse Nationale à leur premier affichage, puis enregistrés (`PUT /appointments/:id/coordinates`). Donnée personnelle : effacée avec l'adresse (`anonymizeWhere`) et décrite dans la politique de confidentialité.
+
+### 36. Suivi d'Intervention pour l'Artisan (Étoffer le Tableau de Bord)
+- **Demandé le 31/10/2026** : rendre le meilleur service possible à l'artisan pour suivre ses interventions, en priorité sur téléphone (usage sur le terrain).
+- **Pistes, par ordre d'intérêt :**
+  - **Fiche du jour sur mobile :** appel et SMS en un geste, itinéraire vers l'adresse (liens Google Maps, Waze, Plans d'Apple), précisions d'accès (code, étage) mises en avant.
+  - **Avancement :** « en route », « sur place », « terminé » depuis la fiche ; l'intervention passe en *Terminé* sans passer par le planning.
+  - **Compte rendu :** notes de fin d'intervention, matériel posé, suite à donner (nouveau rendez-vous, devis de l'Item 22) ; photos seulement si la place le permet (1 Go sur l'offre Starter : taille réduite côté navigateur, purge avec le rendez-vous).
+  - **Points d'attention du jour :** demandes en attente de décision, rendez-vous échus non clôturés, emails en échec, jours sans intervention à combler.
+  - **Indicateurs simples :** interventions et montant de la semaine et du mois, comparés à la période précédente.
+- **Contraintes :** aucune donnée personnelle hors de l'espace Pro, effacement RGPD étendu à toute nouvelle donnée (notes, photos), stockage limité de l'hébergement.
+- **Prérequis :** Item 35 ✅.
+
+### 37. Trajets & Tournées (Ordre de Passage, Suggestions de Créneaux)
+- **Demandé le 31/10/2026** : gérer les trajets et optimiser les tournées de chaque jour, voire suggérer des déplacements si c'est raisonnable.
+- **Tournée du jour :**
+  - Tracé de la tournée sur la carte du tableau de bord, du point de départ à la dernière intervention (et retour), avec distance et durée estimées.
+  - **Ordre conseillé :** pour une journée aux horaires encore souples, ordre de passage le plus court (quelques adresses : calcul exact ou plus proche voisin amélioré, dans le navigateur) ; l'artisan valide, les horaires sont décalés et les clients prévenus (reprogrammation de l'Item 32).
+  - **Itinéraire en un clic :** lien Google Maps à étapes (jusqu'à 10 adresses) ou étape par étape pour Waze et Plans.
+- **Temps de trajet :** aujourd'hui le moteur de créneaux réserve un temps de trajet forfaitaire. Estimation par la distance à vol d'oiseau corrigée (simple, sans service tiers), ou par un service de calcul d'itinéraire (OSRM, OpenRouteService : conditions d'usage, quotas et clé à vérifier, adresse des clients transmise à un tiers à déclarer).
+- **Suggestions (si raisonnables) :**
+  - À la réservation, mettre en avant les créneaux proches d'une intervention déjà prévue dans le même secteur (« Je suis dans votre quartier mardi matin »), sans masquer les autres.
+  - Signaler à l'artisan une journée au trajet incohérent (allers-retours) et proposer une permutation.
+  - Regroupement par secteur et par jour (ex. « le nord le lundi ») en option, jamais imposé au client.
+- **Contraintes :** calcul dans le navigateur ou PHP natif (pas de service payant ni de tâche planifiée sur Starter) ; une suggestion ne déplace jamais un rendez-vous sans accord de l'artisan et sans prévenir le client.
+- **Prérequis :** Item 35 ✅ (positions enregistrées) ; Item 32 ✅ (reprogrammation et notifications).
+
 ---
 
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
@@ -476,11 +507,14 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 |---|---|---|---|---|---|---|
 | **1** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
 | **2** | **Item 22** | **Devis en ligne avec accord du client & aide à la facturation externe** | Espace Pro / Facturation | ⏳ *À faire* | Items 12, 21 et 32 ✅ | 🟡 Devis obligatoire pour l'artisan ; facture laissée à son outil (obligation électronique 2026-2027) |
-| **3** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre séparé (Item 34) |
-| **4** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
-| **5** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
-| **6** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
-| **7** | **Item 34** | **Thème sombre (inversion des couleurs, palettes adaptées)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort ; chantier transversal coûteux (gris, fonds, états et bibliothèques à convertir) |
+| **3** | **Item 36** | **Suivi d'intervention pour l'artisan (fiche mobile, avancement, compte rendu)** | Espace Pro / Exploitation | ⏳ *À faire* | Item 35 ✅ | 🟡 Usage quotidien sur le terrain ; prolonge le tableau de bord |
+| **4** | **Item 37** | **Trajets & tournées (ordre de passage, itinéraire, suggestions de créneaux)** | Planning / Trajets | ⏳ *À faire* | Items 32 et 35 ✅ | 🟡 Gain de temps et de carburant ; suggestions à cadrer pour rester raisonnables |
+| **5** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre séparé (Item 34) |
+| **6** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
+| **7** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| **8** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
+| **9** | **Item 34** | **Thème sombre (inversion des couleurs, palettes adaptées)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort ; chantier transversal coûteux (gris, fonds, états et bibliothèques à convertir) |
+| — | **Item 35** | Tableau de bord (jours en cartes, carte du jour numérotée, positions des rendez-vous enregistrées) | Espace Pro / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 21** | Liste des interventions AG Grid Community (tri, filtres, sélection, export CSV, disposition enregistrée) ; composant `DataGrid` commun, pleine hauteur desktop/tablette, fenêtre de rendez-vous partagée avec le calendrier, avertissements regroupés dans le header, indisponibilités en grille (sous-onglet de « Horaires ») | Espace Pro / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 33** | Abonnement d'agenda de l'artisan (flux iCal privé, optionnel) | Planning / Synchronisation | ✅ **Terminé** | — | — |
 | — | **Item 32** | Fiabilité des notifications (annulation, reprogrammation, décision, anti-abus) | Communication / Fiabilité | ✅ **Terminé** | — | — |
