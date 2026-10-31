@@ -11,7 +11,7 @@ const [script, ...args] = process.argv.slice(2);
 
 for (const bin of candidates) {
   const res = spawnSync(bin, [script, ...args], { stdio: 'inherit' });
-  if (res.error?.code === 'ENOENT') continue;
+  if ((res.error as NodeJS.ErrnoException | undefined)?.code === 'ENOENT') continue;
   process.exit(res.status ?? 1);
 }
 

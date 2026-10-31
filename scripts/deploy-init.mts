@@ -20,24 +20,60 @@ const migrationsDir = join(root, 'sql', 'migrations');
 
 const rl = createInterface({ input: process.stdin, output: process.stdout });
 
+/** Réponses du formulaire (aucun mot de passe n'est mémorisé dans `.deploy/answers.json`). */
+interface Answers {
+  siteUrl: string;
+  dbHost?: string;
+  dbPort?: string;
+  dbName?: string;
+  dbUser?: string;
+  dbPass?: string;
+  mailFrom?: string;
+  mailFromName?: string;
+  smtpHost?: string;
+  smtpPort?: string;
+  smtpSecure?: string;
+  smtpUser?: string;
+  smtpPass?: string;
+  timezone?: string;
+}
+
+/** Réponse de GET /api/health. */
+interface HealthState {
+  app: 'crenelio';
+  installed: boolean;
+  database: 'ok' | 'empty' | 'error';
+  schema_version: string | null;
+}
+
+type Mode = 'initial' | 'update';
+
+/** Contrôle d'une saisie : message d'erreur, ou null si elle est valable. */
+type Check = (value: string) => string | null;
+
 // Entrée non interactive (réponses envoyées d'avance, tests) : les lignes arrivées pendant une
 // attente (interrogation du serveur) sont mises en file au lieu d'être perdues.
-const queued = [];
-const waiting = [];
+const queued: string[] = [];
+const waiting: ((line: string) => void)[] = [];
 let inputClosed = false;
 if (!process.stdin.isTTY) {
-  rl.on('line', (line) => (waiting.length ? waiting.shift()(line) : queued.push(line)));
+  rl.on('line', (line) => {
+    const resolve = waiting.shift();
+    if (resolve) resolve(line);
+    else queued.push(line);
+  });
   rl.on('close', () => {
     inputClosed = true;
-    while (waiting.length) waiting.shift()('');
+    for (const resolve of waiting.splice(0)) resolve('');
   });
 }
 
 /** Une ligne de réponse : interactive (TTY) ou lue dans la file. */
-function question(prompt) {
+function question(prompt: string): Promise<string> {
   if (process.stdin.isTTY) return rl.question(prompt);
   process.stdout.write(prompt);
-  if (queued.length) return Promise.resolve(queued.shift());
+  const next = queued.shift();
+  if (next !== undefined) return Promise.resolve(next);
   if (inputClosed) return Promise.resolve('');
   return new Promise((resolve) => waiting.push(resolve));
 }
@@ -47,7 +83,10 @@ function question(prompt) {
 // -----------------------------------------------------------------
 
 /** Question avec valeur par défaut (Entrée pour l'accepter) et contrôle facultatif. */
-async function ask(label, { def = '', check, secret = false } = {}) {
+async function ask(
+  label: string,
+  { def = '', check, secret = false }: { def?: string; check?: Check; secret?: boolean } = {}
+): Promise<string> {
   for (;;) {
     const suffix = def && !secret ? ` [${def}]` : '';
     const raw = secret ? await askHidden(`${label}${suffix} : `) : await question(`${label}${suffix} : `);
@@ -58,42 +97,46 @@ async function ask(label, { def = '', check, secret = false } = {}) {
   }
 }
 
-async function confirm(label, def = true) {
+async function confirm(label: string, def = true): Promise<boolean> {
   const answer = (await question(`${label} [${def ? 'O/n' : 'o/N'}] : `)).trim().toLowerCase();
   return answer ? answer.startsWith('o') || answer.startsWith('y') : def;
 }
 
 /** Saisie masquée (mot de passe) ; en entrée non interactive (tests), lecture normale. */
-async function askHidden(prompt) {
+async function askHidden(prompt: string): Promise<string> {
   if (!process.stdin.isTTY) return question(prompt);
-  const write = rl._writeToOutput;
-  rl._writeToOutput = (text) => (text.includes(prompt) ? process.stdout.write(text) : null);
+  // Méthode interne de readline (non typée) : on ne laisse passer que l'invite, pas les caractères tapés
+  const output = rl as unknown as { _writeToOutput: (text: string) => void };
+  const write = output._writeToOutput;
+  output._writeToOutput = (text) => {
+    if (text.includes(prompt)) process.stdout.write(text);
+  };
   const value = await rl.question(prompt);
-  rl._writeToOutput = write;
+  output._writeToOutput = write;
   process.stdout.write('\n');
   return value;
 }
 
-const required = (value) => (value ? null : 'Valeur obligatoire');
-const isEmail = (value) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? null : 'Adresse email invalide');
+const required: Check = (value) => (value ? null : 'Valeur obligatoire');
+const isEmail: Check = (value) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? null : 'Adresse email invalide');
 
 // -----------------------------------------------------------------
 // Serveur : déjà installé ?
 // -----------------------------------------------------------------
 
 /** État renvoyé par /api/health, ou null si le site ne répond pas (pas encore déployé). */
-async function serverState(siteUrl) {
+async function serverState(siteUrl: string): Promise<HealthState | null> {
   try {
     const res = await fetch(`${siteUrl}/api/health`, { signal: AbortSignal.timeout(8000) });
-    const data = await res.json();
-    return data?.app === 'crenelio' ? data : null;
+    const data = (await res.json()) as Partial<HealthState> | null;
+    return data?.app === 'crenelio' ? (data as HealthState) : null;
   } catch {
     return null;
   }
 }
 
 /** Migrations postérieures à la version du serveur (toutes si inconnue : elles sont idempotentes). */
-function pendingMigrations(schemaVersion) {
+function pendingMigrations(schemaVersion: string | null | undefined): string[] {
   return readdirSync(migrationsDir)
     .filter((name) => name.endsWith('.sql'))
     .sort()
@@ -126,7 +169,7 @@ const STORAGE_SKELETON = [
   'api/storage/auth/.gitkeep',
 ];
 
-function copyInto(target, paths) {
+function copyInto(target: string, paths: string[]): void {
   for (const path of paths) {
     const source = join(root, path);
     if (!existsSync(source)) throw new Error(`Fichier attendu introuvable : ${path}`);
@@ -135,7 +178,7 @@ function copyInto(target, paths) {
 }
 
 /** Contenu de api/.env : seules les valeurs utiles sont écrites, les autres gardent leur défaut. */
-function envFile(a) {
+function envFile(a: Answers): string {
   const lines = [
     '# Généré par npm run deploy:init — ne jamais versionner ce fichier',
     '',
@@ -169,12 +212,24 @@ function envFile(a) {
   return lines.join('\n') + '\n';
 }
 
-function instructions({ mode, siteUrl, state, migrations, hasEnv }) {
+function instructions({
+  mode,
+  siteUrl,
+  state,
+  migrations,
+  hasEnv,
+}: {
+  mode: Mode;
+  siteUrl: string;
+  state: HealthState | null;
+  migrations: string[];
+  hasEnv: boolean;
+}): string {
   const steps = [];
   if (mode === 'initial') {
     steps.push(
       "Dans l'espace client OVHcloud, créez la base de données si ce n'est pas fait (offre Starter : une seule base).",
-      'Envoyez **tout le contenu de `www/`** dans le dossier racine du site (FTP/SFTP, fichiers cachés compris : `.htaccess`, `.ovhconfig`, `api/.env`).',
+      'Envoyez **tout le contenu de `www/`** dans le dossier racine attribué au domaine (onglet *Multisite* : `www/` pour un site unique, ou le dossier du sous-domaine), en FTP/SFTP, fichiers cachés compris : `.htaccess`, `.ovhconfig`, `api/.env`. Le site doit être à la racine du domaine ou du sous-domaine, jamais dans un sous-chemin.',
       'Dans phpMyAdmin, onglet *SQL* : importez `sql/schema.sql`, puis `sql/seed_init.sql`. **Jamais sur une base qui contient déjà des tables.**',
       'Rendez `api/storage/branding/`, `api/storage/zone/` et `api/storage/auth/` accessibles en écriture par PHP (755, ou 775 si besoin).',
       'Activez HTTPS (certificat SSL gratuit OVHcloud) et DKIM pour le domaine.',
@@ -185,7 +240,7 @@ function instructions({ mode, siteUrl, state, migrations, hasEnv }) {
     steps.push(
       '**Sauvegardez** la base (export phpMyAdmin ou *Sauvegardes* OVHcloud) et le dossier `api/storage/` du serveur.',
       migrations.length
-        ? `Dans phpMyAdmin, onglet *SQL*, appliquez dans l'ordre : ${migrations.map((m) => `\`sql/${m}\``).join(', ')} (idempotentes : les rejouer est sans risque).`
+        ? `Dans phpMyAdmin, onglet *SQL*, appliquez dans l'ordre : ${migrations.map((m: string) => `\`sql/${m}\``).join(', ')} (idempotentes : les rejouer est sans risque).`
         : 'Aucune migration SQL à appliquer.',
       "Envoyez **le contenu de `www/`** par-dessus le site (FTP/SFTP). Il ne contient ni `api/.env` ni `api/storage/` : la configuration et les fichiers de l'artisan sont préservés.",
       `Contrôlez ${siteUrl}/api/health${migrations.length ? ` : \`schema_version\` doit valoir \`${migrations[migrations.length - 1].replace(/\.sql$/, '')}\`` : ''}.`
@@ -208,7 +263,7 @@ Détails : DEPLOYMENT.fr.md (ou DEPLOYMENT.md).
 
 async function main() {
   console.log('\n=== Crénelio — préparation du déploiement ===\n');
-  const saved = existsSync(answersFile) ? JSON.parse(readFileSync(answersFile, 'utf8')) : {};
+  const saved: Partial<Answers> = existsSync(answersFile) ? JSON.parse(readFileSync(answersFile, 'utf8')) : {};
 
   const siteUrl = (
     await ask('Adresse du site', {
@@ -220,7 +275,7 @@ async function main() {
 
   console.log(`\nInterrogation de ${siteUrl}/api/health…`);
   const state = await serverState(siteUrl);
-  let mode;
+  let mode: Mode;
   if (state?.database === 'ok') {
     console.log(`  ✅ Crénelio est installé (schéma : ${state.schema_version ?? 'inconnu'}) : paquet de mise à jour.`);
     mode = 'update';
@@ -235,7 +290,7 @@ async function main() {
     mode = 'initial';
   }
 
-  const answers = { siteUrl };
+  const answers: Answers = { siteUrl };
   if (mode === 'initial') {
     const domain = new URL(siteUrl).hostname.replace(/^www\./, '');
     console.log('\nBase de données (espace client OVHcloud → Web Cloud → Hébergements → Bases de données)');
@@ -273,12 +328,12 @@ async function main() {
   rl.close();
 
   console.log('\n==> Compilation (npm run deploy:build)…');
-  const build = spawnSync(process.execPath, [join(root, 'scripts', 'build.mjs')], { cwd: root, stdio: 'inherit' });
+  const build = spawnSync(process.execPath, [join(root, 'scripts', 'build.mts')], { cwd: root, stdio: 'inherit' });
   if (build.status !== 0) throw new Error('La compilation a échoué : paquet non créé.');
 
   // Horodatage local (AAAAMMJJ-HHMM) : nom de dossier lisible et trié
   const now = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
+  const pad = (n: number) => String(n).padStart(2, '0');
   const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
   const target = join(root, 'deploy', `${stamp}-${mode === 'initial' ? 'premier-deploiement' : 'mise-a-jour'}`);
   const www = join(target, 'www');

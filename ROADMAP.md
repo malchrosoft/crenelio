@@ -341,7 +341,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Prérequis :** Item 25 (changement obligatoire du mot de passe par défaut). L'Item 26 devient facultatif : l'adresse du site est demandée par le script.
 - **Pistes ultérieures :** envoi automatique par SFTP / `lftp` si les identifiants sont fournis ; vérification post-déploiement via `/api/health`.
 - **Réalisé (29/10/2026) :**
-  - `scripts/deploy-init.mjs` (Node, sans dépendance) : questions avec valeurs par défaut et contrôle des saisies, mot de passe masqué, réponses mémorisées sans mot de passe (`.deploy/answers.json`), compilation, paquet `deploy/<date>-premier-deploiement|mise-a-jour/` (`www/`, `sql/`, `INSTRUCTIONS.md`).
+  - `scripts/deploy-init.mts` (TypeScript exécuté directement par Node, sans dépendance) : questions avec valeurs par défaut et contrôle des saisies, mot de passe masqué, réponses mémorisées sans mot de passe (`.deploy/answers.json`), compilation, paquet `deploy/<date>-premier-deploiement|mise-a-jour/` (`www/`, `sql/`, `INSTRUCTIONS.md`).
   - `GET /api/health` (public, sans secret) : `installed`, `database` (`ok` / `empty` / `error`), `schema_version` ; connexion dédiée qui n'interrompt pas la requête en cas d'échec.
   - Version du schéma : clé `config.schema_version` (migration `2026-10-29_item27_schema_version.sql` + `seed_init.sql`) ; une mise à jour ne joint que les migrations postérieures.
   - Premier déploiement : `api/.env` (droits 600) et squelette `api/storage/` (jamais leur contenu) ; mise à jour : ni `.env` ni `storage/`.

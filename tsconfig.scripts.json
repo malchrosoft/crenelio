@@ -1,0 +1,20 @@
+{
+  // Scripts Node (scripts/*.mts), exécutés directement par Node ≥ 22.18 (retrait des types natif) :
+  // seule une syntaxe TypeScript « effaçable » est permise (ni enum, ni namespace, ni paramètres
+  // de constructeur), et les imports relatifs gardent leur extension.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["scripts/*.mts"]
+}

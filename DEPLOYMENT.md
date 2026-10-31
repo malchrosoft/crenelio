@@ -39,7 +39,7 @@ manual deployment.
   addresses; same PHP version as higher plans). Crénelio fits easily within these limits: one
   database, code and bundle of a few MB, logo and favicon ≤ 2 MB each. Choose Perso or higher
   only to host other sites or databases on the same plan.
-- Node.js 18+ installed locally (for building React)
+- Node.js 22.18+ installed locally (to build React and run the `scripts/*.mts` TypeScript scripts, executed directly by Node)
 - An FTP/SFTP client (FileZilla, WinSCP, Cyberduck, or `lftp` CLI)
 - Your OVH FTP/SFTP credentials (found in the OVH control panel)
 
@@ -206,6 +206,31 @@ Notes:
 ---
 
 ## Step 5: Upload Files via FTP/SFTP
+
+### Where to Put the Files
+
+Simply upload the package contents into **the root folder assigned to the domain** in the
+OVHcloud Control Panel (*Web Cloud* → *Hosting plans* → your plan → **Multisite** tab, *Root
+folder* column). No other configuration is needed.
+
+- **Single site (Starter plan)**: the domain points to `www/`; upload the files there.
+- **Several sites (Perso or higher)**: assign a subdomain to a dedicated folder in *Multisite*
+  (*Add a domain or subdomain*), then upload the files into that folder.
+
+Crénelio must sit at **the root** of a domain or subdomain: its files are requested from
+`/assets/` and `/api/`. A sub-path address (`https://my-craftsman.com/booking`) does not work; use
+a subdomain instead.
+
+Examples:
+
+| Site address | Root folder (Multisite) | Uploaded files |
+|---|---|---|
+| `https://www.my-craftsman.com` (Starter plan, single site) | `www/` | `www/.htaccess`, `www/api/…` |
+| `https://booking.my-craftsman.com` (subdomain, Perso plan) | `crenelio/` | `crenelio/.htaccess`, `crenelio/api/…` |
+
+In the second case, `www/` can keep hosting another site (the craftsman's existing website, for
+instance), and `APP_URL` is `https://booking.my-craftsman.com`. The `npm run deploy:init` package
+contains a `www/` folder: upload its **contents** into the chosen root folder, whatever its name.
 
 ### Option A: FileZilla (GUI)
 
@@ -537,7 +562,7 @@ crenelio/
 │   ├── seed_init.sql       # Required configuration keys and hours
 │   ├── seed_test_data.sql  # Demo data (local only)
 │   └── migrations/         # Idempotent scripts for existing databases
-└── scripts/                # start.py / stop.py (local environment), build.mjs (npm run deploy:build)
+└── scripts/                # start.py / stop.py (local environment), build.mts (npm run deploy:build), deploy-init.mts (npm run deploy:init)
 ```
 
 ---

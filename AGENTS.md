@@ -58,7 +58,7 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
   npm start safari admin        # navigateur cité (+ chemin) ; « tous » pour comparer, « aucun » pour ne rien ouvrir
   # ou directement : python3 scripts/start.py [navigateur] [chemin]
   ```
-  Serveur déjà lancé : `npm run ouvrir [navigateur|tous] [chemin]` (`scripts/ouvrir.mjs`).
+  Serveur déjà lancé : `npm run ouvrir [navigateur|tous] [chemin]` (`scripts/ouvrir.mts`).
   ⚠️ Un agent qui teste `npm start` doit utiliser `aucun` et ne jamais arrêter un Vite qu'il n'a
   pas lancé lui-même (l'humain peut avoir le sien sur 5173).
 - **Arrêt complet** (Conteneurs Docker + Processus Vite) :
@@ -84,8 +84,12 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
    ```
    ⚠️ `vite build` ne contrôle pas les types (esbuild se contente de les effacer). Lancer en complément :
    ```bash
-   npx tsc --noEmit
+   npm run typecheck   # tsc --noEmit (src/) + tsc --noEmit -p tsconfig.scripts.json (scripts/)
    ```
+4. **Scripts Node en TypeScript (`scripts/*.mts`)** : exécutés directement par Node ≥ 22.18, qui
+   efface les types sans compiler. Seule une syntaxe « effaçable » est permise (ni `enum`, ni
+   `namespace`, ni paramètres de constructeur ; `erasableSyntaxOnly` dans `tsconfig.scripts.json`),
+   et un import relatif garde son extension `.mts`. Aucun script en `.mjs`.
    *(Le build génère les assets optimisés dans `api/public/assets/`)*.
 
 ---
@@ -261,7 +265,7 @@ modification terminée, la résumer et demander « Je commite ? ». Un accord do
 Le `push` reste à l'humain.
 
 Avant de proposer un commit :
-1. Vérifier que le build Vite s'exécute sans erreur : `npm run build`, **et** que le typage est sain : `npx tsc --noEmit`.
+1. Vérifier que le build Vite s'exécute sans erreur : `npm run build`, **et** que le typage est sain : `npm run typecheck` (application **et** scripts).
 2. Vérifier l'absence de fichiers temporaires ou orphelins : `git status`.
 3. S'assurer que les identifiants et tokens secrets ne sont jamais commités.
 4. Mettre à jour `ROADMAP.md` si des fonctionnalités du backlog ont été complétées.

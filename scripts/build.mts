@@ -2,7 +2,7 @@
 // =====================================================
 // Build : compile React en fichiers statiques et prépare le paquet de déploiement OVH.
 // Node pur, sans dépendance : fonctionne sous Windows, macOS et Linux (remplace build.sh).
-// Usage : npm run deploy:build   (ou : node scripts/build.mjs)
+// Usage : npm run deploy:build   (ou : node scripts/build.mts)
 // =====================================================
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
@@ -15,7 +15,7 @@ const assetsDir = join(root, 'api', 'public', 'assets');
 const builtIndex = join(assetsDir, 'index.html');
 
 /** Lance une commande npm ; `shell` est nécessaire sous Windows (npm.cmd). Arrête le build en cas d'échec. */
-function run(args) {
+function run(args: string[]): void {
   const result = spawnSync('npm', args, { cwd: root, stdio: 'inherit', shell: process.platform === 'win32' });
   if (result.status !== 0) {
     console.error(`ERREUR : « npm ${args.join(' ')} » a échoué.`);
@@ -23,7 +23,7 @@ function run(args) {
   }
 }
 
-function fail(message) {
+function fail(message: string): never {
   console.error(`ERREUR : ${message}`);
   process.exit(1);
 }
@@ -33,7 +33,7 @@ run(['install']);
 
 console.log('==> Vérification des types…');
 // vite build n'en contrôle aucun (esbuild les efface)
-run(['exec', '--', 'tsc', '--noEmit']);
+run(['run', 'typecheck']); // application (src/) et scripts (scripts/*.mts)
 
 console.log('==> Compilation de la version de production…');
 // Vite écrit le JS/CSS dans api/public/assets/ (cf. vite.config.js)

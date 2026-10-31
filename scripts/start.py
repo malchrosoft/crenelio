@@ -105,7 +105,7 @@ def print_urls(port: int):
 
 
 def open_browser_when_ready(port: int, args: list):
-    """Attend que Vite réponde, puis délègue l'ouverture à scripts/ouvrir.mjs."""
+    """Attend que Vite réponde, puis délègue l'ouverture à scripts/ouvrir.mts."""
     url = f"http://localhost:{port}"
     for _ in range(60):
         try:
@@ -117,7 +117,7 @@ def open_browser_when_ready(port: int, args: list):
         print_warn("Vite ne répond pas : navigateur non ouvert.")
         return
     subprocess.run(
-        ["node", os.path.join("scripts", "ouvrir.mjs"), *args],
+        ["node", os.path.join("scripts", "ouvrir.mts"), *args],
         env={**os.environ, "CRENELIO_URL": url},
     )
 
@@ -162,7 +162,7 @@ def run_vite(browser_args: list):
     if selected_port != base_port:
         print_warn(f"Port {base_port} occupé : les liens des emails (APP_URL) pointeront vers {base_port}.")
     print_urls(selected_port)
-    subprocess.run(["node", os.path.join("scripts", "ouvrir.mjs"), "liste"])
+    subprocess.run(["node", os.path.join("scripts", "ouvrir.mts"), "liste"])
     print("👉 Appuyez sur Ctrl+C pour arrêter le serveur.")
     print("=" * 55 + "\n", flush=True)
     # Utilise npx vite avec le port choisi, portable Windows/macOS/Linux

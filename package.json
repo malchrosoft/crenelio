@@ -4,15 +4,19 @@
   "description": "Lightweight React + PHP REST API + MySQL boilerplate for OVHcloud shared hosting",
   "license": "AGPL-3.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
     "dev": "vite",
-    "start": "node scripts/run-python.mjs scripts/start.py",
-    "stop": "node scripts/run-python.mjs scripts/stop.py",
-    "ouvrir": "node scripts/ouvrir.mjs",
+    "start": "node scripts/run-python.mts scripts/start.py",
+    "stop": "node scripts/run-python.mts scripts/stop.py",
+    "ouvrir": "node scripts/ouvrir.mts",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy:build": "node scripts/build.mjs",
-    "deploy:init": "node scripts/deploy-init.mjs"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
+    "deploy:build": "node scripts/build.mts",
+    "deploy:init": "node scripts/deploy-init.mts"
   },
   "dependencies": {
     "@ag-grid-community/locale": "^36.2.0",
@@ -34,6 +38,7 @@
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^4.3.4",

@@ -39,7 +39,7 @@ script prépare, pour un déploiement entièrement manuel.
   email ; même version de PHP que les offres supérieures). Crénelio tient largement dans ces
   limites : une seule base, code et bundle de quelques Mo, logo et favicon ≤ 2 Mo chacun.
   Perso ou supérieure seulement pour héberger d'autres sites ou bases sur le même contrat.
-- Node.js 18+ installé en local (pour compiler React)
+- Node.js 22.18+ installé en local (pour compiler React et exécuter les scripts TypeScript `scripts/*.mts`, lancés directement par Node)
 - Un client FTP/SFTP (FileZilla, WinSCP, Cyberduck ou `lftp` en ligne de commande)
 - Vos identifiants FTP/SFTP OVH (dans l'espace client OVH)
 
@@ -207,6 +207,32 @@ déconnecter la première fois : le code de connexion d'un nouvel appareil part 
 ---
 
 ## Étape 5 : envoyer les fichiers par FTP/SFTP
+
+### Où déposer les fichiers ?
+
+Il suffit de déposer le contenu du paquet dans **le dossier racine attribué au domaine** dans
+l'espace client OVHcloud (*Web Cloud* → *Hébergements* → votre offre → onglet **Multisite**,
+colonne *Dossier racine*). Aucune autre configuration n'est nécessaire.
+
+- **Un seul site (offre Starter)** : le domaine pointe sur `www/` ; déposez-y les fichiers.
+- **Plusieurs sites (Perso ou supérieure)** : attribuez un sous-domaine à un dossier dédié dans
+  *Multisite* (*Ajouter un domaine ou sous-domaine*), puis déposez les fichiers dans ce dossier.
+
+Crénelio doit occuper **la racine** d'un domaine ou d'un sous-domaine : ses fichiers sont appelés
+en `/assets/` et `/api/`. Une adresse en sous-chemin (`https://mon-artisan.fr/rdv`) ne fonctionne
+pas ; utilisez un sous-domaine à la place.
+
+Exemples :
+
+| Adresse du site | Dossier racine (Multisite) | Fichiers déposés |
+|---|---|---|
+| `https://www.mon-artisan.fr` (offre Starter, site unique) | `www/` | `www/.htaccess`, `www/api/…` |
+| `https://rdv.mon-artisan.fr` (sous-domaine, offre Perso) | `crenelio/` | `crenelio/.htaccess`, `crenelio/api/…` |
+
+Dans le second cas, `www/` peut continuer d'héberger un autre site (la vitrine existante de
+l'artisan, par exemple), et `APP_URL` vaut `https://rdv.mon-artisan.fr`. Le paquet de
+`npm run deploy:init` contient un dossier `www/` : c'est son **contenu** qu'il faut envoyer dans le
+dossier racine choisi, quel que soit son nom.
 
 ### Option A : FileZilla (interface graphique)
 
@@ -541,7 +567,7 @@ crenelio/
 │   ├── seed_init.sql       # Clés de configuration et horaires indispensables
 │   ├── seed_test_data.sql  # Données de démonstration (local uniquement)
 │   └── migrations/         # Scripts idempotents pour les bases existantes
-└── scripts/                # start.py / stop.py (environnement local), build.mjs (npm run deploy:build)
+└── scripts/                # start.py / stop.py (environnement local), build.mts (npm run deploy:build), deploy-init.mts (npm run deploy:init)
 ```
 
 ---

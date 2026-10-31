@@ -62,7 +62,7 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 ## Démarrage Rapide
 
 ### Prérequis
-- **Node.js 18+** & npm
+- **Node.js 22.18+** & npm (les scripts `scripts/*.mts` sont du TypeScript exécuté directement par Node, sans compilation)
 - **Python 3.8+** (utilisé pour les scripts multiplateformes `start.py` / `stop.py`, sans dépendance externe)
 - **Docker & Docker Compose** (gère MySQL 8 et l'API PHP 8.2 nativement)
 
@@ -96,7 +96,7 @@ npm stop
 
 Navigateurs reconnus : `chrome`, `brave`, `edge`, `firefox`, `safari`, `opera`, `vivaldi`, `chromium`
 (macOS, Windows, Linux) ; ceux qui sont installés sont listés au démarrage. Serveur déjà lancé :
-`npm run ouvrir [navigateur|tous] [chemin]` (`scripts/ouvrir.mjs`).
+`npm run ouvrir [navigateur|tous] [chemin]` (`scripts/ouvrir.mts`).
 
 ### Build de Production
 
@@ -255,6 +255,8 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 ## Déploiement
 
 Guide pas à pas pour l'hébergement mutualisé OVHcloud (base de données et migrations, `.env`, SMTP, envoi FTP/SFTP, dossiers de stockage, HTTPS) : [🇫🇷 DEPLOYMENT.fr.md](DEPLOYMENT.fr.md) · [🇬🇧 DEPLOYMENT.md](DEPLOYMENT.md).
+
+Le site se dépose dans le **dossier racine attribué au domaine** (onglet *Multisite* d'OVHcloud) : `www/` pour un site unique (offre Starter), ou le dossier d'un sous-domaine dédié (ex. `rdv.mon-artisan.fr` → `crenelio/`). Il doit occuper la racine d'un domaine ou sous-domaine, jamais un sous-chemin.
 
 ---
 
