@@ -45,7 +45,7 @@ class EmailTemplates
         );
 
         $outro = $manageUrl !== null
-            ? 'Le rendez-vous est joint à ce message (fichier .ics) pour l\'ajouter à votre agenda. Un empêchement ? Vous pouvez consulter ou annuler votre rendez-vous à tout moment depuis le lien ci-dessus.'
+            ? 'Le rendez-vous est joint à ce message (fichier .ics) : ajoutez-le à votre agenda depuis ce message, pour qu\'un éventuel changement d\'horaire ou une annulation s\'y reporte automatiquement. Un empêchement ? Vous pouvez consulter ou annuler votre rendez-vous à tout moment depuis le lien ci-dessus.'
             : sprintf(
                 'Un empêchement ? Contactez-nous au %s.',
                 self::escape($config['pro_phone'] ?? '')
@@ -264,6 +264,138 @@ class EmailTemplates
             'subject' => $subject,
             'html'    => self::layout($company, 'Demande non retenue', $intro, $rows, $outro, null, $config),
             'text'    => self::plainText('Demande non retenue', $intro, $rows, $outro, null, $config),
+        ];
+    }
+
+    /**
+     * Limite de la mise à jour automatique des agendas, rappelée dans chaque email qui en dépend :
+     * seul un événement ajouté depuis un email précédent est relié et suivi.
+     */
+    private const AGENDA_SYNC_NOTE = 'Si le rendez-vous a été ajouté à votre agenda depuis un email précédent, celui-ci se met à jour automatiquement (selon votre messagerie, il peut falloir ouvrir ce message ou confirmer). Sinon (fichier importé à la main, autre agenda), modifiez ou supprimez vous-même l\'événement.';
+
+    /**
+     * Annulation, email au client : confirmation s'il a annulé lui-même, information sinon.
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function cancellationClient(array $appointment, array $config, bool $byClient): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $when = sprintf('%s à %s', self::formatDate($appointment['start_datetime']), self::formatTime($appointment['start_datetime']));
+        $intro = sprintf(
+            $byClient
+                ? 'Bonjour %s, votre annulation est bien enregistrée : le rendez-vous du %s est annulé et le créneau libéré.'
+                : 'Bonjour %s, nous sommes désolés : le rendez-vous du %s a dû être annulé.',
+            self::escape($appointment['client_name']),
+            self::escape($when)
+        );
+        $outro = (!empty($config['pro_phone'])
+            ? sprintf('Pour reprendre un rendez-vous ou pour toute question, contactez-nous au %s.', self::escape($config['pro_phone']))
+            : 'Vous pouvez reprendre un rendez-vous en ligne à tout moment.')
+            . ' ' . self::AGENDA_SYNC_NOTE;
+        $rows = self::summaryRows($appointment);
+
+        return [
+            'subject' => sprintf('Rendez-vous annulé : %s — %s', $when, $company),
+            'html'    => self::layout($company, 'Rendez-vous annulé', $intro, $rows, $outro, null, $config),
+            'text'    => self::plainText('Rendez-vous annulé', $intro, $rows, $outro, null, $config),
+        ];
+    }
+
+    /**
+     * Annulation par le client, email à l'artisan (le fichier joint retire l'événement de son agenda).
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function cancellationPro(array $appointment, array $config, bool $byClient = true): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $when = sprintf('%s à %s', self::formatDate($appointment['start_datetime']), self::formatTime($appointment['start_datetime']));
+        $intro = sprintf(
+            $byClient
+                ? '%s a annulé son rendez-vous du %s depuis son lien de gestion. Le créneau est de nouveau réservable en ligne.'
+                : 'Vous avez annulé le rendez-vous de %s du %s depuis l\'espace Artisan. Ce message met à jour votre agenda.',
+            self::escape($appointment['client_name']),
+            self::escape($when)
+        );
+        $rows = self::summaryRows($appointment);
+        if (!empty($appointment['cancellation_reason'])) {
+            $rows['Motif'] = self::escape($appointment['cancellation_reason']);
+        }
+        $outro = self::AGENDA_SYNC_NOTE;
+        $title = $byClient ? 'Rendez-vous annulé par le client' : 'Annulation enregistrée';
+
+        return [
+            'subject' => sprintf('Annulation : %s, %s', $appointment['client_name'], $when),
+            'html'    => self::layout($company, $title, $intro, $rows, $outro, null, $config),
+            'text'    => self::plainText($title, $intro, $rows, $outro, null, $config),
+        ];
+    }
+
+    /**
+     * Reprogrammation par l'artisan, email au client : nouvelle date, agenda mis à jour.
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function rescheduleClient(array $appointment, array $config, string $previousStart): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $manageUrl = self::manageUrl($appointment);
+        $when = sprintf('%s à %s', self::formatDate($appointment['start_datetime']), self::formatTime($appointment['start_datetime']));
+        $before = sprintf('%s à %s', self::formatDate($previousStart), self::formatTime($previousStart));
+        $intro = sprintf(
+            'Bonjour %s, votre rendez-vous initialement prévu le %s est déplacé au <strong>%s</strong>.',
+            self::escape($appointment['client_name']),
+            self::escape($before),
+            self::escape($when)
+        );
+        $rows = self::summaryRows($appointment);
+        $outro = self::AGENDA_SYNC_NOTE . ' '
+            . ($manageUrl !== null
+                ? 'Ce nouvel horaire ne vous convient pas ? Vous pouvez annuler depuis le lien ci-dessus.'
+                : sprintf('Ce nouvel horaire ne vous convient pas ? Contactez-nous au %s.', self::escape($config['pro_phone'] ?? '')));
+
+        return [
+            'subject' => sprintf('Rendez-vous déplacé au %s — %s', $when, $company),
+            'html'    => self::layout(
+                $company,
+                'Rendez-vous déplacé',
+                $intro,
+                $rows,
+                $outro,
+                $manageUrl !== null ? ['label' => 'Gérer mon rendez-vous', 'url' => $manageUrl] : null,
+                $config
+            ),
+            'text'    => self::plainText('Rendez-vous déplacé', $intro, $rows, $outro, $manageUrl, $config),
+        ];
+    }
+
+    /**
+     * Reprogrammation par l'artisan, email à lui-même : met à jour l'intervention dans son agenda.
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function reschedulePro(array $appointment, array $config, string $previousStart, bool $clientNotified): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $when = sprintf('%s à %s', self::formatDate($appointment['start_datetime']), self::formatTime($appointment['start_datetime']));
+        $before = sprintf('%s à %s', self::formatDate($previousStart), self::formatTime($previousStart));
+        $intro = sprintf(
+            'L\'intervention de %s, prévue le %s, est déplacée au <strong>%s</strong>. Ce message met à jour votre agenda.',
+            self::escape($appointment['client_name']),
+            self::escape($before),
+            self::escape($when)
+        );
+        $rows = self::summaryRows($appointment);
+        $outro = ($clientNotified
+            ? 'Le client a été prévenu par email. '
+            : 'Le client n\'a pas été prévenu (option décochée) : pensez à le contacter. ')
+            . self::AGENDA_SYNC_NOTE;
+
+        return [
+            'subject' => sprintf('Déplacé au %s : %s', $when, $appointment['client_name']),
+            'html'    => self::layout($company, 'Intervention déplacée', $intro, $rows, $outro, null, $config),
+            'text'    => self::plainText('Intervention déplacée', $intro, $rows, $outro, null, $config),
         ];
     }
 

@@ -100,6 +100,83 @@ class Notifier
     }
 
     /**
+     * Annulation d'un rendez-vous (Item 32). Le rendez-vous doit déjà être au statut `cancelled` :
+     * les fichiers agenda joints l'annulent (`METHOD:CANCEL`, même UID).
+     * - L'artisan reçoit toujours l'annulation (son agenda est mis à jour), qu'elle vienne du client
+     *   ou de lui-même.
+     * - Le client est prévenu sauf si l'artisan a choisi un changement silencieux.
+     *
+     * @return array<int, array{type: string, status: string}>
+     */
+    public static function sendCancellation(array $appointment, array $config, bool $byClient, bool $notifyClient = true): array
+    {
+        $results = [];
+
+        $proEmail = trim((string)($config['pro_email'] ?? ''));
+        if ($proEmail !== '') {
+            $results[] = self::dispatch(
+                $appointment,
+                'cancellation_pro',
+                $proEmail,
+                (string)($config['pro_name'] ?? ''),
+                EmailTemplates::cancellationPro($appointment, $config, $byClient),
+                self::calendarFile($appointment, $config, 'pro')
+            );
+        }
+
+        if (($byClient || $notifyClient) && trim((string)$appointment['client_email']) !== '') {
+            $results[] = self::dispatch(
+                $appointment,
+                'cancellation_client',
+                $appointment['client_email'],
+                $appointment['client_name'],
+                EmailTemplates::cancellationClient($appointment, $config, $byClient),
+                self::calendarFile($appointment, $config, 'client')
+            );
+        }
+
+        return $results;
+    }
+
+    /**
+     * Reprogrammation par l'artisan (planning ou calendrier) : son agenda est mis à jour, et le
+     * client reçoit la nouvelle date (sauf changement silencieux). Les fichiers agenda remplacent
+     * l'ancien événement (même UID, version supérieure).
+     *
+     * @return array<int, array{type: string, status: string}>
+     */
+    public static function sendReschedule(array $appointment, array $config, string $previousStart, bool $notifyClient = true): array
+    {
+        $results = [];
+        $clientNotified = $notifyClient && trim((string)$appointment['client_email']) !== '';
+
+        if ($clientNotified) {
+            $results[] = self::dispatch(
+                $appointment,
+                'reschedule_client',
+                $appointment['client_email'],
+                $appointment['client_name'],
+                EmailTemplates::rescheduleClient($appointment, $config, $previousStart),
+                self::calendarFile($appointment, $config, 'client')
+            );
+        }
+
+        $proEmail = trim((string)($config['pro_email'] ?? ''));
+        if ($proEmail !== '') {
+            $results[] = self::dispatch(
+                $appointment,
+                'reschedule_pro',
+                $proEmail,
+                (string)($config['pro_name'] ?? ''),
+                EmailTemplates::reschedulePro($appointment, $config, $previousStart, $clientNotified),
+                self::calendarFile($appointment, $config, 'pro')
+            );
+        }
+
+        return $results;
+    }
+
+    /**
      * Rejoue une notification d'un type donné (bouton « Renvoyer » de l'IHM Pro).
      *
      * @return array{type: string, status: string}
@@ -137,8 +214,8 @@ class Notifier
     }
 
     /**
-     * Fichier agenda joint : invitation de l'artisan (créneau élargi du trajet) ou publication du
-     * client (créneau exact, lien de gestion).
+     * Fichier agenda joint : invitation de l'artisan (créneau élargi du trajet) ou du client (créneau
+     * exact, lien de gestion). `method` suit le statut : REQUEST (création, mise à jour) ou CANCEL.
      *
      * @return array{filename: string, mime: string, content: string}
      */
@@ -147,18 +224,18 @@ class Notifier
         return $for === 'client'
             ? [
                 'filename' => 'mon-rendez-vous.ics',
-                'mime'     => 'text/calendar; charset=utf-8; method=PUBLISH',
+                'mime'     => 'text/calendar; charset=utf-8; method=' . ICalendar::method($appointment),
                 'content'  => ICalendar::forClient($appointment, $config),
             ]
             : [
                 'filename' => 'rendez-vous-' . (int)$appointment['id'] . '.ics',
-                'mime'     => 'text/calendar; charset=utf-8; method=REQUEST',
+                'mime'     => 'text/calendar; charset=utf-8; method=' . ICalendar::method($appointment),
                 'content'  => ICalendar::forAppointment($appointment, $config),
             ];
     }
 
     /** Types adressés à l'artisan : on lui répond au client. Tous les autres vont au client. */
-    private const PRO_TYPES = ['pro_confirmation', 'exception_pro_request'];
+    private const PRO_TYPES = ['pro_confirmation', 'exception_pro_request', 'cancellation_pro', 'reschedule_pro'];
 
     /**
      * Adresse de réponse : l'email professionnel pour les emails aux clients (l'expéditeur est

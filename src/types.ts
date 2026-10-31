@@ -114,7 +114,11 @@ export type NotificationType =
   | 'pro_confirmation'
   | 'exception_client_ack'
   | 'exception_pro_request'
-  | 'exception_client_refused';
+  | 'exception_client_refused'
+  | 'cancellation_client'
+  | 'cancellation_pro'
+  | 'reschedule_client'
+  | 'reschedule_pro';
 
 /** Entrée du journal d'envoi rattachée à un rendez-vous. */
 export interface AppointmentNotification {

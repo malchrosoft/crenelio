@@ -112,7 +112,9 @@ CREATE TABLE `appointment_notifications` (
     `appointment_id` INT             NOT NULL,
     `type`           ENUM(
         'client_confirmation', 'pro_confirmation',
-        'exception_client_ack', 'exception_pro_request', 'exception_client_refused'
+        'exception_client_ack', 'exception_pro_request', 'exception_client_refused',
+        -- Item 32 : annulation et reprogrammation (client, et agenda de l'artisan)
+        'cancellation_client', 'cancellation_pro', 'reschedule_client', 'reschedule_pro'
     ) NOT NULL,
     `recipient`      VARCHAR(255)    NOT NULL,
     `subject`        VARCHAR(255)    NOT NULL,

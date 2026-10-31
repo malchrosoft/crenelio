@@ -11,10 +11,29 @@ require_once __DIR__ . '/../core/Notifier.php';
 require_once __DIR__ . '/../models/Notification.php';
 require_once __DIR__ . '/../core/Response.php';
 require_once __DIR__ . '/../core/SlotEngine.php';
+require_once __DIR__ . '/../core/RateLimit.php';
 require_once __DIR__ . '/TravelFeeController.php';
 
 class AppointmentController
 {
+    // Plafonds des formulaires publics qui envoient des emails (Item 32), par heure
+    private const BOOKING_LIMIT_PER_IP   = 10;
+    private const EXCEPTION_LIMIT_PER_IP = 5;
+    /** Tous visiteurs confondus : garde le quota d'envoi de l'hébergement pour l'artisan. */
+    private const PUBLIC_FORMS_LIMIT     = 40;
+
+    /** Répond 429 au-delà du plafond horaire (par adresse IP, puis tous visiteurs confondus). */
+    private static function limitPublicForm(string $form, int $perIp): void
+    {
+        if (!RateLimit::hit(RateLimit::ipBucket($form), $perIp, 3600)
+            || !RateLimit::hit('public-forms', self::PUBLIC_FORMS_LIMIT, 3600)) {
+            Response::json([
+                'error' => 'Trop de demandes envoyées depuis cette connexion. Réessayez dans une heure ou appelez-nous directement.',
+                'code'  => 'rate_limited',
+            ], 429);
+        }
+    }
+
     /**
      * GET /appointments — Liste des rendez-vous (Espace Pro).
      */
@@ -50,6 +69,7 @@ class AppointmentController
     public function store(): void
     {
         $body = Response::body();
+        self::limitPublicForm('booking', self::BOOKING_LIMIT_PER_IP);
 
         // Sans déplacement, le rendez-vous a lieu dans les locaux : l'adresse est celle de l'entreprise
         $config = Config::getAll();
@@ -274,6 +294,7 @@ class AppointmentController
     public function exceptionalRequest(): void
     {
         $body = Response::body();
+        self::limitPublicForm('exception', self::EXCEPTION_LIMIT_PER_IP);
         foreach (['service_id', 'client_name', 'client_email', 'client_phone', 'address', 'postal_code', 'city', 'start_datetime'] as $field) {
             if (empty($body[$field]) || !is_scalar($body[$field])) {
                 Response::json(['error' => "Le champ '$field' est obligatoire"], 400);
@@ -428,6 +449,9 @@ class AppointmentController
         Appointment::updateStatus((int)$appointment['id'], 'cancelled', $reason);
         $updated = Appointment::find((int)$appointment['id']);
 
+        // L'artisan est prévenu (son agenda est mis à jour) et le client reçoit une confirmation
+        Notifier::sendCancellation($updated, Config::getAll(), true);
+
         Response::json([
             'message'     => 'Rendez-vous annulé avec succès',
             'appointment' => $updated
@@ -455,9 +479,33 @@ class AppointmentController
         }
 
         $reason = $body['reason'] ?? null;
-        Appointment::updateStatus($id, $status, $reason);
+        // `notify: false` : changement silencieux (par défaut, le client est prévenu)
+        $notify = ($body['notify'] ?? true) !== false;
 
-        Response::json(Appointment::find($id));
+        // Demande hors zone en attente : même effet que le lien de décision (confirmations ou refus)
+        if ($appointment['status'] === 'pending' && !empty($appointment['decision_token'])
+            && in_array($status, ['confirmed', 'cancelled'], true)) {
+            $accepted = $status === 'confirmed';
+            Appointment::decide($id, $status, $accepted ? null : ($reason ?? "Demande hors zone refusée par l'artisan"));
+            $updated = Appointment::find($id);
+            if ($notify) {
+                $config = Config::getAll();
+                $accepted
+                    ? Notifier::sendBookingConfirmations($updated, $config)
+                    : Notifier::sendExceptionRefused($updated, $config);
+            }
+            Response::json($updated);
+        }
+
+        Appointment::updateStatus($id, $status, $reason);
+        $updated = Appointment::find($id);
+
+        // Annulation par l'artisan : son agenda est mis à jour, le client prévenu (sauf `notify: false`)
+        if ($status === 'cancelled' && $appointment['status'] !== 'cancelled') {
+            Notifier::sendCancellation($updated, Config::getAll(), false, $notify);
+        }
+
+        Response::json($updated);
     }
 
     /**
@@ -503,6 +551,7 @@ class AppointmentController
         $newEnd   = date('Y-m-d H:i:s', $endTime);
 
         Appointment::reschedule($id, $newStart, $newEnd);
+        $previousStart = $appointment['start_datetime'];
 
         // Si le rendez-vous était échu ou annulé, on peut réactiver son statut à confirmed
         $newStatus = $body['status'] ?? null;
@@ -510,7 +559,15 @@ class AppointmentController
             Appointment::updateStatus($id, $newStatus);
         }
 
-        Response::json(Appointment::find($id));
+        $updated = Appointment::find($id);
+
+        // Agenda de l'artisan mis à jour ; client prévenu sauf `notify: false` (rendez-vous annulé ou
+        // horaire inchangé : rien n'est envoyé)
+        if ($updated['status'] !== 'cancelled' && $updated['start_datetime'] !== $previousStart) {
+            Notifier::sendReschedule($updated, Config::getAll(), $previousStart, ($body['notify'] ?? true) !== false);
+        }
+
+        Response::json($updated);
     }
 
     /**

@@ -41,9 +41,11 @@ class ICalendar
             'VERSION:2.0',
             'PRODID:-//Crenelio//Prise de rendez-vous//FR',
             'CALSCALE:GREGORIAN',
-            'METHOD:REQUEST',
+            // Annulé : CANCEL retire l'événement de l'agenda de l'artisan (même UID)
+            'METHOD:' . self::method($appointment),
             'BEGIN:VEVENT',
             'UID:' . self::uid($appointment),
+            'SEQUENCE:' . self::sequence($appointment),
             'DTSTAMP:' . (new DateTime('now', $utc))->format('Ymd\THis\Z'),
             'DTSTART:' . $start->setTimezone($utc)->format('Ymd\THis\Z'),
             'DTEND:' . $end->setTimezone($utc)->format('Ymd\THis\Z'),
@@ -52,7 +54,7 @@ class ICalendar
             'DESCRIPTION:' . self::escape(self::description($appointment, $bufferMinutes)),
             'STATUS:' . ($appointment['status'] === 'cancelled' ? 'CANCELLED' : 'CONFIRMED'),
             'ORGANIZER;CN=' . self::escape($config['company_name'] ?? 'Crénelio')
-                . ':mailto:' . ($config['pro_email'] ?? MAIL_FROM),
+                . ':mailto:' . self::organizerEmail($config),
             'ATTENDEE;CN=' . self::escape($appointment['client_name'])
                 . ';ROLE=REQ-PARTICIPANT:mailto:' . $appointment['client_email'],
             'END:VEVENT',
@@ -64,8 +66,12 @@ class ICalendar
 
     /**
      * Événement côté client : créneau exact (sans le trajet de l'artisan), coordonnées de l'artisan,
-     * détail des tarifs et lien « Gérer ou annuler mon rendez-vous ». `METHOD:PUBLISH` : simple
-     * ajout à l'agenda, sans invitation à laquelle répondre.
+     * détail des tarifs et lien « Gérer ou annuler mon rendez-vous ».
+     *
+     * Invitation iTIP (`METHOD:REQUEST`, puis `CANCEL` une fois annulé) avec l'entreprise comme
+     * organisatrice et le client comme participant déjà « accepté » (`RSVP=FALSE`) : c'est ce qui
+     * permet aux messageries (Gmail, Outlook, Apple Mail) de **mettre à jour** ou de **retirer**
+     * l'événement ajouté depuis l'email. Une simple publication (`PUBLISH`) crée des doublons.
      */
     public static function forClient(array $appointment, array $config): string
     {
@@ -81,9 +87,10 @@ class ICalendar
             'VERSION:2.0',
             'PRODID:-//Crenelio//Prise de rendez-vous//FR',
             'CALSCALE:GREGORIAN',
-            'METHOD:PUBLISH',
+            'METHOD:' . self::method($appointment),
             'BEGIN:VEVENT',
             'UID:' . self::uid($appointment, 'client'),
+            'SEQUENCE:' . self::sequence($appointment),
             'DTSTAMP:' . (new DateTime('now', $utc))->format('Ymd\THis\Z'),
             'DTSTART:' . $start->setTimezone($utc)->format('Ymd\THis\Z'),
             'DTEND:' . $end->setTimezone($utc)->format('Ymd\THis\Z'),
@@ -91,6 +98,9 @@ class ICalendar
             'LOCATION:' . self::escape(self::location($appointment)),
             'DESCRIPTION:' . self::escape(self::clientDescription($appointment, $config, $manage)),
             'STATUS:' . ($appointment['status'] === 'cancelled' ? 'CANCELLED' : 'CONFIRMED'),
+            'ORGANIZER;CN=' . self::escape($company) . ':mailto:' . self::organizerEmail($config),
+            'ATTENDEE;CN=' . self::escape($appointment['client_name'])
+                . ';ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=FALSE:mailto:' . $appointment['client_email'],
         ];
         if ($manage !== null) {
             $lines[] = 'URL:' . $manage;
@@ -108,6 +118,29 @@ class ICalendar
         );
 
         return implode("\r\n", array_map([self::class, 'fold'], $lines)) . "\r\n";
+    }
+
+    /** `REQUEST` crée ou met à jour l'événement, `CANCEL` le retire (même UID, version supérieure). */
+    public static function method(array $appointment): string
+    {
+        return $appointment['status'] === 'cancelled' ? 'CANCEL' : 'REQUEST';
+    }
+
+    private static function organizerEmail(array $config): string
+    {
+        $email = trim((string)($config['pro_email'] ?? ''));
+        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : MAIL_FROM;
+    }
+
+    /**
+     * Numéro de version de l'événement : croît à chaque modification (date de mise à jour), pour
+     * qu'un agenda remplace l'ancienne version par la nouvelle (reprogrammation, annulation).
+     */
+    private static function sequence(array $appointment): int
+    {
+        $updated = strtotime((string)($appointment['updated_at'] ?? '')) ?: time();
+        // Secondes écoulées depuis 2026 : entier croissant, compact
+        return max(0, $updated - 1767225600);
     }
 
     /** Identifiant stable d'un événement (un par destinataire), pour que les réimports se remplacent. */

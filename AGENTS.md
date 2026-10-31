@@ -251,10 +251,24 @@ documentation (`README.md`, `DEPLOYMENT.md` **et** `DEPLOYMENT.fr.md`) doit les 
   dans `config/config.php`). Toute comparaison ou génération de date doit rester
   cohérente avec ce fuseau.
 
-### 📭 Notifications d'annulation absentes
-- Aucun email n'est envoyé lors d'une annulation, ni au client ni à l'artisan.
-  L'énumération `appointment_notifications.type` devra être étendue le jour où
-  cette fonctionnalité sera traitée.
+### 📬 Notifications d'annulation, de reprogrammation et de décision (Item 32)
+- Annulation par le client (lien) : `Notifier::sendCancellation(..., true)` prévient l'artisan
+  (`.ics` `METHOD:CANCEL`, même UID) et confirme au client. Annulation par l'artisan
+  (`PUT /appointments/:id/status`) : client seul. Reprogrammation (`PUT …/reschedule`, planning et
+  calendrier) : `sendReschedule`, `.ics` mis à jour (même UID, `SEQUENCE` croissante).
+- Ces routes acceptent `notify: false` pour un changement silencieux côté client (case « Prévenir le
+  client ») ; l'agenda de l'artisan est mis à jour dans tous les cas (`reschedule_pro`,
+  `cancellation_pro`).
+- **Fichiers agenda = invitations iTIP** (`ICalendar::method` : `REQUEST` ou `CANCEL` selon le statut ;
+  UID stable par destinataire ; `SEQUENCE` croissante ; `ORGANIZER` et `ATTENDEE` obligatoires) : ne
+  jamais repasser en `PUBLISH` (doublons). La synchronisation reste dépendante des messageries : tout
+  email qui en dépend garde la mention `EmailTemplates::AGENDA_SYNC_NOTE`.
+- Une demande « En attente » confirmée ou annulée depuis le planning passe par `Appointment::decide`,
+  comme le lien de décision (confirmations ou refus).
+- Les formulaires publics qui envoient des emails (`POST /appointments`,
+  `POST /appointments/exceptional-request`) sont plafonnés par `RateLimit` (par IP et tous visiteurs
+  confondus, `api/storage/auth/ratelimit.json`) : tout nouveau formulaire public qui envoie un email
+  doit l'être aussi.
 
 ---
 

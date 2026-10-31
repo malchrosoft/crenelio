@@ -392,6 +392,27 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Hors périmètre :** l'espace Pro reste en français.
 - **Points d'attention :** langues écrites de droite à gauche (déjà gérées pour les crédits), longueur des textes traduits dans les boutons, référencement (`lang`, `hreflang`).
 
+### 32. Fiabilité des Notifications (Annulation, Reprogrammation, Décision, Anti-abus) — ✅ Terminée
+- **Constat (31/10/2026) :** trois manques bloquants avant une mise en ligne.
+  - **Annulation silencieuse :** un client qui annule par son lien ne prévient pas l'artisan (son agenda garde l'intervention) ; l'artisan qui annule ou reprogramme depuis le planning ne prévient pas le client.
+  - **Formulaires publics sans limite :** la demande hors zone (et la réservation) envoient deux emails par soumission, sans plafond : un robot peut inonder la boîte de l'artisan et épuiser le quota horaire d'envoi OVHcloud (codes de connexion compris).
+  - **Décision par le planning :** passer une demande « En attente » à « Confirmé » ou « Annulé » depuis le planning n'envoie ni les confirmations ni l'email de refus (seul le lien de décision le fait).
+- **Fonctionnement prévu :**
+  - Annulation par le client : email à l'artisan (+ `.ics` d'annulation qui retire l'événement de son agenda) et confirmation au client.
+  - Annulation ou reprogrammation par l'artisan (planning, calendrier) : email au client (+ `.ics` mis à jour ou annulé).
+  - Changement de statut d'une demande en attente : même effet que le lien de décision (confirmations, ou email de refus).
+  - Limitation par adresse IP des soumissions publiques qui envoient des emails (réservation, demande hors zone).
+  - Nouveaux types dans `appointment_notifications` (migration + `schema_version`), visibles dans le journal « Emails ».
+- **Prérequis :** Item 4 ✅, Item 24 ✅.
+- **Réalisé (31/10/2026) :**
+  - Types `cancellation_client`, `cancellation_pro`, `reschedule_client`, `reschedule_pro` (migration `2026-10-31_item32_notification_types.sql`, `schema.sql`, `schema_version`), libellés dans le journal « Emails ».
+  - Annulation par le client : email à l'artisan avec `.ics` `METHOD:CANCEL` (même UID : l'agenda retire l'intervention) + confirmation au client. Annulation par l'artisan : email au client. Fichiers agenda versionnés (`SEQUENCE` d'après la date de mise à jour).
+  - Reprogrammation (fenêtre du planning et glisser-déposer du calendrier) : email au client avec ancienne et nouvelle date, `.ics` mis à jour ; case « Prévenir le client par email » dans la fenêtre ; `notify: false` pour un changement silencieux.
+  - Demande « En attente » confirmée ou annulée depuis le planning : traitée comme le lien de décision (confirmations, ou refus ; jeton de décision vidé).
+  - `RateLimit` (fichier, clés hachées) : réservation 10 / h / IP, demande hors zone 5 / h / IP, 40 / h tous visiteurs confondus ; 429 au-delà.
+  - **Agendas (iTIP) :** le fichier du client devient une invitation (`METHOD:REQUEST` puis `CANCEL`, organisateur = entreprise, client participant `PARTSTAT=ACCEPTED;RSVP=FALSE`) pour que les messageries mettent à jour ou retirent l'événement au lieu de créer des doublons ; l'agenda de l'artisan est aussi mis à jour quand il déplace (`reschedule_pro`) ou annule lui-même (`cancellation_pro`), même sans prévenir le client. Chaque email concerné rappelle la limite : seul un événement ajouté depuis un email est relié (sinon, modification manuelle). **Synchronisation non garantie** (dépend de la messagerie) : fiabilisée par l'Item 33.
+  - Testé par l'API et Mailpit : reprogrammation (avec et sans email), annulation par l'artisan, annulation par le client (deux emails, `.ics` CANCEL), demande confirmée et refusée depuis le planning, plafond (6ᵉ envoi refusé) ; suite création → déplacement (client prévenu, puis non) → annulation : même UID par destinataire, `SEQUENCE` croissante, `REQUEST` puis `CANCEL`, organisateur et participant présents. Rendez-vous de test supprimés.
+
 ---
 
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
@@ -407,6 +428,7 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 | **5** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
 | **6** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
 | **7** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
+| — | **Item 32** | Fiabilité des notifications (annulation, reprogrammation, décision, anti-abus) | Communication / Fiabilité | ✅ **Terminé** | — | — |
 | — | **Item 23** | Calendrier des interventions (FullCalendar : vues, glisser-déposer validé, création au clic) | Espace Pro / Planning | ✅ **Terminé** | — | — |
 | — | **Item 27** | Déploiement initial interactif (`npm run deploy:init`, `/api/health`, version du schéma) | Installation / Déploiement | ✅ **Terminé** | — | — |
 | — | **Item 5** | Conformité RGPD & cookies (notice, politique, conservation, effacement) | Légal / Conformité | ✅ **Terminé** | — | — |

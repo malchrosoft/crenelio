@@ -65,6 +65,10 @@ const NOTIFICATION_LABELS: Record<NotificationType, string> = {
   exception_client_ack: 'Demande hors zone : accusé de réception client',
   exception_pro_request: 'Demande hors zone : à valider (artisan)',
   exception_client_refused: 'Demande hors zone : refus envoyé au client',
+  cancellation_client: 'Annulation (client)',
+  cancellation_pro: 'Annulation (agenda de l\'artisan)',
+  reschedule_client: 'Rendez-vous déplacé (client)',
+  reschedule_pro: 'Rendez-vous déplacé (agenda de l\'artisan)',
 };
 
 /** Paliers kilométriques modifiables depuis l'espace Pro (cf. `config.travel_tier_*`). */
@@ -170,6 +174,7 @@ export const AdminDashboard: React.FC = () => {
   const [reschedulingAppointment, setReschedulingAppointment] = useState<Appointment | null>(null);
   const [rescheduleDatetime, setRescheduleDatetime] = useState('');
   const [rescheduleLoading, setRescheduleLoading] = useState(false);
+  const [rescheduleNotify, setRescheduleNotify] = useState(true);
 
   // Nouvelle prestation
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -379,6 +384,7 @@ export const AdminDashboard: React.FC = () => {
 
   function startReschedule(appointment: Appointment) {
     setReschedulingAppointment(appointment);
+    setRescheduleNotify(true);
     const dateObj = new Date(appointment.start_datetime);
     // Format YYYY-MM-DDTHH:mm pour input datetime-local
     setRescheduleDatetime(format(dateObj, "yyyy-MM-dd'T'HH:mm"));
@@ -391,7 +397,9 @@ export const AdminDashboard: React.FC = () => {
     try {
       // Conversion de YYYY-MM-DDTHH:mm en YYYY-MM-DD HH:mm:00
       const formattedDatetime = rescheduleDatetime.replace('T', ' ') + ':00';
-      const updated = await api.rescheduleAppointment(reschedulingAppointment.id, formattedDatetime, 'confirmed');
+      const updated = await api.rescheduleAppointment(reschedulingAppointment.id, formattedDatetime, 'confirmed', {
+        notify: rescheduleNotify,
+      });
       setAppointments((prev) =>
         prev.map((a) => (a.id === reschedulingAppointment.id ? { ...a, ...updated } : a))
       );
@@ -827,6 +835,21 @@ export const AdminDashboard: React.FC = () => {
                       onChange={(e) => setRescheduleDatetime(e.target.value)}
                     />
                   </div>
+                  {reschedulingAppointment.client_email && (
+                    <label className="theme-effect">
+                      <input
+                        type="checkbox"
+                        checked={rescheduleNotify}
+                        onChange={(e) => setRescheduleNotify(e.target.checked)}
+                      />
+                      <span>
+                        <strong>Prévenir le client par email</strong>
+                        <span className="form-hint">
+                          Nouvelle date et agenda mis à jour. Votre propre agenda est mis à jour dans tous les cas.
+                        </span>
+                      </span>
+                    </label>
+                  )}
                   <div className="admin-modal__actions">
                     <button
                       type="button"

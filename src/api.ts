@@ -170,7 +170,7 @@ export const api = {
     id: number,
     start_datetime: string,
     status?: string,
-    options: { check?: boolean; force?: boolean } = {}
+    options: { check?: boolean; force?: boolean; notify?: boolean } = {}
   ) => request<Appointment>('PUT', `/appointments/${id}/reschedule`, { start_datetime, status, ...options }),
 
   // Journal des notifications email

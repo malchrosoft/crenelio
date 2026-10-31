@@ -58,5 +58,5 @@ INSERT INTO `schedules` (`day_of_week`, `is_active`, `morning_start`, `morning_e
 
 -- Version du schéma : nom de la dernière migration de sql/migrations/ (Item 27, cf. GET /api/health).
 -- À mettre à jour à chaque nouvelle migration.
-INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-10-29_item27_schema_version')
+INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-10-31_item32_notification_types')
 ON DUPLICATE KEY UPDATE `config_value` = VALUES(`config_value`);
