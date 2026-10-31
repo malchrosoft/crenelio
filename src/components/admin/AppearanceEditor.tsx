@@ -197,6 +197,13 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ config, onSaved }) 
               </label>
             ))}
           </div>
+          <label className="theme-effect theme-button-caps">
+            <input type="checkbox" checked={values.buttonCaps} onChange={(e) => update({ buttonCaps: e.target.checked })} />
+            <span>
+              <strong>Texte en capitales</strong>
+              <span className="form-hint">Pour tous les styles de boutons.</span>
+            </span>
+          </label>
           <p className="form-hint">L'aperçu s'applique aux boutons de cette page, comme « Enregistrer » ci-dessous.</p>
         </div>
 

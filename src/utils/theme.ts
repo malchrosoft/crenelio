@@ -17,6 +17,8 @@ export interface ThemeSettings {
   primary: string;
   radius: ThemeRadius;
   buttons: ThemeButtons;
+  /** Texte des boutons en capitales, quel que soit leur style. */
+  buttonCaps: boolean;
   background: ThemeBackground;
   softShadows: boolean;
   glass: boolean;
@@ -57,7 +59,7 @@ export const BUTTON_OPTIONS: { value: ThemeButtons; label: string; hint: string 
   { value: 'standard', label: 'Standard', hint: 'Légère ombre, forme selon le réglage des arrondis' },
   { value: 'rounded', label: 'Pilule', hint: 'Tous les boutons entièrement arrondis' },
   { value: 'flat', label: 'Plat', hint: 'Sans ombre ni relief, forme selon le réglage des arrondis' },
-  { value: 'material', label: 'Material', hint: 'Angles droits, texte en capitales, ombre qui s\'élève au survol' },
+  { value: 'material', label: 'Material', hint: 'Angles droits, ombre qui s\'élève au survol' },
   { value: 'relief', label: 'Relief', hint: 'Dégradé brillant, effet 3D enfoncé au clic' },
 ];
 
@@ -81,6 +83,7 @@ export function themeFromConfig(config: AppConfig): ThemeSettings {
     radius: RADIUS_OPTIONS.some((o) => o.value === radius) ? radius : 'standard',
     buttons: BUTTON_OPTIONS.some((o) => o.value === buttons) ? buttons : 'standard',
     background: BACKGROUND_OPTIONS.some((o) => o.value === background) ? background : 'slate',
+    buttonCaps: config.theme_button_caps === '1',
     softShadows: config.theme_shadows === 'soft',
     glass: config.theme_glass === '1',
     motion: config.theme_motion === '1',
@@ -94,6 +97,7 @@ export function themeToConfig(theme: ThemeSettings): Record<string, string> {
     theme_radius: theme.radius,
     theme_buttons: theme.buttons,
     theme_background: theme.background,
+    theme_button_caps: theme.buttonCaps ? '1' : '0',
     theme_shadows: theme.softShadows ? 'soft' : 'standard',
     theme_glass: theme.glass ? '1' : '0',
     theme_motion: theme.motion ? '1' : '0',
@@ -107,6 +111,7 @@ export function applyTheme(theme: ThemeSettings, remember = true): void {
   root.dataset.radius = theme.radius;
   root.dataset.buttons = theme.buttons;
   root.dataset.background = theme.background;
+  root.dataset.buttonCaps = theme.buttonCaps ? 'on' : 'off';
   root.dataset.shadows = theme.softShadows ? 'soft' : 'standard';
   root.dataset.glass = theme.glass ? 'on' : 'off';
   root.dataset.motion = theme.motion ? 'on' : 'off';

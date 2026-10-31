@@ -151,20 +151,9 @@
   box-shadow: none;
 }
 
-// Material : angles droits quel que soit le réglage des arrondis, capitales, élévation par l'ombre
+// Material : angles droits quel que soit le réglage des arrondis, élévation par l'ombre
 :root[data-buttons='material'] .btn {
   border-radius: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 0.85rem;
-
-  &.btn--lg {
-    font-size: 0.9rem;
-  }
-
-  &.btn--xl {
-    font-size: 1.05rem;
-  }
 
   &.btn-primary,
   &.btn-secondary {
@@ -229,5 +218,23 @@
         box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.2);
       }
     }
+  }
+}
+
+// -------------------------------------------------------
+// Texte des boutons en capitales (data-button-caps) : option indépendante du style des boutons
+// -------------------------------------------------------
+:root[data-button-caps='on'] .btn {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  // Les capitales occupent plus de place : taille légèrement réduite pour garder les mêmes boutons
+  font-size: 0.85rem;
+
+  &.btn--lg {
+    font-size: 0.9rem;
+  }
+
+  &.btn--xl {
+    font-size: 1.05rem;
   }
 }
