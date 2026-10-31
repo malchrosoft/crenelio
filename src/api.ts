@@ -49,6 +49,15 @@ async function request<T>(method: string, path: string, body: unknown = null): P
   return data as T;
 }
 
+/** Abonnement d'agenda de l'artisan (Item 33) : `path` seulement s'il est activé. */
+export interface CalendarFeedInfo {
+  enabled: boolean;
+  path: string | null;
+  include_unavailabilities: boolean;
+  created_at: string | null;
+  last_access: string | null;
+}
+
 /** État de l'envoi d'emails (lecture seule, réglé dans `api/.env`). */
 export interface MailStatusInfo {
   transport: 'smtp' | 'mail' | 'none';
@@ -101,6 +110,13 @@ export const api = {
   getUiState: <T>(id: string) => request<{ state: T | null }>('GET', `/admin/ui-state/${id}`),
   saveUiState: <T>(id: string, state: T) => request<{ state: T }>('PUT', `/admin/ui-state/${id}`, { state }),
   resetUiState: (id: string) => request<{ state: null }>('DELETE', `/admin/ui-state/${id}`),
+  getCalendarFeed: () => request<CalendarFeedInfo>('GET', '/admin/calendar-feed'),
+  /** Active l'abonnement, ou régénère son adresse (l'ancienne cesse de fonctionner). */
+  enableCalendarFeed: (includeUnavailabilities: boolean) =>
+    request<CalendarFeedInfo>('POST', '/admin/calendar-feed', { include_unavailabilities: includeUnavailabilities }),
+  updateCalendarFeed: (includeUnavailabilities: boolean) =>
+    request<CalendarFeedInfo>('PUT', '/admin/calendar-feed', { include_unavailabilities: includeUnavailabilities }),
+  disableCalendarFeed: () => request<CalendarFeedInfo>('DELETE', '/admin/calendar-feed'),
   getMailStatus: () => request<MailStatusInfo>('GET', '/admin/mail'),
   /** Destinataire libre (testeur, développeur) ; à défaut, l'email professionnel. */
   sendTestMail: (to?: string) => request<{ message: string }>('POST', '/admin/mail/test', { to: to || undefined }),

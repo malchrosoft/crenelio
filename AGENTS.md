@@ -184,7 +184,8 @@ autre tâche, mais en tenir compte et les traiter dans l'item dédié.
   (`UNAUTHORIZED_EVENT` dans `src/api.ts`).
 - Restent publiques : config publique, prestations actives, créneaux, zone, devis de déplacement,
   réservation, demande hors zone, et les routes à token (`/appointments/token/:token`,
-  `/appointments/decision/:token`). `GET /schedules` reste public (horaires d'ouverture).
+  `/appointments/decision/:token`, `/calendar/:token` — flux d'agenda de l'Item 33, 404 s'il est
+  désactivé). `GET /schedules` reste public (horaires d'ouverture).
 - **Mot de passe & email professionnel (Item 25)** : `admin_password` et `pro_email` ne passent
   plus par `PUT /admin/config` (refusés) mais par les routes dédiées (`/admin/password*`,
   `/admin/pro-email*`). Tant que `admin123` est actif, `Auth::guard` répond 403
@@ -250,6 +251,13 @@ documentation (`README.md`, `DEPLOYMENT.md` **et** `DEPLOYMENT.fr.md`) doit les 
   (défaut `Europe/Paris`, appliqué globalement par `date_default_timezone_set()`
   dans `config/config.php`). Toute comparaison ou génération de date doit rester
   cohérente avec ce fuseau.
+
+### 📅 Abonnement d'agenda de l'artisan (Item 33, optionnel)
+- `CalendarFeed` : réglage et jeton dans `api/storage/auth/calendar-feed.json` (jamais en base ni
+  dans la configuration publique) ; désactivé ⇒ pas de fichier ⇒ `/calendar/:token` répond 404.
+- `ICalendar::feed` : mêmes UID et créneaux élargis que les invitations de l'artisan, ni `METHOD` ni
+  organisateur (un abonnement n'est pas une invitation), annulés et anonymisés exclus, fenêtre
+  limitée (un mois passé, un an à venir). En-têtes `no-store` et `noindex` : données clients.
 
 ### 📬 Notifications d'annulation, de reprogrammation et de décision (Item 32)
 - Annulation par le client (lien) : `Notifier::sendCancellation(..., true)` prévient l'artisan

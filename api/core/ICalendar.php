@@ -120,6 +120,73 @@ class ICalendar
         return implode("\r\n", array_map([self::class, 'fold'], $lines)) . "\r\n";
     }
 
+    /**
+     * Flux d'abonnement de l'artisan (Item 33) : copie à sens unique du planning de Crénelio.
+     * Mêmes UID que les invitations de l'artisan, créneaux élargis du trajet, demandes en attente
+     * marquées « provisoires ». Pas de METHOD ni d'organisateur : un abonnement n'est pas une
+     * invitation. Les rendez-vous annulés sont simplement absents (l'agenda les retire).
+     *
+     * @param array<int, array> $appointments     Rendez-vous de la fenêtre (non annulés).
+     * @param array<int, array> $unavailabilities Indisponibilités à inclure (liste vide sinon).
+     */
+    public static function feed(array $appointments, array $unavailabilities, array $config): string
+    {
+        $bufferMinutes = max(0, (int)($config['buffer_minutes'] ?? 0));
+        $timezone = new DateTimeZone(APP_TIMEZONE);
+        $utc      = new DateTimeZone('UTC');
+        $stamp    = (new DateTime('now', $utc))->format('Ymd\THis\Z');
+        $utcTime  = fn(string $datetime, int $shift = 0) =>
+            (new DateTime($datetime, $timezone))->modify(($shift >= 0 ? '+' : '') . $shift . ' minutes')
+                ->setTimezone($utc)->format('Ymd\THis\Z');
+
+        $lines = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//Crenelio//Abonnement agenda//FR',
+            'CALSCALE:GREGORIAN',
+            'X-WR-CALNAME:' . self::escape(($config['company_name'] ?? 'Crénelio') . ' — interventions'),
+            'X-WR-TIMEZONE:' . APP_TIMEZONE,
+            // Rafraîchissement suggéré (les agendas restent libres de leur propre rythme)
+            'REFRESH-INTERVAL;VALUE=DURATION:PT15M',
+            'X-PUBLISHED-TTL:PT15M',
+        ];
+
+        foreach ($appointments as $appointment) {
+            array_push(
+                $lines,
+                'BEGIN:VEVENT',
+                'UID:' . self::uid($appointment),
+                'SEQUENCE:' . self::sequence($appointment),
+                'DTSTAMP:' . $stamp,
+                'DTSTART:' . $utcTime($appointment['start_datetime'], -$bufferMinutes),
+                'DTEND:' . $utcTime($appointment['end_datetime'], $bufferMinutes),
+                'SUMMARY:' . self::escape(($appointment['status'] === 'pending' ? '[À valider] ' : '') . self::summary($appointment)),
+                'LOCATION:' . self::escape(self::location($appointment)),
+                'DESCRIPTION:' . self::escape(self::description($appointment, $bufferMinutes)),
+                'STATUS:' . ($appointment['status'] === 'pending' ? 'TENTATIVE' : 'CONFIRMED'),
+                'END:VEVENT'
+            );
+        }
+
+        $domain = substr(strrchr(MAIL_FROM, '@') ?: '@crenelio.local', 1);
+        foreach ($unavailabilities as $unavailability) {
+            array_push(
+                $lines,
+                'BEGIN:VEVENT',
+                'UID:crenelio-indispo-' . (int)$unavailability['id'] . '@' . $domain,
+                'DTSTAMP:' . $stamp,
+                'DTSTART:' . $utcTime($unavailability['start_datetime']),
+                'DTEND:' . $utcTime($unavailability['end_datetime']),
+                'SUMMARY:' . self::escape('Indisponible : ' . $unavailability['title']),
+                'TRANSP:OPAQUE',
+                'END:VEVENT'
+            );
+        }
+
+        $lines[] = 'END:VCALENDAR';
+        return implode("\r\n", array_map([self::class, 'fold'], $lines)) . "\r\n";
+    }
+
     /** `REQUEST` crée ou met à jour l'événement, `CANCEL` le retire (même UID, version supérieure). */
     public static function method(array $appointment): string
     {

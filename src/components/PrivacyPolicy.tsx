@@ -58,7 +58,9 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ config }) => {
       <p>
         L'artisan, seul utilisateur de l'espace de gestion ; l'hébergeur du site
         {config.legal_hebergeur ? <> ({postalLines(config.legal_hebergeur)[0]})</> : null}, qui stocke les données
-        pour son compte ; le service d'envoi d'emails de l'hébergeur.
+        pour son compte ; le service d'envoi d'emails de l'hébergeur. Si l'artisan l'a choisi, ses rendez-vous (dont
+        vos coordonnées) sont aussi recopiés dans son agenda personnel (par exemple Google, Apple ou Microsoft), par
+        une adresse privée qu'il peut désactiver à tout moment.
       </p>
 
       <h4>Services tiers utilisés par le site</h4>

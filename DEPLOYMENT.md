@@ -405,9 +405,11 @@ is then remembered for **10 days**.
   `admin_password_hash` value with the one shipped in `sql/seed_init.sql`
   (`$2y$10$qyk0/fef0o7Ic3vocJBAXOp18E.2J0UaQhC62vS98B9fAlfK7aCQi`): the password becomes `admin123` again, and
   changing it will be enforced again on the next sign-in.
-- **`api/storage/auth/`** holds the signing key (`secret.key`, created automatically) and the
-  failed sign-in counter (5 failures in 15 minutes block the IP address). Do not version it;
-  deleting it simply signs everyone out.
+- **`api/storage/auth/`** holds the signing key (`secret.key`, created automatically), the failed
+  sign-in counter (5 failures in 15 minutes block the IP address), the public forms counter
+  (`ratelimit.json`) and, when enabled, the calendar subscription settings (`calendar-feed.json`).
+  Do not version it or overwrite it on deployment; deleting it signs everyone out and disables
+  the calendar subscription (re-enable it from the Pro area).
 - **HTTPS is required** in production: cookies are then flagged `Secure`.
 
 ## Step 6: Set File Permissions

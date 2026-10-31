@@ -368,17 +368,12 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Espace disque :** sauvegarde + archive + code doivent tenir dans 1 Go (Starter) ; purge des anciennes sauvegardes.
 - **Prérequis :** Item 28.
 
-### 30. Effets Visuels Avancés (Optionnels) & Thème Sombre
+### 30. Effets Visuels Avancés (Optionnels)
 - **Prolonge l'Item 2** ✅ : mêmes réglages dans l'encart « Apparence », tous désactivés par défaut, et tous coupés si l'appareil demande moins d'animations (`prefers-reduced-motion`).
 - **Liserés animés :** bordure lumineuse qui tourne autour des cartes et du bouton principal (dégradé conique dérivé de `--color-primary`, angle animé via `@property`), au survol ou en continu sur le CTA. Repli statique si `@property` n'est pas pris en charge.
 - **Cartes 3D au survol :** soulèvement + inclinaison qui suit la position de la souris (`perspective`, `rotateX` / `rotateY` calculés en JS sur `pointermove`, reflet lumineux qui suit le curseur), retour en douceur à la sortie. Désactivé sur écran tactile (`hover: none`) et limité à quelques degrés pour rester lisible (public senior).
-- **Thème sombre avec la même couleur de marque :**
-  - Mode choisi par l'artisan : clair, sombre, ou automatique selon l'appareil (`prefers-color-scheme`) ; option d'un bouton de bascule pour les visiteurs (choix mémorisé dans le navigateur).
-  - La couleur principale est conservée, éclaircie automatiquement en mode sombre si son contraste sur fond sombre est insuffisant (`color-mix`), avec le même contrôle de contraste que l'Item 2.
-  - **Prérequis technique :** l'échelle des gris (`$gray-*`), les fonds blancs codés (`white`) et les couleurs d'état doivent passer en variables CSS, comme la couleur principale : chantier transversal sur tout le SCSS.
-  - **Fond sombre :** pendant de la palette claire de l'Item 2 (`theme_background`) : une palette de fonds sombres prédéfinis (anthracite, nuit, ardoise, brun, forêt…) associée au fond clair choisi, ou teinte sombre dérivée de la couleur principale ; pas de couleur libre, contraste du texte vérifié.
-  - Les emails restent en clair (rendu des messageries non maîtrisé) ; cartes OpenStreetMap à assombrir par filtre ou à laisser claires.
-- **Points d'attention :** performances sur mobile (limiter les animations continues, `will-change` ponctuel), lisibilité et contrastes vérifiés dans les deux thèmes, rendu Safari pour `backdrop-filter` et `@property`.
+- **Points d'attention :** performances sur mobile (limiter les animations continues, `will-change` ponctuel), rendu Safari pour `@property`.
+- **Thème sombre :** séparé dans l'Item 34.
 - **Prérequis :** Item 2 ✅.
 
 ### 31. Traduction du Site (Multilingue)
@@ -413,7 +408,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - **Agendas (iTIP) :** le fichier du client devient une invitation (`METHOD:REQUEST` puis `CANCEL`, organisateur = entreprise, client participant `PARTSTAT=ACCEPTED;RSVP=FALSE`) pour que les messageries mettent à jour ou retirent l'événement au lieu de créer des doublons ; l'agenda de l'artisan est aussi mis à jour quand il déplace (`reschedule_pro`) ou annule lui-même (`cancellation_pro`), même sans prévenir le client. Chaque email concerné rappelle la limite : seul un événement ajouté depuis un email est relié (sinon, modification manuelle). **Synchronisation non garantie** (dépend de la messagerie) : fiabilisée par l'Item 33.
   - Testé par l'API et Mailpit : reprogrammation (avec et sans email), annulation par l'artisan, annulation par le client (deux emails, `.ics` CANCEL), demande confirmée et refusée depuis le planning, plafond (6ᵉ envoi refusé) ; suite création → déplacement (client prévenu, puis non) → annulation : même UID par destinataire, `SEQUENCE` croissante, `REQUEST` puis `CANCEL`, organisateur et participant présents. Rendez-vous de test supprimés.
 
-### 33. Abonnement d'Agenda de l'Artisan (Flux iCal Privé)
+### 33. Abonnement d'Agenda de l'Artisan (Flux iCal Privé) — ✅ Terminée
 - **Constat (31/10/2026) :** les invitations par email (Item 32) ne **garantissent** pas la synchronisation avec Google Agenda, Outlook ou l'iPhone : elles dépendent de la messagerie, de l'ajout initial depuis l'email et de la lecture des messages. Le pilotage reste dans Crénelio, il faut donc un miroir fiable et à sens unique.
 - **Optionnel :** désactivé par défaut. Tant que l'artisan ne l'active pas dans l'espace Pro, aucune adresse n'existe et la route répond 404 ; le désactiver supprime le jeton (l'adresse cesse aussitôt de fonctionner). Les invitations par email (Item 32) fonctionnent sans lui.
 - **Fonctionnement prévu :**
@@ -424,6 +419,27 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Sécurité et RGPD :** le flux contient des données clients : jeton secret (comparaison à temps constant), en-têtes anti-cache et anti-indexation, aucune donnée au-delà de la fenêtre, données anonymisées exclues ; flux décrit dans la politique de confidentialité ; jeton stocké hors de la configuration publique.
 - **Hors périmètre :** synchronisation bidirectionnelle par les API Google / Microsoft (OAuth, jetons, conflits) — contraire au pilotage depuis Crénelio et trop lourde pour l'offre Starter.
 - **Prérequis :** Item 32 ✅.
+- **Réalisé (31/10/2026) :**
+  - `CalendarFeed` (réglage dans `api/storage/auth/calendar-feed.json`, jeton aléatoire de 48 caractères, comparaison à temps constant) ; routes `GET` / `POST` / `PUT` / `DELETE /admin/calendar-feed` (session Pro) et `GET /calendar/:token.ics` (404 si désactivé ou jeton inconnu).
+  - `ICalendar::feed` : rendez-vous non annulés d'un mois passé à un an à venir, mêmes UID et créneaux élargis du trajet que les invitations, demandes en attente « [À valider] » (`TENTATIVE`), indisponibilités en option ; `REFRESH-INTERVAL` / `X-PUBLISHED-TTL` de 15 min suggérés ; en-têtes `no-store` et `noindex`.
+  - Espace Pro, Configuration → Coordonnées : encart « Abonnement d'agenda » (interrupteur, adresse à copier, boutons Google / Outlook / Apple, indisponibilités, délais de rafraîchissement, risque de doublon avec les invitations, date de dernière lecture, régénération et désactivation confirmées).
+  - Politique de confidentialité : copie possible dans l'agenda personnel de l'artisan.
+  - Testé par l'API : 401 sans session, 404 désactivé, activation, flux (en-têtes, pas de METHOD ni d'organisateur, statuts), dernière lecture, régénération (ancienne adresse 404), indisponibilités, désactivation. **Abonnement réel dans Google / Outlook / Apple non testé (nécessite un site en ligne).**
+
+### 34. Thème Sombre (Inversion des Couleurs & Palettes Adaptées)
+- **Séparé de l'Item 30 (31/10/2026)** : chantier transversal, indépendant des effets visuels.
+- **Mode :** clair, sombre, ou automatique selon l'appareil (`prefers-color-scheme`), choisi par l'artisan dans l'encart « Apparence » ; option d'un bouton de bascule pour les visiteurs (choix mémorisé dans le navigateur).
+- **Inversion des couleurs :**
+  - **Prérequis technique :** l'échelle des gris (`$gray-*`), les fonds blancs codés (`white`), les ombres et les couleurs d'état (succès, alerte, erreur et leurs fonds pâles) passent en variables CSS, comme la couleur principale ; chaque valeur reçoit son pendant sombre (gris inversés, surfaces sombres étagées plutôt que noir pur, ombres remplacées par des contours ou des surfaces plus claires).
+  - Inventaire préalable des couleurs codées ou dérivées partout dans le SCSS (`white`, `color-mix(..., white)` des teintes, pastilles de statut, calendrier FullCalendar, grille AG Grid, carte de zone).
+- **Adaptation des palettes :**
+  - **Couleur principale** conservée, éclaircie automatiquement en mode sombre si son contraste sur fond sombre est insuffisant (`color-mix`), avec le même contrôle de contraste que l'Item 2 ; déclinaisons (`--color-primary-light`, `primary-tint()`) recalculées vers le sombre.
+  - **Fond sombre :** pendant de la palette claire de l'Item 2 (`theme_background`) : fonds sombres prédéfinis (anthracite, nuit, ardoise, brun, forêt…), associés au fond clair choisi ou dérivés de la couleur principale ; pas de couleur libre, contraste du texte vérifié.
+  - **Couleurs d'état et statuts** (confirmé, en attente, terminé, annulé) : variantes sombres lisibles, y compris dans le calendrier et la grille.
+- **Bibliothèques :** thème sombre de FullCalendar (variables `--fc-*`) et d'AG Grid (`colorScheme` / `withParams` du thème Quartz) branchés sur les mêmes variables.
+- **Hors périmètre :** les emails restent en clair (rendu des messageries non maîtrisé) ; tuiles OpenStreetMap assombries par filtre ou laissées claires (à décider).
+- **Points d'attention :** contrastes vérifiés dans les deux thèmes (WCAG AA, public senior), logo pensé pour fond clair (variante ou fond derrière le logo), images et illustrations, pas de flash clair au chargement (appliqué avant le premier rendu comme le thème actuel).
+- **Prérequis :** Item 2 ✅.
 
 ---
 
@@ -433,14 +449,15 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
 |---|---|---|---|---|---|---|
-| **1** | **Item 33** | **Abonnement d'agenda de l'artisan (flux iCal privé, optionnel)** | Planning / Synchronisation | ⏳ *À faire* | Item 32 ✅ | 🟠 Garantit l'agenda de l'artisan conforme à Crénelio (les emails ne le garantissent pas) |
-| **2** | **Item 21** | **Liste des interventions AG Grid — finitions (partie 2/2)** | Espace Pro / Exploitation | 🚧 *Partie 1/2 livrée* | — | 🟢 Fonctionnelle ; rendu et modules à vérifier dans le navigateur |
-| **3** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
-| **4** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
-| **5** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D) & thème sombre** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre coûteux (gris à convertir partout) |
-| **6** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
-| **7** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
-| **8** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
+| **1** | **Item 21** | **Liste des interventions AG Grid — finitions (partie 2/2)** | Espace Pro / Exploitation | 🚧 *Partie 1/2 livrée* | — | 🟢 Fonctionnelle ; rendu et modules à vérifier dans le navigateur |
+| **2** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
+| **3** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
+| **4** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre séparé (Item 34) |
+| **5** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
+| **6** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| **7** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
+| **8** | **Item 34** | **Thème sombre (inversion des couleurs, palettes adaptées)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort ; chantier transversal coûteux (gris, fonds, états et bibliothèques à convertir) |
+| — | **Item 33** | Abonnement d'agenda de l'artisan (flux iCal privé, optionnel) | Planning / Synchronisation | ✅ **Terminé** | — | — |
 | — | **Item 32** | Fiabilité des notifications (annulation, reprogrammation, décision, anti-abus) | Communication / Fiabilité | ✅ **Terminé** | — | — |
 | — | **Item 23** | Calendrier des interventions (FullCalendar : vues, glisser-déposer validé, création au clic) | Espace Pro / Planning | ✅ **Terminé** | — | — |
 | — | **Item 27** | Déploiement initial interactif (`npm run deploy:init`, `/api/health`, version du schéma) | Installation / Déploiement | ✅ **Terminé** | — | — |

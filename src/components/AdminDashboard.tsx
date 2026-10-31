@@ -48,6 +48,7 @@ const InterventionsGrid = lazy(() => import('./admin/InterventionsGrid'));
 import AdminLogin from './admin/AdminLogin';
 import ConfirmDialog from './admin/ConfirmDialog';
 import MailStatus from './admin/MailStatus';
+import CalendarFeedSettings from './admin/CalendarFeedSettings';
 import AppearanceEditor from './admin/AppearanceEditor';
 import PasswordChange from './admin/PasswordChange';
 import ProEmailField from './admin/ProEmailField';
@@ -1232,6 +1233,7 @@ export const AdminDashboard: React.FC = () => {
                 {group.id === 'identity' && <AppearanceEditor config={config} onSaved={setConfig} />}
                 {group.id === 'vitrine' && <EngagementsEditor config={config} onSaved={setConfig} />}
                 {group.id === 'contact' && <MailStatus proEmail={config.pro_email} />}
+                {group.id === 'contact' && <CalendarFeedSettings />}
                 {group.id === 'contact' && <PasswordChange onChanged={refreshSession} />}
                 </React.Fragment>
               )

@@ -27,6 +27,7 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
   - **Adresse BAN (Base Adresse Nationale)** : autocomplétion via `api-adresse.data.gouv.fr`, coordonnées GPS, carte OpenStreetMap (Pigeon Maps, sans clé API).
   - **Frais de déplacement** : forfait ou paliers kilométriques, calculés depuis le point de départ ou l'adresse de l'entreprise.
   - **Zone d'intervention** : adresse hors des communes desservies ou au-delà du rayon ⇒ réservation directe bloquée. Jusqu'au rayon + 10 %, le client peut envoyer une **demande exceptionnelle** : rendez-vous « En attente », accusé de réception au client, email à l'artisan qui accepte ou refuse en un clic (`/decision/:token`). Au-delà : adresse non desservie.
+- **Abonnement d'agenda** (optionnel, onglet Configuration) : adresse privée et régénérable à laquelle l'artisan abonne Google Agenda, Outlook ou Apple Calendar ; copie à sens unique du planning (Crénelio reste la référence), indisponibilités en option, délai de rafraîchissement propre à chaque agenda.
 - **Annulation & reprogrammation** : le client qui annule par son lien prévient l'artisan (le fichier agenda retire l'intervention) et reçoit une confirmation ; l'artisan qui annule ou déplace un rendez-vous (planning, calendrier) prévient le client, avec un agenda mis à jour (option « Prévenir le client »). Formulaires publics plafonnés par adresse IP contre les abus.
 - **Confirmation & suivi** : récapitulatif, email de confirmation avec fichier agenda (`.ics` : créneau, tarifs, coordonnées de l'artisan, lien de gestion, rappel la veille) et lien de gestion / annulation (`/rdv/:token`).
 - **Mentions légales** : modale dédiée alimentée par la configuration.
@@ -203,6 +204,8 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 | `POST` | `/api/admin/pro-email` | Nouvel email professionnel : envoi d'un code à cette adresse |
 | `POST` | `/api/appointments/:id/anonymize` | Efface les données du client d'un rendez-vous (demande RGPD) |
 | `POST` | `/api/admin/pro-email/confirm` | Validation du code ; l'ancienne adresse est prévenue |
+| `GET` / `POST` / `PUT` / `DELETE` | `/api/admin/calendar-feed` | Abonnement d'agenda : état, activation ou régénération, indisponibilités, désactivation |
+| `GET` | `/api/calendar/:token.ics` | Flux d'agenda privé (404 si désactivé ou jeton inconnu) |
 | `GET` / `PUT` / `DELETE` | `/api/admin/ui-state/:id` | Préférences d'affichage d'une grille de l'espace Pro (disposition des colonnes, tri, taille de page) |
 | `GET` | `/api/admin/mail` | Mode d'envoi des emails et expéditeur (lecture seule) |
 | `POST` | `/api/admin/mail/test` | Email de test vers `to` (testeur, développeur) ou, à défaut, l'email professionnel ; 5 envois / 10 min |

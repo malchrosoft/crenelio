@@ -2871,3 +2871,39 @@ $calendar-statuses: (
     height: 100%;
   }
 }
+
+// -------------------------------------------------------
+// Abonnement d'agenda de l'artisan (Item 33)
+// -------------------------------------------------------
+.calendar-feed {
+  margin-top: $space-block;
+
+  .calendar-feed__url {
+    display: flex;
+    gap: $space-sm;
+
+    .form-input {
+      flex: 1;
+      font-family: ui-monospace, monospace;
+      font-size: 0.8rem;
+    }
+  }
+
+  .calendar-feed__providers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-sm;
+    margin-bottom: $space-block;
+  }
+
+  .calendar-feed__notes {
+    margin: $space-block 0 $space-sm 18px;
+    color: $gray-600;
+    font-size: 0.85rem;
+    line-height: $line-height-base;
+
+    li + li {
+      margin-top: $space-xs;
+    }
+  }
+}

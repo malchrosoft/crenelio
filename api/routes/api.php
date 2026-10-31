@@ -19,6 +19,7 @@ require_once __DIR__ . '/../controllers/BrandingController.php';
 require_once __DIR__ . '/../controllers/MailController.php';
 require_once __DIR__ . '/../controllers/HealthController.php';
 require_once __DIR__ . '/../controllers/UiStateController.php';
+require_once __DIR__ . '/../controllers/CalendarFeedController.php';
 
 $router = new Router();
 
@@ -33,6 +34,7 @@ $zoneController        = new ZoneController();
 $mailController        = new MailController();
 $healthController      = new HealthController();
 $uiStateController     = new UiStateController();
+$calendarFeedController = new CalendarFeedController();
 
 // Routes de l'espace Pro : refusées (401) sans session ouverte, cf. core/Auth.php
 $admin = fn(callable $handler) => Auth::guard($handler);
@@ -60,6 +62,13 @@ $router->post('/admin/pro-email',           $admin([$configController, 'requestP
 $router->post('/admin/pro-email/confirm',   $admin([$configController, 'confirmProEmail']));
 
 // Envoi d'emails : état (lecture seule) et email de test vers l'email professionnel
+// Abonnement d'agenda de l'artisan, optionnel (Item 33) : gestion protégée, flux public à jeton
+$router->get('/admin/calendar-feed',        $admin([$calendarFeedController, 'status']));
+$router->post('/admin/calendar-feed',       $admin([$calendarFeedController, 'enable']));
+$router->put('/admin/calendar-feed',        $admin([$calendarFeedController, 'update']));
+$router->delete('/admin/calendar-feed',     $admin([$calendarFeedController, 'disable']));
+$router->get('/calendar/:token',            [$calendarFeedController, 'feed']);
+
 // Préférences d'affichage de l'espace Pro (disposition des grilles), une clé par élément
 $router->get('/admin/ui-state/:id',         $admin([$uiStateController, 'show']));
 $router->put('/admin/ui-state/:id',         $admin([$uiStateController, 'update']));

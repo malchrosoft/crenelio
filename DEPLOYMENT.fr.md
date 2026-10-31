@@ -408,9 +408,11 @@ L'appareil est ensuite reconnu pendant **10 jours**.
   de `admin_password_hash` par celle livrée dans `sql/seed_init.sql`
   (`$2y$10$qyk0/fef0o7Ic3vocJBAXOp18E.2J0UaQhC62vS98B9fAlfK7aCQi`) : le mot de passe redevient `admin123`, et son
   changement sera de nouveau imposé à la connexion suivante.
-- **`api/storage/auth/`** contient la clé de signature (`secret.key`, créée automatiquement) et le
-  compteur d'échecs de connexion (5 échecs en 15 minutes bloquent l'adresse IP). Ne la versionnez
-  pas ; la supprimer déconnecte simplement tout le monde.
+- **`api/storage/auth/`** contient la clé de signature (`secret.key`, créée automatiquement), le
+  compteur d'échecs de connexion (5 échecs en 15 minutes bloquent l'adresse IP), celui des
+  formulaires publics (`ratelimit.json`) et, s'il est activé, le réglage de l'abonnement d'agenda
+  (`calendar-feed.json`). Ne la versionnez pas, ne l'écrasez pas au déploiement ; la supprimer
+  déconnecte tout le monde et désactive l'abonnement d'agenda (à réactiver dans l'espace Pro).
 - **HTTPS obligatoire** en production : les cookies sont alors marqués `Secure`.
 
 ## Étape 6 : régler les droits des fichiers
