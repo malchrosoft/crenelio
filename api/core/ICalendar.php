@@ -1,10 +1,14 @@
 <?php
 /**
- * ICalendar — Génération du fichier `.ics` joint à l'email de l'artisan.
+ * ICalendar — Fichiers `.ics` des rendez-vous : celui de l'artisan (invitation, créneau élargi du
+ * trajet, coordonnées du client) et celui du client (publication, créneau exact, coordonnées de
+ * l'artisan et lien de gestion du rendez-vous).
  *
  * Produit un VCALENDAR / VEVENT conforme à la RFC 5545, importable
  * directement dans Google Calendar, Apple Calendar et Outlook.
  */
+
+require_once __DIR__ . '/EmailTemplates.php';
 
 class ICalendar
 {
@@ -58,11 +62,91 @@ class ICalendar
         return implode("\r\n", array_map([self::class, 'fold'], $lines)) . "\r\n";
     }
 
-    /** Identifiant stable d'un événement, pour que les réimports se remplacent. */
-    private static function uid(array $appointment): string
+    /**
+     * Événement côté client : créneau exact (sans le trajet de l'artisan), coordonnées de l'artisan,
+     * détail des tarifs et lien « Gérer ou annuler mon rendez-vous ». `METHOD:PUBLISH` : simple
+     * ajout à l'agenda, sans invitation à laquelle répondre.
+     */
+    public static function forClient(array $appointment, array $config): string
+    {
+        $timezone = new DateTimeZone(APP_TIMEZONE);
+        $utc      = new DateTimeZone('UTC');
+        $start    = new DateTime($appointment['start_datetime'], $timezone);
+        $end      = new DateTime($appointment['end_datetime'], $timezone);
+        $company  = $config['company_name'] ?? 'Crénelio';
+        $manage   = EmailTemplates::manageUrl($appointment);
+
+        $lines = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//Crenelio//Prise de rendez-vous//FR',
+            'CALSCALE:GREGORIAN',
+            'METHOD:PUBLISH',
+            'BEGIN:VEVENT',
+            'UID:' . self::uid($appointment, 'client'),
+            'DTSTAMP:' . (new DateTime('now', $utc))->format('Ymd\THis\Z'),
+            'DTSTART:' . $start->setTimezone($utc)->format('Ymd\THis\Z'),
+            'DTEND:' . $end->setTimezone($utc)->format('Ymd\THis\Z'),
+            'SUMMARY:' . self::escape(sprintf('%s — %s', $appointment['service_name'] ?? 'Intervention', $company)),
+            'LOCATION:' . self::escape(self::location($appointment)),
+            'DESCRIPTION:' . self::escape(self::clientDescription($appointment, $config, $manage)),
+            'STATUS:' . ($appointment['status'] === 'cancelled' ? 'CANCELLED' : 'CONFIRMED'),
+        ];
+        if ($manage !== null) {
+            $lines[] = 'URL:' . $manage;
+        }
+        // Rappel la veille (affiché par la plupart des agendas)
+        array_push(
+            $lines,
+            'BEGIN:VALARM',
+            'ACTION:DISPLAY',
+            'DESCRIPTION:' . self::escape('Rendez-vous demain : ' . ($appointment['service_name'] ?? 'intervention')),
+            'TRIGGER:-P1D',
+            'END:VALARM',
+            'END:VEVENT',
+            'END:VCALENDAR'
+        );
+
+        return implode("\r\n", array_map([self::class, 'fold'], $lines)) . "\r\n";
+    }
+
+    /** Identifiant stable d'un événement (un par destinataire), pour que les réimports se remplacent. */
+    private static function uid(array $appointment, string $for = 'pro'): string
     {
         $domain = substr(strrchr(MAIL_FROM, '@') ?: '@crenelio.local', 1);
-        return 'crenelio-rdv-' . $appointment['id'] . '@' . $domain;
+        return 'crenelio-rdv-' . $appointment['id'] . ($for === 'client' ? '-client' : '') . '@' . $domain;
+    }
+
+    private static function clientDescription(array $appointment, array $config, ?string $manage): string
+    {
+        $travelFee = (float)($appointment['travel_fee'] ?? 0);
+        $price     = (float)($appointment['service_price'] ?? 0);
+
+        $lines = [
+            'Prestation : ' . ($appointment['service_name'] ?? '—')
+                . ' (' . ($appointment['duration_minutes'] ?? '?') . ' min)',
+            // Même libellé que l'email de confirmation pour une prestation gratuite
+            'Tarif prestation : ' . ($price > 0 ? number_format($price, 2, ',', ' ') . ' €' : 'Gratuit'),
+        ];
+        if ($travelFee > 0) {
+            $lines[] = 'Frais de déplacement : ' . number_format($travelFee, 2, ',', ' ') . ' €';
+            $lines[] = 'Total estimé : ' . number_format($price + $travelFee, 2, ',', ' ') . ' €';
+        }
+
+        $lines[] = '';
+        $lines[] = $config['company_name'] ?? 'Crénelio';
+        foreach (['pro_name' => '', 'pro_phone' => 'Téléphone : ', 'pro_email' => 'Email : '] as $key => $label) {
+            if (!empty($config[$key])) {
+                $lines[] = $label . $config[$key];
+            }
+        }
+
+        if ($manage !== null) {
+            $lines[] = '';
+            $lines[] = 'Gérer ou annuler mon rendez-vous : ' . $manage;
+        }
+
+        return implode("\n", $lines);
     }
 
     private static function summary(array $appointment): string

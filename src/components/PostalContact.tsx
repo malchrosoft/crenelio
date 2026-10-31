@@ -2,6 +2,8 @@ import React from 'react';
 
 interface PostalContactProps {
   name?: string | null;
+  /** Personne physique sous le nom (ex. « Responsable de la publication : … »). */
+  person?: React.ReactNode;
   /** Une entrée par ligne (rue, code postal et ville…). */
   addressLines?: string[];
   phone?: string | null;
@@ -13,11 +15,12 @@ interface PostalContactProps {
  * « Contact » distinct (téléphone, email). Utilisé partout où une identité est présentée
  * (mentions légales, politique de confidentialité…) pour un rendu homogène et aéré.
  */
-const PostalContact: React.FC<PostalContactProps> = ({ name, addressLines = [], phone, email }) => (
+const PostalContact: React.FC<PostalContactProps> = ({ name, person, addressLines = [], phone, email }) => (
   <div className="postal-contact">
     {(name || addressLines.length > 0) && (
       <address className="postal-contact__address">
         {name && <strong className="postal-contact__name">{name}</strong>}
+        {person && <span className="postal-contact__line postal-contact__person">{person}</span>}
         {addressLines.map((line) => (
           <span key={line} className="postal-contact__line">
             {line}

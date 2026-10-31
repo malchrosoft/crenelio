@@ -32,7 +32,8 @@ class Notifier
                 'client_confirmation',
                 $appointment['client_email'],
                 $appointment['client_name'],
-                EmailTemplates::clientConfirmation($appointment, $config)
+                EmailTemplates::clientConfirmation($appointment, $config),
+                self::calendarFile($appointment, $config, 'client')
             );
         }
 
@@ -44,11 +45,7 @@ class Notifier
                 $proEmail,
                 (string)($config['pro_name'] ?? ''),
                 EmailTemplates::proConfirmation($appointment, $config),
-                [
-                    'filename' => 'rendez-vous-' . (int)$appointment['id'] . '.ics',
-                    'mime'     => 'text/calendar; charset=utf-8; method=REQUEST',
-                    'content'  => ICalendar::forAppointment($appointment, $config),
-                ]
+                self::calendarFile($appointment, $config, 'pro')
             );
         }
 
@@ -121,11 +118,7 @@ class Notifier
                 $proEmail,
                 (string)($config['pro_name'] ?? ''),
                 EmailTemplates::proConfirmation($appointment, $config),
-                [
-                    'filename' => 'rendez-vous-' . (int)$appointment['id'] . '.ics',
-                    'mime'     => 'text/calendar; charset=utf-8; method=REQUEST',
-                    'content'  => ICalendar::forAppointment($appointment, $config),
-                ]
+                self::calendarFile($appointment, $config, 'pro')
             );
         }
 
@@ -135,11 +128,33 @@ class Notifier
                 $type,
                 $appointment['client_email'],
                 $appointment['client_name'],
-                EmailTemplates::clientConfirmation($appointment, $config)
+                EmailTemplates::clientConfirmation($appointment, $config),
+                self::calendarFile($appointment, $config, 'client')
             );
         }
 
         throw new InvalidArgumentException("Type de notification inconnu : $type");
+    }
+
+    /**
+     * Fichier agenda joint : invitation de l'artisan (créneau élargi du trajet) ou publication du
+     * client (créneau exact, lien de gestion).
+     *
+     * @return array{filename: string, mime: string, content: string}
+     */
+    private static function calendarFile(array $appointment, array $config, string $for): array
+    {
+        return $for === 'client'
+            ? [
+                'filename' => 'mon-rendez-vous.ics',
+                'mime'     => 'text/calendar; charset=utf-8; method=PUBLISH',
+                'content'  => ICalendar::forClient($appointment, $config),
+            ]
+            : [
+                'filename' => 'rendez-vous-' . (int)$appointment['id'] . '.ics',
+                'mime'     => 'text/calendar; charset=utf-8; method=REQUEST',
+                'content'  => ICalendar::forAppointment($appointment, $config),
+            ];
     }
 
     /** Types adressés à l'artisan : on lui répond au client. Tous les autres vont au client. */

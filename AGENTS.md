@@ -127,7 +127,7 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
   - `api/core/Response.php` : Réponses JSON standardisées et gestion CORS.
   - `api/core/TravelFee.php` : Distance géodésique (Haversine), paliers kilométriques et détection du hors-zone.
   - `api/core/Mailer.php` : envoi par SMTP natif (socket, STARTTLS / TLS implicite, AUTH LOGIN) si `SMTP_HOST` est renseigné, sinon par la fonction `mail()` de l'hébergement ; même composition MIME multipart dans les deux cas.
-  - `api/core/ICalendar.php` : Génération du `.ics` (RFC 5545) joint à l'email de l'artisan.
+  - `api/core/ICalendar.php` : Génération des `.ics` (RFC 5545) : `forAppointment` pour l'artisan (invitation, créneau élargi du trajet, coordonnées du client) et `forClient` pour le client (publication, créneau exact, coordonnées de l'artisan, lien `/rdv/:token`, rappel la veille). Pièces jointes construites par `Notifier::calendarFile`.
   - `api/core/EmailTemplates.php` : Gabarits HTML et texte des emails. Les styles y sont **volontairement en ligne** : les clients de messagerie ignorent les feuilles de style externes. La règle « pas de style inline » ne vaut que pour le front React.
   - `api/core/Notifier.php` : Orchestration des envois. Journalise en `pending` *avant* d'appeler le SMTP, puis bascule en `sent` / `failed`. **Ne propage jamais d'exception** : une panne d'envoi ne doit pas faire échouer une réservation déjà enregistrée.
 - **Modèles & Contrôleurs :**

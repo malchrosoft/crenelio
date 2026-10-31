@@ -45,7 +45,7 @@ class EmailTemplates
         );
 
         $outro = $manageUrl !== null
-            ? 'Un empêchement ? Vous pouvez consulter ou annuler votre rendez-vous à tout moment depuis le lien ci-dessus.'
+            ? 'Le rendez-vous est joint à ce message (fichier .ics) pour l\'ajouter à votre agenda. Un empêchement ? Vous pouvez consulter ou annuler votre rendez-vous à tout moment depuis le lien ci-dessus.'
             : sprintf(
                 'Un empêchement ? Contactez-nous au %s.',
                 self::escape($config['pro_phone'] ?? '')
@@ -518,7 +518,8 @@ class EmailTemplates
     // -----------------------------------------------------------------
 
     /** Lien public de gestion du rendez-vous, si l'URL du site est connue. */
-    private static function manageUrl(array $appointment): ?string
+    /** Lien de gestion du rendez-vous par le client (/rdv/:token), null sans APP_URL. */
+    public static function manageUrl(array $appointment): ?string
     {
         if (APP_URL === '') {
             return null;

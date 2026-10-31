@@ -27,7 +27,7 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
   - **Adresse BAN (Base Adresse Nationale)** : autocomplétion via `api-adresse.data.gouv.fr`, coordonnées GPS, carte OpenStreetMap (Pigeon Maps, sans clé API).
   - **Frais de déplacement** : forfait ou paliers kilométriques, calculés depuis le point de départ ou l'adresse de l'entreprise.
   - **Zone d'intervention** : adresse hors des communes desservies ou au-delà du rayon ⇒ réservation directe bloquée. Jusqu'au rayon + 10 %, le client peut envoyer une **demande exceptionnelle** : rendez-vous « En attente », accusé de réception au client, email à l'artisan qui accepte ou refuse en un clic (`/decision/:token`). Au-delà : adresse non desservie.
-- **Confirmation & suivi** : récapitulatif, email de confirmation et lien de gestion / annulation (`/rdv/:token`).
+- **Confirmation & suivi** : récapitulatif, email de confirmation avec fichier agenda (`.ics` : créneau, tarifs, coordonnées de l'artisan, lien de gestion, rappel la veille) et lien de gestion / annulation (`/rdv/:token`).
 - **Mentions légales** : modale dédiée alimentée par la configuration.
 
 ### Espace Artisan (`/admin`)

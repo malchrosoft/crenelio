@@ -75,11 +75,12 @@ const LegalModal: React.FC<LegalModalProps> = ({ config, onClose, section }) => 
         <div className="legal-modal__body">
           {hasLegal ? (
             <>
-              {config.legal_raison_sociale && (
+              {(config.legal_raison_sociale || config.pro_name) && (
                 <div className="legal-section">
                   <h3>Éditeur du site</h3>
                   <PostalContact
-                    name={config.legal_raison_sociale}
+                    name={config.legal_raison_sociale || companyName}
+                    person={config.pro_name && <>Responsable de la publication : {config.pro_name}</>}
                     addressLines={legalAddressLines(config)}
                     phone={config.pro_phone}
                     email={config.pro_email}

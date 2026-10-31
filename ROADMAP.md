@@ -85,6 +85,8 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - Table de logs dédiée enregistrant chaque notification envoyée (`appointment_id`, `recipient`, `status`, `sent_at`, `delivery_status`).
   - **Consultation directe dans l'IHM Pro :** Visualisation des logs d'envoi attachés à chaque rendez-vous depuis le tableau de bord (icône/bouton dédié, date/heure exacte d'expédition, statut et destinataire) pour répondre immédiatement aux interrogations des clients.
 
+- **Ajout (31/10/2026) :** fichier agenda réciproque pour le client, joint à son email de confirmation (`mon-rendez-vous.ics`, `METHOD:PUBLISH`) : créneau exact, prestation et tarifs, coordonnées de l'artisan, lien « Gérer ou annuler mon rendez-vous » (`URL` et description), rappel la veille. Aussi joint lors d'un renvoi depuis le journal « Emails ».
+
 ---
 
 ### 5. Conformité RGPD & Gestion des Cookies — ✅ Terminée

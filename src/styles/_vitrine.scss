@@ -967,6 +967,12 @@ $engagement-gap: 24px;
     display: block;
   }
 
+  // Personne sous la raison sociale, avant l'adresse
+  .postal-contact__person {
+    margin-bottom: $space-xs;
+    color: $gray-700;
+  }
+
   p.postal-contact__contact {
     margin-top: $space-block;
   }
