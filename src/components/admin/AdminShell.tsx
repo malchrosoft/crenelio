@@ -6,6 +6,7 @@ import {
   SidebarSimpleIcon,
   SignOutIcon,
 } from '@phosphor-icons/react';
+import AdminNotices, { AdminNotice } from './AdminNotices';
 
 export type AdminTab = 'appointments' | 'calendar' | 'services' | 'hours' | 'settings' | 'zone' | 'config';
 
@@ -21,6 +22,10 @@ interface AdminShellProps {
   /** Absent avant connexion : ni menu ni déconnexion. */
   nav?: { items: NavItem[]; active: AdminTab; onSelect: (tab: AdminTab) => void };
   onLogout?: () => void;
+  /** Avertissements regroupés dans le header (cf. AdminNotices). */
+  notices?: AdminNotice[];
+  /** Écran de travail en pleine hauteur (liste, grille) : la page ne défile plus. */
+  fill?: boolean;
   children: React.ReactNode;
 }
 
@@ -30,7 +35,7 @@ const COLLAPSED_KEY = 'crenelio.admin.sidebarCollapsed';
  * Mise en page pleine page de l'espace Artisan : header fixe, menu latéral rétractable.
  * Le site public s'ouvre dans un nouvel onglet pour ne pas quitter la gestion.
  */
-const AdminShell: React.FC<AdminShellProps> = ({ companyName, nav, onLogout, children }) => {
+const AdminShell: React.FC<AdminShellProps> = ({ companyName, nav, onLogout, notices = [], fill = false, children }) => {
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem(COLLAPSED_KEY) === '1');
 
   useEffect(() => {
@@ -58,6 +63,7 @@ const AdminShell: React.FC<AdminShellProps> = ({ companyName, nav, onLogout, chi
         </div>
 
         <nav className="admin-topbar__actions" aria-label="Liens du site">
+          <AdminNotices notices={notices} />
           <a className="admin-topbar__link" href="/" target="_blank" rel="noopener">
             <HouseIcon size={18} weight="fill" aria-hidden="true" />
             <span>Accueil</span>
@@ -99,7 +105,7 @@ const AdminShell: React.FC<AdminShellProps> = ({ companyName, nav, onLogout, chi
         </aside>
       )}
 
-      <main className="admin-main">{children}</main>
+      <main className={clsx('admin-main', { 'admin-main--fill': fill })}>{children}</main>
     </div>
   );
 };

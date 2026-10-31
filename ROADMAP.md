@@ -259,7 +259,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - **Secret mal protégé :** chiffré, le mot de passe resterait déchiffrable avec une clé posée sur le même serveur ; une session volée suffirait à détourner tous les emails, codes de connexion compris.
   - **Peu utile :** un artisan seul ne change presque jamais de serveur d'envoi, et l'hébergement OVHcloud sait envoyer sans identifiants (`mail()`).
 
-### 21. Exploitation des Interventions avec AG Grid (édition Community) — 🚧 Partie 1/2 livrée, finitions à reprendre
+### 21. Exploitation des Interventions avec AG Grid (édition Community) — ✅ Terminée
 - **Besoin :** une vue tabulaire des interventions dans l'espace Pro pour les exploiter au quotidien : tri, filtres par colonne, recherche, regroupement par statut ou par commune, export CSV.
 - **Choix :** `ag-grid-react` en **édition Community** (licence MIT). Ne pas utiliser les fonctionnalités Enterprise (export Excel natif, regroupement de lignes avancé, tableaux croisés) qui exigent une licence payante.
 - **Pistes :** remplacer ou compléter la liste actuelle du planning ; thème AG Grid aligné sur les variables SCSS ; colonnes : date, client, prestation, adresse, frais de déplacement, statut ; actions de ligne réutilisant les appels existants (statut, reprogrammation, emails).
@@ -273,11 +273,13 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - Thème AG Grid branché sur les variables du thème (couleur principale, fond, arrondis).
   - Modules enregistrés un par un (liste client, filtres, pagination, CSV, styles de ligne, défilement, traduction) : ≈ 270 ko compressés au lieu de 350 avec `AllCommunityModule`.
   - **Écart avec la fiche :** le regroupement de lignes (par statut ou commune) est réservé à l'édition Enterprise, payante : remplacé par le tri et les filtres de colonnes.
-- **Partie 2/2 — finitions à reprendre (29/10/2026) :**
-  - Peaufiner le rendu dans le navigateur (non vérifié de bout en bout) : barre d'outils, barre d'actions de la sélection, barre d'état accolée, hauteur des lignes, colonne Actions optionnelle.
-  - Parcourir toutes les fonctions (filtres de colonnes, export, pagination, préférences, sélection depuis le calendrier) pour détecter un éventuel module AG Grid manquant (erreur #200 en développement).
-  - Revoir le poids de la grille (≈ 281 ko compressés) si besoin.
-
+- **Partie 2/2 — finitions (31/10/2026) :**
+  - Parcours complet vérifié dans un navigateur sans interface (Playwright, captures d'écran) : tri, filtre de colonne, sélection, actions par ligne, taille de page, export CSV, disposition conservée au rechargement, réglages par défaut, ouverture depuis le calendrier — **aucune erreur ni alerte en console** (aucun module AG Grid manquant).
+  - Barre d'outils : « Nouveau rendez-vous » et la recherche sur une même ligne (prioritaires), options en dessous si la place manque, option de colonne à gauche et boutons à droite ; texte d'aide de la recherche raccourci.
+  - Prestation sur deux lignes au lieu d'être tronquée.
+  - Couleurs des statuts alignées sur le calendrier : Confirmé = couleur principale, Terminé = succès.
+  - « Réglages par défaut » ne réenregistre plus aussitôt la disposition (événements de colonnes ignorés jusqu'à la fin de la réinitialisation, comme à la restauration).
+  - Poids de la grille conservé (≈ 281 ko compressés, chargée à la demande) : pas d'allègement possible sans retirer des fonctions.
 ### 22. Devis en Ligne avec Accord du Client & Aide à la Facturation Externe
 - **Réorienté (31/10/2026) :** Crénelio génère les **devis** et fait **accepter** le client ; la **facture** reste par défaut dans l'outil de l'artisan, que Crénelio alimente. Une facturation interne conforme à la facturation électronique est prévue en option (Volet C), si la réglementation l'autorise.
 - **Pourquoi pas de facture native :**
@@ -472,14 +474,14 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
 |---|---|---|---|---|---|---|
-| **1** | **Item 21** | **Liste des interventions AG Grid — finitions (partie 2/2)** | Espace Pro / Exploitation | 🚧 *Partie 1/2 livrée* | — | 🟢 Fonctionnelle ; rendu et modules à vérifier dans le navigateur |
-| **2** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
-| **3** | **Item 22** | **Devis en ligne avec accord du client & aide à la facturation externe** | Espace Pro / Facturation | ⏳ *À faire* | Items 12, 21 et 32 ✅ | 🟡 Devis obligatoire pour l'artisan ; facture laissée à son outil (obligation électronique 2026-2027) |
-| **4** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre séparé (Item 34) |
-| **5** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
-| **6** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
-| **7** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
-| **8** | **Item 34** | **Thème sombre (inversion des couleurs, palettes adaptées)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort ; chantier transversal coûteux (gris, fonds, états et bibliothèques à convertir) |
+| **1** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
+| **2** | **Item 22** | **Devis en ligne avec accord du client & aide à la facturation externe** | Espace Pro / Facturation | ⏳ *À faire* | Items 12, 21 et 32 ✅ | 🟡 Devis obligatoire pour l'artisan ; facture laissée à son outil (obligation électronique 2026-2027) |
+| **3** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre séparé (Item 34) |
+| **4** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
+| **5** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| **6** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
+| **7** | **Item 34** | **Thème sombre (inversion des couleurs, palettes adaptées)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort ; chantier transversal coûteux (gris, fonds, états et bibliothèques à convertir) |
+| — | **Item 21** | Liste des interventions AG Grid Community (tri, filtres, sélection, export CSV, disposition enregistrée) ; composant `DataGrid` commun, pleine hauteur desktop/tablette, fenêtre de rendez-vous partagée avec le calendrier, avertissements regroupés dans le header, indisponibilités en grille (sous-onglet de « Horaires ») | Espace Pro / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 33** | Abonnement d'agenda de l'artisan (flux iCal privé, optionnel) | Planning / Synchronisation | ✅ **Terminé** | — | — |
 | — | **Item 32** | Fiabilité des notifications (annulation, reprogrammation, décision, anti-abus) | Communication / Fiabilité | ✅ **Terminé** | — | — |
 | — | **Item 23** | Calendrier des interventions (FullCalendar : vues, glisser-déposer validé, création au clic) | Espace Pro / Planning | ✅ **Terminé** | — | — |

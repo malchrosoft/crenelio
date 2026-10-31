@@ -524,8 +524,9 @@
   font-weight: 600;
   text-transform: uppercase;
 
-  &.status-confirmed { background: $success-light; color: $success; }
-  &.status-completed { background: $primary-light; color: $primary; }
+  // Mêmes couleurs que le calendrier (confirmé = couleur principale, terminé = succès)
+  &.status-confirmed { background: $primary-light; color: $primary; }
+  &.status-completed { background: $success-light; color: $success; }
   &.status-cancelled { background: $danger-light; color: $danger; }
   &.status-pending   { background: $warning-light; color: $warning; }
 }
@@ -674,26 +675,6 @@
     letter-spacing: 0.4em;
     text-align: center;
     font-variant-numeric: tabular-nums;
-  }
-}
-
-/* Second facteur indisponible (pas d'email professionnel ou pas de SMTP) */
-.admin-security-notice {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 20px;
-  padding: 12px 16px;
-  border-radius: $radius-sm;
-  background: $warning-light;
-  color: $gray-800;
-  font-size: 0.9rem;
-  line-height: $line-height-base;
-
-  svg {
-    flex-shrink: 0;
-    margin-top: 1px;
-    color: $warning;
   }
 }
 
@@ -2696,24 +2677,31 @@ $calendar-statuses: (
 
 
 // -------------------------------------------------------
-// Liste des interventions (Item 21, AG Grid Community)
+// Listes de l'espace Pro sur AG Grid Community (DataGrid)
 // -------------------------------------------------------
-.interventions-grid {
-  margin-top: $space-md;
+// Pleine page à partir d'une tablette assez haute : même requête que FILL_QUERY (DataGrid.tsx)
+$data-grid-fill: '(min-width: 768px) and (min-height: 600px)';
+// Hauteur du panneau de pagination d'AG Grid (thème Quartz) : le compteur s'y superpose
+$data-grid-footer-height: 48px;
 
-  // Une seule ligne d'actions générales : nouveau rendez-vous, recherche, puis options de la grille
-  .interventions-grid__toolbar {
+.data-grid {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+
+  // Une seule ligne d'actions générales : ajout et recherche prioritaires, options dessous si
+  // la place manque (option de colonne à gauche, boutons à droite)
+  .data-grid__toolbar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: $space-block;
-    margin-bottom: $space-sm;
   }
 
-  .interventions-grid__start {
+  .data-grid__start {
     display: flex;
-    flex: 1 1 420px;
+    flex: 999 1 560px;
     flex-wrap: wrap;
     align-items: center;
     gap: $space-block;
@@ -2724,47 +2712,27 @@ $calendar-statuses: (
     }
   }
 
-  // Barre d'état accolée sous la grille : même cadre, coins arrondis seulement en bas
-  .ag-root-wrapper {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  .interventions-grid__status {
+  .data-grid__options {
     display: flex;
+    flex: 1 1 auto;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: $space-sm;
-    padding: 8px 14px;
-    border: 1px solid $gray-200;
-    border-top: none;
-    border-radius: 0 0 $radius $radius;
-    background: $background;
-    color: $gray-600;
-    font-size: 0.85rem;
-  }
-
-  .interventions-grid__status-note {
-    color: $warning;
-    font-weight: 600;
-  }
-
-  .interventions-grid__options {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    justify-content: flex-end;
     gap: $space-block;
+
+    .data-grid__toggle {
+      margin-right: auto;
+    }
   }
 
-  .interventions-grid__save {
+  .data-grid__save {
     min-width: 11em;
     color: $gray-400;
     font-size: 0.8rem;
     text-align: right;
   }
 
-  .interventions-grid__toggle {
+  .data-grid__toggle {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -2777,15 +2745,13 @@ $calendar-statuses: (
     }
   }
 
-  // Barre d'actions de la ligne sélectionnée, au-dessus de la grille : même place avec ou sans
-  // sélection (contrôles désactivés), pour que la grille ne se décale jamais
-  .interventions-grid__selection {
+  // Barre d'actions de la ligne sélectionnée : même place avec ou sans sélection
+  .data-grid__selection {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: $space-block;
     min-height: 58px;
-    margin-bottom: $space-sm;
     padding: 10px 14px;
     background: $primary-light;
     border: 1px solid primary-alpha(30%);
@@ -2795,7 +2761,7 @@ $calendar-statuses: (
       background: $gray-50;
       border-color: $gray-200;
 
-      .interventions-grid__selection-label {
+      .data-grid__selection-label {
         color: $gray-400;
       }
     }
@@ -2808,7 +2774,7 @@ $calendar-statuses: (
     }
   }
 
-  .interventions-grid__selection-label {
+  .data-grid__selection-label {
     flex: 1 1 220px;
     color: $gray-700;
     font-size: 0.9rem;
@@ -2818,7 +2784,7 @@ $calendar-statuses: (
     }
   }
 
-  .interventions-grid__deselect {
+  .data-grid__deselect {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2828,11 +2794,49 @@ $calendar-statuses: (
     color: $gray-500;
     @include hover-transition(background-color color, $duration-fast);
 
-    &:hover,
+    &:hover:not(:disabled),
     &:focus-visible {
       background: white;
       color: $gray-900;
     }
+  }
+
+  .data-grid__body {
+    position: relative;
+  }
+
+  // Compteur : sous la grille sur petit écran, dans le pied de la grille sinon (voir --fill)
+  .data-grid__status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-sm;
+    padding: 8px 4px 0;
+    color: $gray-600;
+    font-size: 0.85rem;
+  }
+
+  .data-grid__status-note {
+    color: $warning;
+    font-weight: 600;
+  }
+
+  // Cellules sur deux lignes (date + badge, client + téléphone)
+  .grid-cell-stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: $space-2xs;
+    height: 100%;
+    line-height: $line-height-snug;
+  }
+
+  // Texte long (prestation) sur deux lignes plutôt que coupé
+  .grid-cell-wrap {
+    display: flex;
+    align-items: center;
+    white-space: normal;
+    line-height: $line-height-snug;
   }
 
   .grid-cell-muted {
@@ -2847,28 +2851,40 @@ $calendar-statuses: (
     cursor: pointer;
   }
 
-  // Rendez-vous ouvert depuis le calendrier
-  .ag-row.admin-row--highlighted {
-    background-color: $primary-light !important;
-    box-shadow: inset 3px 0 0 $primary;
-  }
-
-  // Cellules sur deux lignes (date + badge, client + téléphone)
-  .grid-cell-stack {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: $space-2xs;
-    height: 100%;
-    line-height: $line-height-snug;
-  }
-
-  // Actions sur une seule ligne dans la grille (empilées dans l'ancienne liste)
+  // Actions sur une seule ligne dans une cellule de grille
   .ag-cell .admin-table-actions {
     flex-direction: row;
     align-items: center;
     gap: $space-sm;
     height: 100%;
+  }
+}
+
+// Pleine page : la grille occupe la hauteur restante, la page ne défile plus ; le compteur se
+// superpose à gauche du panneau de pagination (alignée à droite par AG Grid)
+@media #{$data-grid-fill} {
+  .data-grid--fill {
+    flex: 1;
+    min-height: 0;
+
+    .data-grid__body {
+      flex: 1;
+      min-height: 320px;
+
+      // Conteneur créé par AgGridReact
+      > div:first-child {
+        height: 100%;
+      }
+    }
+
+    .data-grid__status {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: $data-grid-footer-height;
+      padding: 0 16px;
+      pointer-events: none;
+    }
   }
 }
 
@@ -2905,5 +2921,175 @@ $calendar-statuses: (
     li + li {
       margin-top: $space-xs;
     }
+  }
+}
+
+// Pleine hauteur (desktop, tablette) : le contenu tient dans la fenêtre, seule la grille défile
+@media #{$data-grid-fill} {
+  .admin-main--fill {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - #{$admin-topbar-height});
+    overflow: hidden;
+
+    > .admin-page {
+      flex: 1;
+      min-height: 0;
+    }
+  }
+}
+
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-block;
+}
+
+.data-grid__hint {
+  margin: 0;
+  color: $gray-500;
+  font-size: 0.85rem;
+}
+
+.unavailability-period--current { background: $warning-light; color: $gray-800; }
+.unavailability-period--upcoming { background: $primary-light; color: $primary; }
+.unavailability-period--past { background: $gray-100; color: $gray-600; }
+
+// -------------------------------------------------------
+// Sous-onglets d'une page (Horaires : semaine type / indisponibilités)
+// -------------------------------------------------------
+.admin-subtabs {
+  display: flex;
+  gap: $space-xs;
+  border-bottom: 1px solid $gray-200;
+
+  .admin-subtabs__tab {
+    padding: $space-xs $space-sm;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    background: none;
+    color: $gray-600;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color $duration-fast, border-color $duration-fast;
+
+    &:hover { color: $gray-900; }
+  }
+
+  .admin-subtabs__tab--active {
+    color: $primary;
+    border-bottom-color: $primary;
+  }
+}
+
+// -------------------------------------------------------
+// Avertissements regroupés dans le header
+// -------------------------------------------------------
+.admin-notices {
+  position: relative;
+
+  .admin-notices__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2xs;
+    padding: $space-2xs $space-xs;
+    border: 1px solid $gray-200;
+    border-radius: $radius-full;
+    background: $gray-50;
+    color: $gray-700;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover { background: $gray-100; }
+  }
+
+  .admin-notices__trigger--warning {
+    border-color: $warning;
+    background: $warning-light;
+
+    svg { color: $warning; }
+  }
+
+  .admin-notices__count { font-weight: 700; }
+
+  @include mobile {
+    .admin-notices__label { display: none; }
+  }
+
+  .admin-notices__panel {
+    position: absolute;
+    top: calc(100% + #{$space-xs});
+    right: 0;
+    z-index: 30;
+    width: min(360px, 90vw);
+    padding: $space-xs;
+    border-radius: $radius-md;
+    background: $background;
+    box-shadow: $shadow-lg;
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+  }
+
+  .admin-notices__item {
+    display: flex;
+    gap: $space-xs;
+    padding: $space-xs;
+    border-radius: $radius-sm;
+    line-height: $line-height-base;
+    font-size: 0.9rem;
+
+    + .admin-notices__item { margin-top: $space-2xs; }
+
+    > svg { flex-shrink: 0; margin-top: 2px; }
+
+    p { margin: $space-2xs 0 $space-xs; color: $gray-700; }
+  }
+
+  .admin-notices__item--warning {
+    background: $warning-light;
+
+    > svg { color: $warning; }
+  }
+
+  .admin-notices__item--info > svg { color: $primary; }
+}
+
+// -------------------------------------------------------
+// Fenêtre d'un rendez-vous (calendrier et liste)
+// -------------------------------------------------------
+.appointment-dialog {
+  .appointment-dialog__details {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: $space-2xs $space-sm;
+    margin: 0 0 $space-block;
+    line-height: $line-height-base;
+
+    dt { color: $gray-500; }
+    dd { margin: 0; overflow-wrap: anywhere; }
+  }
+
+  .appointment-dialog__edit {
+    display: grid;
+    grid-template-columns: minmax(160px, 1fr) 2fr;
+    gap: $space-sm;
+    padding-top: $space-block;
+    border-top: 1px solid $gray-200;
+
+    @include mobile { grid-template-columns: 1fr; }
+  }
+
+  .appointment-dialog__reschedule {
+    display: flex;
+    gap: $space-xs;
+
+    .form-input { flex: 1; }
   }
 }

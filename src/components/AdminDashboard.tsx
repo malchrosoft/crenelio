@@ -15,7 +15,6 @@ import {
   GearSixIcon,
   MapTrifoldIcon,
   PlusIcon,
-  WarningIcon,
   CalendarDotsIcon,
 } from '@phosphor-icons/react';
 import { api, UNAUTHORIZED_EVENT } from '../api';
@@ -33,7 +32,6 @@ import { CONFIG_GROUPS, buildOtherGroup } from '../config/configSchema';
 import ConfigGroupForm from './admin/ConfigGroupForm';
 import EngagementsEditor from './admin/EngagementsEditor';
 import ScheduleEditor from './admin/ScheduleEditor';
-import UnavailabilityEditor from './admin/UnavailabilityEditor';
 import TravelSettingsEditor from './admin/TravelSettingsEditor';
 import ZoneWorkspace from './admin/ZoneWorkspace';
 import ResetButton from './admin/ResetButton';
@@ -45,7 +43,10 @@ import AdminShell, { AdminTab } from './admin/AdminShell';
 const AppointmentCalendar = lazy(() => import('./admin/AppointmentCalendar'));
 // Liste des interventions (AG Grid Community) chargée à l'ouverture du planning
 const InterventionsGrid = lazy(() => import('./admin/InterventionsGrid'));
+const UnavailabilitiesGrid = lazy(() => import('./admin/UnavailabilitiesGrid'));
 import AdminLogin from './admin/AdminLogin';
+import type { AdminNotice } from './admin/AdminNotices';
+import AppointmentDialog from './admin/AppointmentDialog';
 import ConfirmDialog from './admin/ConfirmDialog';
 import MailStatus from './admin/MailStatus';
 import CalendarFeedSettings from './admin/CalendarFeedSettings';
@@ -168,14 +169,10 @@ export const AdminDashboard: React.FC = () => {
   const [timeFilter, setTimeFilter] = useState<'all' | 'upcoming' | 'today' | 'overdue' | 'past'>('all');
   // Jour précis (YYYY-MM-DD), posé notamment par un clic sur un rendez-vous du calendrier
   const [dateFilter, setDateFilter] = useState('');
-  // Rendez-vous mis en évidence dans la liste (ouvert depuis le calendrier)
-  const [highlightedId, setHighlightedId] = useState<number | null>(null);
-
-  // Reprogrammation de rendez-vous (champ datetime-local unique)
-  const [reschedulingAppointment, setReschedulingAppointment] = useState<Appointment | null>(null);
-  const [rescheduleDatetime, setRescheduleDatetime] = useState('');
-  const [rescheduleLoading, setRescheduleLoading] = useState(false);
-  const [rescheduleNotify, setRescheduleNotify] = useState(true);
+  // Onglet Horaires : semaine type ou indisponibilités (grille)
+  const [hoursView, setHoursView] = useState<'week' | 'unavailabilities'>('week');
+  // Rendez-vous ouvert dans la fenêtre de consultation / modification (calendrier ou liste)
+  const [openedId, setOpenedId] = useState<number | null>(null);
 
   // Nouvelle prestation
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -243,13 +240,12 @@ export const AdminDashboard: React.FC = () => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (isAddModalOpen) setIsAddModalOpen(false);
-        if (reschedulingAppointment) setReschedulingAppointment(null);
         if (notificationsAppointment) setNotificationsAppointment(null);
       }
     };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
-  }, [isAddModalOpen, reschedulingAppointment, notificationsAppointment]);
+  }, [isAddModalOpen, notificationsAppointment]);
 
   /** Relit l'état de la session (mot de passe par défaut encore actif ?). */
   async function refreshSession() {
@@ -374,42 +370,15 @@ export const AdminDashboard: React.FC = () => {
 
   async function handleStatusChange(id: number, newStatus: string) {
     try {
-      await api.updateAppointmentStatus(id, newStatus);
-      setAppointments((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, status: newStatus as Appointment['status'] } : a))
-      );
+      replaceAppointment(await api.updateAppointmentStatus(id, newStatus));
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'Erreur lors de la mise à jour');
     }
   }
 
-  function startReschedule(appointment: Appointment) {
-    setReschedulingAppointment(appointment);
-    setRescheduleNotify(true);
-    const dateObj = new Date(appointment.start_datetime);
-    // Format YYYY-MM-DDTHH:mm pour input datetime-local
-    setRescheduleDatetime(format(dateObj, "yyyy-MM-dd'T'HH:mm"));
-  }
-
-  async function handleRescheduleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!reschedulingAppointment) return;
-    setRescheduleLoading(true);
-    try {
-      // Conversion de YYYY-MM-DDTHH:mm en YYYY-MM-DD HH:mm:00
-      const formattedDatetime = rescheduleDatetime.replace('T', ' ') + ':00';
-      const updated = await api.rescheduleAppointment(reschedulingAppointment.id, formattedDatetime, 'confirmed', {
-        notify: rescheduleNotify,
-      });
-      setAppointments((prev) =>
-        prev.map((a) => (a.id === reschedulingAppointment.id ? { ...a, ...updated } : a))
-      );
-      setReschedulingAppointment(null);
-    } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Erreur lors du déplacement du rendez-vous');
-    } finally {
-      setRescheduleLoading(false);
-    }
+  /** Rendez-vous modifié (fenêtre, calendrier, liste) : remplacé dans la liste chargée. */
+  function replaceAppointment(updated: Appointment) {
+    setAppointments((prev) => prev.map((a) => (a.id === updated.id ? { ...a, ...updated } : a)));
   }
 
   // Filtrage et détection des rendez-vous échus
@@ -580,6 +549,41 @@ export const AdminDashboard: React.FC = () => {
     );
   }
 
+  // Avertissements du header (au lieu de bandeaux en tête de page)
+  const notices: AdminNotice[] = [
+    ...(defaultPassword
+      ? [
+          {
+            id: 'default-password',
+            level: 'warning' as const,
+            title: 'Mot de passe par défaut actif',
+            text: (
+              <>
+                <code>admin123</code> est toléré en développement, mais devra être changé avant toute mise en ligne.
+              </>
+            ),
+            action: { label: 'Changer le mot de passe', onClick: () => setActiveTab('config') },
+          },
+        ]
+      : []),
+    ...(!twoFactor
+      ? [
+          {
+            id: 'two-factor',
+            level: 'warning' as const,
+            title: 'Double authentification inactive',
+            text: (
+              <>
+                Renseignez l'email de contact (Configuration) et l'adresse d'expédition des emails (<code>MAIL_FROM</code>{' '}
+                dans <code>api/.env</code>). En attendant, le mot de passe seul protège l'espace Artisan.
+              </>
+            ),
+            action: { label: 'Ouvrir la configuration', onClick: () => setActiveTab('config') },
+          },
+        ]
+      : []),
+  ];
+
   const navItems: { id: AdminTab; label: string; icon: React.ReactNode; count?: number }[] = [
     { id: 'appointments', label: 'Rendez-vous', icon: <CalendarBlankIcon {...NAV_ICON} />, count: appointments.length },
     { id: 'calendar', label: 'Calendrier', icon: <CalendarDotsIcon {...NAV_ICON} /> },
@@ -598,15 +602,21 @@ export const AdminDashboard: React.FC = () => {
       companyName={config.company_name}
       onLogout={handleLogout}
       nav={{ items: navItems, active: activeTab, onSelect: setActiveTab }}
+      notices={notices}
+      fill={!loading && ((activeTab === 'appointments' && !creatingAppointment) || (activeTab === 'hours' && hoursView === 'unavailabilities'))}
     >
-      {defaultPassword && (
-        <div className="admin-security-notice" role="status">
-          <WarningIcon size={20} weight="fill" aria-hidden="true" />
-          <span>
-            Mot de passe par défaut (<code>admin123</code>) encore actif : toléré en développement, il devra être changé
-            avant toute mise en ligne (Configuration → Mot de passe).
-          </span>
-        </div>
+      {openedId !== null && appointments.some((a) => a.id === openedId) && (
+        <AppointmentDialog
+          appointment={appointments.find((a) => a.id === openedId)!}
+          onClose={() => setOpenedId(null)}
+          onChanged={replaceAppointment}
+          // Le journal s'ouvre à la place de la fenêtre (pas de fenêtres empilées)
+          onEmails={(appointment) => {
+            setOpenedId(null);
+            openNotifications(appointment);
+          }}
+          onAnonymize={setAnonymizing}
+        />
       )}
       {anonymizing && (
         <ConfirmDialog
@@ -619,15 +629,6 @@ export const AdminDashboard: React.FC = () => {
           effacés, ainsi que les adresses du journal des emails. Le rendez-vous reste dans le planning (prestation,
           date, montant, commune). Cette action est irréversible : à utiliser pour une demande d'effacement.
         </ConfirmDialog>
-      )}
-      {!twoFactor && (
-        <div className="admin-security-notice" role="status">
-          <WarningIcon size={20} weight="fill" aria-hidden="true" />
-          <span>
-            Double authentification inactive : renseignez l'email de contact (Configuration) et l'adresse
-            d'expédition des emails (<code>MAIL_FROM</code> dans <code>api/.env</code>). En attendant, le mot de passe seul protège l'espace Artisan.
-          </span>
-        </div>
       )}
       {loading ? (
         <p>Chargement des données...</p>
@@ -650,18 +651,9 @@ export const AdminDashboard: React.FC = () => {
         <Suspense fallback={<p>Chargement du calendrier…</p>}>
           <AppointmentCalendar
             appointments={appointments}
-            onChanged={(updated) =>
-              setAppointments((prev) => prev.map((a) => (a.id === updated.id ? { ...a, ...updated } : a)))
-            }
-            onOpen={(appointment) => {
-              // Actions complètes (statut, emails, effacement) : planning du jour, rendez-vous en évidence
-              setSearchQuery('');
-              setStatusFilter('all');
-              setTimeFilter('all');
-              setDateFilter(appointment.start_datetime.slice(0, 10));
-              setHighlightedId(appointment.id);
-              setActiveTab('appointments');
-            }}
+            onChanged={replaceAppointment}
+            // Même fenêtre que depuis la liste : on reste sur le calendrier
+            onOpen={(appointment) => setOpenedId(appointment.id)}
             onCreate={(date) => {
               setNewAppointmentDate(date);
               setCreatingAppointment(true);
@@ -670,7 +662,7 @@ export const AdminDashboard: React.FC = () => {
           />
         </Suspense>
       ) : activeTab === 'appointments' ? (
-        <div>
+        <div className="admin-page">
           {/* ── Barre de recherche et filtres multi-critères ── */}
           <div className="admin-filters-bar">
             <div className="admin-filters-groups">
@@ -717,20 +709,14 @@ export const AdminDashboard: React.FC = () => {
                   type="date"
                   className="admin-time-select"
                   value={dateFilter}
-                  onChange={(e) => {
-                    setDateFilter(e.target.value);
-                    setHighlightedId(null);
-                  }}
+                  onChange={(e) => setDateFilter(e.target.value)}
                   aria-label="Jour précis"
                 />
                 {dateFilter && (
                   <button
                     type="button"
                     className="btn btn-secondary admin-btn-sm"
-                    onClick={() => {
-                      setDateFilter('');
-                      setHighlightedId(null);
-                    }}
+                    onClick={() => setDateFilter('')}
                     aria-label="Retirer le filtre de date"
                   >
                     Tous les jours
@@ -772,7 +758,7 @@ export const AdminDashboard: React.FC = () => {
                       <input
                         type="text"
                         className="form-input admin-search-input"
-                        placeholder="Rechercher par client, téléphone, email, prestation, adresse, ville…"
+                        placeholder="Rechercher : client, téléphone, adresse, prestation…"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                       />
@@ -789,89 +775,12 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </>
                 }
-                highlightedId={highlightedId}
+                onOpen={(appointment) => setOpenedId(appointment.id)}
                 onStatusChange={handleStatusChange}
-                onReschedule={startReschedule}
                 onEmails={openNotifications}
                 onAnonymize={setAnonymizing}
               />
             </Suspense>
-
-          {/* ── Pop-up / Modale de reprogrammation (champ unique datetime-local) ── */}
-          {reschedulingAppointment && (
-            <div
-              className="admin-modal-overlay"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="reschedule-modal-title"
-              onClick={() => setReschedulingAppointment(null)}
-            >
-              <div
-                className="admin-modal"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="admin-modal__header">
-                  <h3 className="admin-modal__title" id="reschedule-modal-title">
-                    Reprogrammer l'intervention #{reschedulingAppointment.id}
-                  </h3>
-                  <button
-                    className="admin-modal__close"
-                    onClick={() => setReschedulingAppointment(null)}
-                    aria-label="Fermer"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <form onSubmit={handleRescheduleSubmit} className="admin-modal__body">
-                  <p className="admin-modal-hint">
-                    Client : <strong>{reschedulingAppointment.client_name}</strong> ({reschedulingAppointment.service_name})
-                  </p>
-                  <div className="form-group">
-                    <label className="form-label">Nouvelle date et heure d'intervention *</label>
-                    <input
-                      type="datetime-local"
-                      className="form-input"
-                      required
-                      value={rescheduleDatetime}
-                      onChange={(e) => setRescheduleDatetime(e.target.value)}
-                    />
-                  </div>
-                  {reschedulingAppointment.client_email && (
-                    <label className="theme-effect">
-                      <input
-                        type="checkbox"
-                        checked={rescheduleNotify}
-                        onChange={(e) => setRescheduleNotify(e.target.checked)}
-                      />
-                      <span>
-                        <strong>Prévenir le client par email</strong>
-                        <span className="form-hint">
-                          Nouvelle date et agenda mis à jour. Votre propre agenda est mis à jour dans tous les cas.
-                        </span>
-                      </span>
-                    </label>
-                  )}
-                  <div className="admin-modal__actions">
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => setReschedulingAppointment(null)}
-                      disabled={rescheduleLoading}
-                    >
-                      Annuler
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={rescheduleLoading}
-                    >
-                      {rescheduleLoading ? 'Mise à jour…' : 'Enregistrer la nouvelle date'}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
 
           {/* ── Journal des notifications email ── */}
           {notificationsAppointment && (
@@ -1206,9 +1115,36 @@ export const AdminDashboard: React.FC = () => {
       ) : activeTab === 'zone' ? (
         <ZoneWorkspace config={config} onSaved={setConfig} />
       ) : activeTab === 'hours' ? (
-        <div className="admin-config">
-          <ScheduleEditor />
-          <UnavailabilityEditor />
+        <div className="admin-page">
+          {/* Sous-onglets : semaine type, indisponibilités (grille) */}
+          <div className="admin-subtabs" role="tablist" aria-label="Horaires">
+            {(
+              [
+                ['week', 'Semaine type'],
+                ['unavailabilities', 'Indisponibilités'],
+              ] as const
+            ).map(([view, label]) => (
+              <button
+                key={view}
+                type="button"
+                role="tab"
+                aria-selected={hoursView === view}
+                className={clsx('admin-subtabs__tab', { 'admin-subtabs__tab--active': hoursView === view })}
+                onClick={() => setHoursView(view)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {hoursView === 'week' ? (
+            <div className="admin-config">
+              <ScheduleEditor />
+            </div>
+          ) : (
+            <Suspense fallback={<p>Chargement…</p>}>
+              <UnavailabilitiesGrid />
+            </Suspense>
+          )}
         </div>
       ) : activeTab === 'config' ? (
         <div className="admin-config">
