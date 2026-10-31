@@ -278,10 +278,33 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - Parcourir toutes les fonctions (filtres de colonnes, export, pagination, préférences, sélection depuis le calendrier) pour détecter un éventuel module AG Grid manquant (erreur #200 en développement).
   - Revoir le poids de la grille (≈ 281 ko compressés) si besoin.
 
-### 22. Génération des Factures (plus tard)
-- **Besoin :** générer une facture à partir d'une intervention réalisée, depuis la grille de l'Item 21.
-- **Pistes :** numérotation chronologique continue et sans trou, mentions légales obligatoires (SIRET, TVA ou mention d'exonération), montant prestation + frais de déplacement, export PDF, facture non modifiable une fois émise (avoir pour corriger).
-- **Prérequis :** Item 21 ; Item 12 (données comptables à protéger côté serveur).
+### 22. Devis en Ligne avec Accord du Client & Aide à la Facturation Externe
+- **Réorienté (31/10/2026) :** Crénelio génère les **devis** et fait **accepter** le client ; la **facture** reste par défaut dans l'outil de l'artisan, que Crénelio alimente. Une facturation interne conforme à la facturation électronique est prévue en option (Volet C), si la réglementation l'autorise.
+- **Pourquoi pas de facture native :**
+  - Facturation électronique : réception obligatoire pour toutes les entreprises au 1ᵉʳ septembre 2026, émission (B2B) et e-reporting (ventes aux particuliers) au 1ᵉʳ septembre 2027 pour les micro-entreprises et PME, via une plateforme agréée (PA). Un générateur maison devrait s'y raccorder et suivre une norme encore mouvante (calendrier relevé sur des sites spécialisés, à revérifier sur impots.gouv.fr avant de coder).
+  - Les outils du marché (Indy, Tiime, Abby, Henrri, Pennylane, Axonaut…) couvrent déjà numérotation sans trou, avoirs, mentions et conformité électronique ; beaucoup d'artisans en utilisent un.
+- **Pourquoi le devis dans Crénelio :**
+  - Dépannage, réparation et entretien à domicile : devis en principe obligatoire **quel que soit le montant** depuis la réforme de 2017 (fin du seuil de 150 €), accepté avant l'exécution, sauf urgence absolue (texte consolidé de l'arrêté du 24 janvier 2017 à vérifier sur Légifrance).
+  - Le devis n'est pas concerné par la facturation électronique, et Crénelio connaît déjà client, prestation, tarif et frais de déplacement.
+- **Volet A — Devis en ligne (cœur) :**
+  - Devis créé depuis un rendez-vous, prérempli (prestation, frais de déplacement), lignes ajoutables (pièces, main-d'œuvre), quantités, TVA ou mention d'exonération.
+  - Mentions obligatoires : identité et SIRET de l'artisan, date, durée de validité, détail et total, conservation des pièces remplacées par le client ; numérotation propre aux devis.
+  - Envoi par email avec lien sécurisé « Consulter et accepter le devis » ; accord horodaté et tracé (date, IP) ; statuts brouillon / envoyé / accepté / refusé / expiré dans l'espace Pro.
+  - Version imprimable (enregistrable en PDF par le navigateur), sans bibliothèque côté serveur.
+- **Volet B — Aide à la facture dans l'outil de l'artisan :**
+  1. Fiche « Préparer la facture » sur chaque intervention terminée : champs prêts à copier un par un (client, adresse, lignes, quantités, prix, TVA) et « Tout copier » — fonctionne avec n'importe quel outil.
+  2. Exports CSV : clients (import initial dans l'outil) et interventions terminées sur une période ; colonnes à caler sur les imports des 2-3 outils les plus utilisés avant de les figer.
+  3. Plus tard : intégration directe avec un outil disposant d'une API (Pennylane, Axonaut, Sellsy…) pour créer le brouillon de facture en un clic — seulement si l'artisan l'utilise ; jeton d'accès à stocker hors base.
+- **Volet C — Facturation interne conforme (option, si la réglementation l'autorise) :** pour l'artisan sans outil de facturation, une facturation dans Crénelio respectant les exigences de la facturation électronique.
+  - **Préalable bloquant :** vérifier sur les sources officielles (impots.gouv.fr, Légifrance, documentation des plateformes agréées) que l'émission par un logiciel tiers raccordé à une plateforme agréée est permise, les formats et le calendrier en vigueur, et l'absence de certification exigée du logiciel (contrairement aux logiciels de caisse). Sans confirmation, le volet n'est pas engagé.
+  - **Socle commun :** mentions obligatoires, numérotation chronologique continue sans trou, facture **non modifiable** une fois émise (correction par avoir), archivage de la durée légale (à vérifier : 10 ans commercial, 6 ans fiscal), facture issue d'un devis accepté (Volet A).
+  - **Ventes aux particuliers (B2C, cas principal) :** pas de facture électronique, mais **e-reporting** des données de transaction à partir de septembre 2027 (micro-entreprises, PME) : transmission via l'API de la plateforme agréée choisie par l'artisan, ou export au format qu'elle attend.
+  - **Ventes aux professionnels (B2B) :** facture au format structuré (Factur-X, UBL ou CII selon la norme retenue), transmise **obligatoirement par une plateforme agréée** — Crénelio ne peut pas l'être : dépôt via l'API de la plateforme de l'artisan.
+  - **Contraintes d'hébergement (offre Starter, PHP natif) :** un Factur-X (PDF/A-3 avec XML embarqué) est difficile sans bibliothèque ; privilégier un format XML structuré (CII / UBL) et une plateforme agréée qui produit elle-même la représentation lisible ; compatibilité à vérifier avant tout développement.
+  - **Calendrier :** à engager après la stabilisation de l'obligation (au plus tôt pour septembre 2027), et seulement si le Volet B ne suffit pas aux artisans visés.
+- **Réglage « Comment facturez-vous ? » :** « Avec mon logiciel » (fiche et exports affichés), « Avec Crénelio » (Volet C, s'il est disponible) ou « Je ne facture pas depuis Crénelio » (masqués) ; les devis restent proposés dans tous les cas.
+- **RGPD :** devis et accords contiennent des données clients : à ajouter à l'effacement et à la purge (`Appointment::anonymizeWhere`) et à la politique de confidentialité ; durée de conservation des devis acceptés à définir (preuve contractuelle).
+- **Prérequis :** Items 12, 21 (partie 1) et 32 ✅.
 
 ### 23. Calendrier des Interventions avec FullCalendar — ✅ Terminée
 - **Besoin :** gérer le calendrier d'intervention dans l'espace Pro avec des vues jour / semaine / mois.
@@ -451,7 +474,7 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 |---|---|---|---|---|---|---|
 | **1** | **Item 21** | **Liste des interventions AG Grid — finitions (partie 2/2)** | Espace Pro / Exploitation | 🚧 *Partie 1/2 livrée* | — | 🟢 Fonctionnelle ; rendu et modules à vérifier dans le navigateur |
 | **2** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
-| **3** | **Item 22** | **Génération des factures** | Espace Pro / Facturation | 🕒 *Plus tard* | Items 21 et 12 ✅ | 🟡 Fort gain mais conformité lourde (numérotation, mentions, immuabilité) ; l'artisan a souvent déjà un outil |
+| **3** | **Item 22** | **Devis en ligne avec accord du client & aide à la facturation externe** | Espace Pro / Facturation | ⏳ *À faire* | Items 12, 21 et 32 ✅ | 🟡 Devis obligatoire pour l'artisan ; facture laissée à son outil (obligation électronique 2026-2027) |
 | **4** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre séparé (Item 34) |
 | **5** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
 | **6** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
