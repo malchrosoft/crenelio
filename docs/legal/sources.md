@@ -1,6 +1,6 @@
 # Sources
 
-Vérifiées le **01/11/2026**. « Officielle » : texte ou publication de l'administration ; « secondaire » :
+Vérifiées le **01/11/2026** (rétractation en ligne : **02/11/2026**). « Officielle » : texte ou publication de l'administration ; « secondaire » :
 guide privé, à recouper.
 
 | Source | Nature | Utilisée pour |
@@ -14,10 +14,15 @@ guide privé, à recouper.
 | [Legifiscal : débours et TVA](https://www.legifiscal.fr/tva/tva-francaise/regimes-specifiques/debours-tva.html) | Secondaire | CGI art. 267 II 2° |
 | [Dougs : les débours](https://www.dougs.fr/blog/les-debours/) | Secondaire | Débours |
 | [Bpifrance Création : mention EI](https://bpifrance-creation.fr/entrepreneur/actualites/ei-documents-concernes-nouvelle-mention-obligatoire) | Secondaire (public) | C. com. R526-27, documents concernés |
+| [Légifrance : annexe à l'article R221-3 (modèle d'information, version du 19 juin 2026)](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000053303407) | Officielle (texte non reproduit par l'outil) | Rétractation : modèle d'information, décret n° 2026-3 |
+| [Lexing Avocats : bouton de rétractation](https://www.lexing.law/avocats/bouton-de-retractation-ce-qui-change-pour-le-commerce/2026/03/30/) | Secondaire | Fonction de rétractation en ligne : champ, libellés, accusé |
+| [La Cité des entreprises : décret n° 2026-3](https://www.lacitedesentreprises.com/droit-des-affaires/obligation-daffichage-du-bouton-de-retractation-en-ligne-les-precisions-apportees-par-le-decret-n-2026-3-du-5-janvier-2026/) | Secondaire | Contenu de la déclaration, accusé de réception, information précontractuelle |
 | [Lettre des réseaux : rétractation et prestation de services](https://www.lettredesreseaux.com/droit-de-retractation-et-contrat-de-prestation-de-services.html) | Secondaire | L221-25 (exécution anticipée) |
 
 ## À lire dans le texte officiel (non consulté directement)
 
+- Ordonnance n° 2026-2 et décret n° 2026-3 du 5 janvier 2026 (fonction de rétractation en ligne) ;
+  annexe à l'article R221-3 (version du 19 juin 2026).
 - Code de la consommation : L111-1, L111-2, L221-5, L221-9, L221-18, L221-20, L221-25, L221-28 ;
   formulaire type de rétractation (annexe à l'article R221-1) ; L616-1 (médiation).
 - Code de commerce : R526-27 (dénomination de l'entrepreneur individuel).

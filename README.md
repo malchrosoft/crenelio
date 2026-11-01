@@ -35,6 +35,7 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 ### Espace Artisan (`/admin`)
 - **Mise en page pleine page** : header fixe (nom de l'entreprise, déconnexion, liens vers le site ouverts dans un nouvel onglet) et menu latéral rétractable.
 - **Rendez-vous** : planning, recherche et filtres, statuts en français, reprogrammation, journal des emails avec relance ; **saisie d'un rendez-vous par l'artisan** (heure libre, hors zone forçable, envoi des confirmations au choix).
+- **Devis** (en cours, Item 22) : devis prérempli depuis un rendez-vous, lignes main-d'œuvre, forfait, déplacement et pièces achetées au nom du client (débours, hors chiffre d'affaires), TVA ou franchise, intervention urgente, envoi par email avec lien vers la page du devis (`/devis/:token` : accord, mandat de débours distinct, pièces remplacées, rétractation en ligne), lecture seule avec la réponse du client ; cadre légal et sources dans [`docs/legal/`](docs/legal/README.md).
 - **Prestations** : ajout, édition, prix, durée, mode de frais de déplacement.
 - **Horaires** : plages du matin et de l'après-midi par jour, indisponibilités (congés, formation…).
 - **Déplacement** : mode d'intervention (à domicile ou dans les locaux), adresse de l'entreprise, frais par paliers.
@@ -255,9 +256,11 @@ consultable depuis l'Espace Artisan (bouton « Emails » d'un rendez-vous) et re
 | `POST` | `/api/appointments/:id/notifications/resend` | Relance manuelle d'un email (`client_confirmation` ou `pro_confirmation`) |
 | `GET` / `POST` | `/api/quotes` | Devis (Item 22) : liste ; brouillon, prérempli depuis un rendez-vous avec `appointment_id` |
 | `GET` / `PUT` / `DELETE` | `/api/quotes/:id` | Détail ; modification et suppression d'un brouillon uniquement |
-| `POST` | `/api/quotes/:id/send` | Envoi : numéro (`D-AAAA-0001`), lien client et échéance ; le devis n'est plus modifiable |
+| `POST` | `/api/quotes/:id/send` | Envoi : numéro (`D-AAAA-0001`), lien client, échéance et email au client (email du client et `APP_URL` exigés) ; le devis n'est plus modifiable |
+| `GET` | `/api/quotes/:id/notifications` | Journal des emails du devis |
 | `GET` | `/api/quotes/token/:token` | Consultation publique par le client (lien à jeton) |
-| `POST` | `/api/quotes/token/:token/decision` | Réponse du client (`accept` / `refuse`) : pour accepter, `keep_parts` (pièces remplacées ou décharge), `debours_mandate` s'il y a des débours, `withdrawal_ack` hors intervention urgente (`early_execution` facultatif) ; plafonnée par `RateLimit` |
+| `POST` | `/api/quotes/token/:token/withdraw` | Rétractation en ligne (`name`, `email` de l'accusé de réception) pendant le délai : accusé au client, avis à l'artisan ; plafonnée par `RateLimit` |
+| `POST` | `/api/quotes/token/:token/decision` | Réponse du client (`accept` / `refuse`) : pour accepter, `keep_parts` (pièces remplacées ou décharge), `debours_mandate` (accord distinct, `true` ou `false`) s'il y a des débours, `withdrawal_ack` hors intervention urgente (`early_execution` facultatif) ; plafonnée par `RateLimit` |
 
 ---
 

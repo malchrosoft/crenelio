@@ -219,3 +219,97 @@ export interface BookingPayload {
   /** Espace Artisan : envoyer les confirmations par email. */
   notify?: boolean;
 }
+
+// --- Devis (Item 22) ---
+
+/** Types de ligne : main-d'œuvre, forfait, déplacement, pièce au nom du client (débours), fourniture revendue. */
+export type QuoteLineKind = 'labour' | 'service' | 'travel' | 'debours' | 'supply';
+export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'refused' | 'expired' | 'withdrawn';
+
+/** Montants en chaînes (DECIMAL MySQL) à la lecture, en nombres à l'envoi. */
+export interface QuoteLine {
+  kind: QuoteLineKind;
+  label: string;
+  quantity: number | string;
+  unit: string;
+  unit_price: number | string;
+  vat_rate: number | string;
+}
+
+export interface Quote {
+  id: number;
+  number: string | null;
+  appointment_id: number | null;
+  appointment_start?: string | null;
+  client_name: string;
+  client_email: string;
+  client_phone: string;
+  address: string;
+  postal_code: string;
+  city: string;
+  title: string;
+  notes: string | null;
+  status: QuoteStatus;
+  vat_mode: 'franchise' | 'vat';
+  validity_days: number;
+  quote_price: string | null;
+  urgent: number;
+  total_ht: string;
+  total_vat: string;
+  total_debours: string;
+  total_ttc: string;
+  sent_at: string | null;
+  valid_until: string | null;
+  decided_at: string | null;
+  keep_parts: number | null;
+  /** Budget maximum du mandat de débours (document séparé) ; null sans débours. */
+  debours_budget: string | null;
+  /** Mandat de débours : null sans réponse, 0 refusé (le client fournit les pièces), 1 donné. */
+  debours_mandate: number | null;
+  mandate_decided_at: string | null;
+  early_execution: number;
+  withdrawal_until: string | null;
+  withdrawn_at: string | null;
+  withdrawal_name: string | null;
+  withdrawal_email: string | null;
+  refusal_reason: string | null;
+  /** Page publique : rétractation en ligne encore possible. */
+  can_withdraw?: boolean;
+  created_at: string;
+  lines?: QuoteLine[];
+}
+
+/** Champs modifiables d'un brouillon. */
+export type QuotePayload = Pick<
+  Quote,
+  'client_name' | 'client_email' | 'client_phone' | 'address' | 'postal_code' | 'city' | 'title' | 'notes' | 'validity_days'
+> & {
+  appointment_id?: number | null;
+  quote_price: number | null;
+  urgent: boolean;
+  /** Vide : montant estimé des pièces. */
+  debours_budget: number | null;
+  lines: QuoteLine[];
+};
+
+/** Réponse du client au devis (page publique). */
+export interface QuoteDecisionPayload {
+  action: 'accept' | 'refuse';
+  keep_parts?: boolean;
+  debours_mandate?: boolean;
+  withdrawal_ack?: boolean;
+  early_execution?: boolean;
+  reason?: string;
+}
+
+/** Journal des emails d'un devis. */
+export interface QuoteNotification {
+  id: number;
+  type: 'quote_client' | 'decision_client' | 'decision_pro' | 'withdrawal_client' | 'withdrawal_pro';
+  recipient: string;
+  subject: string;
+  status: 'pending' | 'sent' | 'failed';
+  error_message: string | null;
+  sent_at: string | null;
+  created_at: string;
+}

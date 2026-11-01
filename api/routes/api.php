@@ -140,9 +140,11 @@ $router->get('/quotes',                     $admin([$quoteController, 'index']))
 $router->post('/quotes',                    $admin([$quoteController, 'store']));
 $router->get('/quotes/token/:token',        [$quoteController, 'showByToken']);
 $router->post('/quotes/token/:token/decision', [$quoteController, 'decide']);
+$router->post('/quotes/token/:token/withdraw', [$quoteController, 'withdraw']);
 $router->get('/quotes/:id',                 $admin([$quoteController, 'show']));
 $router->put('/quotes/:id',                 $admin([$quoteController, 'update']));
 $router->delete('/quotes/:id',              $admin([$quoteController, 'destroy']));
 $router->post('/quotes/:id/send',           $admin([$quoteController, 'send']));
+$router->get('/quotes/:id/notifications',   $admin([$quoteController, 'notifications']));
 
 return $router;

@@ -1,0 +1,551 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { PaperPlaneTiltIcon, PlusIcon, TrashIcon, WarningIcon, XIcon } from '@phosphor-icons/react';
+import { format, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { api } from '../../api';
+import { AppConfig, Quote, QuoteLine, QuoteLineKind, QuotePayload } from '../../types';
+import ConfirmDialog from './ConfirmDialog';
+import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, euro, lineAmount, newLine, quoteTotals, vatRates } from './quoteRules';
+
+interface QuoteEditorProps {
+  /** Devis existant ; `null` : nouveau brouillon (créé au premier enregistrement). */
+  quote: Quote | null;
+  config: AppConfig;
+  onClose: () => void;
+  onSaved: (quote: Quote) => void;
+  onDeleted: (id: number) => void;
+}
+
+const EMPTY: QuotePayload = {
+  client_name: '',
+  client_email: '',
+  client_phone: '',
+  address: '',
+  postal_code: '',
+  city: '',
+  title: '',
+  notes: null,
+  validity_days: 30,
+  quote_price: null,
+  urgent: false,
+  debours_budget: null,
+  lines: [],
+};
+
+function toPayload(quote: Quote): QuotePayload {
+  return {
+    appointment_id: quote.appointment_id,
+    client_name: quote.client_name,
+    client_email: quote.client_email,
+    client_phone: quote.client_phone,
+    address: quote.address,
+    postal_code: quote.postal_code,
+    city: quote.city,
+    title: quote.title,
+    notes: quote.notes,
+    validity_days: quote.validity_days,
+    quote_price: quote.quote_price === null ? null : Number(quote.quote_price),
+    urgent: Boolean(Number(quote.urgent)),
+    debours_budget: quote.debours_budget === null ? null : Number(quote.debours_budget),
+    lines: (quote.lines ?? []).map((line) => ({ ...line })),
+  };
+}
+
+const sqlDate = (value: string | null) => (value ? format(parseISO(value.replace(' ', 'T')), 'd MMMM yyyy', { locale: fr }) : '—');
+
+/**
+ * Éditeur d'un devis (Item 22) : client, nature des travaux, lignes typées, totaux, conditions.
+ * Un devis envoyé n'est plus modifiable : il s'affiche en lecture, avec la réponse du client.
+ * Cadre légal et rappels : docs/legal/ (devis, débours, rétractation, achat-revente).
+ */
+const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSaved, onDeleted }) => {
+  const vatMode: 'franchise' | 'vat' = quote?.vat_mode ?? (config.quote_vat_mode === 'vat' ? 'vat' : 'franchise');
+  const [form, setForm] = useState<QuotePayload>(() =>
+    quote ? toPayload(quote) : { ...EMPTY, validity_days: Number(config.quote_validity_days || 30) },
+  );
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
+  const [confirm, setConfirm] = useState<'send' | 'delete' | null>(null);
+
+  const locked = quote !== null && quote.status !== 'draft';
+  const allowSupply = config.quote_allow_supply === '1';
+  const rates = vatRates(config);
+  const totals = useMemo(() => quoteTotals(form.lines, vatMode), [form.lines, vatMode]);
+  const hasDebours = form.lines.some((line) => line.kind === 'debours');
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !confirm && onClose();
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose, confirm]);
+
+  const set = <K extends keyof QuotePayload>(key: K, value: QuotePayload[K]) => setForm((prev) => ({ ...prev, [key]: value }));
+  const setLine = (index: number, patch: Partial<QuoteLine>) =>
+    set(
+      'lines',
+      form.lines.map((line, i) => (i === index ? { ...line, ...patch } : line)),
+    );
+  const addLine = (kind: QuoteLineKind) => set('lines', [...form.lines, newLine(kind, config, vatMode)]);
+
+  /** Enregistre le brouillon (création au premier passage) ; renvoie le devis à jour. */
+  async function save(): Promise<Quote | null> {
+    setBusy(true);
+    setError(null);
+    try {
+      const saved = quote ? await api.updateQuote(quote.id, form) : await api.createQuote(form);
+      onSaved(saved);
+      return saved;
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'enregistrement");
+      return null;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function send() {
+    setConfirm(null);
+    const saved = await save();
+    if (!saved) return;
+    setBusy(true);
+    try {
+      const sent = await api.sendQuote(saved.id);
+      onSaved(sent);
+      setInfo(
+        sent.notifications.some((n) => n.status === 'sent')
+          ? 'Devis envoyé au client par email, avec le lien pour répondre.'
+          : "Devis numéroté, mais l'email n'est pas parti : vérifiez l'envoi des emails (écran Compte)."
+      );
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'envoi");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function remove() {
+    setConfirm(null);
+    if (!quote) return;
+    try {
+      await api.deleteQuote(quote.id);
+      onDeleted(quote.id);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la suppression');
+    }
+  }
+
+  /** Lignes d'une partie : prestations (devis) ou pièces au nom du client (mandat de débours). */
+  const renderLines = (debours: boolean) =>
+    form.lines.some((line) => (line.kind === 'debours') === debours) && (
+      <div className="quote-lines" role="table" aria-label={debours ? 'Pièces au nom du client' : 'Prestations'}>
+        <div className="quote-lines__row quote-lines__row--head" role="row">
+          <span role="columnheader">Type</span>
+          <span role="columnheader">Désignation</span>
+          <span role="columnheader">Qté</span>
+          <span role="columnheader">Unité</span>
+          <span role="columnheader">{vatMode === 'vat' && !debours ? 'PU HT' : 'Prix unitaire'}</span>
+          {vatMode === 'vat' && <span role="columnheader">TVA</span>}
+          <span role="columnheader">Montant</span>
+          <span role="columnheader" aria-label="Actions" />
+        </div>
+        {form.lines.map((line, index) =>
+          (line.kind === 'debours') !== debours ? null : (
+            <div className={`quote-lines__row quote-lines__row--${line.kind}`} role="row" key={index}>
+              <span className="quote-lines__kind" role="cell">
+                {LINE_KIND_LABELS[line.kind]}
+              </span>
+              <input
+                className="form-input"
+                aria-label="Désignation"
+                required
+                placeholder={line.kind === 'debours' ? 'Pièce, référence' : 'Désignation'}
+                value={line.label}
+                onChange={(e) => setLine(index, { label: e.target.value })}
+              />
+              <input
+                className="form-input"
+                aria-label="Quantité"
+                type="number"
+                min="0.01"
+                step="0.01"
+                required
+                value={line.quantity}
+                onChange={(e) => setLine(index, { quantity: e.target.value })}
+              />
+              <input
+                className="form-input"
+                aria-label="Unité"
+                value={line.unit}
+                onChange={(e) => setLine(index, { unit: e.target.value })}
+              />
+              <input
+                className="form-input"
+                aria-label="Prix unitaire"
+                type="number"
+                min="0"
+                step="0.01"
+                required
+                value={line.unit_price}
+                onChange={(e) => setLine(index, { unit_price: e.target.value })}
+              />
+              {vatMode === 'vat' &&
+                (line.kind === 'debours' ? (
+                  <span className="quote-lines__na" role="cell" title="Débours : sans TVA de l'artisan">
+                    —
+                  </span>
+                ) : (
+                  <select
+                    className="form-input"
+                    aria-label="Taux de TVA"
+                    value={Number(line.vat_rate)}
+                    onChange={(e) => setLine(index, { vat_rate: Number(e.target.value) })}
+                  >
+                    {rates.map((rate) => (
+                      <option key={rate} value={rate}>
+                        {String(rate).replace('.', ',')} %
+                      </option>
+                    ))}
+                  </select>
+                ))}
+              <span className="quote-lines__amount" role="cell">
+                {euro(lineAmount(line))}
+              </span>
+              {!locked && (
+                <button
+                  type="button"
+                  className="btn btn-secondary admin-btn-sm data-grid__icon-btn"
+                  onClick={() =>
+                    set(
+                      'lines',
+                      form.lines.filter((_, i) => i !== index),
+                    )
+                  }
+                  title="Retirer la ligne"
+                  aria-label="Retirer la ligne"
+                >
+                  <TrashIcon size={14} weight="bold" aria-hidden="true" />
+                </button>
+              )}
+            </div>
+          ),
+        )}
+      </div>
+    );
+
+  const title = quote?.number ? `Devis ${quote.number}` : quote ? 'Devis (brouillon)' : 'Nouveau devis';
+
+  return createPortal(
+    <div className="admin-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="quote-editor-title">
+      <div className="admin-modal admin-modal--xwide">
+        <div className="admin-modal__header">
+          <h3 className="admin-modal__title" id="quote-editor-title">
+            {title}
+            {quote && <span className={`status-badge quote-status--${quote.status}`}>{QUOTE_STATUS_LABELS[quote.status]}</span>}
+          </h3>
+          <button type="button" className="admin-modal__close" onClick={onClose} aria-label="Fermer">
+            <XIcon size={18} weight="bold" aria-hidden="true" />
+          </button>
+        </div>
+
+        <form
+          className="admin-modal__body quote-editor"
+          onSubmit={(e) => {
+            e.preventDefault();
+            save();
+          }}
+        >
+          {locked && quote && <QuoteDecision quote={quote} />}
+
+          <fieldset className="quote-editor__section" disabled={locked}>
+            <legend>Client et lieu d'intervention</legend>
+            <div className="quote-editor__grid">
+              <Field
+                id="quote-client-name"
+                label="Nom du client"
+                required
+                value={form.client_name}
+                onChange={(v) => set('client_name', v)}
+              />
+              <Field
+                id="quote-client-email"
+                label="Email"
+                type="email"
+                value={form.client_email}
+                onChange={(v) => set('client_email', v)}
+              />
+              <Field
+                id="quote-client-phone"
+                label="Téléphone"
+                type="tel"
+                value={form.client_phone}
+                onChange={(v) => set('client_phone', v)}
+              />
+              <Field id="quote-address" label="Adresse" required value={form.address} onChange={(v) => set('address', v)} />
+              <Field id="quote-postal-code" label="Code postal" value={form.postal_code} onChange={(v) => set('postal_code', v)} />
+              <Field id="quote-city" label="Ville" value={form.city} onChange={(v) => set('city', v)} />
+            </div>
+          </fieldset>
+
+          <fieldset className="quote-editor__section" disabled={locked}>
+            <legend>Travaux</legend>
+            <Field
+              id="quote-title"
+              label="Nature exacte des travaux"
+              value={form.title}
+              onChange={(v) => set('title', v)}
+              hint="Mention obligatoire du devis : décrivez précisément la réparation ou l'entretien."
+            />
+            <label className="form-check quote-editor__urgent">
+              <input type="checkbox" checked={form.urgent} onChange={(e) => set('urgent', e.target.checked)} />
+              <span>Intervention urgente demandée par le client</span>
+            </label>
+            <p className="form-hint">
+              Danger pour les personnes ou les locaux : pas de délai de rétractation, mais seulement pour les pièces et travaux strictement
+              nécessaires. Tout le reste fait l'objet d'un devis séparé.
+            </p>
+          </fieldset>
+
+          <fieldset className="quote-editor__section" disabled={locked}>
+            <legend>Prestations</legend>
+            {renderLines(false)}
+            {!locked && (
+              <div className="quote-editor__add">
+                {(['labour', 'service', 'travel', ...(allowSupply ? ['supply'] : [])] as QuoteLineKind[]).map((kind) => (
+                  <button key={kind} type="button" className="btn btn-secondary admin-btn-sm" onClick={() => addLine(kind)}>
+                    <PlusIcon size={14} weight="bold" aria-hidden="true" />
+                    {LINE_KIND_LABELS[kind]}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <dl className="quote-totals">
+              <dt>{vatMode === 'vat' ? 'Total HT' : 'Total prestations'}</dt>
+              <dd>{euro(totals.ht)}</dd>
+              {vatMode === 'vat' ? (
+                <>
+                  <dt>TVA</dt>
+                  <dd>{euro(totals.vat)}</dd>
+                </>
+              ) : (
+                <dd className="quote-totals__mention">{config.quote_vat_exemption || 'TVA non applicable, art. 293 B du CGI'}</dd>
+              )}
+              <dt className="quote-totals__total">Total du devis TTC</dt>
+              <dd className="quote-totals__total">{euro(totals.ttc)}</dd>
+            </dl>
+          </fieldset>
+
+          <fieldset className="quote-editor__section quote-mandate" disabled={locked}>
+            <legend>Mandat de débours (document séparé)</legend>
+            <p className="form-hint">
+              Pièces achetées <strong>au nom et pour le compte du client</strong>, sur son mandat : hors de votre chiffre d'affaires et sans
+              votre TVA. Le client donne ou refuse ce mandat par un accord distinct du devis ; s'il le refuse, il fournit lui-même les
+              pièces.
+            </p>
+            {renderLines(true)}
+            {!locked && (
+              <div className="quote-editor__add">
+                <button type="button" className="btn btn-secondary admin-btn-sm" onClick={() => addLine('debours')}>
+                  <PlusIcon size={14} weight="bold" aria-hidden="true" />
+                  Pièce au nom du client
+                </button>
+              </div>
+            )}
+            {hasDebours && (
+              <>
+                <div className="quote-editor__grid">
+                  <Field
+                    id="quote-debours-budget"
+                    label="Budget maximum du mandat (€)"
+                    type="number"
+                    value={form.debours_budget === null ? '' : String(form.debours_budget)}
+                    onChange={(v) => set('debours_budget', v === '' ? null : Number(v))}
+                    hint={`Vide : montant estimé des pièces (${euro(totals.debours)}). Au-delà du budget, nouvel accord du client.`}
+                  />
+                </div>
+                <dl className="quote-totals">
+                  <dt>Pièces estimées (débours)</dt>
+                  <dd>{euro(totals.debours)}</dd>
+                  <dt className="quote-totals__total">Total estimé à régler (devis + débours)</dt>
+                  <dd className="quote-totals__total">{euro(totals.estimated)}</dd>
+                </dl>
+                <DeboursReminder budget={form.debours_budget ?? totals.debours} />
+              </>
+            )}
+          </fieldset>
+
+          <fieldset className="quote-editor__section" disabled={locked}>
+            <legend>Conditions</legend>
+            <div className="quote-editor__grid">
+              <Field
+                id="quote-validity"
+                label="Durée de validité (jours)"
+                type="number"
+                value={String(form.validity_days)}
+                onChange={(v) => set('validity_days', Number(v))}
+              />
+              <Field
+                id="quote-price"
+                label="Prix du devis (vide : gratuit)"
+                type="number"
+                value={form.quote_price === null ? '' : String(form.quote_price)}
+                onChange={(v) => set('quote_price', v === '' ? null : Number(v))}
+                hint="Mention obligatoire : le devis indique s'il est gratuit ou payant."
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="quote-notes">
+                Précisions pour le client
+              </label>
+              <textarea
+                id="quote-notes"
+                className="form-textarea"
+                value={form.notes ?? ''}
+                onChange={(e) => set('notes', e.target.value || null)}
+              />
+            </div>
+          </fieldset>
+
+          {error && <p className="form-alert-error">{error}</p>}
+          {info && (
+            <p className="admin-settings-message" role="status">
+              {info}
+            </p>
+          )}
+
+          <div className="admin-modal__actions">
+            {quote && quote.status === 'draft' && (
+              <button type="button" className="btn btn-danger" onClick={() => setConfirm('delete')} disabled={busy}>
+                <TrashIcon size={16} weight="bold" aria-hidden="true" />
+                Supprimer
+              </button>
+            )}
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={busy}>
+              Fermer
+            </button>
+            {!locked && (
+              <>
+                <button type="submit" className="btn btn-secondary" disabled={busy}>
+                  {busy ? 'Enregistrement…' : 'Enregistrer le brouillon'}
+                </button>
+                <button type="button" className="btn btn-primary" onClick={() => setConfirm('send')} disabled={busy || !form.lines.length}>
+                  <PaperPlaneTiltIcon size={16} weight="bold" aria-hidden="true" />
+                  Envoyer
+                </button>
+              </>
+            )}
+          </div>
+        </form>
+      </div>
+
+      {confirm === 'send' && (
+        <ConfirmDialog title="Envoyer le devis ?" confirmLabel="Envoyer" onConfirm={send} onCancel={() => setConfirm(null)}>
+          <p>Le devis reçoit son numéro et n'est plus modifiable : pour toute correction, vous en créerez un nouveau.</p>
+          <p>
+            Il est envoyé par email au client avec un lien pour l'accepter ou le refuser, et reste valable {form.validity_days} jours.
+          </p>
+        </ConfirmDialog>
+      )}
+      {confirm === 'delete' && (
+        <ConfirmDialog title="Supprimer le brouillon ?" confirmLabel="Supprimer" onConfirm={remove} onCancel={() => setConfirm(null)}>
+          <p>Ce brouillon n'a jamais été envoyé : il est supprimé définitivement.</p>
+        </ConfirmDialog>
+      )}
+    </div>,
+    document.body,
+  );
+};
+
+/** Champ de formulaire simple (libellé, aide facultative). */
+const Field: React.FC<{
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  required?: boolean;
+  hint?: string;
+}> = ({ id, label, value, onChange, type = 'text', required, hint }) => (
+  <div className="form-group">
+    <label className="form-label" htmlFor={id}>
+      {label}
+    </label>
+    <input id={id} className="form-input" type={type} required={required} value={value} onChange={(e) => onChange(e.target.value)} />
+    {hint && <p className="form-hint">{hint}</p>}
+  </div>
+);
+
+/** Rappels à l'artisan pour les pièces achetées au nom du client (docs/legal/fr/rappels-artisan.md). */
+const DeboursReminder: React.FC<{ budget: number }> = ({ budget }) => (
+  <aside className="quote-reminder" aria-label="Rappels sur les débours">
+    <p className="quote-reminder__title">
+      <WarningIcon size={16} weight="fill" aria-hidden="true" />
+      Pièces au nom du client : à respecter
+    </p>
+    <ul>
+      <li>N'achetez qu'après le mandat du client (accord distinct du devis), dans la limite de {euro(budget)} ; au-delà, nouvel accord.</li>
+      <li>Facture ou ticket du fournisseur au nom du client (nom, adresse ; SIRET et TVA s'il est professionnel).</li>
+      <li>Conservez les originaux (contrôle), remettez une copie au client avec votre facture.</li>
+      <li>Refacturez le montant exact, sans marge, sur une ligne distincte ; notez « débours » dans votre livre des recettes.</li>
+      <li>Jamais de carburant, de frais kilométriques ni d'outillage en débours.</li>
+    </ul>
+  </aside>
+);
+
+/** Réponse du client sur un devis envoyé (preuve de l'accord). */
+const QuoteDecision: React.FC<{ quote: Quote }> = ({ quote }) => (
+  <dl className="quote-decision">
+    <dt>Envoyé le</dt>
+    <dd>{sqlDate(quote.sent_at)}</dd>
+    <dt>Valable jusqu'au</dt>
+    <dd>{sqlDate(quote.valid_until)}</dd>
+    {quote.decided_at && (
+      <>
+        <dt>{quote.status === 'accepted' ? 'Accepté le' : 'Refusé le'}</dt>
+        <dd>{sqlDate(quote.decided_at)}</dd>
+      </>
+    )}
+    {quote.status === 'accepted' && (
+      <>
+        <dt>Pièces remplacées</dt>
+        <dd>{Number(quote.keep_parts) ? 'Le client les conserve' : 'Laissées à l’artisan (décharge)'}</dd>
+        {Number(quote.total_debours) > 0 && (
+          <>
+            <dt>Mandat de débours</dt>
+            <dd>
+              {quote.debours_mandate === null
+                ? 'Sans réponse'
+                : Number(quote.debours_mandate)
+                  ? `Donné le ${sqlDate(quote.mandate_decided_at)} (${euro(quote.debours_budget ?? quote.total_debours)} maximum)`
+                  : 'Refusé : le client fournit les pièces'}
+            </dd>
+          </>
+        )}
+        <dt>Rétractation</dt>
+        <dd>
+          {Number(quote.urgent)
+            ? 'Intervention urgente : pas de délai'
+            : `Jusqu'au ${sqlDate(quote.withdrawal_until)}${Number(quote.early_execution) ? ' (exécution anticipée demandée)' : ''}`}
+        </dd>
+      </>
+    )}
+    {quote.status === 'withdrawn' && (
+      <>
+        <dt>Rétracté le</dt>
+        <dd>
+          {sqlDate(quote.withdrawn_at)} par {quote.withdrawal_name} (accusé de réception : {quote.withdrawal_email})
+        </dd>
+      </>
+    )}
+    {quote.refusal_reason && (
+      <>
+        <dt>Motif du refus</dt>
+        <dd>{quote.refusal_reason}</dd>
+      </>
+    )}
+  </dl>
+);
+
+export default QuoteEditor;

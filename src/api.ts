@@ -16,6 +16,10 @@ import {
   NotificationType,
   BrandingKind,
   BrandingUrls,
+  Quote,
+  QuotePayload,
+  QuoteDecisionPayload,
+  QuoteNotification,
 } from './types';
 
 const BASE_URL = '/api';
@@ -135,6 +139,24 @@ export const api = {
   createUnavailability: (payload: { title: string; start_datetime: string; end_datetime: string }) =>
     request<Unavailability>('POST', '/unavailabilities', payload),
   deleteUnavailability: (id: number) => request<{ message: string }>('DELETE', `/unavailabilities/${id}`),
+
+  // Devis (Item 22)
+  listQuotes: () => request<Quote[]>('GET', '/quotes'),
+  getQuote: (id: number) => request<Quote>('GET', `/quotes/${id}`),
+  /** Brouillon ; avec `appointment_id` seul, prérempli depuis le rendez-vous. */
+  createQuote: (payload: Partial<QuotePayload>) => request<Quote>('POST', '/quotes', payload),
+  updateQuote: (id: number, payload: QuotePayload) => request<Quote>('PUT', `/quotes/${id}`, payload),
+  deleteQuote: (id: number) => request<{ deleted: boolean }>('DELETE', `/quotes/${id}`),
+  /** Numéro, lien et email au client (`notifications` : résultat de l'envoi). */
+  sendQuote: (id: number) =>
+    request<Quote & { notifications: { type: string; status: string }[] }>('POST', `/quotes/${id}/send`),
+  quoteNotifications: (id: number) => request<QuoteNotification[]>('GET', `/quotes/${id}/notifications`),
+  // Page publique du devis (lien à jeton)
+  getQuoteByToken: (token: string) => request<Quote>('GET', `/quotes/token/${token}`),
+  decideQuote: (token: string, payload: QuoteDecisionPayload) =>
+    request<{ status: Quote['status'] }>('POST', `/quotes/token/${token}/decision`, payload),
+  withdrawQuote: (token: string, name: string, email: string) =>
+    request<{ status: 'withdrawn'; withdrawn_at: string }>('POST', `/quotes/token/${token}/withdraw`, { name, email }),
 
   // Moteur de créneaux
   getSlots: (serviceId: number, date: string) =>

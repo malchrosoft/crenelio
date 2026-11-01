@@ -1623,6 +1623,11 @@ $admin-sidebar-collapsed: 68px;
   max-width: 720px;
 }
 
+// Éditeur de devis : lignes en tableau
+.admin-modal--xwide {
+  max-width: 1040px;
+}
+
 /* Zone de recadrage : react-easy-crop occupe tout le conteneur positionné */
 .crop-area {
   position: relative;
@@ -2249,6 +2254,105 @@ $admin-sidebar-collapsed: 68px;
 
   .decision-card__result--ok {
     color: $success;
+  }
+}
+
+// Page du devis (/devis/:token) : mentions, devis, mandat de débours séparé, rétractation en ligne
+.decision-card.quote-page {
+  max-width: 880px;
+
+  h3 {
+    margin: 0 0 $space-xs;
+    font-size: 1rem;
+    color: $gray-800;
+  }
+
+  .quote-page__title .status-badge {
+    margin-left: $space-sm;
+  }
+
+  .quote-page__parties {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $space-md;
+    line-height: $line-height-base;
+
+    p { margin: 0 0 $space-xs; }
+
+    @include mobile { grid-template-columns: 1fr; }
+  }
+
+  .quote-page__section {
+    margin-top: $space-md;
+    padding-top: $space-md;
+    border-top: 1px solid $gray-200;
+
+    > p { line-height: $line-height-base; }
+    .form-check { margin-top: $space-xs; align-items: flex-start; font-weight: 400; }
+  }
+
+  // Mandat : document distinct, encadré à part
+  .quote-mandate {
+    padding: $space-block;
+    border: 1px dashed $gray-300;
+    border-radius: $radius-sm;
+  }
+
+  .quote-page__choice {
+    display: grid;
+    justify-items: start;
+    gap: $space-2xs;
+    margin: $space-sm 0 0;
+    padding: 0;
+    border: 0;
+
+    legend { font-weight: 600; }
+  }
+
+  .quote-page__lines {
+    width: 100%;
+    margin-top: $space-sm;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+
+    th, td {
+      padding: $space-xs;
+      border-bottom: 1px solid $gray-200;
+      text-align: right;
+      vertical-align: top;
+    }
+
+    th { color: $gray-500; font-weight: 600; }
+    th:first-child, td:first-child { text-align: left; }
+  }
+
+  .quote-page__kind {
+    display: block;
+    font-size: 0.75rem;
+    color: $gray-500;
+  }
+
+  .quote-page__mediator { margin-top: $space-md; }
+
+  // Modèle d'information sur la rétractation (texte réglementaire)
+  .quote-page__notice {
+    margin: $space-sm 0;
+    padding: $space-sm $space-block;
+    background: $gray-100;
+    border-radius: $radius-sm;
+    font-size: 0.85rem;
+    line-height: $line-height-base;
+
+    p { margin: 0 0 $space-xs; }
+  }
+
+  .quote-page__notice-title { font-weight: 700; }
+  .quote-page__notice-heading { font-weight: 600; margin-top: $space-sm; }
+
+  .quote-withdrawal {
+    text-align: right;
+
+    form { text-align: left; }
   }
 }
 
@@ -3287,6 +3391,180 @@ $data-grid-status-width: 13em;
   }
 
   .admin-notices__item--info > svg { color: $primary; }
+}
+
+// -------------------------------------------------------
+// Devis (Item 22) : statuts, éditeur, lignes, totaux, rappels
+// -------------------------------------------------------
+.status-badge {
+  &.quote-status--draft    { background: $gray-100; color: $gray-600; }
+  &.quote-status--sent     { background: $primary-light; color: $primary; }
+  &.quote-status--accepted { background: $success-light; color: $success; }
+  &.quote-status--refused  { background: $danger-light; color: $danger; }
+  &.quote-status--expired  { background: $warning-light; color: $warning; }
+  &.quote-status--withdrawn { background: $danger-light; color: $danger; }
+}
+
+.admin-modal__title .status-badge {
+  margin-left: $space-sm;
+}
+
+.quote-editor {
+  display: grid;
+  gap: $space-md;
+
+  .quote-editor__section {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+
+    legend {
+      margin-bottom: $space-sm;
+      font-weight: 700;
+      color: $gray-800;
+    }
+  }
+
+  .quote-editor__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 $space-block;
+
+    @include tablet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @include mobile { grid-template-columns: 1fr; }
+  }
+
+  .quote-editor__urgent {
+    margin-top: $space-xs;
+  }
+
+  .quote-editor__add {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-xs;
+    margin-top: $space-sm;
+  }
+}
+
+// Mandat de débours : document distinct du devis, encadré à part
+.quote-editor .quote-mandate {
+  padding: $space-sm $space-block $space-block;
+  border: 1px dashed $gray-300;
+  border-radius: $radius-sm;
+
+  legend { padding: 0 $space-xs; }
+  .quote-editor__grid { margin-top: $space-block; }
+}
+
+.quote-lines {
+  display: grid;
+  gap: $space-xs;
+
+  .quote-lines__row {
+    display: grid;
+    grid-template-columns: 150px minmax(160px, 1fr) 80px 80px 110px 90px 100px 36px;
+    gap: $space-xs;
+    align-items: center;
+
+    @include tablet {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  // Sans TVA (franchise) : pas de colonne de taux
+  &:not(:has(select)) .quote-lines__row {
+    grid-template-columns: 150px minmax(160px, 1fr) 80px 80px 110px 100px 36px;
+
+    @include tablet { grid-template-columns: 1fr 1fr; }
+  }
+
+  .quote-lines__row--head {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $gray-500;
+    text-transform: uppercase;
+
+    @include tablet { display: none; }
+  }
+
+  .quote-lines__kind {
+    font-size: 0.8rem;
+    color: $gray-600;
+  }
+
+  // Débours : distingués (hors chiffre d'affaires)
+  .quote-lines__row--debours .quote-lines__kind { color: $warning; font-weight: 600; }
+
+  .quote-lines__amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .quote-lines__na {
+    text-align: center;
+    color: $gray-500;
+  }
+}
+
+.quote-totals {
+  display: grid;
+  grid-template-columns: max-content 140px;
+  justify-content: end;
+  gap: $space-2xs $space-md;
+  margin: $space-block 0 0;
+
+  dt { color: $gray-600; text-align: right; }
+  dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+
+  .quote-totals__mention {
+    grid-column: 1 / -1;
+    font-size: 0.8rem;
+    color: $gray-500;
+  }
+
+  .quote-totals__total {
+    font-weight: 700;
+    color: $gray-800;
+  }
+}
+
+.quote-reminder {
+  margin-top: $space-block;
+  padding: $space-sm $space-block;
+  background: $warning-light;
+  border-radius: $radius-sm;
+  font-size: 0.85rem;
+  color: $gray-700;
+
+  .quote-reminder__title {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    margin: 0 0 $space-xs;
+    font-weight: 700;
+
+    svg { color: $warning; }
+  }
+
+  ul {
+    margin: 0;
+    padding-left: $space-md;
+    line-height: $line-height-base;
+  }
+}
+
+.quote-decision {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: $space-2xs $space-sm;
+  margin: 0;
+  padding: $space-sm $space-block;
+  background: $gray-100;
+  border-radius: $radius-sm;
+
+  dt { color: $gray-500; }
+  dd { margin: 0; }
 }
 
 // -------------------------------------------------------

@@ -646,6 +646,191 @@ class EmailTemplates
     }
 
     // -----------------------------------------------------------------
+    // Devis (Item 22) — cadre légal : docs/legal/
+    // -----------------------------------------------------------------
+
+    /** Lien public du devis (/devis/:token), null sans APP_URL. */
+    public static function quoteUrl(array $quote): ?string
+    {
+        return APP_URL !== '' && !empty($quote['token']) ? APP_URL . '/devis/' . $quote['token'] : null;
+    }
+
+    /**
+     * Devis envoyé au client : lien « Consulter et répondre ». Le devis et le mandat de débours sont
+     * présentés séparément sur la page ; la rétractation y est expliquée.
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function quoteClient(array $quote, array $config): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $subject = sprintf('Votre devis %s — %s', $quote['number'], $company);
+        $intro = sprintf(
+            'Bonjour %s, voici votre devis pour : <strong>%s</strong>. Consultez-le en ligne pour l\'accepter ou le refuser.',
+            self::escape($quote['client_name']),
+            self::escape($quote['title'] ?: 'votre intervention')
+        );
+        $rows = self::quoteRows($quote);
+        $outro = (float)$quote['total_debours'] > 0
+            ? 'Les pièces sont présentées dans un <strong>mandat de débours</strong> distinct : vous choisissez de les faire acheter en votre nom par l\'artisan, ou de les fournir vous-même.'
+            : 'Rien n\'est dû tant que vous n\'avez pas accepté le devis.';
+        $url = self::quoteUrl($quote);
+
+        return [
+            'subject' => $subject,
+            'html'    => self::layout($company, 'Votre devis ' . $quote['number'], $intro, $rows, $outro, $url ? ['url' => $url, 'label' => 'Consulter et répondre au devis'] : null, $config),
+            'text'    => self::plainText('Votre devis ' . $quote['number'], $intro, $rows, $outro, $url, $config, 'Consulter et répondre au devis'),
+        ];
+    }
+
+    /**
+     * Réponse enregistrée, au client. Accepté : exemplaire du contrat sur support durable (lignes,
+     * mandat, pièces remplacées) et, hors urgence, délai de rétractation avec la fonction en ligne.
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function quoteDecisionClient(array $quote, array $config): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $accepted = $quote['status'] === 'accepted';
+        $subject = sprintf('Devis %s %s — %s', $quote['number'], $accepted ? 'accepté' : 'refusé', $company);
+        $url = self::quoteUrl($quote);
+
+        if (!$accepted) {
+            $intro = sprintf('Bonjour %s, votre refus du devis %s a bien été enregistré. Aucune somme n\'est due.', self::escape($quote['client_name']), self::escape($quote['number']));
+            return [
+                'subject' => $subject,
+                'html'    => self::layout($company, 'Devis refusé', $intro, [], '', null, $config),
+                'text'    => self::plainText('Devis refusé', $intro, [], '', null, $config),
+            ];
+        }
+
+        $intro = sprintf(
+            'Bonjour %s, votre accord sur le devis %s a été enregistré le %s. Ce message en est votre exemplaire : conservez-le.',
+            self::escape($quote['client_name']),
+            self::escape($quote['number']),
+            self::escape(self::formatDate((string)$quote['decided_at']) . ' à ' . self::formatTime((string)$quote['decided_at']))
+        );
+        $rows = self::quoteRows($quote, true);
+        if ((float)$quote['total_debours'] > 0) {
+            $rows['Mandat de débours'] = $quote['debours_mandate']
+                ? self::escape('Donné : achat des pièces en votre nom, dans la limite de ' . self::money((float)$quote['debours_budget']))
+                : 'Refusé : vous fournissez les pièces';
+        }
+        $rows['Pièces remplacées'] = $quote['keep_parts'] ? 'Vous les conservez' : 'Laissées à l\'artisan (décharge)';
+        if ((int)$quote['urgent']) {
+            $outro = 'Intervention urgente demandée par vous : pas de délai de rétractation, dans la limite des pièces et travaux strictement nécessaires.';
+        } else {
+            $outro = sprintf(
+                'Vous pouvez vous rétracter sans motif jusqu\'au %s inclus, depuis la page du devis (« Renoncer au contrat ici ») ; un accusé de réception vous sera envoyé par email.%s',
+                self::escape(self::formatDate((string)$quote['withdrawal_until'])),
+                $quote['early_execution'] ? ' Vous avez demandé que l\'intervention commence avant la fin de ce délai : en cas de rétractation, le service déjà fourni reste dû à proportion.' : ''
+            );
+        }
+
+        return [
+            'subject' => $subject,
+            'html'    => self::layout($company, 'Devis accepté', $intro, $rows, $outro, $url && !(int)$quote['urgent'] ? ['url' => $url, 'label' => 'Voir le devis'] : null, $config),
+            'text'    => self::plainText('Devis accepté', $intro, $rows, $outro, $url, $config, 'Voir le devis'),
+        ];
+    }
+
+    /**
+     * Réponse du client, à l'artisan : décision, mandat, pièces remplacées, rétractation.
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function quoteDecisionPro(array $quote, array $config): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $accepted = $quote['status'] === 'accepted';
+        $subject = sprintf('Devis %s %s par %s', $quote['number'], $accepted ? 'accepté' : 'refusé', $quote['client_name']);
+        $intro = sprintf('%s a %s le devis %s.', self::escape($quote['client_name']), $accepted ? 'accepté' : 'refusé', self::escape($quote['number']));
+        $rows = self::quoteRows($quote);
+        if ($accepted) {
+            if ((float)$quote['total_debours'] > 0) {
+                $rows['Mandat de débours'] = $quote['debours_mandate']
+                    ? self::escape('Donné, budget ' . self::money((float)$quote['debours_budget']) . ' : pièces à acheter au nom du client')
+                    : 'Refusé : le client fournit les pièces';
+            }
+            $rows['Pièces remplacées'] = $quote['keep_parts'] ? 'Le client les conserve' : 'Laissées à l\'artisan (décharge)';
+            $rows['Rétractation'] = (int)$quote['urgent']
+                ? 'Intervention urgente : aucun délai'
+                : self::escape('Jusqu\'au ' . self::formatDate((string)$quote['withdrawal_until']) . ($quote['early_execution'] ? ' (exécution anticipée demandée)' : ' : ne pas commencer avant, sauf demande expresse'));
+        } elseif (!empty($quote['refusal_reason'])) {
+            $rows['Motif'] = self::escape((string)$quote['refusal_reason']);
+        }
+        $outro = $accepted && (float)$quote['total_debours'] > 0 && $quote['debours_mandate']
+            ? 'Pièces : facture ou ticket au nom du client, originaux à conserver, copie au client, montant exact refacturé.'
+            : '';
+
+        return [
+            'subject' => $subject,
+            'html'    => self::layout($company, $accepted ? 'Devis accepté' : 'Devis refusé', $intro, $rows, $outro, null, $config),
+            'text'    => self::plainText($accepted ? 'Devis accepté' : 'Devis refusé', $intro, $rows, $outro, null, $config),
+        ];
+    }
+
+    /**
+     * Accusé de réception de la rétractation, sur support durable : contenu de la déclaration, date
+     * et heure de son envoi (fonction de rétractation en ligne, depuis le 19 juin 2026).
+     *
+     * @param bool $forPro Copie destinée à l'artisan.
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function quoteWithdrawal(array $quote, array $config, bool $forPro): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $title = $forPro ? 'Rétractation du client' : 'Accusé de réception de votre rétractation';
+        $subject = sprintf('%s — devis %s', $title, $quote['number']);
+        $intro = $forPro
+            ? sprintf('%s s\'est rétracté du devis %s : ne pas engager l\'intervention ni l\'achat des pièces.', self::escape($quote['client_name']), self::escape($quote['number']))
+            : sprintf('Bonjour %s, nous avons bien reçu votre déclaration de rétractation. Le contrat est annulé.', self::escape((string)$quote['withdrawal_name']));
+        $rows = [
+            'Contrat'                 => self::escape('Devis ' . $quote['number'] . ($quote['title'] ? ' — ' . $quote['title'] : '')),
+            'Déclaration de'          => self::escape((string)$quote['withdrawal_name']),
+            'Accusé envoyé à'         => self::escape((string)$quote['withdrawal_email']),
+            'Envoyée le'              => self::escape(self::formatDate((string)$quote['withdrawn_at']) . ' à ' . self::formatTime((string)$quote['withdrawn_at'])),
+        ];
+        $outro = $forPro
+            ? 'Toute somme déjà versée est à rembourser au client dans les 14 jours (prestation déjà fournie à sa demande expresse : à proportion).'
+            : 'Toute somme déjà versée vous sera remboursée dans les 14 jours.';
+
+        return [
+            'subject' => $subject,
+            'html'    => self::layout($company, $title, $intro, $rows, $outro, null, $config),
+            'text'    => self::plainText($title, $intro, $rows, $outro, null, $config),
+        ];
+    }
+
+    /** Lignes du récapitulatif d'un devis (détail des lignes pour l'exemplaire du contrat). */
+    private static function quoteRows(array $quote, bool $detailed = false): array
+    {
+        $rows = ['Devis' => self::escape((string)$quote['number'])];
+        if ($detailed) {
+            foreach ($quote['lines'] ?? [] as $line) {
+                $amount = round((float)$line['quantity'] * (float)$line['unit_price'], 2);
+                $label = sprintf('%s (%s %s)', $line['label'], rtrim(rtrim(number_format((float)$line['quantity'], 2, ',', ''), '0'), ','), $line['unit']);
+                $rows[($line['kind'] === 'debours' ? 'Débours : ' : '') . $label] = self::money($amount);
+            }
+        }
+        $rows['Total du devis TTC'] = self::money((float)$quote['total_ttc']);
+        if ((float)$quote['total_debours'] > 0) {
+            $rows['Pièces (mandat de débours, à part)'] = self::money((float)$quote['total_debours']);
+        }
+        if (!empty($quote['valid_until']) && $quote['status'] === 'sent') {
+            $rows['Valable jusqu\'au'] = self::escape(self::formatDate((string)$quote['valid_until']));
+        }
+        return $rows;
+    }
+
+    /** Montant, zéro compris (un total de devis n'est jamais « Gratuit »). */
+    private static function money(float $amount): string
+    {
+        return number_format($amount, 2, ',', ' ') . ' €';
+    }
+
+    // -----------------------------------------------------------------
     // Utilitaires
     // -----------------------------------------------------------------
 

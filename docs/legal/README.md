@@ -23,6 +23,7 @@ avec une explication traduite.
 |---|---|
 | [fr/devis-depannage.md](fr/devis-depannage.md) | Devis du dépannage à domicile : document précontractuel, mentions, pièces remplacées |
 | [fr/retractation.md](fr/retractation.md) | Contrat à distance ou au domicile : rétractation, urgence, exécution anticipée |
+| [fr/retractation-modele.md](fr/retractation-modele.md) | Texte officiel du modèle d'information (annexe R221-3, 19 juin 2026) et choix d'application |
 | [fr/debours.md](fr/debours.md) | Pièces achetées au nom du client : conditions, justificatifs, chiffre d'affaires |
 | [fr/achat-revente.md](fr/achat-revente.md) | Revente de pièces : conséquences, forme juridique, alternative du débours |
 | [fr/note-facture.md](fr/note-facture.md) | Note (facture) obligatoire au-delà de 25 € TTC |

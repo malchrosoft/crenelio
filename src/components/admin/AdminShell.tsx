@@ -12,6 +12,7 @@ export type AdminTab =
   | 'appointments'
   | 'calendar'
   | 'unavailabilities'
+  | 'quotes'
   | 'services'
   | 'hours'
   | 'settings'

@@ -35,9 +35,22 @@ client**, le montant n'entre pas dans le chiffre d'affaires et ne supporte pas d
 Si l'artisan est en franchise de TVA, il est préférable que le client professionnel paie lui-même le
 fournisseur : il pourra récupérer la TVA.
 
+## Mandat : un accord distinct du devis
+
+Les sources exigent un **accord écrit préalable** (« mandat de débours ») précisant la nature de l'achat
+et le budget maximum, signé par les deux parties ; aucune ne prescrit sa forme. Crénelio le traite comme
+un **document séparé** du devis, avec son **propre accord** : le mandat engage le client à rembourser un
+achat fait en son nom, ce qui n'est pas l'objet du devis de prestation, et il sert de preuve propre en cas
+de contrôle (montants hors chiffre d'affaires). Le client peut accepter le devis et **refuser le mandat** :
+il fournit alors lui-même les pièces.
+
 ## Dans Crénelio
 
-- Ligne de devis « Pièce au nom du client (débours) » : montant estimé, sans TVA de l'artisan, totalisée
-  à part (`total_debours`), hors chiffre d'affaires.
-- Mandat de débours accepté par une case distincte ; le budget est le total des débours du devis.
+- Éditeur : section « Mandat de débours (document séparé) » : pièces au nom du client, **budget maximum**
+  (`debours_budget`, au moins le montant estimé), rappels à l'artisan.
+- Totaux : le **total du devis** ne couvre que les prestations ; les débours sont totalisés à part
+  (`total_debours`), avec un « total estimé à régler » indicatif.
+- Réponse du client : accord sur le devis **et** réponse distincte au mandat (donné ou refusé), chacun daté
+  (`decided_at`, `mandate_decided_at`) avec l'adresse IP.
+- Version imprimable du mandat, seule (étape 4 de l'Item 22).
 - La ligne « fourniture revendue » (achat-revente) est désactivée par défaut (`quote_allow_supply`).

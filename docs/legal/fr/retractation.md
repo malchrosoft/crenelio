@@ -1,6 +1,6 @@
 # Rétractation : contrat à distance ou au domicile du client
 
-*Dernière vérification : 01/11/2026. Sources : fiche DGCCRF « Dépannage à domicile » (officielle) ; INC ;
+*Dernière vérification : 02/11/2026. Sources : fiche DGCCRF « Dépannage à domicile » (officielle) ; INC ;
 sources secondaires sur L221-25. Articles du Code de la consommation à relire dans leur version
 consolidée (voir [sources](../sources.md)).*
 
@@ -34,9 +34,35 @@ Selon les sources secondaires (L221-25) : le professionnel ne peut commencer ava
 sur **demande expresse** du client ; si le client se rétracte ensuite, il doit un montant proportionnel
 au service déjà fourni. Sans demande expresse recueillie, rien n'est dû.
 
+## Fonction de rétractation en ligne (depuis le 19 juin 2026)
+
+L'ordonnance n° 2026-2 et le décret n° 2026-3 du 5 janvier 2026 (transposition de la directive (UE)
+2023/2673) imposent, pour tout contrat à distance conclu **via une interface en ligne**, une fonction de
+rétractation gratuite (sources secondaires concordantes, articles à relire sur Légifrance) :
+
+- identifiée par les mots « **renoncer au contrat ici** » ou une formule analogue dénuée d'ambiguïté ;
+- visible, directement et facilement accessible **pendant tout le délai** de rétractation ;
+- le consommateur y indique ou confirme son **nom et prénom**, le **contrat** concerné et le **moyen
+  électronique** de recevoir l'accusé de réception, puis valide par « **confirmer la rétractation** » ;
+- **accusé de réception** sur support durable, dans un délai raisonnable, reprenant le contenu de la
+  déclaration et la **date et l'heure** de son envoi ;
+- l'information précontractuelle indique où se trouve cette fonction ;
+- sanction : amende administrative jusqu'à 15 000 € (personne physique) ou 75 000 € (personne morale).
+
+Le modèle d'information (annexe à l'article R221-3) a été modifié en conséquence (version en vigueur au
+19 juin 2026) : texte officiel et choix d'application dans [retractation-modele.md](retractation-modele.md).
+
 ## Dans Crénelio
 
-- Case « intervention urgente » sur le devis : ni délai ni formulaire de rétractation.
+- Case « intervention urgente » sur le devis : ni délai ni fonction de rétractation.
 - Sinon, pour accepter, le client confirme avoir pris connaissance de son droit ; il peut demander
   l'exécution anticipée (case distincte) ; la fin du délai est enregistrée (`withdrawal_until`).
-- À faire (étape 3 de l'Item 22) : formulaire type joint, repris mot pour mot du texte officiel.
+- Page du devis (`/devis/:token`) : information sur le délai et l'emplacement de la fonction avant
+  l'accord ; après l'accord, bouton « Renoncer au contrat ici », déclaration (nom, email de l'accusé,
+  contrat rappelé), bouton « Confirmer la rétractation » ; statut `withdrawn`, déclaration conservée
+  (`withdrawn_at`, `withdrawal_name`, `withdrawal_email`, IP).
+- Accusé de réception par email au client (contenu, date et heure) et avis à l'artisan (remboursement
+  sous 14 jours) ; l'email d'accord rappelle la date limite et l'emplacement de la fonction.
+- Horodatages : la connexion MySQL est alignée sur le fuseau de l'application.
+- Page du devis : modèle d'information réglementaire affiché mot pour mot (`src/utils/withdrawalNotice.ts`).
+- À faire (étape 4) : formulaire type (annexe R221-1) et modèle d'information dans la version imprimable.

@@ -30,6 +30,10 @@ class Database
 
             try {
                 self::$instance = new PDO($dsn, DB_USER, DB_PASS, $options);
+                // NOW() / CURDATE() dans le fuseau de l'application (APP_TIMEZONE), quel que soit celui du
+                // serveur MySQL (UTC en local sous Docker) : les dates naïves en base s'y interprètent, et
+                // les horodatages des devis (accord, rétractation) ont valeur de preuve
+                self::$instance->exec("SET time_zone = '" . date('P') . "'");
             } catch (PDOException $e) {
                 if (APP_DEBUG) {
                     http_response_code(500);

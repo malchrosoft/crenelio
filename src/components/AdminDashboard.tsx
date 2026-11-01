@@ -11,6 +11,7 @@ import {
   MapTrifoldIcon,
   CalendarDotsIcon,
   CalendarXIcon,
+  FileTextIcon,
   StorefrontIcon,
   BrowserIcon,
   PaletteIcon,
@@ -42,6 +43,7 @@ const AppointmentCalendar = lazy(() => import('./admin/AppointmentCalendar'));
 // Liste des interventions (AG Grid Community) chargée à l'ouverture du planning
 const InterventionsGrid = lazy(() => import('./admin/InterventionsGrid'));
 const UnavailabilitiesGrid = lazy(() => import('./admin/UnavailabilitiesGrid'));
+const QuotesGrid = lazy(() => import('./admin/QuotesGrid'));
 const DashboardOverview = lazy(() => import('./admin/DashboardOverview'));
 import AdminLogin from './admin/AdminLogin';
 import type { AdminNotice } from './admin/AdminNotices';
@@ -162,6 +164,9 @@ export const AdminDashboard: React.FC = () => {
   const [dateEndFilter, setDateEndFilter] = useState('');
   // Rendez-vous ouvert dans la fenêtre de consultation / modification (calendrier ou liste)
   const [openedId, setOpenedId] = useState<number | null>(null);
+  // Devis à ouvrir dans l'écran « Devis » (créé depuis la fenêtre d'un rendez-vous)
+  const [openQuoteId, setOpenQuoteId] = useState<number | null>(null);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
 
   // Nouvelle prestation
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -576,6 +581,7 @@ export const AdminDashboard: React.FC = () => {
     { id: 'appointments', group: 'Interventions', label: 'Rendez-vous', icon: <CalendarBlankIcon {...NAV_ICON} />, count: appointments.length },
     { id: 'calendar', group: 'Interventions', label: 'Calendrier', icon: <CalendarDotsIcon {...NAV_ICON} /> },
     { id: 'unavailabilities', group: 'Interventions', label: 'Indisponibilités', icon: <CalendarXIcon {...NAV_ICON} /> },
+    { id: 'quotes', group: 'Interventions', label: 'Devis', icon: <FileTextIcon {...NAV_ICON} /> },
     { id: 'services', group: 'Activité', label: 'Prestations', icon: <WrenchIcon {...NAV_ICON} />, count: services.length },
     { id: 'hours', group: 'Activité', label: 'Horaires', icon: <ClockIcon {...NAV_ICON} /> },
     { id: 'settings', group: 'Activité', label: 'Déplacement', icon: <CarIcon {...NAV_ICON} /> },
@@ -624,12 +630,15 @@ export const AdminDashboard: React.FC = () => {
       onLogout={handleLogout}
       nav={{ items: navItems, active: activeTab, onSelect: setActiveTab }}
       notices={notices}
-      fill={!loading && ((activeTab === 'appointments' && !creatingAppointment) || activeTab === 'calendar' || activeTab === 'unavailabilities')}
+      fill={!loading && ((activeTab === 'appointments' && !creatingAppointment) || activeTab === 'calendar' || activeTab === 'unavailabilities' || activeTab === 'quotes')}
     >
       {openedId !== null && appointments.some((a) => a.id === openedId) && (
         <AppointmentDialog
           appointment={appointments.find((a) => a.id === openedId)!}
-          onClose={() => setOpenedId(null)}
+          onClose={() => {
+            setOpenedId(null);
+            setQuoteError(null);
+          }}
           onChanged={replaceAppointment}
           // Le journal remplace la fenêtre (pas de fenêtres empilées), avec retour possible
           onEmails={(appointment) => {
@@ -637,6 +646,18 @@ export const AdminDashboard: React.FC = () => {
             setEmailsFor({ appointment, fromDialog: true });
           }}
           onAnonymize={setAnonymizing}
+          onQuote={async (appointment) => {
+            setQuoteError(null);
+            try {
+              const draft = await api.createQuote({ appointment_id: appointment.id });
+              setOpenedId(null);
+              setOpenQuoteId(draft.id);
+              setActiveTab('quotes');
+            } catch (err: unknown) {
+              setQuoteError(err instanceof Error ? err.message : 'Création du devis impossible');
+            }
+          }}
+          quoteError={quoteError}
         />
       )}
       {emailsFor && (
@@ -1078,6 +1099,12 @@ export const AdminDashboard: React.FC = () => {
         </div>
       ) : activeTab === 'zone' ? (
         <ZoneWorkspace config={config} onSaved={setConfig} />
+      ) : activeTab === 'quotes' ? (
+        <div className="admin-page">
+          <Suspense fallback={<p>Chargement…</p>}>
+            <QuotesGrid config={config} openId={openQuoteId} onOpened={() => setOpenQuoteId(null)} />
+          </Suspense>
+        </div>
       ) : activeTab === 'unavailabilities' ? (
         <div className="admin-page">
           <Suspense fallback={<p>Chargement…</p>}>

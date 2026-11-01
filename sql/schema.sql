@@ -7,6 +7,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 SET NAMES utf8mb4;
 
+DROP TABLE IF EXISTS `quote_notifications`;
 DROP TABLE IF EXISTS `quote_lines`;
 DROP TABLE IF EXISTS `quotes`;
 DROP TABLE IF EXISTS `appointment_notifications`;
@@ -150,13 +151,15 @@ CREATE TABLE `quotes` (
     `city`            VARCHAR(100)    NOT NULL DEFAULT '',
     `title`           VARCHAR(255)    NOT NULL DEFAULT '',
     `notes`           TEXT            NULL,
-    `status`          ENUM('draft', 'sent', 'accepted', 'refused', 'expired') NOT NULL DEFAULT 'draft',
+    -- withdrawn : rétractation du client (fonction de rétractation en ligne, C. consom. L221-18 et suivants)
+    `status`          ENUM('draft', 'sent', 'accepted', 'refused', 'expired', 'withdrawn') NOT NULL DEFAULT 'draft',
     -- Régime de TVA figé à la création : 'franchise' (art. 293 B du CGI) ou 'vat'
     `vat_mode`        ENUM('franchise', 'vat') NOT NULL DEFAULT 'franchise',
     `validity_days`   SMALLINT        NOT NULL DEFAULT 30,
     -- NULL : devis gratuit ; sinon prix du devis (arrêté du 24 janvier 2017, art. 4)
     `quote_price`     DECIMAL(10,2)   NULL,
-    -- Totaux recalculés à chaque enregistrement ; débours hors chiffre d'affaires et hors TVA
+    -- Totaux recalculés à chaque enregistrement : total_ttc = prestations seules ; débours à part (mandat
+    -- séparé, hors chiffre d'affaires et hors TVA)
     `total_ht`        DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
     `total_vat`       DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
     `total_debours`   DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
@@ -169,14 +172,24 @@ CREATE TABLE `quotes` (
     `decision_ip`     VARCHAR(45)     NULL,
     -- Pièces remplacées (arrêté du 24 janvier 2017, annexe 2) : refus de les garder = décharge du client
     `keep_parts`      BOOLEAN         NULL,
-    -- Mandat de débours : achat des pièces au nom et pour le compte du client, dans la limite du devis
-    `debours_mandate` BOOLEAN         NOT NULL DEFAULT FALSE,
+    -- Mandat de débours : document distinct du devis, accord séparé du client (achat des pièces en son
+    -- nom et pour son compte, dans la limite du budget). NULL : pas de réponse ; 0 : refusé (le client
+    -- fournit lui-même les pièces) ; 1 : donné. Date et IP propres à cet accord.
+    `debours_budget`     DECIMAL(10,2) NULL,
+    `debours_mandate`    BOOLEAN       NULL,
+    `mandate_decided_at` DATETIME      NULL,
+    `mandate_ip`         VARCHAR(45)   NULL,
     -- Contrat à distance ou hors établissement (C. consom. L221-18) : rétractation de 14 jours, sauf
     -- travaux d'entretien ou de réparation urgents expressément demandés par le client (L221-28 8°)
     `urgent`          BOOLEAN         NOT NULL DEFAULT FALSE,
     -- Demande expresse du client de commencer avant la fin du délai de rétractation (L221-25)
     `early_execution` BOOLEAN         NOT NULL DEFAULT FALSE,
     `withdrawal_until` DATE           NULL,
+    -- Déclaration de rétractation en ligne (« Renoncer au contrat ici ») : nom, email de l'accusé, date, IP
+    `withdrawn_at`     DATETIME       NULL,
+    `withdrawal_name`  VARCHAR(255)   NULL,
+    `withdrawal_email` VARCHAR(255)   NULL,
+    `withdrawal_ip`    VARCHAR(45)    NULL,
     `refusal_reason`  TEXT            NULL,
     `created_at`      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -202,3 +215,18 @@ CREATE TABLE `quote_lines` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX `idx_quote_lines_quote` ON `quote_lines` (`quote_id`, `position`);
+
+-- Journal des emails d'un devis (envoi, réponses, rétractation), comme appointment_notifications
+CREATE TABLE `quote_notifications` (
+    `id`            INT AUTO_INCREMENT PRIMARY KEY,
+    `quote_id`      INT             NOT NULL,
+    `type`          ENUM('quote_client', 'decision_client', 'decision_pro', 'withdrawal_client', 'withdrawal_pro') NOT NULL,
+    `recipient`     VARCHAR(255)    NOT NULL,
+    `subject`       VARCHAR(255)    NOT NULL,
+    `status`        ENUM('pending', 'sent', 'failed') NOT NULL DEFAULT 'pending',
+    `error_message` TEXT            NULL,
+    `sent_at`       DATETIME        NULL,
+    `created_at`    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX `idx_quote_notifications_quote` (`quote_id`, `created_at`),
+    CONSTRAINT `fk_quote_notification_quote` FOREIGN KEY (`quote_id`) REFERENCES `quotes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

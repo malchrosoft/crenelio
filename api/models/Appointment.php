@@ -220,12 +220,23 @@ class Appointment
             [self::ANONYMIZED_NAME, ...$params]
         );
 
-        // Devis du rendez-vous (Item 22) : client et preuve de réponse ; montants et lignes conservés
+        // Devis du rendez-vous (Item 22) : client, preuves de réponse et de rétractation, journal des
+        // emails ; montants et lignes conservés
+        Database::execute(
+            "UPDATE `quote_notifications` n
+             JOIN `quotes` q ON q.id = n.quote_id
+             JOIN `appointments` a ON a.id = q.appointment_id
+             SET n.recipient = IF(n.type IN ('decision_pro', 'withdrawal_pro'), n.recipient, ''),
+                 n.subject = '(données anonymisées)'
+             WHERE a.client_name <> ? AND $condition",
+            [self::ANONYMIZED_NAME, ...$params]
+        );
         Database::execute(
             "UPDATE `quotes` q
              JOIN `appointments` a ON a.id = q.appointment_id
              SET q.client_name = ?, q.client_email = '', q.client_phone = '', q.address = '',
-                 q.decision_ip = NULL, q.notes = NULL, q.refusal_reason = NULL
+                 q.decision_ip = NULL, q.mandate_ip = NULL, q.notes = NULL, q.refusal_reason = NULL,
+                 q.withdrawal_name = NULL, q.withdrawal_email = NULL, q.withdrawal_ip = NULL
              WHERE a.client_name <> ? AND $condition",
             [self::ANONYMIZED_NAME, self::ANONYMIZED_NAME, ...$params]
         );

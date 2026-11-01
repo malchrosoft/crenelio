@@ -23,7 +23,7 @@ class Quote
     public const KINDS = ['labour', 'service', 'travel', 'debours', 'supply'];
 
     /** Statuts dans lesquels le devis n'est plus modifiable (envoyé au client ou décidé). */
-    private const LOCKED = ['sent', 'accepted', 'refused', 'expired'];
+    private const LOCKED = ['sent', 'accepted', 'refused', 'expired', 'withdrawn'];
 
     /** Liste, avec passage en « expiré » des devis envoyés dont la validité est dépassée. */
     public static function all(): array
@@ -143,10 +143,26 @@ class Quote
         unset($line);
         $data['lines'] = array_values($lines);
         $data['urgent'] = !empty($data['urgent']);
+
+        // Budget maximum du mandat de débours : au moins le montant estimé des pièces
+        $debours = self::totals($data['lines'])['total_debours'];
+        $budget = $data['debours_budget'] ?? null;
+        if ($debours <= 0) {
+            $data['debours_budget'] = null;
+        } elseif ($budget === null || $budget === '') {
+            $data['debours_budget'] = $debours;
+        } elseif (!is_numeric($budget) || round((float)$budget, 2) < $debours) {
+            return 'Le budget du mandat de débours doit couvrir au moins le montant estimé des pièces (' . number_format($debours, 2, ',', ' ') . ' €).';
+        } else {
+            $data['debours_budget'] = round((float)$budget, 2);
+        }
         return null;
     }
 
-    /** Totaux : HT et TVA arrondis par ligne ; débours à part (hors chiffre d'affaires, sans TVA). */
+    /**
+     * Totaux : HT et TVA arrondis par ligne. `total_ttc` ne couvre que les prestations : les débours
+     * relèvent du mandat séparé (hors chiffre d'affaires, sans TVA de l'artisan), totalisés à part.
+     */
     public static function totals(array $lines): array
     {
         $ht = $vat = $debours = 0.0;
@@ -163,7 +179,7 @@ class Quote
             'total_ht'      => round($ht, 2),
             'total_vat'     => round($vat, 2),
             'total_debours' => round($debours, 2),
-            'total_ttc'     => round($ht + $vat + $debours, 2),
+            'total_ttc'     => round($ht + $vat, 2),
         ];
     }
 
@@ -173,11 +189,12 @@ class Quote
         $totals = self::totals($data['lines']);
         Database::execute(
             'INSERT INTO `quotes` (appointment_id, client_name, client_email, client_phone, address, postal_code, city,
-                title, notes, vat_mode, validity_days, quote_price, urgent, total_ht, total_vat, total_debours, total_ttc)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                title, notes, vat_mode, validity_days, quote_price, urgent, debours_budget,
+                total_ht, total_vat, total_debours, total_ttc)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $data['appointment_id'] ?? null, ...self::clientFields($data), $vatMode, $data['validity_days'],
-                $data['quote_price'], (int)$data['urgent'], ...array_values($totals),
+                $data['quote_price'], (int)$data['urgent'], $data['debours_budget'], ...array_values($totals),
             ]
         );
         $id = (int)Database::lastInsertId();
@@ -191,10 +208,10 @@ class Quote
         $totals = self::totals($data['lines']);
         $changed = Database::execute(
             "UPDATE `quotes` SET client_name = ?, client_email = ?, client_phone = ?, address = ?, postal_code = ?,
-                city = ?, title = ?, notes = ?, validity_days = ?, quote_price = ?, urgent = ?,
+                city = ?, title = ?, notes = ?, validity_days = ?, quote_price = ?, urgent = ?, debours_budget = ?,
                 total_ht = ?, total_vat = ?, total_debours = ?, total_ttc = ?
              WHERE id = ? AND status = 'draft'",
-            [...self::clientFields($data), $data['validity_days'], $data['quote_price'], (int)$data['urgent'], ...array_values($totals), $id]
+            [...self::clientFields($data), $data['validity_days'], $data['quote_price'], (int)$data['urgent'], $data['debours_budget'], ...array_values($totals), $id]
         );
         if ($changed === 0 && !self::isDraft($id)) {
             return false;
@@ -249,23 +266,50 @@ class Quote
     }
 
     /**
-     * Réponse du client (preuve : date et IP). Accepté hors urgence : fin du délai de rétractation
-     * (14 jours, L221-18) ; exécution anticipée seulement sur sa demande expresse (L221-25).
+     * Réponses du client (preuve : date et IP de chacune).
+     * - Devis : accepté hors urgence ⇒ fin du délai de rétractation (14 jours, L221-18) ; exécution
+     *   anticipée seulement sur sa demande expresse (L221-25).
+     * - Mandat de débours, accord distinct : `$mandate` null s'il n'y a pas de débours ; false si le client
+     *   fournit lui-même les pièces.
      * false si le devis n'attend plus de réponse.
      */
-    public static function decide(int $id, bool $accepted, ?bool $keepParts, bool $mandate, bool $earlyExecution, ?string $reason): bool
+    public static function decide(int $id, bool $accepted, ?bool $keepParts, ?bool $mandate, bool $earlyExecution, ?string $reason): bool
     {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? null;
         return Database::execute(
             "UPDATE `quotes` SET status = ?, decided_at = NOW(), decision_ip = ?, keep_parts = ?,
-                debours_mandate = ?, early_execution = ?, refusal_reason = ?,
+                debours_mandate = ?, mandate_decided_at = IF(? IS NULL, NULL, NOW()), mandate_ip = IF(? IS NULL, NULL, ?),
+                early_execution = ?, refusal_reason = ?,
                 withdrawal_until = IF(? AND NOT urgent, DATE_ADD(CURDATE(), INTERVAL 14 DAY), NULL)
              WHERE id = ? AND status = 'sent' AND valid_until >= CURDATE()",
             [
-                $accepted ? 'accepted' : 'refused', $_SERVER['REMOTE_ADDR'] ?? null,
-                $keepParts === null ? null : (int)$keepParts, (int)$mandate, (int)$earlyExecution, $reason,
-                (int)$accepted, $id,
+                $accepted ? 'accepted' : 'refused', $ip, $keepParts === null ? null : (int)$keepParts,
+                $mandate === null ? null : (int)$mandate, $mandate, $mandate, $ip,
+                (int)$earlyExecution, $reason, (int)$accepted, $id,
             ]
         ) > 0;
+    }
+
+    /**
+     * Rétractation en ligne (« Renoncer au contrat ici », C. consom. L221-18 ; fonction de rétractation
+     * obligatoire depuis le 19 juin 2026) : devis accepté, hors intervention urgente, jusqu'à la fin du
+     * délai inclus. Conserve la déclaration (nom, email de l'accusé de réception, date, IP).
+     */
+    public static function withdraw(int $id, string $name, string $email): bool
+    {
+        return Database::execute(
+            "UPDATE `quotes` SET status = 'withdrawn', withdrawn_at = NOW(), withdrawal_name = ?,
+                withdrawal_email = ?, withdrawal_ip = ?
+             WHERE id = ? AND status = 'accepted' AND NOT urgent AND withdrawal_until >= CURDATE()",
+            [$name, $email, $_SERVER['REMOTE_ADDR'] ?? null, $id]
+        ) > 0;
+    }
+
+    /** Rétractation encore possible (même règle que `withdraw`). */
+    public static function canWithdraw(array $quote): bool
+    {
+        return $quote['status'] === 'accepted' && !(int)$quote['urgent']
+            && $quote['withdrawal_until'] !== null && $quote['withdrawal_until'] >= date('Y-m-d');
     }
 
     public static function isLocked(array $quote): bool
