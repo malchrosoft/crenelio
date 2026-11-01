@@ -18,7 +18,7 @@ interface LegalModalProps {
 }
 
 /**
- * Modal affichant les mentions légales configurées dans l'espace Pro.
+ * Modal affichant les mentions légales configurées dans l'espace Artisan.
  * Accessible : focus piégé, fermeture sur Echap et clic overlay.
  */
 const LegalModal: React.FC<LegalModalProps> = ({ config, onClose, section }) => {

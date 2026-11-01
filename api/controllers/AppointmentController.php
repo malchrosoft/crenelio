@@ -35,7 +35,7 @@ class AppointmentController
     }
 
     /**
-     * GET /appointments — Liste des rendez-vous (Espace Pro).
+     * GET /appointments — Liste des rendez-vous (Espace Artisan).
      */
     public function index(): void
     {
@@ -174,7 +174,7 @@ class AppointmentController
     }
 
     /**
-     * GET /appointments/:id/notifications — Journal d'envoi d'un rendez-vous (Espace Pro).
+     * GET /appointments/:id/notifications — Journal d'envoi d'un rendez-vous (Espace Artisan).
      */
     public function notifications(array $params): void
     {

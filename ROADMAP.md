@@ -10,7 +10,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Moteur de calcul `api/core/TravelFee.php` :** distance géodésique (Haversine) entre `config.default_latitude/longitude` et l'adresse BAN du client, résolution des paliers et détection du hors-zone.
 - **Endpoint public `POST /travel-fee/quote` :** décomposition tarifaire (prestation + déplacement + total, distance, hors-zone) consommée par le tunnel pour l'affichage avant confirmation.
 - **Frais figés en base à la réservation :** `appointments.travel_fee`, `distance_km`, `is_out_of_zone` ; le montant est toujours recalculé côté serveur, jamais repris du client.
-- **Espace Pro :** mode et forfait de déplacement dans la création et l'édition des prestations, badge dédié sur les cartes, onglet « Zone & déplacement » pour les paliers et le rayon maximal.
+- **Espace Artisan :** mode et forfait de déplacement dans la création et l'édition des prestations, badge dédié sur les cartes, onglet « Zone & déplacement » pour les paliers et le rayon maximal.
 - **Options tarifaires par prestation (`services.travel_fee_mode`) :**
   - `'none'` : Aucun frais / déplacement inclus (ex: télé-diagnostic, prestation atelier).
   - `'fixed'` : Montant forfaitaire fixe dédié à la prestation (ex: forfait intervention urgente +20 €), renseigné dans `services.travel_fee_amount`.
@@ -31,7 +31,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 ### 2. Theming, Matérialisation & Effets Graphiques (Pilotable via Admin) — ✅ Terminée
 - **Système de Theming dynamique :**
   - Variables CSS injectées dynamiquement (`--primary`, `--primary-hover`, `--radius`, etc.) depuis la table `config`.
-  - Palette prédéfinie ou sélecteur de couleur personnalisée dans l'espace Pro.
+  - Palette prédéfinie ou sélecteur de couleur personnalisée dans l'espace Artisan.
 - **Effets Graphiques & Matérialisation activables :**
   - Options dans l'admin pour activer des styles esthétiques modernes :
     - *Glassmorphism / Effets de flou d'arrière-plan* (`backdrop-filter`).
@@ -41,12 +41,12 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Réalisé (28/10/2026) :**
   - Couleurs, arrondis et ombres en variables CSS (`src/styles/_theme.scss`) ; survol et fond pâle dérivés par `color-mix()` ; fonctions `primary-alpha()` / `primary-tint()` (`_mixins.scss`) à la place des bleus codés en dur (halos de focus, hero, CTA).
   - Clés `theme_primary`, `theme_radius` (`compact` / `standard` / `rounded`), `theme_shadows` (`soft`), `theme_glass`, `theme_motion` ; appliquées par `src/utils/theme.ts` (variable `--color-primary`, attributs `data-*` sur `<html>`), mémorisées localement et reposées avant le premier rendu.
-  - Espace Pro, onglet Configuration : encart « Apparence » (6 couleurs lisibles + couleur libre, avertissement de contraste < 4,5:1, arrondis, 3 effets), aperçu en direct annulable.
+  - Espace Artisan, onglet Configuration : encart « Apparence » (6 couleurs lisibles + couleur libre, avertissement de contraste < 4,5:1, arrondis, 3 effets), aperçu en direct annulable.
   - Effets, tous désactivés par défaut : ombres douces teintées, verre dépoli (header, barre Pro, stepper, fond des fenêtres), animations (cartes soulevées, boutons, sections de la vitrine révélées au défilement) respectant `prefers-reduced-motion`.
   - Emails : couleur principale du thème.
   - Fond des pages `theme_background` : 12 fonds clairs prédéfinis (gris bleuté par défaut, blanc, ivoire, lin, sable, pierre, sauge, menthe, ciel, lavande, rose poudré, pêche) ou teinte légère de la couleur principale ; pas de couleur libre, pour garantir la lisibilité.
   - Ajouts du 28/10 : style des boutons `theme_buttons` (standard et plat selon le réglage des arrondis, pilule, material : angles droits et élévation, capitales en option pour tous les styles (`theme_button_caps`), relief : dégradé brillant et enfoncement au clic) ; arrondis `none` (sans arrondi) en plus de compact / standard / arrondi, appliqué à tous les boutons, désormais unifiés sur `.btn` (tailles `--lg` / `--xl`) : les copies `hero__cta-primary`, `vitrine-header__cta`, `contact-cta-btn` et `vitrine-service-card__cta` sont supprimées, plus aucun mouvement au survol ; arrondi intermédiaire `--radius-md` (boutons, champs, créneaux, calendrier) qui suit désormais le réglage des arrondis.
-  - **Non repris :** carte de la zone d'intervention de l'espace Pro (couleurs bleu / orange de couverture, `ZoneMap.tsx`).
+  - **Non repris :** carte de la zone d'intervention de l'espace Artisan (couleurs bleu / orange de couverture, `ZoneMap.tsx`).
 
 ---
 
@@ -72,7 +72,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Reste à faire :** notification d'annulation (client et artisan) — non couverte par cet item.
 - **Mécanisme d'envoi moderne & sécurisé :**
   - Intégration SMTP sécurisé (STARTTLS / TLS) ou API de messagerie moderne (ex: Brevo / Resend / Mailjet / Symfony Mailer).
-  - Configuration sécurisée des identifiants SMTP via l'espace Pro / `.env`.
+  - Configuration sécurisée des identifiants SMTP via l'espace Artisan / `.env`.
 - **Email de confirmation Client :**
   - Template HTML responsive élégant confirmant la date, l'horaire, le montant indicatif et le lien direct de gestion/annulation.
 - **Email Artisan avec pièce jointe iCalendar (`.ics`) :**
@@ -98,7 +98,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Réalisé (28/10/2026) :**
   - **Information plutôt que consentement :** la prise de rendez-vous repose sur l'exécution du contrat (RGPD art. 6.1.b), pas sur le consentement ; une case à cocher serait inexacte. Notice d'information (art. 13) sous le formulaire de réservation et de demande hors zone (`PrivacyNotice`), avec lien vers la politique.
   - **Politique de confidentialité** générée depuis la configuration (`PrivacyPolicy`, fenêtre « Mentions légales & confidentialité ») : responsable, données et finalités, base légale, destinataires, services tiers (Base Adresse Nationale, tuiles OpenStreetMap), durée de conservation, droits et réclamation CNIL, cookies.
-  - **Cookies :** aucun traceur (ni mesure d'audience, ni publicité, ni réseau social) ⇒ pas de bandeau ; les cookies de l'espace Pro et le stockage du thème sont strictement nécessaires (exemptés) et listés dans la politique. **À revoir si un outil d'audience est ajouté.**
+  - **Cookies :** aucun traceur (ni mesure d'audience, ni publicité, ni réseau social) ⇒ pas de bandeau ; les cookies de l'espace Artisan et le stockage du thème sont strictement nécessaires (exemptés) et listés dans la politique. **À revoir si un outil d'audience est ajouté.**
   - **Conservation :** `rgpd_retention_months` (36 par défaut, groupe Mentions légales) ; purge automatique une fois par jour à l'ouverture du planning (`Appointment::purgeOlderThan`), sans tâche planifiée.
   - **Effacement :** bouton « Effacer le client » du planning (`POST /appointments/:id/anonymize`) : nom, email, téléphone, adresse, notes, motif d'annulation et adresses du journal des emails effacés ; restent prestation, date, montant, code postal et commune. Aucune évolution de schéma.
   - **Non fait :** export des données d'un client (droit d'accès / portabilité) : l'artisan répond à partir de la fiche du rendez-vous ; à outiller si les demandes deviennent fréquentes.
@@ -108,7 +108,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ### 6. Identité Visuelle & Logo (Favicon, Header) — ✅ Terminée
 - **Fichiers sous leurs noms d'usage** dans `api/storage/branding/` (`logo.svg|png`, `favicon.png|svg|ico`), déposables aussi par FTP, servis par `/api/branding/:kind` ; URLs versionnées exposées avec la config (`branding_logo_url`, `branding_favicon_url`).
-- **Espace Pro, groupe « Identité de l'entreprise » :** envoi PNG / SVG avec zoom et recadrage (`react-easy-crop`, chargé à la demande) ; un SVG reste vectoriel (seul son `viewBox` change).
+- **Espace Artisan, groupe « Identité de l'entreprise » :** envoi PNG / SVG avec zoom et recadrage (`react-easy-crop`, chargé à la demande) ; un SVG reste vectoriel (seul son `viewBox` change).
 - **Favicon :** généré depuis le logo ou depuis une image dédiée plus épurée, décliné en PNG 512 px + ICO (16/32/48) + SVG si la source l'est.
 - **Replis :** sans logo, icône + nom de l'entreprise (`BrandMark`) ; sans favicon, icône par défaut servie par l'API. La suppression restaure le repli.
 - **Sécurité :** contrôle des signatures PNG / ICO, SVG porteurs de script refusés, SVG servis sous CSP `sandbox`. Routes d'écriture non protégées tant que l'Item 12 n'est pas fait.
@@ -118,7 +118,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 ### 7. Footer Complet & Mentions Légales Pré-configurables — ✅ Terminée
 - **Pied de page riche :**
   - Navigation, coordonnées de contact rapides (téléphone, email), rappel de la zone d'intervention.
-  - Lien d'accès discret vers l'espace Pro.
+  - Lien d'accès discret vers l'espace Artisan.
 - **Mentions légales & Informations d'entreprise :**
   - Champs configurables dans `config` : Raison sociale, SIRET, code NAF/APE, numéro d'assurance décennale / RC Pro, adresse, hébergeur.
   - Modale dédiée accessible depuis le footer affichant les mentions légales complètes et les règles de traitement des données.
@@ -131,7 +131,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Conformité aux conventions SCSS :**
   - Classes sémantiques de composant créées dans `_components.scss` (`.form-actions-between`, `.form-alert-error`, `.form-gps-status`, `.slots-loading`, `.slots-error`, `.slots-empty`, `.confirmation-card`, `.confirmation-badge-icon`, `.admin-login-card`, etc.).
   - Remplacement systématique des couleurs hexadécimales en dur par les constantes SCSS de `_variables.scss` (`$primary`, `$primary-light`, `$danger-light`, `$success-light`, `$warning-light`, etc.).
-  - Cohérence des boutons vitrine et correction du lien Espace Pro vers `/booking?view=admin`.
+  - Cohérence des boutons vitrine et correction du lien Espace Artisan vers `/booking?view=admin`.
 
 ---
 
@@ -149,7 +149,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 11. Gestion des Prestations Espace Pro (Création, Édition, Suppression protégée) — ✅ Terminée
+### 11. Gestion des Prestations Espace Artisan (Création, Édition, Suppression protégée) — ✅ Terminée
 - **Formulaire d'ajout :**
   - Ajout du champ `description` pour détailler le contenu de la prestation lors de sa création.
 - **Édition inline :**
@@ -160,7 +160,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 12. Sécurité & Authentification Renforcée Espace Pro (2FA Email OTP & Appareil de confiance 10 jours) — ✅ Terminée
+### 12. Sécurité & Authentification Renforcée Espace Artisan (2FA Email OTP & Appareil de confiance 10 jours) — ✅ Terminée
 - **Objectif :**
   - Sécuriser l'accès à l'espace de gestion artisan sans complexité excessive ni dépendance externe lourde (standard conforme aux recommandations ANSSI / OWASP pour mono-utilisateur).
 - **Fonctionnement :**
@@ -199,9 +199,9 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 14. IHM de Configuration Complète (Espace Pro) — ✅ Terminée
+### 14. IHM de Configuration Complète (Espace Artisan) — ✅ Terminée
 - **Constat :** l'onglet « Paramètres » n'édite que les 7 clés de déplacement (`travel_tier_*`, `travel_max_km`) ; `company_name` y est seulement affiché. Toutes les autres clés de `config` ne se modifient qu'en base.
-- **Objectif :** un formulaire par groupe dans l'espace Pro :
+- **Objectif :** un formulaire par groupe dans l'espace Artisan :
   - *Entreprise & coordonnées* : `company_name`, `pro_name`, `pro_email`, `pro_phone`, `service_area`.
   - *Réservation & créneaux* : `slot_step_minutes`, `buffer_minutes`, `min_notice_hours`, `max_advance_days`.
   - *Carte* : `default_latitude`, `default_longitude`, `default_zoom`.
@@ -211,7 +211,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Hors périmètre :** changement du mot de passe (`admin_password_hash`), rattaché à l'Item 12.
 - **Contraintes :** aucun secret dans `config` (exposée par `GET /admin/config`) ; tant que l'Item 12 n'est pas fait, ces écritures restent ouvertes côté serveur comme toutes les routes `/admin/*`.
 - **Réalisé :** onglet « Configuration » piloté par `src/config/configSchema.ts` (groupes Identité, Coordonnées, Page vitrine, Engagements, Réservation, Carte, Mentions légales) ; toute clé non décrite reste éditable dans « Autres paramètres ». Engagements : `EngagementsEditor` (ajout, suppression, ordre), clés renumérotées de 1 à N à l'enregistrement, les clés en trop supprimées (`PUT /admin/config` : une valeur `null` supprime la clé). Logo et favicon : conseils de lisibilité selon l'image (fond opaque, logo sombre ou clair, image très allongée, résolution faible). Vitrine : cartes d'engagement réparties en rangées équilibrées de 4 au plus (5 → 3 + 2), dernière rangée centrée.
-- **Améliorations possibles :** nombre de paliers de déplacement libre (le serveur en lit jusqu'à 10, l'écran en affiche 3) ; rafraîchir la config de l'application après un changement dans l'espace Pro (aujourd'hui au rechargement).
+- **Améliorations possibles :** nombre de paliers de déplacement libre (le serveur en lit jusqu'à 10, l'écran en affiche 3) ; rafraîchir la config de l'application après un changement dans l'espace Artisan (aujourd'hui au rechargement).
 
 ---
 
@@ -219,13 +219,13 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Constat :** le header sticky et le `Footer` ne sont rendus que sur la vitrine (`VitrinePage.tsx`) ; la page `/booking` en est dépourvue.
 - **Objectif :** conserver le header et le footer de la vitrine sur la partie réservation pour une navigation et une identité continues.
 - **Pistes :** extraire le header de `VitrinePage.tsx` en composant réutilisable (ou layout commun aux routes publiques) ; sur `/booking`, header affiché en permanence (sans déclenchement lié au bouton du Hero) ; réutiliser `Footer` tel quel.
-- **Réalisé (22/10/2026) :** composant `SiteHeader` partagé (vitrine : fixe et déclenché par le CTA du hero ; `/booking` : permanent en `position: sticky`, sans bouton « Prendre rendez-vous »), `Footer` rendu sous le stepper. Le lien « Espace Pro » du header de réservation disparaît au profit de celui du footer. La page `/rdv/:token` garde son header allégé.
+- **Réalisé (22/10/2026) :** composant `SiteHeader` partagé (vitrine : fixe et déclenché par le CTA du hero ; `/booking` : permanent en `position: sticky`, sans bouton « Prendre rendez-vous »), `Footer` rendu sous le stepper. Le lien « Espace Artisan » du header de réservation disparaît au profit de celui du footer. La page `/rdv/:token` garde son header allégé.
 
 ---
 
-### 16. Horaires de Travail & Indisponibilités (Espace Pro) — ✅ Terminée
+### 16. Horaires de Travail & Indisponibilités (Espace Artisan) — ✅ Terminée
 - **Constat :** le moteur de créneaux lisait déjà `schedules` et `unavailabilities`, mais rien ne permettait de les modifier hors base ; le calendrier client laissait choisir des jours sans aucun créneau, et `POST /appointments` ne vérifiait que les chevauchements (pas les horaires ni le délai minimal).
-- **Réalisé :** onglet « Horaires » (plage matin + après-midi par jour, jour travaillé ou non, validation serveur des plages) et gestion des indisponibilités (ajout, suppression). Calcul extrait dans `api/core/SlotEngine.php`, partagé par `GET /slots`, le nouveau `GET /slots/availability` (jours grisés dans le calendrier) et la validation de réservation. Espace Pro chargé à la demande (bundle client de 500 à 420 ko).
+- **Réalisé :** onglet « Horaires » (plage matin + après-midi par jour, jour travaillé ou non, validation serveur des plages) et gestion des indisponibilités (ajout, suppression). Calcul extrait dans `api/core/SlotEngine.php`, partagé par `GET /slots`, le nouveau `GET /slots/availability` (jours grisés dans le calendrier) et la validation de réservation. Espace Artisan chargé à la demande (bundle client de 500 à 420 ko).
 - **Améliorations possibles :** plus de deux plages par jour ; horaires d'exception sur une date précise (ex. samedi après-midi ponctuel).
 
 ---
@@ -252,15 +252,15 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
-### 20. Compte SMTP Configurable depuis l'Espace Pro — ❌ Abandonné (27/10/2026)
-- **Besoin initial :** saisir le compte d'envoi (hôte, port, identifiant, mot de passe, expéditeur) dans l'espace Pro plutôt que dans `api/.env`.
+### 20. Compte SMTP Configurable depuis l'Espace Artisan — ❌ Abandonné (27/10/2026)
+- **Besoin initial :** saisir le compte d'envoi (hôte, port, identifiant, mot de passe, expéditeur) dans l'espace Artisan plutôt que dans `api/.env`.
 - **Abandonné, remplacé par l'Item 24 :**
-  - **Verrouillage :** le code de connexion (Item 12) part par ce SMTP ; un réglage erroné saisi depuis l'espace Pro empêcherait toute connexion depuis un nouvel appareil, donc toute correction.
+  - **Verrouillage :** le code de connexion (Item 12) part par ce SMTP ; un réglage erroné saisi depuis l'espace Artisan empêcherait toute connexion depuis un nouvel appareil, donc toute correction.
   - **Secret mal protégé :** chiffré, le mot de passe resterait déchiffrable avec une clé posée sur le même serveur ; une session volée suffirait à détourner tous les emails, codes de connexion compris.
   - **Peu utile :** un artisan seul ne change presque jamais de serveur d'envoi, et l'hébergement OVHcloud sait envoyer sans identifiants (`mail()`).
 
 ### 21. Exploitation des Interventions avec AG Grid (édition Community) — ✅ Terminée
-- **Besoin :** une vue tabulaire des interventions dans l'espace Pro pour les exploiter au quotidien : tri, filtres par colonne, recherche, regroupement par statut ou par commune, export CSV.
+- **Besoin :** une vue tabulaire des interventions dans l'espace Artisan pour les exploiter au quotidien : tri, filtres par colonne, recherche, regroupement par statut ou par commune, export CSV.
 - **Choix :** `ag-grid-react` en **édition Community** (licence MIT). Ne pas utiliser les fonctionnalités Enterprise (export Excel natif, regroupement de lignes avancé, tableaux croisés) qui exigent une licence payante.
 - **Pistes :** remplacer ou compléter la liste actuelle du planning ; thème AG Grid aligné sur les variables SCSS ; colonnes : date, client, prestation, adresse, frais de déplacement, statut ; actions de ligne réutilisant les appels existants (statut, reprogrammation, emails).
 - **Réalisé (29/10/2026) :**
@@ -291,7 +291,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Volet A — Devis en ligne (cœur) :**
   - Devis créé depuis un rendez-vous, prérempli (prestation, frais de déplacement), lignes ajoutables (pièces, main-d'œuvre), quantités, TVA ou mention d'exonération.
   - Mentions obligatoires : identité et SIRET de l'artisan, date, durée de validité, détail et total, conservation des pièces remplacées par le client ; numérotation propre aux devis.
-  - Envoi par email avec lien sécurisé « Consulter et accepter le devis » ; accord horodaté et tracé (date, IP) ; statuts brouillon / envoyé / accepté / refusé / expiré dans l'espace Pro.
+  - Envoi par email avec lien sécurisé « Consulter et accepter le devis » ; accord horodaté et tracé (date, IP) ; statuts brouillon / envoyé / accepté / refusé / expiré dans l'espace Artisan.
   - Version imprimable (enregistrable en PDF par le navigateur), sans bibliothèque côté serveur.
 - **Volet B — Aide à la facture dans l'outil de l'artisan :**
   1. Fiche « Préparer la facture » sur chaque intervention terminée : champs prêts à copier un par un (client, adresse, lignes, quantités, prix, TVA) et « Tout copier » — fonctionne avec n'importe quel outil.
@@ -309,18 +309,18 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Prérequis :** Items 12, 21 (partie 1) et 32 ✅.
 
 ### 23. Calendrier des Interventions avec FullCalendar — ✅ Terminée
-- **Besoin :** gérer le calendrier d'intervention dans l'espace Pro avec des vues jour / semaine / mois.
+- **Besoin :** gérer le calendrier d'intervention dans l'espace Artisan avec des vues jour / semaine / mois.
 - **Choix :** `@fullcalendar/react` avec les plugins **standard** (licence MIT : `daygrid`, `timegrid`, `interaction`, `list`). Les plugins Premium (vues ressources, timeline) sont payants et non nécessaires pour un artisan seul.
 - **Pistes :** affichage des rendez-vous, indisponibilités et horaires de travail ; glisser-déposer pour reprogrammer, validé par le `SlotEngine` (refus si le créneau n'est pas proposable) ; création d'un rendez-vous au clic (formulaire de l'Item 19) ; locale `fr`, fuseau `APP_TIMEZONE`.
 - **Réalisé (29/10/2026) :**
-  - Onglet « Calendrier » de l'espace Pro (`AppointmentCalendar`, chargé à la demande : FullCalendar 6.1.22, plugins MIT `daygrid`, `timegrid`, `interaction`, `list` ; adaptateur React aligné en 6.x). Vues mois / semaine / jour / liste, locale `fr`, indicateur de l'heure courante.
+  - Onglet « Calendrier » de l'espace Artisan (`AppointmentCalendar`, chargé à la demande : FullCalendar 6.1.22, plugins MIT `daygrid`, `timegrid`, `interaction`, `list` ; adaptateur React aligné en 6.x). Vues mois / semaine / jour / liste, locale `fr`, indicateur de l'heure courante.
   - Horaires de travail (plages matin / après-midi) en zones ouvertes, indisponibilités en bandes grises, rendez-vous colorés par statut (légende), annulés masqués par défaut.
   - Glisser-déposer des rendez-vous à venir (en attente / confirmés) : `PUT /appointments/:id/reschedule` avec `check` → validation par `SlotEngine` en ignorant le rendez-vous déplacé (`excludeId`) ; refus 409 `slot_unavailable`, puis « Déplacer quand même » (`force`) ou retour à la place d'origine. La fenêtre « Reprogrammer » du planning reste libre.
   - Clic sur un jour : nouveau rendez-vous à cette date (formulaire de l'Item 19) ; clic sur un rendez-vous : planning filtré sur ce jour (nouveau filtre « jour précis », aussi disponible à la main), rendez-vous mis en évidence et amené à l'écran (statut, emails, effacement).
   - Couleurs reprises du thème (variables CSS de FullCalendar). Datetimes envoyés en heure locale naïve (cohérent avec `APP_TIMEZONE`).
   - Testé par l'API : refus d'un dimanche, déplacement forcé, créneau proposé accepté, rendez-vous sur son propre créneau accepté, reprogrammation libre inchangée. **Interface non vue dans le navigateur.**
 
-### 24. Envoi Natif OVHcloud (`mail()`) & Contrôle de l'Envoi dans l'Espace Pro — ✅ Terminée
+### 24. Envoi Natif OVHcloud (`mail()`) & Contrôle de l'Envoi dans l'Espace Artisan — ✅ Terminée
 - **Objectif :** ne plus exiger d'identifiants SMTP en production ; garder SMTP en option (Mailpit en local, ou compte dédié).
 - **Fonctionnement prévu :**
   - Sans `SMTP_HOST` mais avec `MAIL_FROM` : envoi par la fonction PHP `mail()` de l'hébergement (même message MIME, pièce jointe `.ics` et logo intégré compris). Sans `MAIL_FROM` : envoi désactivé, comme aujourd'hui.
@@ -336,7 +336,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ### 25. Mot de Passe & Email Professionnel Sécurisés (Changement, Réinitialisation, Vérification) — ✅ Terminée
 - **Constat (27/10/2026) :** aucun écran ne permet de changer le mot de passe (`admin123` par défaut, la clé `admin_password` n'est modifiable que par l'API) ; aucune procédure en cas d'oubli ; l'email professionnel, qui reçoit les codes de connexion (Item 12), se modifie sans vérification.
-- **Changement du mot de passe :** dans l'espace Pro, avec saisie de l'ancien mot de passe, règles de robustesse (longueur minimale, refus des mots de passe trop courants), et **changement obligatoire tant que `admin123` est actif**. Le changement ferme les autres sessions et oublie les appareils de confiance (déjà assuré par `Auth`).
+- **Changement du mot de passe :** dans l'espace Artisan, avec saisie de l'ancien mot de passe, règles de robustesse (longueur minimale, refus des mots de passe trop courants), et **changement obligatoire tant que `admin123` est actif**. Le changement ferme les autres sessions et oublie les appareils de confiance (déjà assuré par `Auth`).
 - **Mot de passe oublié :** lien sur l'écran de connexion ; envoi à `pro_email` d'un lien (ou code) à usage unique, valable 30 minutes, haché côté serveur ; réponse identique que l'adresse existe ou non ; limitation par IP comme pour la connexion ; à l'issue, toutes les sessions et appareils sont révoqués et un email de confirmation est envoyé.
 - **Vérification de l'email professionnel :** une nouvelle adresse n'est retenue qu'après saisie d'un code reçu sur cette adresse ; l'ancienne adresse est prévenue du changement. Évite de se couper soi-même des codes de connexion, ou qu'une session volée détourne la récupération du compte.
 - **Prérequis :** Item 12 ✅, envoi d'emails (Item 24 ✅). Sans envoi configuré, la réinitialisation est impossible : la documenter (procédure de secours via phpMyAdmin et `password_hash`).
@@ -351,7 +351,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ### 26. Adresse Publique du Site (`APP_URL`) Détectée Automatiquement
 - **Objectif :** supprimer `APP_URL` des réglages obligatoires de `api/.env` (liens des emails, expéditeur par défaut `noreply@` domaine). Facultatif si le déploiement passe par l'Item 27, qui demande l'adresse du site.
-- **Fonctionnement prévu :** à défaut d'`APP_URL`, l'adresse est relevée lors d'une requête de l'espace Pro authentifiée (schéma + hôte), **mémorisée une seule fois** puis figée ; affichée dans l'encart « Envoi des emails » avec un bouton pour la redéfinir (session Pro requise). `APP_URL` reste prioritaire s'il est renseigné.
+- **Fonctionnement prévu :** à défaut d'`APP_URL`, l'adresse est relevée lors d'une requête de l'espace Artisan authentifiée (schéma + hôte), **mémorisée une seule fois** puis figée ; affichée dans l'encart « Envoi des emails » avec un bouton pour la redéfinir (session Pro requise). `APP_URL` reste prioritaire s'il est renseigné.
 - **Risque à traiter :** l'en-tête `Host` est fourni par le visiteur ; le déduire à chaque requête permettrait d'empoisonner les liens envoyés par email. D'où la capture limitée à une session Pro et le figeage. Ne jamais utiliser l'hôte d'une requête publique.
 
 ### 27. Déploiement Initial Interactif (`npm run deploy:init`) — ✅ Terminée
@@ -382,8 +382,8 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Mise à jour sans l'Item 29 :** la même archive sert aux mises à jour manuelles (FTP ou Git), en suivant « Mettre à jour un site en ligne » de `DEPLOYMENT*.md` (sauvegarde, migrations, envoi du code).
 - **Prérequis :** Item 27.
 
-### 29. Mise à Jour depuis le Site Hébergé (Espace Pro) — sous réserve de l'hébergement
-- **Objectif :** mettre à jour Crénelio en un clic depuis l'espace Pro, à partir des paquets de l'Item 28.
+### 29. Mise à Jour depuis le Site Hébergé (Espace Artisan) — sous réserve de l'hébergement
+- **Objectif :** mettre à jour Crénelio en un clic depuis l'espace Artisan, à partir des paquets de l'Item 28.
 - **Étude de faisabilité d'abord**, sur l'offre Starter : `ZipArchive` (sinon `PharData`), téléchargement sortant (`allow_url_fopen` / cURL), temps d'exécution maximal, droits d'écriture de PHP sur le code. **Si l'hébergement ne le permet pas, l'item est abandonné** : la mise à jour manuelle de l'Item 28 reste la voie standard.
 - **Fonctionnement prévu :**
   - Encart « Version » : version installée, dernière version disponible, notes de version.
@@ -407,9 +407,9 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - Textes de l'interface publique (vitrine, tunnel de réservation, page de gestion `/rdv/:token`, notice et politique de confidentialité) extraits dans des fichiers de traduction, sur le modèle de `src/data/legalCreditsI18n.json` ; aucune dépendance lourde.
   - Sélecteur de langue discret (header de la vitrine), langue proposée selon le navigateur, choix mémorisé localement.
   - Emails et fichier `.ics` dans la langue du client (langue mémorisée avec le rendez-vous : évolution de schéma + migration).
-  - Textes saisis par l'artisan (accroche, présentation, engagements, prestations) : traduction facultative par langue dans l'espace Pro, repli sur le français.
+  - Textes saisis par l'artisan (accroche, présentation, engagements, prestations) : traduction facultative par langue dans l'espace Artisan, repli sur le français.
   - Dates, heures et montants formatés selon la langue (`Intl`).
-- **Hors périmètre :** l'espace Pro reste en français.
+- **Hors périmètre :** l'espace Artisan reste en français.
 - **Points d'attention :** langues écrites de droite à gauche (déjà gérées pour les crédits), longueur des textes traduits dans les boutons, référencement (`lang`, `hreflang`).
 
 ### 32. Fiabilité des Notifications (Annulation, Reprogrammation, Décision, Anti-abus) — ✅ Terminée
@@ -435,11 +435,11 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ### 33. Abonnement d'Agenda de l'Artisan (Flux iCal Privé) — ✅ Terminée
 - **Constat (31/10/2026) :** les invitations par email (Item 32) ne **garantissent** pas la synchronisation avec Google Agenda, Outlook ou l'iPhone : elles dépendent de la messagerie, de l'ajout initial depuis l'email et de la lecture des messages. Le pilotage reste dans Crénelio, il faut donc un miroir fiable et à sens unique.
-- **Optionnel :** désactivé par défaut. Tant que l'artisan ne l'active pas dans l'espace Pro, aucune adresse n'existe et la route répond 404 ; le désactiver supprime le jeton (l'adresse cesse aussitôt de fonctionner). Les invitations par email (Item 32) fonctionnent sans lui.
+- **Optionnel :** désactivé par défaut. Tant que l'artisan ne l'active pas dans l'espace Artisan, aucune adresse n'existe et la route répond 404 ; le désactiver supprime le jeton (l'adresse cesse aussitôt de fonctionner). Les invitations par email (Item 32) fonctionnent sans lui.
 - **Fonctionnement prévu :**
   - Adresse d'agenda privée et secrète (`webcal://<site>/api/calendar/<jeton>.ics`, jeton aléatoire long, jamais devinable), à laquelle l'artisan s'abonne une fois dans son agenda ; Crénelio en reste la source unique.
   - Flux iCal (RFC 5545) généré à la volée : rendez-vous à venir et récents (fenêtre limitée), mêmes UID que les invitations de l'Item 32 (pas de doublon), statut, coordonnées du client et notes d'accès ; indisponibilités en option.
-  - Espace Pro (Configuration) : interrupteur « Abonnement d'agenda » (activer / désactiver), adresse à copier, boutons « Ajouter à Google Agenda / Outlook / Apple », **régénération du jeton** (l'ancienne adresse cesse de fonctionner), date du dernier accès au flux.
+  - Espace Artisan (Configuration) : interrupteur « Abonnement d'agenda » (activer / désactiver), adresse à copier, boutons « Ajouter à Google Agenda / Outlook / Apple », **régénération du jeton** (l'ancienne adresse cesse de fonctionner), date du dernier accès au flux.
 - **Limites à afficher :** délai de rafraîchissement fixé par chaque agenda, pas par Crénelio (Apple réglable jusqu'à 5 min, Outlook quelques heures, Google jusqu'à ≈ 24 h) ; les invitations par email restent la mise à jour immédiate, le flux en est le filet de sécurité. Sens unique : une modification faite dans l'agenda externe ne revient pas dans Crénelio.
 - **Sécurité et RGPD :** le flux contient des données clients : jeton secret (comparaison à temps constant), en-têtes anti-cache et anti-indexation, aucune donnée au-delà de la fenêtre, données anonymisées exclues ; flux décrit dans la politique de confidentialité ; jeton stocké hors de la configuration publique.
 - **Hors périmètre :** synchronisation bidirectionnelle par les API Google / Microsoft (OAuth, jetons, conflits) — contraire au pilotage depuis Crénelio et trop lourde pour l'offre Starter.
@@ -447,7 +447,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Réalisé (31/10/2026) :**
   - `CalendarFeed` (réglage dans `api/storage/auth/calendar-feed.json`, jeton aléatoire de 48 caractères, comparaison à temps constant) ; routes `GET` / `POST` / `PUT` / `DELETE /admin/calendar-feed` (session Pro) et `GET /calendar/:token.ics` (404 si désactivé ou jeton inconnu).
   - `ICalendar::feed` : rendez-vous non annulés d'un mois passé à un an à venir, mêmes UID et créneaux élargis du trajet que les invitations, demandes en attente « [À valider] » (`TENTATIVE`), indisponibilités en option ; `REFRESH-INTERVAL` / `X-PUBLISHED-TTL` de 15 min suggérés ; en-têtes `no-store` et `noindex`.
-  - Espace Pro, Configuration → Coordonnées : encart « Abonnement d'agenda » (interrupteur, adresse à copier, boutons Google / Outlook / Apple, indisponibilités, délais de rafraîchissement, risque de doublon avec les invitations, date de dernière lecture, régénération et désactivation confirmées).
+  - Espace Artisan, Configuration → Coordonnées : encart « Abonnement d'agenda » (interrupteur, adresse à copier, boutons Google / Outlook / Apple, indisponibilités, délais de rafraîchissement, risque de doublon avec les invitations, date de dernière lecture, régénération et désactivation confirmées).
   - Politique de confidentialité : copie possible dans l'agenda personnel de l'artisan.
   - Testé par l'API : 401 sans session, 404 désactivé, activation, flux (en-têtes, pas de METHOD ni d'organisateur, statuts), dernière lecture, régénération (ancienne adresse 404), indisponibilités, désactivation. **Abonnement réel dans Google / Outlook / Apple non testé (nécessite un site en ligne).**
 
@@ -466,12 +466,12 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Points d'attention :** contrastes vérifiés dans les deux thèmes (WCAG AA, public senior), logo pensé pour fond clair (variante ou fond derrière le logo), images et illustrations, pas de flash clair au chargement (appliqué avant le premier rendu comme le thème actuel).
 - **Prérequis :** Item 2 ✅.
 
-### 38. Menu de l'Espace Pro par Catégories — ✅ Terminée
-- **Demandé le 01/11/2026.** Catégories au style de rubrique (losange, intitulé et filet en couleur principale ; filet seul en menu replié) : *Interventions* (Rendez-vous, Calendrier, Indisponibilités), *Activité* (Prestations, Horaires, Créneaux, Déplacement, Zone d'intervention), *Paramétrage* (Entreprise, Vitrine, Compte).
-- **Configuration éclatée :** les sous-onglets de « Horaires » deviennent deux écrans ; l'ancien fourre-tout « Configuration » est réparti entre Créneaux (règles de réservation), Entreprise (identité, logo, mentions légales), Vitrine (apparence, zone couverte, page vitrine, engagements, carte) et Compte (coordonnées de l'artisan, email professionnel, envoi des emails, abonnement d'agenda, autres paramètres, mot de passe en bas).
+### 38. Menu de l'Espace Artisan par Catégories — ✅ Terminée
+- **Demandé le 01/11/2026.** Catégories au style de rubrique (losange, intitulé et filet en couleur principale ; filet seul en menu replié) : *Interventions* (Rendez-vous, Calendrier, Indisponibilités), *Activité* (Prestations, Horaires, Créneaux, Déplacement, Zone d'intervention), *Paramétrage* (Entreprise, Vitrine, Thème, Compte).
+- **Configuration éclatée :** les sous-onglets de « Horaires » deviennent deux écrans ; l'ancien fourre-tout « Configuration » est réparti entre Créneaux (règles de réservation), Entreprise (identité, logo, mentions légales), Vitrine (zone couverte, page vitrine, engagements, carte), Thème (apparence, appelé à s'étoffer) et Compte (coordonnées de l'artisan, email professionnel, envoi des emails, abonnement d'agenda, autres paramètres, mot de passe en bas).
 
-### 35. Tableau de Bord de l'Espace Pro (Jours en Cartes & Carte du Jour) — ✅ Terminée
-- **Demandé le 31/10/2026** : page d'accueil de l'espace Pro, en tête du menu.
+### 35. Tableau de Bord de l'Espace Artisan (Jours en Cartes & Carte du Jour) — ✅ Terminée
+- **Demandé le 31/10/2026** : page d'accueil de l'espace Artisan, en tête du menu.
 - **Jours affichés** (`DashboardOverview`) : le jour travaillé précédent, aujourd'hui (même non travaillé) et les deux jours travaillés suivants, d'après les horaires hebdomadaires. Une carte (`Panel`) par jour : interventions non annulées dans l'ordre horaire, numérotées, couleur du statut, horaire, client, prestation et commune ; nombre et montant du jour ; ajout d'un rendez-vous à cette date. Un clic ouvre la fenêtre du rendez-vous (`AppointmentDialog`).
 - **Carte du jour :** point de départ de l'artisan et interventions numérotées comme dans la liste (même adresse : un repère « 1, 2 »), cadrage automatique ; le bouton de chaque carte de jour change le jour affiché.
 - **Lieu de départ** (choisi sur la carte, mémorisé comme préférence d'affichage `ui_state_dashboard`) : point de départ des interventions, adresse de l'entreprise ou siège social (mentions légales, localisé à la demande). Un lieu non renseigné reste proposé, grisé avec sa raison ; point de départ et entreprise regroupés s'ils coïncident. Indépendant de l'origine du calcul des frais (`travel_fee_origin`).
@@ -485,7 +485,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - **Compte rendu :** notes de fin d'intervention, matériel posé, suite à donner (nouveau rendez-vous, devis de l'Item 22) ; photos seulement si la place le permet (1 Go sur l'offre Starter : taille réduite côté navigateur, purge avec le rendez-vous).
   - **Points d'attention du jour :** demandes en attente de décision, rendez-vous échus non clôturés, emails en échec, jours sans intervention à combler.
   - **Indicateurs simples :** interventions et montant de la semaine et du mois, comparés à la période précédente.
-- **Contraintes :** aucune donnée personnelle hors de l'espace Pro, effacement RGPD étendu à toute nouvelle donnée (notes, photos), stockage limité de l'hébergement.
+- **Contraintes :** aucune donnée personnelle hors de l'espace Artisan, effacement RGPD étendu à toute nouvelle donnée (notes, photos), stockage limité de l'hébergement.
 - **Prérequis :** Item 35 ✅.
 
 ### 37. Trajets & Tournées (Ordre de Passage, Suggestions de Créneaux)
@@ -511,33 +511,33 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
 |---|---|---|---|---|---|---|
 | **1** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
-| **2** | **Item 22** | **Devis en ligne avec accord du client & aide à la facturation externe** | Espace Pro / Facturation | ⏳ *À faire* | Items 12, 21 et 32 ✅ | 🟡 Devis obligatoire pour l'artisan ; facture laissée à son outil (obligation électronique 2026-2027) |
-| **3** | **Item 36** | **Suivi d'intervention pour l'artisan (fiche mobile, avancement, compte rendu)** | Espace Pro / Exploitation | ⏳ *À faire* | Item 35 ✅ | 🟡 Usage quotidien sur le terrain ; prolonge le tableau de bord |
+| **2** | **Item 22** | **Devis en ligne avec accord du client & aide à la facturation externe** | Espace Artisan / Facturation | ⏳ *À faire* | Items 12, 21 et 32 ✅ | 🟡 Devis obligatoire pour l'artisan ; facture laissée à son outil (obligation électronique 2026-2027) |
+| **3** | **Item 36** | **Suivi d'intervention pour l'artisan (fiche mobile, avancement, compte rendu)** | Espace Artisan / Exploitation | ⏳ *À faire* | Item 35 ✅ | 🟡 Usage quotidien sur le terrain ; prolonge le tableau de bord |
 | **4** | **Item 37** | **Trajets & tournées (ordre de passage, itinéraire, suggestions de créneaux)** | Planning / Trajets | ⏳ *À faire* | Items 32 et 35 ✅ | 🟡 Gain de temps et de carburant ; suggestions à cadrer pour rester raisonnables |
 | **5** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre séparé (Item 34) |
 | **6** | **Item 26** | **Adresse publique du site (`APP_URL`) détectée automatiquement** | Installation / Configuration | ⏳ *À faire* | Item 12 ✅ | ⚪ Devient facultatif avec l'Item 27, qui demande l'adresse |
-| **7** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
+| **7** | **Item 29** | **Mise à jour depuis le site hébergé (espace Artisan)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
 | **8** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
 | **9** | **Item 34** | **Thème sombre (inversion des couleurs, palettes adaptées)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort ; chantier transversal coûteux (gris, fonds, états et bibliothèques à convertir) |
-| — | **Item 38** | Menu de l'espace Pro par catégories, configuration répartie en écrans (Entreprise, Vitrine, Compte, Créneaux) | Espace Pro / Navigation | ✅ **Terminé** | — | — |
-| — | **Item 35** | Tableau de bord (jours en cartes, carte du jour numérotée, positions des rendez-vous enregistrées) | Espace Pro / Exploitation | ✅ **Terminé** | — | — |
-| — | **Item 21** | Liste des interventions AG Grid Community (tri, filtres, sélection, export CSV, disposition enregistrée) ; composant `DataGrid` commun, pleine hauteur desktop/tablette, fenêtre de rendez-vous partagée avec le calendrier, avertissements regroupés dans le header, indisponibilités en grille (sous-onglet de « Horaires ») | Espace Pro / Exploitation | ✅ **Terminé** | — | — |
+| — | **Item 38** | Menu de l'espace Artisan par catégories, configuration répartie en écrans (Entreprise, Vitrine, Compte, Créneaux) | Espace Artisan / Navigation | ✅ **Terminé** | — | — |
+| — | **Item 35** | Tableau de bord (jours en cartes, carte du jour numérotée, positions des rendez-vous enregistrées) | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |
+| — | **Item 21** | Liste des interventions AG Grid Community (tri, filtres, sélection, export CSV, disposition enregistrée) ; composant `DataGrid` commun, pleine hauteur desktop/tablette, fenêtre de rendez-vous partagée avec le calendrier, avertissements regroupés dans le header, indisponibilités en grille (sous-onglet de « Horaires ») | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 33** | Abonnement d'agenda de l'artisan (flux iCal privé, optionnel) | Planning / Synchronisation | ✅ **Terminé** | — | — |
 | — | **Item 32** | Fiabilité des notifications (annulation, reprogrammation, décision, anti-abus) | Communication / Fiabilité | ✅ **Terminé** | — | — |
-| — | **Item 23** | Calendrier des interventions (FullCalendar : vues, glisser-déposer validé, création au clic) | Espace Pro / Planning | ✅ **Terminé** | — | — |
+| — | **Item 23** | Calendrier des interventions (FullCalendar : vues, glisser-déposer validé, création au clic) | Espace Artisan / Planning | ✅ **Terminé** | — | — |
 | — | **Item 27** | Déploiement initial interactif (`npm run deploy:init`, `/api/health`, version du schéma) | Installation / Déploiement | ✅ **Terminé** | — | — |
 | — | **Item 5** | Conformité RGPD & cookies (notice, politique, conservation, effacement) | Légal / Conformité | ✅ **Terminé** | — | — |
 | — | **Item 25** | Mot de passe & email professionnel sécurisés (changement, réinitialisation, vérification) | Sécurité / Authentification | ✅ **Terminé** | — | — |
-| — | **Item 2** | Theming & effets visuels pilotables depuis l'espace Pro | Design / UI | ✅ **Terminé** | — | — |
-| — | **Item 20** | Compte SMTP configurable depuis l'espace Pro | Communication / Configuration | ❌ **Abandonné** | Remplacé par l'Item 24 | — |
-| — | **Item 24** | Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Pro | Communication / Configuration | ✅ **Terminé** | — | — |
+| — | **Item 2** | Theming & effets visuels pilotables depuis l'espace Artisan | Design / UI | ✅ **Terminé** | — | — |
+| — | **Item 20** | Compte SMTP configurable depuis l'espace Artisan | Communication / Configuration | ❌ **Abandonné** | Remplacé par l'Item 24 | — |
+| — | **Item 24** | Envoi natif OVHcloud (`mail()`) & email de test depuis l'espace Artisan | Communication / Configuration | ✅ **Terminé** | — | — |
 | — | **Item 12** | Sécurité : routes de gestion vérifiées côté serveur, code par email, appareil de confiance 10 jours | Sécurité / Authentification | ✅ **Terminé** | — | — |
 | — | **Item 15** | Header & footer communs au tunnel de réservation (+ bouton d'abandon) | Vitrine / Navigation | ✅ **Terminé** | — | — |
-| — | **Item 19** | Saisie d'un rendez-vous par l'artisan (formulaires partagés, hors zone forçable) | Espace Pro / Planning | ✅ **Terminé** | — | — |
+| — | **Item 19** | Saisie d'un rendez-vous par l'artisan (formulaires partagés, hors zone forçable) | Espace Artisan / Planning | ✅ **Terminé** | — | — |
 | — | **Item 18** | Zone d'intervention calculée, mode sans déplacement, demandes hors zone validées par l'artisan | Zone / Réservation | ✅ **Terminé** | — | — |
-| — | **Item 17** | Espace Artisan en pleine page (`/admin`, menu rétractable) | Espace Pro / Navigation | ✅ **Terminé** | — | — |
-| — | **Item 16** | Horaires de travail, indisponibilités, moteur de créneaux partagé | Espace Pro / Planning | ✅ **Terminé** | — | — |
-| — | **Item 14** | IHM de configuration complète (Espace Pro) | Espace Pro / Configuration | ✅ **Terminé** | — | — |
+| — | **Item 17** | Espace Artisan en pleine page (`/admin`, menu rétractable) | Espace Artisan / Navigation | ✅ **Terminé** | — | — |
+| — | **Item 16** | Horaires de travail, indisponibilités, moteur de créneaux partagé | Espace Artisan / Planning | ✅ **Terminé** | — | — |
+| — | **Item 14** | IHM de configuration complète (Espace Artisan) | Espace Artisan / Configuration | ✅ **Terminé** | — | — |
 | — | **Item 6** | Identité visuelle : logo & favicon (recadrage, replis) | Design / Personnalisation | ✅ **Terminé** | — | — |
 | — | **Item 4** | Notifications email, iCal & logs d'envoi IHM | Communication / Traçabilité | ✅ **Terminé** | — | — |
 | — | **Item 1** | Frais de déplacement hybrides & gestion hors-zone | Tunnel / Tarification | ✅ **Terminé** | — | — |
@@ -546,6 +546,6 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 | — | **Item 8** | Dette Technique & Harmonisation Styles SCSS | Qualité Code / SCSS | ✅ **Terminé** | — | — |
 | — | **Item 9** | Modernisation Sass (Dart Sass Modern Compiler) | Outillage / Build | ✅ **Terminé** | — | — |
 | — | **Item 10**| Gestion Propre des Classes Conditionnelles (`clsx`) | Qualité Code / React | ✅ **Terminé** | — | — |
-| — | **Item 11**| Gestion des Prestations (Création pop-up, Édition, Delete)| Espace Pro / Catalogue | ✅ **Terminé** | — | — |
-| — | **Item 13**| Recherche, filtres, RDV échus & reprogrammation datetime | Espace Pro / Planning | ✅ **Terminé** | — | — |
+| — | **Item 11**| Gestion des Prestations (Création pop-up, Édition, Delete)| Espace Artisan / Catalogue | ✅ **Terminé** | — | — |
+| — | **Item 13**| Recherche, filtres, RDV échus & reprogrammation datetime | Espace Artisan / Planning | ✅ **Terminé** | — | — |
 

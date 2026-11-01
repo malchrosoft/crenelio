@@ -1,6 +1,6 @@
 <?php
 /**
- * Auth — Authentification de l'espace Pro, vérifiée côté serveur.
+ * Auth — Authentification de l'espace Artisan, vérifiée côté serveur.
  *
  * - Session PHP dans un cookie HttpOnly / SameSite=Strict : aucun jeton n'est exposé au JavaScript.
  * - Appareil de confiance : cookie signé (HMAC) valable 10 jours ; il dispense du code par email.
@@ -41,7 +41,7 @@ class Auth
     // -----------------------------------------------------------------
 
     /**
-     * Enveloppe un gestionnaire de route : 401 si l'espace Pro n'est pas ouvert, 403 tant que le
+     * Enveloppe un gestionnaire de route : 401 si l'espace Artisan n'est pas ouvert, 403 tant que le
      * mot de passe par défaut n'a pas été changé (sauf `$allowDefaultPassword`, pour le changer).
      */
     public static function guard(callable $handler, bool $allowDefaultPassword = false): callable
@@ -175,7 +175,7 @@ class Auth
         return null;
     }
 
-    /** Changement depuis l'espace Pro : l'ancien mot de passe est redemandé. */
+    /** Changement depuis l'espace Artisan : l'ancien mot de passe est redemandé. */
     public static function changePassword(string $current, string $new): void
     {
         self::checkThrottle();

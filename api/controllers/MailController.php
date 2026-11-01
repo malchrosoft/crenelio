@@ -1,9 +1,9 @@
 <?php
 /**
- * MailController — État de l'envoi d'emails et email de test (espace Pro).
+ * MailController — État de l'envoi d'emails et email de test (espace Artisan).
  *
  * Lecture seule : le mode d'envoi et l'expéditeur viennent de `api/.env`, jamais modifiables
- * depuis l'espace Pro (un réglage erroné couperait l'envoi des codes de connexion).
+ * depuis l'espace Artisan (un réglage erroné couperait l'envoi des codes de connexion).
  * Aucun mot de passe n'est renvoyé.
  */
 

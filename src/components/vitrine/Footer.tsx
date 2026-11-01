@@ -119,7 +119,7 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
               title="Espace d'administration artisan"
             >
               <LockKeyIcon size={14} weight="fill" aria-hidden="true" />
-              Espace Pro
+              Espace Artisan
             </Link>
           </div>
         </div>

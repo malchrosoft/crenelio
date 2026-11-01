@@ -15,7 +15,7 @@ const TRANSPORT_LABELS: Record<MailStatusInfo['transport'], string> = {
 };
 
 /**
- * Envoi des emails : état en lecture seule (réglé dans `api/.env`, jamais depuis l'espace Pro)
+ * Envoi des emails : état en lecture seule (réglé dans `api/.env`, jamais depuis l'espace Artisan)
  * et email de test (email professionnel ou destinataire libre : testeur, développeur).
  */
 /** L'expéditeur est-il sur le domaine du site (sous-domaines compris) ? */

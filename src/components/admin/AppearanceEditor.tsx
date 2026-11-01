@@ -36,7 +36,7 @@ const EFFECTS: { key: 'softShadows' | 'glass' | 'motion'; label: string; hint: s
 
 /**
  * Apparence du site (Item 2) : couleur principale, arrondis et effets, avec aperçu en direct
- * sur tout le site (espace Pro compris) tant que le réglage n'est pas enregistré ou annulé.
+ * sur tout le site (espace Artisan compris) tant que le réglage n'est pas enregistré ou annulé.
  */
 const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ config, onSaved }) => {
   const stored = themeFromConfig(config);

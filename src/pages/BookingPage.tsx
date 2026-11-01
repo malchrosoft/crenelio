@@ -27,7 +27,7 @@ interface BookingPageProps {
 const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
   const [searchParams] = useSearchParams();
   const preselectedServiceId = searchParams.get('service');
-  // Anciens liens vers l'espace Pro (?view=admin, ?admin=1) : redirigés vers /admin
+  // Anciens liens vers l'espace Artisan (?view=admin, ?admin=1) : redirigés vers /admin
   const legacyAdminLink = searchParams.get('admin') === '1' || searchParams.get('view') === 'admin';
 
   const [selectedService, setSelectedService] = useState<Service | null>(null);

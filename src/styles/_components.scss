@@ -633,7 +633,7 @@
   }
 }
 
-/* Espace Pro Dashboard */
+/* Espace Artisan Dashboard */
 .admin-login-card {
   max-width: 440px;
   margin: 40px auto;
@@ -1216,7 +1216,7 @@ $admin-sidebar-collapsed: 68px;
   font-size: 0.8rem;
 }
 
-/* Modale Pop-up Espace Pro */
+/* Modale Pop-up Espace Artisan */
 .admin-modal-overlay {
   @include modal-overlay;
 }
@@ -1340,13 +1340,13 @@ $admin-sidebar-collapsed: 68px;
   }
 }
 
-/* Badge de déplacement sur les cartes de prestation (Espace Pro & vitrine) */
+/* Badge de déplacement sur les cartes de prestation (Espace Artisan & vitrine) */
 .badge-travel {
   background: $primary-light;
   color: $primary;
 }
 
-/* Bloc « déplacement » des formulaires de prestation (Espace Pro) */
+/* Bloc « déplacement » des formulaires de prestation (Espace Artisan) */
 .service-travel-fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1384,7 +1384,7 @@ $admin-sidebar-collapsed: 68px;
   font-weight: 500;
 }
 
-/* Onglet « Zone & déplacement » de l'espace Pro */
+/* Onglet « Zone & déplacement » de l'espace Artisan */
 .admin-settings-intro {
   margin: 0 0 20px;
   color: $gray-500;
@@ -1484,7 +1484,7 @@ $admin-sidebar-collapsed: 68px;
 }
 
 /* ===================================================================
-   Journal des notifications email (Espace Pro)
+   Journal des notifications email (Espace Artisan)
    =================================================================== */
 
 .notification-empty {
@@ -1601,7 +1601,7 @@ $admin-sidebar-collapsed: 68px;
 }
 
 /* ===================================================================
-   Logo & favicon (onglet Configuration, Espace Pro)
+   Logo & favicon (onglet Configuration, Espace Artisan)
    =================================================================== */
 
 .admin-modal--wide {
@@ -1744,7 +1744,7 @@ $admin-sidebar-collapsed: 68px;
 }
 
 // -------------------------------------------------------
-// Horaires de travail & indisponibilités (Espace Pro)
+// Horaires de travail & indisponibilités (Espace Artisan)
 // -------------------------------------------------------
 .schedule-editor {
   .schedule-editor__grid {
@@ -2760,7 +2760,7 @@ $calendar-statuses: (
 
 
 // -------------------------------------------------------
-// Listes de l'espace Pro sur AG Grid Community (DataGrid)
+// Listes de l'espace Artisan sur AG Grid Community (DataGrid)
 // -------------------------------------------------------
 // Pleine page à partir d'une tablette assez haute : même requête que FILL_QUERY (DataGrid.tsx)
 $data-grid-fill: '(min-width: 768px) and (min-height: 600px)';

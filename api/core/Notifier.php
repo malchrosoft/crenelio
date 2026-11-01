@@ -5,7 +5,7 @@
  * Contrat volontairement défensif : une panne d'envoi ne doit jamais faire
  * échouer une réservation déjà enregistrée. Chaque tentative est donc
  * journalisée en `pending` *avant* l'appel SMTP, puis basculée en `sent`
- * ou `failed`. L'artisan voit le résultat dans l'espace Pro et peut
+ * ou `failed`. L'artisan voit le résultat dans l'espace Artisan et peut
  * relancer manuellement.
  */
 

@@ -19,7 +19,7 @@ class ConfigController
     }
 
     /**
-     * GET /admin/config — Configuration complète pour l'espace pro.
+     * GET /admin/config — Configuration complète pour l'espace Artisan.
      */
     public function getAll(): void
     {
@@ -124,7 +124,7 @@ class ConfigController
     // Mot de passe & email professionnel (Item 25)
     // -----------------------------------------------------------------
 
-    /** POST /admin/password — Changement depuis l'espace Pro (ancien mot de passe requis). */
+    /** POST /admin/password — Changement depuis l'espace Artisan (ancien mot de passe requis). */
     public function changePassword(): void
     {
         $body = Response::body();

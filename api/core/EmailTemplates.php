@@ -14,7 +14,7 @@ require_once __DIR__ . '/Branding.php';
 
 class EmailTemplates
 {
-    /** Couleur principale par défaut ; le thème choisi dans l'espace Pro la remplace (theme_primary). */
+    /** Couleur principale par défaut ; le thème choisi dans l'espace Artisan la remplace (theme_primary). */
     private const PRIMARY = '#2563eb';
     private const GRAY_50 = '#f8fafc';
     private const GRAY_200 = '#e2e8f0';
@@ -67,7 +67,7 @@ class EmailTemplates
     }
 
     /**
-     * Code de connexion à l'espace Pro (second facteur), envoyé à `pro_email`.
+     * Code de connexion à l'espace Artisan (second facteur), envoyé à `pro_email`.
      *
      * @return array{subject: string, html: string, text: string}
      */
@@ -134,7 +134,7 @@ class EmailTemplates
     }
 
     /**
-     * Email de test déclenché depuis l'espace Pro (onglet Configuration).
+     * Email de test déclenché depuis l'espace Artisan (onglet Configuration).
      *
      * @return array{subject: string, html: string, text: string}
      */

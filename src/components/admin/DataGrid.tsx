@@ -139,7 +139,7 @@ export interface DataGridProps<T> {
 }
 
 /**
- * Liste de l'espace Pro sur AG Grid Community : thème, traduction, modules, préférences enregistrées
+ * Liste de l'espace Artisan sur AG Grid Community : thème, traduction, modules, préférences enregistrées
  * en base, barre d'outils (actions contextuelles à la sélection, filtres, export, menu de réglages),
  * export CSV, hauteur pleine page sur ordinateur et
  * tablette, et nombre de lignes affiché dans le pied de la grille (le module natif de barre d'état

@@ -140,7 +140,7 @@ utile si la lecture du `.env` pose problème sur l'hébergement).
 ## Étape 4b : configurer l'envoi d'emails
 
 Les emails de confirmation (client), les fiches d'intervention avec pièce jointe `.ics` (artisan),
-les demandes hors zone et les codes de connexion à l'espace Pro partent sans dépendance Composer,
+les demandes hors zone et les codes de connexion à l'espace Artisan partent sans dépendance Composer,
 selon l'un de deux modes. Ajoutez au même fichier `api/.env` :
 
 **Option A — fonction `mail()` de l'hébergement (recommandée chez OVHcloud) :** aucun identifiant.
@@ -148,13 +148,13 @@ Laissez `SMTP_HOST` vide.
 
 ```env
 MAIL_FROM=contact@votre-domaine.com
-# Facultatif : vide ⇒ nom de l'entreprise saisi dans l'espace Pro
+# Facultatif : vide ⇒ nom de l'entreprise saisi dans l'espace Artisan
 MAIL_FROM_NAME=Nom de votre entreprise
 ```
 
 Sans `MAIL_FROM`, l'expéditeur devient `noreply@` + le domaine d'`APP_URL` (sans `www.`) : ce
 domaine sert le site, il est donc attaché à l'hébergement et respecte la règle OVHcloud. Si vous
-choisissez une adresse sur un autre domaine, l'encart « Envoi des emails » de l'espace Pro le
+choisissez une adresse sur un autre domaine, l'encart « Envoi des emails » de l'espace Artisan le
 signale : vérifiez qu'il est attaché à l'hébergement, puis envoyez l'email de test.
 
 **Option B — compte SMTP** (boîte email OVHcloud ou service dédié) : utilisé dès que `SMTP_HOST`
@@ -169,11 +169,11 @@ SMTP_PASS=mot-de-passe-de-la-boite
 SMTP_SECURE=starttls
 # Doit être identique à SMTP_USER
 MAIL_FROM=contact@votre-domaine.com
-# Facultatif : vide ⇒ nom de l'entreprise saisi dans l'espace Pro
+# Facultatif : vide ⇒ nom de l'entreprise saisi dans l'espace Artisan
 MAIL_FROM_NAME=Nom de votre entreprise
 ```
 
-**Vérifiez l'envoi** depuis l'espace Pro : onglet *Configuration*, encart « Envoi des emails »,
+**Vérifiez l'envoi** depuis l'espace Artisan : onglet *Configuration*, encart « Envoi des emails »,
 bouton « Envoyer un email de test » (vers l'email professionnel, ou vers l'adresse d'un testeur ;
 5 envois par tranche de 10 minutes). Faites-le **avant** de vous
 déconnecter la première fois : le code de connexion d'un nouvel appareil part par le même chemin.
@@ -181,7 +181,7 @@ déconnecter la première fois : le code de connexion d'un nouvel appareil part 
 À savoir :
 
 - **Les identifiants ne sont jamais stockés en base.** Ils sont lus uniquement dans `.env` :
-  l'espace Pro ne peut pas les divulguer et ils n'apparaissent dans aucune sauvegarde de la base.
+  l'espace Artisan ne peut pas les divulguer et ils n'apparaissent dans aucune sauvegarde de la base.
 - **Règles OVHcloud sur l'expéditeur** ([bonnes pratiques d'envoi d'e-mail](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices)) :
   - le domaine de `MAIL_FROM` doit être **attaché à l'hébergement** (onglet *Multisite*), sinon
     l'email ne peut pas être authentifié et il est rejeté. Une adresse tierce (gmail.com…) ne
@@ -197,10 +197,10 @@ déconnecter la première fois : le code de connexion d'un nouvel appareil part 
     source ; 10 Mo maximum par message.
   - les envois `mail()` se suivent (statistiques, erreurs, déblocage) dans l'onglet *Scripts e-mail*
     de l'hébergement ; les envois SMTP n'y apparaissent pas : suivez le journal « Emails » de
-    l'espace Pro.
+    l'espace Artisan.
 - Si `MAIL_FROM` est vide et qu'`APP_URL` n'indique pas de domaine réel, l'envoi est désactivé. Les réservations aboutissent
   quand même : chaque tentative est journalisée dans `appointment_notifications` avec le statut
-  `failed` et un motif explicite, visible depuis le planning de l'espace Pro (bouton « Emails »).
+  `failed` et un motif explicite, visible depuis le planning de l'espace Artisan (bouton « Emails »).
 - Un échec d'envoi ne bloque jamais une réservation. Les boutons « Renvoyer » du journal
   permettent de relancer une fois le SMTP corrigé.
 
@@ -285,7 +285,7 @@ rsync -avz --exclude node_modules --exclude .git --exclude src --exclude sql \
 ```
 
 ⚠️ Une fois le site en ligne, n'écrasez jamais `api/storage/` depuis votre machine : il contient
-le logo, le favicon et la zone d'intervention enregistrés depuis l'espace Pro.
+le logo, le favicon et la zone d'intervention enregistrés depuis l'espace Artisan.
 
 ---
 
@@ -386,16 +386,16 @@ Ne jamais importer `sql/schema.sql` sur une base existante : il commence par sup
 
 ---
 
-## Étape 5 ter : connexion à l'espace Pro (double authentification)
+## Étape 5 ter : connexion à l'espace Artisan (double authentification)
 
-L'espace Pro est protégé côté serveur : session dans un cookie `HttpOnly`, puis, sur un appareil
+L'espace Artisan est protégé côté serveur : session dans un cookie `HttpOnly`, puis, sur un appareil
 inconnu, un **code à 6 chiffres envoyé à l'email professionnel** (valable 15 minutes, 3 essais).
 L'appareil est ensuite reconnu pendant **10 jours**.
 
 - **Prérequis :** l'email professionnel (onglet *Configuration*) et l'envoi d'emails (`SMTP_*` et
-  `MAIL_FROM` dans `api/.env`). Sans eux, le mot de passe seul protège l'espace Pro et un bandeau
+  `MAIL_FROM` dans `api/.env`). Sans eux, le mot de passe seul protège l'espace Artisan et un bandeau
   l'indique après connexion. Testez l'envoi d'un email **avant** de vous déconnecter.
-- **Mot de passe `admin123` : changement imposé.** À la première connexion, l'espace Pro n'affiche
+- **Mot de passe `admin123` : changement imposé.** À la première connexion, l'espace Artisan n'affiche
   que l'écran « Choisissez votre mot de passe » (12 caractères minimum, mots de passe courants
   refusés) ; le serveur refuse toute autre action tant qu'il n'est pas changé. Ensuite :
   *Configuration* → *Mot de passe*. Chaque changement ferme les autres sessions, oublie les
@@ -412,7 +412,7 @@ L'appareil est ensuite reconnu pendant **10 jours**.
   compteur d'échecs de connexion (5 échecs en 15 minutes bloquent l'adresse IP), celui des
   formulaires publics (`ratelimit.json`) et, s'il est activé, le réglage de l'abonnement d'agenda
   (`calendar-feed.json`). Ne la versionnez pas, ne l'écrasez pas au déploiement ; la supprimer
-  déconnecte tout le monde et désactive l'abonnement d'agenda (à réactiver dans l'espace Pro).
+  déconnecte tout le monde et désactive l'abonnement d'agenda (à réactiver dans l'espace Artisan).
 - **HTTPS obligatoire** en production : les cookies sont alors marqués `Secure`.
 
 ## Étape 6 : régler les droits des fichiers
@@ -435,7 +435,7 @@ fichiers passent par l'API.
 
 ### Logo et favicon
 
-L'espace Pro (Configuration → Identité de l'entreprise) enregistre le logo et le favicon dans
+L'espace Artisan (Configuration → Identité de l'entreprise) enregistre le logo et le favicon dans
 `api/storage/branding/`. On peut aussi les y déposer par FTP sous leurs noms usuels — le premier
 présent est utilisé :
 
@@ -444,12 +444,12 @@ présent est utilisé :
 | Logo    | `logo.svg`, `logo.png`                         | Nom de l'entreprise en texte |
 | Favicon | `favicon.png`, `favicon.svg`, `favicon.ico`    | Icône par défaut intégrée    |
 
-Supprimer un fichier (depuis l'espace Pro ou par FTP) rétablit le repli. Les fichiers sont servis
+Supprimer un fichier (depuis l'espace Artisan ou par FTP) rétablit le repli. Les fichiers sont servis
 par `/api/branding/logo` et `/api/branding/favicon`.
 
 ### Zone d'intervention
 
-L'espace Pro (menu « Zone d'intervention » → « Calculer les communes ») enregistre les communes
+L'espace Artisan (menu « Zone d'intervention » → « Calculer les communes ») enregistre les communes
 retenues dans `api/storage/zone/service-area.geojson`. Après un premier déploiement, la carte de
 la vitrine n'affiche que le repère de l'entreprise tant que la zone n'a pas été calculée et
 enregistrée une fois. Les réservations sont ensuite limitées aux communes cochées. Le calcul
@@ -476,9 +476,9 @@ curl "https://votre-domaine.com/api/slots/availability?service_id=1"
 
 - `https://votre-domaine.com/` — la page vitrine
 - `https://votre-domaine.com/booking` — le parcours de réservation
-- `https://votre-domaine.com/admin` — l'espace Pro (artisan)
+- `https://votre-domaine.com/admin` — l'espace Artisan (artisan)
 
-Faites ensuite une réservation de test et consultez le journal « Emails » du rendez-vous dans l'espace Pro.
+Faites ensuite une réservation de test et consultez le journal « Emails » du rendez-vous dans l'espace Artisan.
 
 ---
 
@@ -529,7 +529,7 @@ OVH fournit gratuitement des certificats SSL Let's Encrypt :
 
 ### Les emails ne partent pas
 
-- Ouvrez le journal « Emails » d'un rendez-vous dans l'espace Pro : le motif de l'échec y figure
+- Ouvrez le journal « Emails » d'un rendez-vous dans l'espace Artisan : le motif de l'échec y figure
 - « Envoi d'emails non configuré » : ni `MAIL_FROM` ni `APP_URL` (domaine réel) dans `api/.env`
 - « Envoi refusé par la fonction mail() » : domaine de `MAIL_FROM` non attaché à l'hébergement
   (*Multisite*), ou envoi bloqué (onglet *Scripts e-mail*)
@@ -550,9 +550,9 @@ crenelio/
 ├── index.html              # Entrée de développement Vite (jamais servie en production)
 ├── src/                    # Code source React & TypeScript
 │   ├── App.tsx             # Routes : /, /booking, /rdv/:token, /admin, /decision/:token
-│   ├── pages/              # Vitrine, réservation, gestion du rendez-vous, espace Pro, décision
+│   ├── pages/              # Vitrine, réservation, gestion du rendez-vous, espace Artisan, décision
 │   ├── components/         # Étapes de réservation, cartes, sections de la vitrine
-│   │   └── admin/          # Espace Pro : mise en page, configuration, horaires, zone, nouveau rendez-vous…
+│   │   └── admin/          # Espace Artisan : mise en page, configuration, horaires, zone, nouveau rendez-vous…
 │   ├── config/             # Schéma de l'écran de configuration, pictos des engagements
 │   ├── utils/              # Mise en forme, recadrage d'images, calcul de la zone
 │   └── styles/             # Sass modulaire (variables, mixins, composants, vitrine)
@@ -586,7 +586,7 @@ npm run dev
 ```
 
 - Vite : `http://localhost:5173` (relaie `/api/*` vers le conteneur PHP sur le port 8000)
-- Espace Pro : `http://localhost:5173/admin`
+- Espace Artisan : `http://localhost:5173/admin`
 - Base : `127.0.0.1:3306`, base `crenelio`, utilisateur `crenelio`, mot de passe `crenelio_dev`,
   initialisée avec le schéma, les clés indispensables et les données de démonstration
 - Réinitialiser la base : `docker compose down -v && docker compose up -d`

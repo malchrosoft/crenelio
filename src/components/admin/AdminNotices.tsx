@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { InfoIcon, WarningIcon } from '@phosphor-icons/react';
 
-/** Avertissement de l'espace Pro (sécurité, configuration incomplète…). */
+/** Avertissement de l'espace Artisan (sécurité, configuration incomplète…). */
 export interface AdminNotice {
   id: string;
   level: 'warning' | 'info';

@@ -20,6 +20,7 @@ export type AdminTab =
   | 'zone'
   | 'company'
   | 'site'
+  | 'theme'
   | 'account';
 
 export interface NavItem {

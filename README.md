@@ -40,9 +40,9 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 - **Déplacement** : mode d'intervention (à domicile ou dans les locaux), adresse de l'entreprise, frais par paliers.
 - **Zone d'intervention** (pleine page) : point de départ (adresse ou GPS), rayon, communes limitrophes, calcul des communes via `geo.api.gouv.fr` (bleu : entièrement dans le rayon, orange : partiellement), retrait d'une commune au clic droit.
 - **Configuration** : identité (nom, logo et favicon PNG/SVG avec recadrage), coordonnées, page vitrine, engagements, réservation, mentions légales ; bouton « Annuler » sur chaque formulaire.
-- **Apparence** (écran « Vitrine ») : couleur principale (palette lisible ou couleur libre, contrôle du contraste), arrondis, fond des pages (12 teintes claires ou teinte de la couleur principale), arrondis (sans, compact, standard, arrondi), style des boutons (standard, pilule, plat, material, relief) et texte des boutons en capitales en option, effets activables (ombres douces, verre dépoli, animations respectant « réduire les animations »), aperçu en direct ; reprise dans les emails.
+- **Apparence** (écran « Thème ») : couleur principale (palette lisible ou couleur libre, contrôle du contraste), arrondis, fond des pages (12 teintes claires ou teinte de la couleur principale), arrondis (sans, compact, standard, arrondi), style des boutons (standard, pilule, plat, material, relief) et texte des boutons en capitales en option, effets activables (ombres douces, verre dépoli, animations respectant « réduire les animations »), aperçu en direct ; reprise dans les emails.
 - **Liste des interventions** (onglet Rendez-vous, AG Grid Community MIT) : colonnes triables et filtrables, pagination, export CSV, actions par ligne (statut, reprogrammation, emails, effacement).
-- **Calendrier** (onglet de l'espace Pro, FullCalendar MIT) : vues mois / semaine / jour / liste, horaires de travail et indisponibilités affichés, glisser-déposer d'un rendez-vous validé par le moteur de créneaux (forçable sur confirmation), création d'un rendez-vous au clic sur un jour.
+- **Calendrier** (onglet de l'espace Artisan, FullCalendar MIT) : vues mois / semaine / jour / liste, horaires de travail et indisponibilités affichés, glisser-déposer d'un rendez-vous validé par le moteur de créneaux (forçable sur confirmation), création d'un rendez-vous au clic sur un jour.
 - **RGPD** : notice d'information sous le formulaire de réservation, politique de confidentialité générée depuis la configuration (fenêtre « Mentions légales & confidentialité »), aucun cookie de traçage donc pas de bandeau, durée de conservation réglable (36 mois par défaut) avec effacement automatique, bouton « Effacer le client » pour les demandes d'effacement.
 - **Mot de passe & email professionnel** : changement imposé tant que `admin123` est actif (toléré en développement, avec bandeau), changement depuis *Configuration* (ancien mot de passe requis, 12 caractères minimum, mots de passe courants refusés), « Mot de passe oublié » par code envoyé à l'email professionnel, email professionnel modifié seulement après vérification par code (l'ancienne adresse est prévenue). Chaque changement ferme les autres sessions et envoie un email de confirmation.
 - **Authentification** : mot de passe haché (Bcrypt), session serveur (cookie `HttpOnly`, `SameSite=Strict`) vérifiée sur toutes les routes de gestion. Sur un nouvel appareil, **code à 6 chiffres envoyé à l'email professionnel** (15 min, 3 essais), puis appareil reconnu 10 jours. 5 échecs de mot de passe en 15 min bloquent l'adresse IP. Sans email professionnel ni envoi d'emails (`MAIL_FROM`), le mot de passe seul protège l'espace (bandeau d'avertissement). En local, le code arrive dans Mailpit (`http://localhost:8025`).
@@ -154,7 +154,7 @@ SMTP_USER=contact@votre-domaine.com
 SMTP_PASS=
 SMTP_SECURE=starttls           # starttls (587) | tls (465, implicite) | none
 MAIL_FROM=contact@votre-domaine.com
-MAIL_FROM_NAME=                # facultatif : vide ⇒ nom de l'entreprise (espace Pro)
+MAIL_FROM_NAME=                # facultatif : vide ⇒ nom de l'entreprise (espace Artisan)
 ```
 
 | Variable | Défaut | Rôle |
@@ -167,7 +167,7 @@ MAIL_FROM_NAME=                # facultatif : vide ⇒ nom de l'entreprise (espa
 | `SMTP_HOST` / `SMTP_PORT` | *(vide)* / `587` | Serveur SMTP. **Vide ⇒ fonction `mail()` de l'hébergement** (aucun identifiant) |
 | `SMTP_USER` / `SMTP_PASS` | *(vide)* | Identifiants `AUTH LOGIN` ; laisser vide pour un relais sans authentification |
 | `SMTP_SECURE` | `starttls` | `starttls` (587), `tls` (465, TLS implicite) ou `none` |
-| `MAIL_FROM` / `MAIL_FROM_NAME` | *(vide)* / *(vide)* | Expéditeur. **`MAIL_FROM_NAME` vide ⇒ nom de l'entreprise** saisi dans l'espace Pro. **Vide ⇒ `noreply@` + domaine d'`APP_URL`** (sans `www.`), domaine forcément attaché à l'hébergement. Chez OVHcloud : domaine **attaché à l'hébergement** (*Multisite*) et, en SMTP, adresse **identique à `SMTP_USER`**, sinon rejet |
+| `MAIL_FROM` / `MAIL_FROM_NAME` | *(vide)* / *(vide)* | Expéditeur. **`MAIL_FROM_NAME` vide ⇒ nom de l'entreprise** saisi dans l'espace Artisan. **Vide ⇒ `noreply@` + domaine d'`APP_URL`** (sans `www.`), domaine forcément attaché à l'hébergement. Chez OVHcloud : domaine **attaché à l'hébergement** (*Multisite*) et, en SMTP, adresse **identique à `SMTP_USER`**, sinon rejet |
 
 **En local, Docker Compose fournit ces variables au conteneur PHP pour viser Mailpit** (elles
 priment sur `api/.env`) : l'envoi fonctionne sans rien configurer. Retirez-les du service `api`
@@ -177,11 +177,11 @@ Règles d'envoi propres à OVHcloud (expéditeur, `Reply-To`, SPF/DKIM/DMARC, qu
 [DEPLOYMENT.fr.md, étape 4b](DEPLOYMENT.fr.md) et les
 [bonnes pratiques d'envoi d'e-mail](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices).
 
-L'écran *Compte* de l'espace Pro affiche le mode d'envoi et l'expéditeur (lecture seule) et propose un **email de test**.
+L'écran *Compte* de l'espace Artisan affiche le mode d'envoi et l'expéditeur (lecture seule) et propose un **email de test**.
 
 **Sans `MAIL_FROM` ni `APP_URL` exploitable (domaine réel), l'envoi est simplement désactivé** : les réservations
 aboutissent normalement et chaque tentative est journalisée en `failed` avec un motif explicite,
-consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relançable manuellement.
+consultable depuis l'Espace Artisan (bouton « Emails » d'un rendez-vous) et relançable manuellement.
 
 ---
 
@@ -192,7 +192,7 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 |---|---|---|
 | `GET` | `/api/health` | État d'installation, public et sans secret (`installed`, `database`, `schema_version`) — lu par `npm run deploy:init` |
 | `GET` | `/api/config` | Configuration publique (nom pro, coordonnées, centrage carte) |
-| `GET` | `/api/admin/config` | Configuration complète (espace pro) |
+| `GET` | `/api/admin/config` | Configuration complète (espace Artisan) |
 | `PUT` | `/api/admin/config` | Mise à jour des réglages artisan |
 | `POST` | `/api/admin/login` | Mot de passe ; ouvre la session ou envoie le code (nouvel appareil) |
 | `POST` | `/api/admin/login/code` | Validation du code à 6 chiffres |
@@ -206,7 +206,7 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 | `POST` | `/api/admin/pro-email/confirm` | Validation du code ; l'ancienne adresse est prévenue |
 | `GET` / `POST` / `PUT` / `DELETE` | `/api/admin/calendar-feed` | Abonnement d'agenda : état, activation ou régénération, indisponibilités, désactivation |
 | `GET` | `/api/calendar/:token.ics` | Flux d'agenda privé (404 si désactivé ou jeton inconnu) |
-| `GET` / `PUT` / `DELETE` | `/api/admin/ui-state/:id` | Préférences d'affichage d'une grille de l'espace Pro (disposition des colonnes, tri, taille de page) |
+| `GET` / `PUT` / `DELETE` | `/api/admin/ui-state/:id` | Préférences d'affichage d'une grille de l'espace Artisan (disposition des colonnes, tri, taille de page) |
 | `GET` | `/api/admin/mail` | Mode d'envoi des emails et expéditeur (lecture seule) |
 | `POST` | `/api/admin/mail/test` | Email de test vers `to` (testeur, développeur) ou, à défaut, l'email professionnel ; 5 envois / 10 min |
 
@@ -214,7 +214,7 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 | Méthode | Route | Description |
 |---|---|---|
 | `GET` | `/api/services` | Liste des prestations actives |
-| `POST` | `/api/services` | Ajouter une prestation (espace pro) |
+| `POST` | `/api/services` | Ajouter une prestation (espace Artisan) |
 | `PUT` | `/api/services/:id` | Modifier une prestation |
 | `DELETE` | `/api/services/:id` | Supprimer une prestation |
 | `GET` | `/api/slots?service_id=1&date=YYYY-MM-DD` | Calcul temps réel des créneaux libres |
@@ -241,14 +241,14 @@ consultable depuis l'Espace Pro (bouton « Emails » d'un rendez-vous) et relan�
 ### Rendez-vous
 | Méthode | Route | Description |
 |---|---|---|
-| `GET` | `/api/appointments` | Liste des rendez-vous (espace pro) |
+| `GET` | `/api/appointments` | Liste des rendez-vous (espace Artisan) |
 | `POST` | `/api/appointments` | Réservation d'un créneau (client) |
 | `POST` | `/api/appointments/exceptional-request` | Demande hors zone (rendez-vous « En attente » soumis à l'artisan) |
 | `GET` / `POST` | `/api/appointments/decision/:token` | Consultation puis acceptation / refus d'une demande hors zone |
 | `POST` | `/api/admin/appointments` | Rendez-vous saisi par l'artisan (hors zone et heure libre acceptés) |
 | `GET` | `/api/appointments/token/:token` | Consultation d'un rendez-vous via son token |
 | `POST` | `/api/appointments/token/:token/cancel` | Annulation d'un rendez-vous par le client |
-| `GET` | `/api/appointments/:id` | Détail d'un rendez-vous (espace pro) |
+| `GET` | `/api/appointments/:id` | Détail d'un rendez-vous (espace Artisan) |
 | `PUT` | `/api/appointments/:id/status` | Modification du statut (pending, confirmed, completed, cancelled) |
 | `PUT` | `/api/appointments/:id/reschedule` | Reprogrammation (l'heure de fin suit la durée de la prestation) |
 | `GET` | `/api/appointments/:id/notifications` | Journal des emails envoyés pour ce rendez-vous |

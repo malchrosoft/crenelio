@@ -95,7 +95,7 @@ class Branding
     /**
      * Logo PNG à intégrer aux emails, avec ses dimensions d'affichage.
      * Gmail et Outlook n'affichent pas le SVG : on utilise la copie allégée `logo-email.png`,
-     * générée à l'envoi du logo depuis l'espace Pro (cf. BrandingField), sinon `logo.png`.
+     * générée à l'envoi du logo depuis l'espace Artisan (cf. BrandingField), sinon `logo.png`.
      *
      * @return array{content: string, width: int, height: int}|null
      */

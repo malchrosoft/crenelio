@@ -36,7 +36,7 @@ $healthController      = new HealthController();
 $uiStateController     = new UiStateController();
 $calendarFeedController = new CalendarFeedController();
 
-// Routes de l'espace Pro : refusées (401) sans session ouverte, cf. core/Auth.php
+// Routes de l'espace Artisan : refusées (401) sans session ouverte, cf. core/Auth.php
 $admin = fn(callable $handler) => Auth::guard($handler);
 // Routes accessibles avec le mot de passe par défaut : celles qui permettent de le changer
 $adminDefaultOk = fn(callable $handler) => Auth::guard($handler, true);
@@ -69,7 +69,7 @@ $router->put('/admin/calendar-feed',        $admin([$calendarFeedController, 'up
 $router->delete('/admin/calendar-feed',     $admin([$calendarFeedController, 'disable']));
 $router->get('/calendar/:token',            [$calendarFeedController, 'feed']);
 
-// Préférences d'affichage de l'espace Pro (disposition des grilles), une clé par élément
+// Préférences d'affichage de l'espace Artisan (disposition des grilles), une clé par élément
 $router->get('/admin/ui-state/:id',         $admin([$uiStateController, 'show']));
 $router->put('/admin/ui-state/:id',         $admin([$uiStateController, 'update']));
 $router->delete('/admin/ui-state/:id',      $admin([$uiStateController, 'destroy']));

@@ -1,5 +1,5 @@
 // ===================================================================
-// Thème réglable depuis l'espace Pro (Item 2)
+// Thème réglable depuis l'espace Artisan (Item 2)
 // Valeurs par défaut sur :root ; src/utils/theme.ts les surcharge (--color-primary) et pose
 // les attributs data-* sur <html> : data-radius, data-shadows, data-glass, data-motion.
 // ===================================================================
@@ -76,7 +76,7 @@
 }
 
 // -------------------------------------------------------
-// Verre dépoli : header de la vitrine, barre de l'espace Pro, fond des fenêtres
+// Verre dépoli : header de la vitrine, barre de l'espace Artisan, fond des fenêtres
 // -------------------------------------------------------
 :root[data-glass='on'] {
   .vitrine-header,

@@ -2,7 +2,7 @@
 /**
  * Notification model — Journal des emails rattachés à un rendez-vous.
  *
- * Chaque tentative d'envoi laisse une trace consultable depuis l'espace Pro,
+ * Chaque tentative d'envoi laisse une trace consultable depuis l'espace Artisan,
  * afin de répondre immédiatement à un client qui n'a rien reçu.
  */
 

@@ -15,7 +15,7 @@ class ServiceController
     public function index(): void
     {
         $all = isset($_GET['all']) && $_GET['all'] === '1';
-        // Prestations désactivées : réservées à l'espace Pro
+        // Prestations désactivées : réservées à l'espace Artisan
         if ($all && !Auth::isAuthenticated()) {
             Response::json(['error' => 'Session expirée, reconnectez-vous'], 401);
         }

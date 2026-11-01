@@ -20,7 +20,7 @@ import {
 
 const BASE_URL = '/api';
 
-/** Émis quand l'API refuse une route de l'espace Pro (session absente ou expirée). */
+/** Émis quand l'API refuse une route de l'espace Artisan (session absente ou expirée). */
 export const UNAUTHORIZED_EVENT = 'crenelio:unauthorized';
 
 /** Routes de connexion : un 401 y signale une erreur de saisie, pas une session expirée. */
@@ -31,7 +31,7 @@ async function request<T>(method: string, path: string, body: unknown = null): P
   const isForm = body instanceof FormData;
   const headers: Record<string, string> = isForm ? {} : { 'Content-Type': 'application/json' };
 
-  // La session de l'espace Pro voyage dans un cookie HttpOnly (même origine)
+  // La session de l'espace Artisan voyage dans un cookie HttpOnly (même origine)
   const options: RequestInit = { method, headers, credentials: 'same-origin' };
   if (body) {
     options.body = isForm ? body : JSON.stringify(body);
@@ -93,7 +93,7 @@ export const api = {
       'GET',
       '/admin/session'
     ),
-  /** Changement depuis l'espace Pro : ferme les autres sessions. */
+  /** Changement depuis l'espace Artisan : ferme les autres sessions. */
   changePassword: (current: string, password: string) =>
     request<{ message: string }>('POST', '/admin/password', { current, password }),
   /** Mot de passe oublié : code envoyé à l'email professionnel (réponse identique dans tous les cas). */
@@ -106,7 +106,7 @@ export const api = {
   confirmProEmail: (code: string) =>
     request<{ status: 'saved'; pro_email: string }>('POST', '/admin/pro-email/confirm', { code }),
   adminLogout: () => request<{ success: boolean }>('POST', '/admin/logout'),
-  /** Préférences d'affichage de l'espace Pro (disposition d'une grille), `null` si aucune. */
+  /** Préférences d'affichage de l'espace Artisan (disposition d'une grille), `null` si aucune. */
   getUiState: <T>(id: string) => request<{ state: T | null }>('GET', `/admin/ui-state/${id}`),
   saveUiState: <T>(id: string, state: T) => request<{ state: T }>('PUT', `/admin/ui-state/${id}`, { state }),
   resetUiState: (id: string) => request<{ state: null }>('DELETE', `/admin/ui-state/${id}`),

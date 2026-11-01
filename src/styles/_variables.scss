@@ -2,7 +2,7 @@
 // Variables SCSS de Crénelio
 // ===================================================================
 
-// Couleur principale par défaut : surchargée à l'exécution par le thème choisi dans l'espace Pro
+// Couleur principale par défaut : surchargée à l'exécution par le thème choisi dans l'espace Artisan
 // (`--color-primary`, cf. _theme.scss et src/utils/theme.ts). Seul endroit où elle est écrite.
 $default-primary: #2563eb;
 
@@ -14,7 +14,7 @@ $primary: var(--color-primary);
 // Fond des pages (corps, sections alternées de la vitrine) : variable CSS réglée par le thème
 $background: var(--color-background);
 
-// Fonds clairs proposés dans l'espace Pro (pas de couleur libre : lisibilité garantie).
+// Fonds clairs proposés dans l'espace Artisan (pas de couleur libre : lisibilité garantie).
 // Clés reprises par BACKGROUND_OPTIONS (src/utils/theme.ts) ; « tint » est calculé à part.
 $background-presets: (
   'slate': #f8fafc,
@@ -31,7 +31,7 @@ $background-presets: (
   'peach': #fcf4ec,
 );
 
-// Palette proposée dans l'espace Pro (pastilles) : garder synchronisée avec THEME_PRESETS
+// Palette proposée dans l'espace Artisan (pastilles) : garder synchronisée avec THEME_PRESETS
 // (src/utils/theme.ts). Toutes lisibles avec un texte blanc (contraste ≥ 4,5:1).
 $theme-presets: (
   '2563eb': #2563eb,

@@ -13,6 +13,7 @@ import {
   CalendarXIcon,
   CalendarCheckIcon,
   StorefrontIcon,
+  BrowserIcon,
   PaletteIcon,
   ShieldCheckIcon,
   SquaresFourIcon,
@@ -60,7 +61,7 @@ import { format, isPast, isToday, parseISO } from 'date-fns';
 
 const NAV_ICON = { size: 20, weight: 'fill' as const, 'aria-hidden': true };
 
-/** Paliers kilométriques modifiables depuis l'espace Pro (cf. `config.travel_tier_*`). */
+/** Paliers kilométriques modifiables depuis l'espace Artisan (cf. `config.travel_tier_*`). */
 const TRAVEL_TIER_INDEXES = [1, 2, 3] as const;
 
 /** Libellés d'aide associés à chaque mode de facturation du déplacement. */
@@ -585,7 +586,8 @@ export const AdminDashboard: React.FC = () => {
       ? []
       : [{ id: 'zone' as const, group: 'Activité', label: "Zone d'intervention", icon: <MapTrifoldIcon {...NAV_ICON} /> }]),
     { id: 'company', group: 'Paramétrage', label: 'Entreprise', icon: <StorefrontIcon {...NAV_ICON} /> },
-    { id: 'site', group: 'Paramétrage', label: 'Vitrine', icon: <PaletteIcon {...NAV_ICON} /> },
+    { id: 'site', group: 'Paramétrage', label: 'Vitrine', icon: <BrowserIcon {...NAV_ICON} /> },
+    { id: 'theme', group: 'Paramétrage', label: 'Thème', icon: <PaletteIcon {...NAV_ICON} /> },
     { id: 'account', group: 'Paramétrage', label: 'Compte', icon: <ShieldCheckIcon {...NAV_ICON} /> },
   ];
 
@@ -1094,8 +1096,11 @@ export const AdminDashboard: React.FC = () => {
         <div className="admin-config">{renderConfigGroups(['identity', 'legal'])}</div>
       ) : activeTab === 'site' ? (
         <div className="admin-config">
-          <AppearanceEditor config={config} onSaved={setConfig} />
           {renderConfigGroups(['vitrine', 'map'])}
+        </div>
+      ) : activeTab === 'theme' ? (
+        <div className="admin-config">
+          <AppearanceEditor config={config} onSaved={setConfig} />
         </div>
       ) : activeTab === 'account' ? (
         <div className="admin-config">

@@ -44,7 +44,6 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
     title: 'Page vitrine',
     intro: 'Textes de présentation de la page d’accueil. Les engagements se gèrent juste en dessous.',
     fields: [
-      { key: 'service_area', label: 'Zone couverte (texte affiché)', type: 'text', hint: 'Ex. : « Clamart et 15 km alentour ».' },
       { key: 'vitrine_tagline', label: 'Accroche', type: 'text', hint: 'Sous le nom, en haut de page et dans le pied de page.' },
       { key: 'vitrine_about', label: 'Présentation', type: 'textarea', hint: 'Section « À propos ».' },
       { key: 'vitrine_photo_url', label: 'Photo (URL)', type: 'url', hint: 'Illustration de la section « À propos ». Vide : aucune photo.' },
@@ -63,8 +62,9 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
   {
     id: 'map',
     title: 'Carte de la vitrine',
-    intro: "Zoom initial de la carte (avant cadrage sur les communes). Le point de départ se règle dans « Zone & déplacement ».",
+    intro: "Texte de la zone couverte et zoom initial de la carte (avant cadrage sur les communes). Le point de départ se règle dans « Zone d'intervention ».",
     fields: [
+      { key: 'service_area', label: 'Zone couverte (texte affiché)', type: 'text', hint: 'Ex. : « Clamart et 15 km alentour ».' },
       { key: 'default_zoom', label: 'Niveau de zoom', type: 'number', step: '1' },
     ],
   },

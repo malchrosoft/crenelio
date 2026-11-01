@@ -57,7 +57,7 @@
   encart `Panel`, coordonnées au format postal (`PostalContact`), liens soulignés au survol
   seulement, section Contact à deux cartes, plus de coordonnées dans le hero.
 - **Feuille de route :** priorités réordonnées selon la criticité puis le gain ; ajouts des
-  Items 25 à 31 ; Item 20 (SMTP dans l'espace Pro) abandonné au profit de l'Item 24.
+  Items 25 à 31 ; Item 20 (SMTP dans l'espace Artisan) abandonné au profit de l'Item 24.
 
 ### Session du 27/10/2026 (`fdb9b73` → `40086a9`)
 - **Règles OVHcloud sur l'expéditeur (`ad6358d`)**, vérifiées dans la
@@ -66,7 +66,7 @@
   identique au compte authentifié ; adresse d'un tiers seulement en `Reply-To:` ; SPF / DKIM /
   DMARC. Consignées comme **règle générale OVHcloud** dans `AGENTS.md` (section 5), et dans
   `README.md` et `DEPLOYMENT*.md` (étape 4b).
-- **Item 20 abandonné :** saisir le SMTP dans l'espace Pro risquerait de couper l'envoi des codes
+- **Item 20 abandonné :** saisir le SMTP dans l'espace Artisan risquerait de couper l'envoi des codes
   de connexion (impossible de se reconnecter pour corriger) et exposerait le mot de passe.
 - **Item 24 — Envoi natif & email de test (`40086a9`) :**
   - `Mailer::transport()` : `smtp` si `SMTP_HOST` est renseigné, sinon `mail()` de l'hébergement,
@@ -79,7 +79,7 @@
     **Le vrai `mail()` ne se teste que sur l'hébergement.** Encart non vu dans le navigateur.
 
 ### Sessions du 21 au 23/10/2026 (`51564a4` → `1ff45be`)
-- **Item 12 — Sécurité de l'espace Pro (`14871c2`) :** `api/core/Auth.php`.
+- **Item 12 — Sécurité de l'espace Artisan (`14871c2`) :** `api/core/Auth.php`.
   - Session PHP en cookie `HttpOnly` / `SameSite=Strict` (inactivité 2 h, 12 h max), `Secure` en HTTPS.
   - Nouvel appareil ⇒ code à 6 chiffres envoyé à `pro_email` (haché en session, 15 min, 3 essais,
     renvoi au plus toutes les 60 s) ; appareil de confiance 10 jours (cookie signé HMAC).
@@ -87,7 +87,7 @@
   - 5 échecs de mot de passe en 15 min ⇒ IP bloquée (`api/storage/auth/throttle.json`).
   - Clé de signature `api/storage/auth/secret.key`, générée au premier besoin, non versionnée.
   - Toutes les routes de gestion enveloppées par `$admin(...)` dans `api/routes/api.php`
-    (401 sinon) ; `?all=1` sur `/services` réservé à l'espace Pro.
+    (401 sinon) ; `?all=1` sur `/services` réservé à l'espace Artisan.
   - Nouvelles routes : `POST /admin/login/code`, `GET /admin/session`, `POST /admin/logout`.
   - Front : `src/components/admin/AdminLogin.tsx` (mot de passe puis code), session conservée au
     rechargement, retour à la connexion sur tout 401 (`UNAUTHORIZED_EVENT`, `src/api.ts`).
@@ -209,7 +209,7 @@
   Prestation + Déplacement (+ distance) = Total estimé, blocage bienveillant hors zone avec `mailto:`
   pré-rempli de demande exceptionnelle et lien `tel:`.
 - **Confirmation** (`BookingConfirmation.tsx`) et **vitrine** (`ServicesSection.tsx`) : rappel du détail tarifaire.
-- **Espace Pro** (`AdminDashboard.tsx`) : mode et forfait de déplacement en création et édition de prestation,
+- **Espace Artisan** (`AdminDashboard.tsx`) : mode et forfait de déplacement en création et édition de prestation,
   badge dédié sur les cartes, nouvel onglet **« Zone & déplacement »** pour les 3 paliers et le rayon maximal.
 - **Helpers partagés** : `src/utils/format.ts` (`formatEuro`, `formatKm`).
 
@@ -274,7 +274,7 @@ Les deux sens ont été réalignés.
 
 ### Contraintes et reliquats
 Consignés dans [`AGENTS.md`](AGENTS.md), section *5. Contraintes Connues & Dette Technique*
-(sécurité de l'espace Pro et règle `$admin(...)` pour toute nouvelle route de gestion, mot de passe et
+(sécurité de l'espace Artisan et règle `$admin(...)` pour toute nouvelle route de gestion, mot de passe et
 email pro hors de `PUT /admin/config`, RGPD (toute nouvelle donnée personnelle → effacement + politique),
 hébergement OVHcloud Starter, fichiers `.env` hors de portée des agents, fuseau horaire, absence de
 notification à l'annulation).

@@ -32,7 +32,7 @@ const CalendarFeedSettings: React.FC = () => {
     }
   }
 
-  // Adresse complète : même origine que l'espace Pro (domaine du site en production)
+  // Adresse complète : même origine que l'espace Artisan (domaine du site en production)
   const httpsUrl = feed?.path ? `${window.location.origin}${feed.path}` : null;
   const webcalUrl = httpsUrl?.replace(/^https?:/, 'webcal:') ?? null;
 

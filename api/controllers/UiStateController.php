@@ -1,6 +1,6 @@
 <?php
 /**
- * UiStateController — Préférences d'affichage de l'espace Pro (disposition des grilles…).
+ * UiStateController — Préférences d'affichage de l'espace Artisan (disposition des grilles…).
  *
  * Une clé `config` par élément : `ui_state_<id>`, contenant un objet JSON. Routes protégées
  * (session Pro) ; ces clés sont exclues de la configuration publique (Config::getPublic) et

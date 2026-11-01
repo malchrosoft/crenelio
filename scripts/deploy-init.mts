@@ -271,7 +271,7 @@ async function main() {
       check: (v) => (/^https?:\/\/[^\s/]+\.[^\s/]+/.test(v) ? null : 'Adresse complète attendue, ex. https://www.mon-artisan.fr'),
     })
   ).replace(/\/+$/, '');
-  if (siteUrl.startsWith('http://')) console.log('  ⚠️  HTTPS est indispensable en production (cookies sécurisés de l’espace Pro).');
+  if (siteUrl.startsWith('http://')) console.log('  ⚠️  HTTPS est indispensable en production (cookies sécurisés de l’espace Artisan).');
 
   console.log(`\nInterrogation de ${siteUrl}/api/health…`);
   const state = await serverState(siteUrl);

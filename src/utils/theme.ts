@@ -1,5 +1,5 @@
 /**
- * Thème réglable depuis l'espace Pro (Item 2) : couleur principale, arrondis, effets.
+ * Thème réglable depuis l'espace Artisan (Item 2) : couleur principale, arrondis, effets.
  *
  * Les clés `theme_*` de la table `config` sont traduites en variable CSS (`--color-primary`) et en
  * attributs `data-*` sur <html>, lus par `src/styles/_theme.scss`. Le dernier thème appliqué est
@@ -90,7 +90,7 @@ export function themeFromConfig(config: AppConfig): ThemeSettings {
   };
 }
 
-/** Clés `config` correspondant à un thème (enregistrement depuis l'espace Pro). */
+/** Clés `config` correspondant à un thème (enregistrement depuis l'espace Artisan). */
 export function themeToConfig(theme: ThemeSettings): Record<string, string> {
   return {
     theme_primary: theme.primary.toLowerCase(),
