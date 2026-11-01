@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import {
-  CalendarCheckIcon,
   HouseIcon,
   SidebarSimpleIcon,
   SignOutIcon,
@@ -15,7 +14,6 @@ export type AdminTab =
   | 'unavailabilities'
   | 'services'
   | 'hours'
-  | 'booking'
   | 'settings'
   | 'zone'
   | 'company'
@@ -79,13 +77,9 @@ const AdminShell: React.FC<AdminShellProps> = ({ companyName, nav, onLogout, not
 
         <nav className="admin-topbar__actions" aria-label="Liens du site">
           <AdminNotices notices={notices} />
-          <a className="admin-topbar__link" href="/" target="_blank" rel="noopener">
+          <a className="admin-topbar__link" href="/">
             <HouseIcon size={18} weight="fill" aria-hidden="true" />
             <span>Accueil</span>
-          </a>
-          <a className="admin-topbar__link" href="/booking" target="_blank" rel="noopener">
-            <CalendarCheckIcon size={18} weight="fill" aria-hidden="true" />
-            <span>Espace client</span>
           </a>
           {onLogout && (
             <button type="button" className="btn btn-secondary admin-topbar__logout" onClick={onLogout}>

@@ -11,7 +11,6 @@ import {
   MapTrifoldIcon,
   CalendarDotsIcon,
   CalendarXIcon,
-  CalendarCheckIcon,
   StorefrontIcon,
   BrowserIcon,
   PaletteIcon,
@@ -579,7 +578,6 @@ export const AdminDashboard: React.FC = () => {
     { id: 'unavailabilities', group: 'Interventions', label: 'Indisponibilités', icon: <CalendarXIcon {...NAV_ICON} /> },
     { id: 'services', group: 'Activité', label: 'Prestations', icon: <WrenchIcon {...NAV_ICON} />, count: services.length },
     { id: 'hours', group: 'Activité', label: 'Horaires', icon: <ClockIcon {...NAV_ICON} /> },
-    { id: 'booking', group: 'Activité', label: 'Créneaux', icon: <CalendarCheckIcon {...NAV_ICON} /> },
     { id: 'settings', group: 'Activité', label: 'Déplacement', icon: <CarIcon {...NAV_ICON} /> },
     // Zone d'intervention : uniquement si l'artisan se déplace chez ses clients
     ...(config.travel_mode === 'premises'
@@ -1089,9 +1087,8 @@ export const AdminDashboard: React.FC = () => {
       ) : activeTab === 'hours' ? (
         <div className="admin-config">
           <ScheduleEditor />
+          {renderConfigGroups(['booking'])}
         </div>
-      ) : activeTab === 'booking' ? (
-        <div className="admin-config">{renderConfigGroups(['booking'])}</div>
       ) : activeTab === 'company' ? (
         <div className="admin-config">{renderConfigGroups(['identity', 'legal'])}</div>
       ) : activeTab === 'site' ? (

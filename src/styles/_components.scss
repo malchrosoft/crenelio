@@ -815,7 +815,7 @@ $admin-sidebar-collapsed: 68px;
     display: flex;
     align-items: center;
     gap: $space-xs;
-    margin-top: $space-sm;
+    margin-top: $space-md;
     padding: $space-xs 12px $space-2xs;
 
     &::before {
@@ -823,6 +823,7 @@ $admin-sidebar-collapsed: 68px;
       flex-shrink: 0;
       width: 6px;
       height: 6px;
+      margin-right: $space-2xs;
       background: $primary;
       transform: rotate(45deg);
     }

@@ -231,7 +231,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 ---
 
 ### 17. Espace Artisan en Pleine Page — ✅ Terminée
-- **Réalisé :** route dédiée `/admin` (les anciens liens `/booking?view=admin` y redirigent), header fixe « Espace Artisan » + nom de l'entreprise, déconnexion à droite, liens Accueil et Espace client ouverts dans un nouvel onglet ; menu latéral rétractable (icônes seules, état mémorisé dans le navigateur). Composant `src/components/admin/AdminShell.tsx`.
+- **Réalisé :** route dédiée `/admin` (les anciens liens `/booking?view=admin` y redirigent), header fixe « Espace Artisan » + nom de l'entreprise, déconnexion à droite, lien Accueil dans le même onglet (le lien Espace client a été retiré le 01/11/2026) ; menu latéral rétractable (icônes seules, état mémorisé dans le navigateur). Composant `src/components/admin/AdminShell.tsx`.
 - **Améliorations possibles :** conserver la session à l'actualisation de la page (aujourd'hui, retour à l'écran de connexion — à traiter avec l'Item 12) ; tableau des rendez-vous adapté au mobile.
 
 ---
@@ -467,8 +467,8 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Prérequis :** Item 2 ✅.
 
 ### 38. Menu de l'Espace Artisan par Catégories — ✅ Terminée
-- **Demandé le 01/11/2026.** Catégories au style de rubrique (losange, intitulé et filet en couleur principale ; filet seul en menu replié) : *Interventions* (Rendez-vous, Calendrier, Indisponibilités), *Activité* (Prestations, Horaires, Créneaux, Déplacement, Zone d'intervention), *Paramétrage* (Entreprise, Vitrine, Thème, Compte).
-- **Configuration éclatée :** les sous-onglets de « Horaires » deviennent deux écrans ; l'ancien fourre-tout « Configuration » est réparti entre Créneaux (règles de réservation), Entreprise (identité, logo, mentions légales), Vitrine (zone couverte, page vitrine, engagements, carte), Thème (apparence, appelé à s'étoffer) et Compte (coordonnées de l'artisan, email professionnel, envoi des emails, abonnement d'agenda, autres paramètres, mot de passe en bas).
+- **Demandé le 01/11/2026.** Catégories au style de rubrique (losange, intitulé et filet en couleur principale ; filet seul en menu replié) : *Interventions* (Rendez-vous, Calendrier, Indisponibilités), *Activité* (Prestations, Horaires, Déplacement, Zone d'intervention), *Paramétrage* (Entreprise, Vitrine, Thème, Compte).
+- **Configuration éclatée :** les sous-onglets de « Horaires » deviennent deux écrans ; l'ancien fourre-tout « Configuration » est réparti entre Horaires (semaine type et créneaux), Entreprise (identité, logo, mentions légales), Vitrine (zone couverte, page vitrine, engagements, carte), Thème (apparence, appelé à s'étoffer) et Compte (coordonnées de l'artisan, email professionnel, envoi des emails, abonnement d'agenda, autres paramètres, mot de passe en bas).
 
 ### 35. Tableau de Bord de l'Espace Artisan (Jours en Cartes & Carte du Jour) — ✅ Terminée
 - **Demandé le 31/10/2026** : page d'accueil de l'espace Artisan, en tête du menu.
@@ -519,7 +519,7 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 | **7** | **Item 29** | **Mise à jour depuis le site hébergé (espace Artisan)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
 | **8** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
 | **9** | **Item 34** | **Thème sombre (inversion des couleurs, palettes adaptées)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort ; chantier transversal coûteux (gris, fonds, états et bibliothèques à convertir) |
-| — | **Item 38** | Menu de l'espace Artisan par catégories, configuration répartie en écrans (Entreprise, Vitrine, Compte, Créneaux) | Espace Artisan / Navigation | ✅ **Terminé** | — | — |
+| — | **Item 38** | Menu de l'espace Artisan par catégories, configuration répartie en écrans (Entreprise, Vitrine, Thème, Compte ; créneaux sous Horaires) | Espace Artisan / Navigation | ✅ **Terminé** | — | — |
 | — | **Item 35** | Tableau de bord (jours en cartes, carte du jour numérotée, positions des rendez-vous enregistrées) | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 21** | Liste des interventions AG Grid Community (tri, filtres, sélection, export CSV, disposition enregistrée) ; composant `DataGrid` commun, pleine hauteur desktop/tablette, fenêtre de rendez-vous partagée avec le calendrier, avertissements regroupés dans le header, indisponibilités en grille (sous-onglet de « Horaires ») | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 33** | Abonnement d'agenda de l'artisan (flux iCal privé, optionnel) | Planning / Synchronisation | ✅ **Terminé** | — | — |
