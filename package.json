@@ -1,6 +1,6 @@
 {
   "name": "crenelio",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Lightweight React + PHP REST API + MySQL boilerplate for OVHcloud shared hosting",
   "license": "AGPL-3.0",
   "type": "module",
@@ -16,7 +16,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
     "deploy:build": "node scripts/build.mts",
-    "deploy:init": "node scripts/deploy-init.mts"
+    "deploy:init": "node scripts/deploy-init.mts",
+    "release": "node scripts/release.mts"
   },
   "dependencies": {
     "@ag-grid-community/locale": "^36.2.0",

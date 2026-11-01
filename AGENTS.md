@@ -24,6 +24,7 @@ Le schéma et les données sont montés en lecture seule dans `/docker-entrypoin
 - `sql/seed_test_data.sql` : **DML de test / démo** (prestations d'exemple, congés/indisponibilités de test, rendez-vous récents et à venir).
 - `sql/migrations/` : **Migrations idempotentes** à appliquer sur une base existante lorsqu'un item modifie le schéma. `schema.sql` reste la source de vérité : toute colonne ajoutée en migration doit y figurer également, sans quoi un `docker compose down -v` la ferait disparaître.
   **Version du schéma (Item 27) :** chaque nouvelle migration se termine par la mise à jour de `config.schema_version` avec son propre nom de fichier (sans `.sql`), et `seed_init.sql` reprend cette même valeur. `GET /api/health` l'expose, et `npm run deploy:init` en déduit les migrations à joindre à une mise à jour.
+  **Release (Item 28) :** `npm run release` publie l'archive (et sa somme SHA-256) de la version de `package.json` (entrée `## [x.y.z]` obligatoire dans `CHANGELOG.md`). Un fichier à déployer s'ajoute dans `scripts/package-files.mts`, commun à `deploy:init` et à la release ; jamais de `.env`, de contenu de `api/storage/` ni de `seed_test_data.sql` dans une archive.
   ```bash
   docker compose exec -T db mysql -ucrenelio -pcrenelio_dev crenelio < sql/migrations/<fichier>.sql
   ```

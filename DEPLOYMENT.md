@@ -32,6 +32,31 @@ manual deployment.
 
 ---
 
+## Installing from an Archive (no Node, no cloning)
+
+Each version is published on [GitHub Releases](https://github.com/malchrosoft/crenelio/releases)
+as a ready-to-deploy archive, `crenelio-<version>.zip`, with its SHA-256 checksum (`.sha256`). `0.x` versions are betas.
+
+1. **Verify the archive** (complete, intact download):
+   ```bash
+   shasum -a 256 -c crenelio-<version>.zip.sha256   # Windows: certutil -hashfile crenelio-<version>.zip SHA256
+   ```
+   The command must answer `OK` (on Windows, compare the hash with the `.sha256` content).
+2. **Contents**: `www/` (built site and API, upload as is, see step 5), `sql/` (schema, base data
+   and migrations, see step 3), `CHANGELOG.md` and both guides. Never a `.env`, any `api/storage/`
+   content or demo data.
+3. **First deployment**: skip step 1, create `www/api/.env` from `www/api/.env.example` (steps 4
+   and 4b), then follow steps 2, 3, 5 and onwards.
+4. **Update**: the same archive works, following "Updating a Live Site": do not upload `api/.env`
+   or `api/storage/`, and apply only the migrations newer than your database
+   (`/api/health`, `schema_version` field).
+
+**Publishing a version** (maintainer): fill in `CHANGELOG.md` and the `package.json` version,
+commit, then `npm run release`. The script prints the `git tag` and
+`gh release create` commands to run.
+
+---
+
 ## Prerequisites
 
 - An OVHcloud Web Hosting plan, **Starter at minimum** ([Starter plan](https://www.ovhcloud.com/fr/web-hosting/starter-offer/): 1 database of

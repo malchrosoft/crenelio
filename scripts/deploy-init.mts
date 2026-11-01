@@ -12,6 +12,7 @@ import { chmodSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, wr
 import { dirname, join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
+import { SITE_FILES, STORAGE_SKELETON } from './package-files.mts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 // Réponses mémorisées pour le déploiement suivant (sans aucun mot de passe), hors Git
@@ -146,28 +147,6 @@ function pendingMigrations(schemaVersion: string | null | undefined): string[] {
 // -----------------------------------------------------------------
 // Paquet
 // -----------------------------------------------------------------
-
-/** Fichiers du site, à la même place que sur le serveur (dossier www/ OVH). */
-const SITE_FILES = [
-  '.htaccess',
-  '.ovhconfig',
-  'api/.htaccess',
-  'api/index.php',
-  'api/config',
-  'api/core',
-  'api/controllers',
-  'api/models',
-  'api/routes',
-  'api/public/assets',
-];
-
-/** Premier déploiement seulement : dossiers de stockage vides (jamais leur contenu). */
-const STORAGE_SKELETON = [
-  'api/storage/.htaccess',
-  'api/storage/branding/.gitkeep',
-  'api/storage/zone/.gitkeep',
-  'api/storage/auth/.gitkeep',
-];
 
 function copyInto(target: string, paths: string[]): void {
   for (const path of paths) {

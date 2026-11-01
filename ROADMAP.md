@@ -378,9 +378,10 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Objectif :** installer Crénelio sans cloner le dépôt ni compiler : un artisan (ou son prestataire) télécharge un paquet prêt à déployer.
 - **Contenu de l'archive** (publiée à chaque version, ex. GitHub Releases) : bundle React déjà compilé, API PHP, `sql/` (schéma, socle, migrations), scripts d'installation (Item 27, ou équivalent sans Node), fiches de déploiement FR / EN, `CHANGELOG`.
 - **Exclus :** `.env`, contenu de `api/storage/`, données de démonstration (`seed_test_data.sql`).
-- **Intégrité :** somme de contrôle (SHA-256) et signature publiées avec chaque archive.
+- **Intégrité :** somme de contrôle (SHA-256) publiée avec chaque archive (signature reportée).
 - **Mise à jour sans l'Item 29 :** la même archive sert aux mises à jour manuelles (FTP ou Git), en suivant « Mettre à jour un site en ligne » de `DEPLOYMENT*.md` (sauvegarde, migrations, envoi du code).
 - **Prérequis :** Item 27.
+- **Réalisé (01/11/2026, version 0.0.1) :** `npm run release` (`scripts/release.mts`) refuse un dépôt non commité et une version absente de `CHANGELOG.md`, compile, assemble `www/` (mêmes listes que `deploy:init`, `scripts/package-files.mts`, plus `api/.env.example`), `sql/` et les guides, puis produit `crenelio-<version>.zip`, sa somme `.sha256` et les notes de version. Signature (SSH) écartée pour la bêta : la somme SHA-256 suffit à garantir un téléchargement intact ; à reprendre si l'archive est distribuée hors de GitHub. Publication (`git tag`, `gh release create --prerelease`) laissée au mainteneur.
 
 ### 29. Mise à Jour depuis le Site Hébergé (Espace Artisan) — sous réserve de l'hébergement
 - **Objectif :** mettre à jour Crénelio en un clic depuis l'espace Artisan, à partir des paquets de l'Item 28.
@@ -510,7 +511,7 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
 |---|---|---|---|---|---|---|
-| **1** | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ⏳ *À faire* | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
+| — | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ✅ **Terminé** | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
 | **2** | **Item 22** | **Devis en ligne avec accord du client & aide à la facturation externe** | Espace Artisan / Facturation | ⏳ *À faire* | Items 12, 21 et 32 ✅ | 🟡 Devis obligatoire pour l'artisan ; facture laissée à son outil (obligation électronique 2026-2027) |
 | **3** | **Item 36** | **Suivi d'intervention pour l'artisan (fiche mobile, avancement, compte rendu)** | Espace Artisan / Exploitation | ⏳ *À faire* | Item 35 ✅ | 🟡 Usage quotidien sur le terrain ; prolonge le tableau de bord |
 | **4** | **Item 37** | **Trajets & tournées (ordre de passage, itinéraire, suggestions de créneaux)** | Planning / Trajets | ⏳ *À faire* | Items 32 et 35 ✅ | 🟡 Gain de temps et de carburant ; suggestions à cadrer pour rester raisonnables |

@@ -32,6 +32,31 @@ script prépare, pour un déploiement entièrement manuel.
 
 ---
 
+## Installer depuis une archive (sans Node ni clonage)
+
+Chaque version est publiée sur [GitHub Releases](https://github.com/malchrosoft/crenelio/releases)
+sous forme d'archive prête à déployer : `crenelio-<version>.zip`, accompagnée de sa somme
+SHA-256 (`.sha256`). Les versions `0.x` sont des bêtas.
+
+1. **Vérifier l'archive** (téléchargement complet et intact) :
+   ```bash
+   shasum -a 256 -c crenelio-<version>.zip.sha256   # Windows : certutil -hashfile crenelio-<version>.zip SHA256
+   ```
+   La commande doit répondre `OK` (sous Windows, comparer l'empreinte au contenu du `.sha256`).
+2. **Contenu** : `www/` (site compilé et API, à envoyer tel quel, cf. étape 5), `sql/` (schéma,
+   socle et migrations, cf. étape 3), `CHANGELOG.md` et ces deux guides. Jamais de `.env`, de
+   contenu de `api/storage/` ni de données de démonstration.
+3. **Premier déploiement** : sautez l'étape 1, créez `www/api/.env` à partir de
+   `www/api/.env.example` (étapes 4 et 4b), puis suivez les étapes 2, 3, 5 et suivantes.
+4. **Mise à jour** : la même archive sert, en suivant « Mettre à jour un site en ligne » : n'envoyez
+   ni `api/.env` ni `api/storage/`, et appliquez seulement les migrations postérieures à la version
+   de votre base (`/api/health`, champ `schema_version`).
+
+**Publier une version** (mainteneur) : renseigner `CHANGELOG.md` et la version de `package.json`,
+commiter, puis `npm run release`. Le script affiche les commandes `git tag` et `gh release create` à lancer.
+
+---
+
 ## Prérequis
 
 - Une offre d'hébergement web OVHcloud, **Starter au minimum** ([offre Starter](https://www.ovhcloud.com/fr/web-hosting/starter-offer/) :

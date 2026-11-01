@@ -258,6 +258,8 @@ consultable depuis l'Espace Artisan (bouton « Emails » d'un rendez-vous) et re
 
 ## Déploiement
 
+**Sans Node ni clonage :** archive prête à déployer, avec somme SHA-256, sur [GitHub Releases](https://github.com/malchrosoft/crenelio/releases) (section « Installer depuis une archive » des guides ; publication par `npm run release`, versions décrites dans [CHANGELOG.md](CHANGELOG.md)).
+
 Guide pas à pas pour l'hébergement mutualisé OVHcloud (base de données et migrations, `.env`, SMTP, envoi FTP/SFTP, dossiers de stockage, HTTPS) : [🇫🇷 DEPLOYMENT.fr.md](DEPLOYMENT.fr.md) · [🇬🇧 DEPLOYMENT.md](DEPLOYMENT.md).
 
 Le site se dépose dans le **dossier racine attribué au domaine** (onglet *Multisite* d'OVHcloud) : `www/` pour un site unique (offre Starter), ou le dossier d'un sous-domaine dédié (ex. `rdv.mon-artisan.fr` → `crenelio/`). Il doit occuper la racine d'un domaine ou sous-domaine, jamais un sous-chemin.
