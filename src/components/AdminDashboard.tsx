@@ -1090,7 +1090,7 @@ export const AdminDashboard: React.FC = () => {
           {renderConfigGroups(['booking'])}
         </div>
       ) : activeTab === 'company' ? (
-        <div className="admin-config">{renderConfigGroups(['identity', 'legal'])}</div>
+        <div className="admin-config">{renderConfigGroups(['identity', 'legal', 'quotes'])}</div>
       ) : activeTab === 'site' ? (
         <div className="admin-config">
           {renderConfigGroups(['vitrine', 'map'])}

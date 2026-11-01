@@ -253,6 +253,11 @@ consultable depuis l'Espace Artisan (bouton « Emails » d'un rendez-vous) et re
 | `PUT` | `/api/appointments/:id/reschedule` | Reprogrammation (l'heure de fin suit la durée de la prestation) |
 | `GET` | `/api/appointments/:id/notifications` | Journal des emails envoyés pour ce rendez-vous |
 | `POST` | `/api/appointments/:id/notifications/resend` | Relance manuelle d'un email (`client_confirmation` ou `pro_confirmation`) |
+| `GET` / `POST` | `/api/quotes` | Devis (Item 22) : liste ; brouillon, prérempli depuis un rendez-vous avec `appointment_id` |
+| `GET` / `PUT` / `DELETE` | `/api/quotes/:id` | Détail ; modification et suppression d'un brouillon uniquement |
+| `POST` | `/api/quotes/:id/send` | Envoi : numéro (`D-AAAA-0001`), lien client et échéance ; le devis n'est plus modifiable |
+| `GET` | `/api/quotes/token/:token` | Consultation publique par le client (lien à jeton) |
+| `POST` | `/api/quotes/token/:token/decision` | Réponse du client (`accept` / `refuse`) : pour accepter, `keep_parts` (pièces remplacées ou décharge), `debours_mandate` s'il y a des débours, `withdrawal_ack` hors intervention urgente (`early_execution` facultatif) ; plafonnée par `RateLimit` |
 
 ---
 

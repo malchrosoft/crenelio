@@ -20,6 +20,7 @@ require_once __DIR__ . '/../controllers/MailController.php';
 require_once __DIR__ . '/../controllers/HealthController.php';
 require_once __DIR__ . '/../controllers/UiStateController.php';
 require_once __DIR__ . '/../controllers/CalendarFeedController.php';
+require_once __DIR__ . '/../controllers/QuoteController.php';
 
 $router = new Router();
 
@@ -35,6 +36,7 @@ $mailController        = new MailController();
 $healthController      = new HealthController();
 $uiStateController     = new UiStateController();
 $calendarFeedController = new CalendarFeedController();
+$quoteController       = new QuoteController();
 
 // Routes de l'espace Artisan : refusées (401) sans session ouverte, cf. core/Auth.php
 $admin = fn(callable $handler) => Auth::guard($handler);
@@ -130,5 +132,17 @@ $router->put('/appointments/:id/reschedule',$admin([$appointmentController, 'res
 $router->put('/appointments/:id/coordinates', $admin([$appointmentController, 'locate']));
 $router->get('/appointments/:id/notifications', $admin([$appointmentController, 'notifications']));
 $router->post('/appointments/:id/notifications/resend', $admin([$appointmentController, 'resendNotification']));
+
+// -------------------------------------------------------------------
+// 7. Devis (Item 22) : gestion protégée, consultation et réponse du client par lien à jeton
+// -------------------------------------------------------------------
+$router->get('/quotes',                     $admin([$quoteController, 'index']));
+$router->post('/quotes',                    $admin([$quoteController, 'store']));
+$router->get('/quotes/token/:token',        [$quoteController, 'showByToken']);
+$router->post('/quotes/token/:token/decision', [$quoteController, 'decide']);
+$router->get('/quotes/:id',                 $admin([$quoteController, 'show']));
+$router->put('/quotes/:id',                 $admin([$quoteController, 'update']));
+$router->delete('/quotes/:id',              $admin([$quoteController, 'destroy']));
+$router->post('/quotes/:id/send',           $admin([$quoteController, 'send']));
 
 return $router;

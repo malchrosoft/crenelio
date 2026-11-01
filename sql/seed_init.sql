@@ -56,7 +56,21 @@ INSERT INTO `schedules` (`day_of_week`, `is_active`, `morning_start`, `morning_e
 (6, 1, '09:00:00', '12:30:00', NULL, NULL),               -- Samedi matin
 (7, 0, NULL, NULL, NULL, NULL);                            -- Dimanche fermé
 
+-- Devis (Item 22) : valeurs susceptibles d'évoluer avec la réglementation, réglables dans l'Espace Artisan
+INSERT IGNORE INTO `config` (`config_key`, `config_value`) VALUES
+('quote_vat_mode',        'franchise'),
+('quote_vat_rates',       '20,10,5.5'),
+('quote_vat_exemption',   'TVA non applicable, art. 293 B du CGI'),
+('quote_validity_days',   '30'),
+('quote_number_prefix',   'D'),
+('quote_labour_rate',     ''),
+('quote_allow_supply',    '0'),
+-- Mentions de l'entreprise : forme « EI » (C. com. R526-27), répertoire des métiers, médiateur (C. consom. L616-1)
+('legal_ei_mention',      'EI'),
+('legal_rm',              ''),
+('legal_mediator',        '');
+
 -- Version du schéma : nom de la dernière migration de sql/migrations/ (Item 27, cf. GET /api/health).
 -- À mettre à jour à chaque nouvelle migration.
-INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-10-31_item35_appointment_coordinates')
+INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-11-01_item22_quotes')
 ON DUPLICATE KEY UPDATE `config_value` = VALUES(`config_value`);

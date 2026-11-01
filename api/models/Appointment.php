@@ -220,6 +220,16 @@ class Appointment
             [self::ANONYMIZED_NAME, ...$params]
         );
 
+        // Devis du rendez-vous (Item 22) : client et preuve de réponse ; montants et lignes conservés
+        Database::execute(
+            "UPDATE `quotes` q
+             JOIN `appointments` a ON a.id = q.appointment_id
+             SET q.client_name = ?, q.client_email = '', q.client_phone = '', q.address = '',
+                 q.decision_ip = NULL, q.notes = NULL, q.refusal_reason = NULL
+             WHERE a.client_name <> ? AND $condition",
+            [self::ANONYMIZED_NAME, self::ANONYMIZED_NAME, ...$params]
+        );
+
         return Database::execute(
             "UPDATE `appointments` a
              SET a.client_name = ?, a.client_email = '', a.client_phone = '', a.address = '',

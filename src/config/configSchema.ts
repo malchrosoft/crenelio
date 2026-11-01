@@ -69,6 +69,26 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
     ],
   },
   {
+    id: 'quotes',
+    title: 'Devis & TVA',
+    intro:
+      "Valeurs reprises sur chaque nouveau devis. Elles suivent la réglementation : à vérifier avec votre comptable lors d'un changement de régime ou de taux.",
+    fields: [
+      { key: 'quote_vat_mode', label: 'Régime de TVA', type: 'text', hint: '« franchise » (micro-entreprise, sans TVA) ou « vat » (assujetti).' },
+      { key: 'quote_vat_exemption', label: 'Mention de franchise', type: 'text', hint: 'Imprimée sur les devis en franchise de TVA.' },
+      { key: 'quote_vat_rates', label: 'Taux de TVA proposés', type: 'text', unit: '%', hint: 'Séparés par des virgules, taux normal en premier (ex. : 20,10,5.5).' },
+      { key: 'quote_labour_rate', label: 'Taux horaire de main-d’œuvre', type: 'number', unit: '€ HT/h', hint: 'Prérempli sur les lignes de main-d’œuvre.' },
+      { key: 'quote_validity_days', label: 'Durée de validité', type: 'number', unit: 'jours' },
+      { key: 'quote_number_prefix', label: 'Préfixe de numérotation', type: 'text', hint: 'Ex. : D → D-2026-0001.' },
+      {
+        key: 'quote_allow_supply',
+        label: 'Revente de fournitures (achat-revente)',
+        type: 'text',
+        hint: "1 pour autoriser. Activité commerciale distincte (seuils et cotisations propres) : préférez les pièces achetées au nom du client (débours).",
+      },
+    ],
+  },
+  {
     id: 'legal',
     title: 'Mentions légales',
     intro: 'Affichées dans la fenêtre « Mentions légales » du pied de page. Les rubriques vides sont masquées.',
@@ -81,6 +101,19 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
         hint: "Vide : l'adresse de l'entreprise (menu « Déplacement ») est utilisée. À renseigner seulement si le siège est ailleurs (domiciliation…).",
       },
       { key: 'legal_siret', label: 'SIRET', type: 'text' },
+      {
+        key: 'legal_ei_mention',
+        label: 'Mention « entrepreneur individuel »',
+        type: 'text',
+        hint: "« EI » ou « Entrepreneur individuel », accolé à votre nom sur les devis et factures (C. com. R526-27). Vide pour une société.",
+      },
+      { key: 'legal_rm', label: 'N° au répertoire des métiers (RM) ou RCS', type: 'text', hint: 'Exigé sur les publicités du dépannage à domicile.' },
+      {
+        key: 'legal_mediator',
+        label: 'Médiateur de la consommation',
+        type: 'textarea',
+        hint: 'Nom, site et adresse du médiateur auquel vous adhérez (obligatoire envers les particuliers, C. consom. L616-1).',
+      },
       { key: 'legal_naf', label: 'Code NAF / APE', type: 'text' },
       { key: 'legal_assurance', label: 'Assurance professionnelle', type: 'text', hint: 'Assureur et numéro de contrat.' },
       {

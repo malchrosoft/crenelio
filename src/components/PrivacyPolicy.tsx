@@ -46,6 +46,12 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ config }) => {
           légale : mesures précontractuelles et exécution du contrat (RGPD, art. 6.1.b).
         </li>
         <li>
+          <strong>Devis :</strong> nom, coordonnées et lieu d'intervention repris du rendez-vous, puis, si vous
+          répondez en ligne, la date, l'adresse IP de la réponse et vos choix (conservation des pièces remplacées,
+          mandat d'achat des pièces en votre nom). Ils servent à établir le devis et à prouver votre accord. Même
+          base légale ; effacés avec le rendez-vous.
+        </li>
+        <li>
           <strong>Journal des emails :</strong> destinataire, date et état de chaque envoi, pour s'assurer que les
           confirmations sont bien parties. Même base légale.
         </li>

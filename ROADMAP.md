@@ -307,6 +307,35 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Réglage « Comment facturez-vous ? » :** « Avec mon logiciel » (fiche et exports affichés), « Avec Crénelio » (Volet C, s'il est disponible) ou « Je ne facture pas depuis Crénelio » (masqués) ; les devis restent proposés dans tous les cas.
 - **RGPD :** devis et accords contiennent des données clients : à ajouter à l'effacement et à la purge (`Appointment::anonymizeWhere`) et à la politique de confidentialité ; durée de conservation des devis acceptés à définir (preuve contractuelle).
 - **Prérequis :** Items 12, 21 (partie 1) et 32 ✅.
+- **Pièces : précaution pour les micro-entrepreneurs (01/11/2026).** Revendre des pièces, c'est de l'achat-revente : activité commerciale aux seuils et cotisations propres. Par défaut, une pièce est donc un **débours** : achetée au nom et pour le compte du client final (facture du fournisseur à son nom), sur mandat donné avec l'accord du devis, refacturée à l'euro près, hors chiffre d'affaires et sans TVA de l'artisan. La ligne « fourniture revendue » n'existe qu'après activation explicite (`quote_allow_supply`), avec avertissement.
+- **Cadre légal retenu (vérifié le 01/11/2026, sources ci-dessous) :**
+  - **Documents distincts et appellations :**
+    1. **« Devis »** (« document précontractuel » de l'arrêté de 2017), numéroté, gratuit ou payant (mention obligatoire). Accepté, il devient le contrat : un exemplaire est remis au client sur support durable (email avec lien et version imprimable).
+    2. **« Mandat de débours »** : accord écrit du client pour l'achat des pièces **en son nom et pour son compte**, avec la nature des pièces et le **budget maximum** ; affiché comme section séparée du devis, accepté par une case distincte, imprimable seul.
+    3. **« Pièces remplacées »** (annexe 2 de l'arrêté) : le client choisit de conserver ou non les pièces ; un refus vaut **décharge** signée, que le professionnel doit obtenir.
+    4. **« Formulaire de rétractation »** (formulaire type) joint au contrat lorsqu'il est conclu à distance ou au domicile ; absent pour une intervention urgente.
+    5. **« Note » / facture** : obligatoire au-delà de 25 € TTC, remise dès la prestation rendue et **avant tout paiement** (coordonnées, date, dates et lieu d'exécution, décompte détaillé, totaux HT et TTC, nom du client) ; établie dans l'outil de l'artisan (Volet B), débours sur une ligne distincte.
+  - **Mentions du devis** (arrêté du 24 janvier 2017, art. 4) : date ; nom et adresse de l'entreprise, avec la mention **« EI »** accolée au nom pour un entrepreneur individuel (C. com. R526-27) et le SIRET ; nom du client ; lieu d'intervention ; nature exacte des travaux ; décompte détaillé (désignation, prix unitaire, unité : heure, mètre, unité… et quantité) ; frais de déplacement ; totaux HT et TTC et taux de TVA (ou mention de franchise) ; durée de validité ; devis gratuit ou payant ; hors établissement : existence et modalités du droit de rétractation. À ajouter : assurance professionnelle, médiateur de la consommation.
+  - **Rétractation** (C. consom. L221-18, L221-25, L221-28 8°) : un devis accepté en ligne ou au domicile ouvre **14 jours** de rétractation, sauf travaux d'entretien ou de réparation **urgents** expressément demandés par le client, et seulement dans la limite des pièces et travaux strictement nécessaires (tout travail supplémentaire proposé sur place redevient rétractable). Commencer avant la fin du délai exige une **demande expresse** du client ; sans elle, rien n'est dû s'il se rétracte. Implémenté : case « intervention urgente » sur le devis, prise de connaissance du droit exigée pour accepter, demande d'exécution anticipée, date de fin du délai.
+  - **Débours** (CGI art. 267 II 2° ; Portail auto-entrepreneur) : mandat écrit préalable (nature, budget maximum) ; facture ou ticket du fournisseur **au nom du client** avec ses coordonnées complètes, sinon pas de débours ; remboursement au montant exact, sans marge ni TVA ajoutée ; ligne distincte sur la facture ; mention « débours » dans le livre des recettes ; hors chiffre d'affaires et sans cotisations. **Jamais** de débours pour le carburant ou les frais kilométriques, les outils et le matériel de l'artisan. Client professionnel assujetti à la TVA : préférer qu'il paie lui-même le fournisseur (il récupère la TVA).
+  - **Rappels à l'artisan** (dans l'éditeur de devis, la fiche « Préparer la facture » et la base documentaire de l'Item 40) :
+    - acheter la pièce **au nom du client** (nom, adresse ; SIRET et TVA intracommunautaire si c'est un professionnel) ; un ticket à son propre nom transforme la pièce en revente ;
+    - **conserver les originaux** des factures et tickets de caisse des pièces avancées (contrôle URSSAF ou fiscal), en remettre une **copie au client** avec la facture ;
+    - refacturer **le montant exact** du justificatif, même s'il diffère de l'estimation du devis, dans la limite du budget du mandat (au-delà : nouvel accord du client) ;
+    - noter « débours » dans le livre des recettes, à côté du montant, et ne pas le déclarer en chiffre d'affaires ;
+    - remettre la facture **avant d'être payé** ; faire signer la décharge si le client ne garde pas les pièces remplacées ;
+    - en urgence, ne proposer sur place que le strictement nécessaire ; tout le reste fait l'objet d'un devis avec délai de rétractation.
+- **Sources :**
+  - [Arrêté du 24 janvier 2017, Légifrance](https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000033935539) (art. 4 et annexe 2).
+  - [Fiche DGCCRF « Dépannage à domicile » (2018)](https://bretagne.dreets.gouv.fr/sites/bretagne.dreets.gouv.fr/IMG/pdf/2018_10_fiche_pratique_dgccrf_depannage-a-domicile.pdf) : document précontractuel, contrat hors établissement et formulaire de rétractation, urgence, note obligatoire au-delà de 25 € TTC, décharge des pièces.
+  - [Portail auto-entrepreneur, frais de débours](https://www.portail-autoentrepreneur.fr/academie/gestion-auto-entreprise/facturation/frais-de-debours) et [actualité sur les débours](https://www.portail-autoentrepreneur.fr/actualites/les-frais-de-debours).
+  - Sources secondaires concordantes : [Legifiscal (débours et TVA)](https://www.legifiscal.fr/tva/tva-francaise/regimes-specifiques/debours-tva.html), [Dougs](https://www.dougs.fr/blog/les-debours/), [INC, tableau des textes sur le devis](https://www.inc-conso.fr/sites/default/files/pdf/Tableau_devis.pdf), [INC, dépannage et rétractation](https://www.inc-conso.fr/node/9603), [mention EI (Bpifrance Création)](https://bpifrance-creation.fr/entrepreneur/actualites/ei-documents-concernes-nouvelle-mention-obligatoire).
+  - À lire dans le texte avant l'étape 3 : C. consom. L221-5, L221-18, L221-25, L221-28 et le formulaire type de rétractation (annexe à l'art. R221-1) ; C. com. R526-27 ; BOFiP BOI-TVA-BASE-10-20-40.
+- **Avancement :**
+  1. ✅ **Base et API (01/11/2026)** : tables `quotes` / `quote_lines` (migration `2026-11-01_item22_quotes`), `Quote` / `QuoteController`, brouillon prérempli depuis un rendez-vous, totaux (débours à part), envoi (numéro, lien, échéance), expiration, réponse du client (pièces remplacées ou décharge, mandat de débours, rétractation et exécution anticipée, intervention urgente, date et IP), effacement RGPD avec le rendez-vous, réglages `quote_*` (groupe « Devis & TVA ») et mentions `legal_ei_mention`, `legal_rm`, `legal_mediator` (écran Entreprise).
+  2. Espace Artisan : grille des devis, éditeur de lignes, création depuis un rendez-vous.
+  3. Email au client avec lien, page publique d'acceptation (devis, mandat de débours, pièces remplacées, rétractation et formulaire type), artisan prévenu de la réponse.
+  4. Versions imprimables avec mentions obligatoires : devis, mandat de débours, formulaire de rétractation ; rappels à l'artisan.
 
 ### 23. Calendrier des Interventions avec FullCalendar — ✅ Terminée
 - **Besoin :** gérer le calendrier d'intervention dans l'espace Artisan avec des vues jour / semaine / mois.
@@ -505,6 +534,29 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 
 ---
 
+### 39. Veille & Ajustements Réglementaires (Devis, TVA, Consommation)
+- **Demandé le 01/11/2026** : les valeurs légales changent souvent ; elles doivent rester réglables sans développement, et leur suivi être organisé.
+- **Déjà réglable (Item 22) :** régime de TVA, taux proposés, mention de franchise, durée de validité, préfixe de numérotation, taux horaire, achat-revente, mention « EI », n° RM ou RCS, médiateur de la consommation.
+- **À étudier (vérifier chaque point sur les sources officielles avant de coder) :**
+  - **Droit de rétractation** : règles prises en compte dans l'Item 22 ; relire les articles et le formulaire type dans leur version consolidée à chaque revue (prolongation de 12 mois si l'information manque).
+  - **Publicité du dépannage à domicile** (arrêté du 24 janvier 2017, fiche DGCCRF) : la vitrine permet une commande à distance ; y afficher nom, adresse, n° RM ou RCS, **taux horaires TTC** ou prix unitaires, frais de déplacement, caractère payant ou gratuit du devis. Vérifier la page vitrine et les prestations.
+  - **Assurance** : décennale ou responsabilité civile professionnelle selon les travaux, mention sur devis et factures (assureur, couverture géographique).
+  - **Mentions des factures** (Volet B) : à rappeler dans la fiche « Préparer la facture ».
+  - **Seuils de la franchise en base de TVA** : modifiés plusieurs fois récemment ; alerte quand le chiffre d'affaires de l'année (hors débours) en approche (indicateurs de l'Item 36).
+  - **Taux réduits** (10 % rénovation, 5,5 % rénovation énergétique) : conditions (logement de plus de 2 ans, attestation du client) à rappeler sur la ligne concernée.
+  - **Durée de conservation** des devis acceptés (preuve contractuelle) au-delà de l'effacement du rendez-vous, et devis sans rendez-vous à inclure dans la purge.
+  - **Débours** : relire la doctrine BOFiP (BOI-TVA-BASE-10-20-40) et faire valider le modèle par un expert-comptable.
+- **Méthode :** une page « Références réglementaires » (Item 40) date chaque vérification ; revue annuelle et à chaque loi de finances.
+- **Prérequis :** Item 22 (volet A).
+
+### 40. Base Documentaire de l'Artisan (Guides, Références, Traductions)
+- **Demandé le 01/11/2026** : une base documentaire consultable depuis l'Espace Artisan (aide à l'usage de Crénelio, obligations du devis, débours et conservation des justificatifs, rétractation, TVA, RGPD, déploiement), avec les liens vers les textes officiels et la date de leur dernière vérification (Item 39). Contenu de départ : le cadre légal et les rappels à l'artisan de l'Item 22.
+- **Traductions :** pour les artisans d'expression étrangère, documentation traduisible, langue choisie dans l'Espace Artisan ; les textes juridiques restent cités en français avec une explication traduite (la version française fait foi).
+- **Langues envisagées** (à confirmer) : anglais, portugais, espagnol, italien, arabe (de droite à gauche), turc, roumain, polonais.
+- **Forme :** fichiers Markdown versionnés par langue (`docs/<langue>/…`), embarqués dans le bundle, sans service tiers ni stockage serveur (offre Starter) ; repli sur le français pour une page non traduite.
+- **Lien avec l'Item 31 :** même mécanisme de traduction ; l'Item 31 traite la partie publique (clients), celui-ci la partie artisan.
+- **Prérequis :** aucun ; contenu juridique après l'Item 39.
+
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
 Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légale, blocage de la mise en ligne) puis **le gain** (usage quotidien de l'artisan, effort).
@@ -512,7 +564,7 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 | Ordre Prioritaire | Réf. | Fonctionnalité | Domaine | Statut | Dépendances / Prérequis | Pourquoi ce rang |
 |---|---|---|---|---|---|---|
 | — | **Item 28** | **Paquet d'installation téléchargeable (release prête à déployer)** | Installation / Distribution | ✅ **Terminé** | Item 27 | 🟡 Utile dès qu'un second artisan ou un prestataire installe Crénelio |
-| **2** | **Item 22** | **Devis en ligne avec accord du client & aide à la facturation externe** | Espace Artisan / Facturation | ⏳ *À faire* | Items 12, 21 et 32 ✅ | 🟡 Devis obligatoire pour l'artisan ; facture laissée à son outil (obligation électronique 2026-2027) |
+| **2** | **Item 22** | **Devis en ligne avec accord du client & aide à la facturation externe** | Espace Artisan / Facturation | 🚧 *En cours* (base et API) | Items 12, 21 et 32 ✅ | 🟡 Devis obligatoire pour l'artisan ; facture laissée à son outil (obligation électronique 2026-2027) |
 | **3** | **Item 36** | **Suivi d'intervention pour l'artisan (fiche mobile, avancement, compte rendu)** | Espace Artisan / Exploitation | ⏳ *À faire* | Item 35 ✅ | 🟡 Usage quotidien sur le terrain ; prolonge le tableau de bord |
 | **4** | **Item 37** | **Trajets & tournées (ordre de passage, itinéraire, suggestions de créneaux)** | Planning / Trajets | ⏳ *À faire* | Items 32 et 35 ✅ | 🟡 Gain de temps et de carburant ; suggestions à cadrer pour rester raisonnables |
 | **5** | **Item 30** | **Effets visuels avancés (liserés animés, cartes 3D)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort visuel ; thème sombre séparé (Item 34) |
@@ -520,6 +572,8 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 | **7** | **Item 29** | **Mise à jour depuis le site hébergé (espace Artisan)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
 | **8** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
 | **9** | **Item 34** | **Thème sombre (inversion des couleurs, palettes adaptées)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort ; chantier transversal coûteux (gris, fonds, états et bibliothèques à convertir) |
+| — | **Item 39** | **Veille & ajustements réglementaires (publicité des prix, assurance, seuils de TVA, conservation)** | Conformité | ⏳ *À faire* | Item 22 | 🟡 Obligations du devis en ligne à compléter |
+| — | **Item 40** | **Base documentaire de l'artisan, traduite (anglais, portugais, espagnol…)** | Documentation / Internationalisation | ⏳ *À faire* | — | ⚪ Artisans d'expression étrangère ; lié à l'Item 31 |
 | — | **Item 38** | Menu de l'espace Artisan par catégories, configuration répartie en écrans (Entreprise, Vitrine, Thème, Compte ; créneaux sous Horaires) | Espace Artisan / Navigation | ✅ **Terminé** | — | — |
 | — | **Item 35** | Tableau de bord (jours en cartes, carte du jour numérotée, positions des rendez-vous enregistrées) | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 21** | Liste des interventions AG Grid Community (tri, filtres, sélection, export CSV, disposition enregistrée) ; composant `DataGrid` commun, pleine hauteur desktop/tablette, fenêtre de rendez-vous partagée avec le calendrier, avertissements regroupés dans le header, indisponibilités en grille (sous-onglet de « Horaires ») | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |
