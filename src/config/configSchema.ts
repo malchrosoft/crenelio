@@ -1,7 +1,7 @@
 import { AppConfig } from '../types';
 
 /** Type de saisie d'un paramètre de configuration. */
-export type ConfigFieldType = 'text' | 'email' | 'tel' | 'number' | 'textarea' | 'url';
+export type ConfigFieldType = 'text' | 'email' | 'tel' | 'number' | 'textarea' | 'url' | 'select' | 'checkbox';
 
 export interface ConfigField {
   key: string;
@@ -10,6 +10,15 @@ export interface ConfigField {
   unit?: string;
   step?: string;
   hint?: string;
+  /** Liste de choix (`select`) : valeur enregistrée et libellé affiché. */
+  options?: { value: string; label: string }[];
+  /** `select` : ajoute « Autre (saisie libre) », pour une valeur hors liste. */
+  allowCustom?: boolean;
+  /** Modifiable seulement selon la valeur d'un autre champ du même groupe (sinon grisé, avec `disabledHint`). */
+  enableIf?: { key: string; equals?: string; in?: string[] };
+  disabledHint?: string;
+  /** `checkbox` : avertissement à accepter avant de cocher, choisi d'après la configuration enregistrée. */
+  confirmEnable?: (config: AppConfig) => { title: string; paragraphs: string[]; confirmLabel: string };
 }
 
 export interface ConfigGroup {
@@ -23,6 +32,12 @@ export interface ConfigGroup {
  * Groupes de paramètres décrits explicitement (libellé, type, unité).
  * Toute clé présente en base mais absente d'ici reste éditable via le groupe « Autres paramètres ».
  */
+/**
+ * Formes juridiques dont les documents mentionnent le capital social (sociétés commerciales de la liste) :
+ * seules à afficher et imprimer `legal_capital`. Une forme saisie librement ne l'imprime pas.
+ */
+export const CAPITAL_FORMS = ['EURL', 'SARL', 'SASU', 'SAS'];
+
 export const CONFIG_GROUPS: ConfigGroup[] = [
   {
     id: 'identity',
@@ -74,8 +89,24 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
     intro:
       "Valeurs reprises sur chaque nouveau devis. Elles suivent la réglementation : à vérifier avec votre comptable lors d'un changement de régime ou de taux.",
     fields: [
-      { key: 'quote_vat_mode', label: 'Régime de TVA', type: 'text', hint: '« franchise » (micro-entreprise, sans TVA) ou « vat » (assujetti).' },
-      { key: 'quote_vat_exemption', label: 'Mention de franchise', type: 'text', hint: 'Imprimée sur les devis en franchise de TVA.' },
+      {
+        key: 'quote_vat_mode',
+        label: 'Régime de TVA',
+        type: 'select',
+        options: [
+          { value: 'franchise', label: 'Franchise en base (micro-entreprise, sans TVA)' },
+          { value: 'vat', label: 'Assujetti à la TVA' },
+        ],
+        hint: 'Repris sur chaque nouveau devis ; un devis existant garde son régime.',
+      },
+      {
+        key: 'quote_vat_exemption',
+        label: 'Mention de franchise',
+        type: 'select',
+        options: [{ value: 'TVA non applicable, art. 293 B du CGI', label: 'TVA non applicable, art. 293 B du CGI' }],
+        allowCustom: true,
+        hint: "Imprimée sur les devis sans TVA. Mention légale de la franchise en base ; « Autre » seulement pour un autre motif d'exonération, validé par votre comptable.",
+      },
       { key: 'quote_vat_rates', label: 'Taux de TVA proposés', type: 'text', unit: '%', hint: 'Séparés par des virgules, taux normal en premier (ex. : 20,10,5.5).' },
       { key: 'quote_labour_rate', label: 'Taux horaire de main-d’œuvre', type: 'number', unit: '€ HT/h', hint: 'Prérempli sur les lignes de main-d’œuvre.' },
       { key: 'quote_validity_days', label: 'Durée de validité', type: 'number', unit: 'jours' },
@@ -83,8 +114,30 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
       {
         key: 'quote_allow_supply',
         label: 'Revente de fournitures (achat-revente)',
-        type: 'text',
-        hint: "1 pour autoriser. Activité commerciale distincte (seuils et cotisations propres) : préférez les pièces achetées au nom du client (débours).",
+        type: 'checkbox',
+        hint: "Activité commerciale distincte : préférez les pièces achetées au nom du client (débours). Voir docs/legal/fr/achat-revente.md.",
+        confirmEnable: (config) =>
+          (config.legal_form ?? 'ei') === 'ei'
+            ? {
+                title: 'Revente de fournitures : entrepreneur individuel',
+                paragraphs: [
+                  "Revendre une pièce achetée à votre nom, c'est exercer une activité d'achat-revente (vente de marchandises), distincte de vos prestations de services.",
+                  "En micro-entreprise : le montant revendu entre dans votre chiffre d'affaires, avec les seuils et le taux de cotisations propres à la vente ; vos deux activités sont alors suivies séparément (activité mixte), à déclarer au guichet unique si elle n'est pas déjà enregistrée.",
+                  "Vous devenez vendeur de la pièce : garanties légales dues au client, facture d'achat à votre nom, stock éventuel.",
+                  "Sans ces démarches, privilégiez le débours : pièce achetée au nom et pour le compte du client, sur son mandat, refacturée au montant exact et hors chiffre d'affaires.",
+                  "Vérifiez votre situation avec votre expert-comptable ou votre chambre de métiers avant d'activer.",
+                ],
+                confirmLabel: "J'ai compris, j'active la revente",
+              }
+            : {
+                title: 'Revente de fournitures : société',
+                paragraphs: [
+                  "La revente de pièces est une activité commerciale : elle doit entrer dans l'objet social de votre société.",
+                  "Les pièces revendues sont facturées avec votre TVA, et vous en êtes le vendeur (garanties légales dues au client).",
+                  "Vérifiez avec votre expert-comptable avant d'activer.",
+                ],
+                confirmLabel: "J'active la revente",
+              },
       },
     ],
   },
@@ -102,10 +155,39 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
       },
       { key: 'legal_siret', label: 'SIRET', type: 'text' },
       {
+        key: 'legal_form',
+        label: 'Forme juridique',
+        type: 'select',
+        options: [
+          { value: 'ei', label: 'Entreprise individuelle (dont micro-entreprise)' },
+          { value: 'EURL', label: 'EURL' },
+          { value: 'SARL', label: 'SARL' },
+          { value: 'SASU', label: 'SASU' },
+          { value: 'SAS', label: 'SAS' },
+        ],
+        allowCustom: true,
+        hint: 'Détermine les mentions légales des devis : « EI » pour un entrepreneur individuel, forme et capital pour une société.',
+      },
+      {
         key: 'legal_ei_mention',
-        label: 'Mention « entrepreneur individuel »',
-        type: 'text',
-        hint: "« EI » ou « Entrepreneur individuel », accolé à votre nom sur les devis et factures (C. com. R526-27). Vide pour une société.",
+        label: 'Appellation légale',
+        type: 'select',
+        options: [
+          { value: 'EI', label: 'EI' },
+          { value: 'Entrepreneur individuel', label: 'Entrepreneur individuel' },
+        ],
+        enableIf: { key: 'legal_form', equals: 'ei' },
+        disabledHint: 'Réservée à une entreprise individuelle.',
+        hint: 'Accolée à votre nom sur les devis, factures et publicités (C. com. R526-27).',
+      },
+      {
+        key: 'legal_capital',
+        label: 'Capital social',
+        type: 'number',
+        unit: '€',
+        enableIf: { key: 'legal_form', in: CAPITAL_FORMS },
+        disabledHint: 'Sans objet pour cette forme juridique : non imprimé.',
+        hint: 'Indiqué avec la forme juridique sur les devis et factures (sociétés à capital).',
       },
       { key: 'legal_rm', label: 'N° au répertoire des métiers (RM) ou RCS', type: 'text', hint: 'Exigé sur les publicités du dépannage à domicile.' },
       {

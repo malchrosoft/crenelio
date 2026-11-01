@@ -65,8 +65,11 @@ INSERT IGNORE INTO `config` (`config_key`, `config_value`) VALUES
 ('quote_number_prefix',   'D'),
 ('quote_labour_rate',     ''),
 ('quote_allow_supply',    '0'),
--- Mentions de l'entreprise : forme « EI » (C. com. R526-27), répertoire des métiers, médiateur (C. consom. L616-1)
+-- Mentions de l'entreprise : forme juridique (« EI » accolé au nom d'un entrepreneur individuel,
+-- C. com. R526-27 ; forme et capital d'une société), répertoire des métiers, médiateur (C. consom. L616-1)
+('legal_form',            'ei'),
 ('legal_ei_mention',      'EI'),
+('legal_capital',         ''),
 ('legal_rm',              ''),
 ('legal_mediator',        '');
 

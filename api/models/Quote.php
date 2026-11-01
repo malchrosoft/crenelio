@@ -2,7 +2,7 @@
 /**
  * Quote model — Devis (Item 22) et leurs lignes.
  *
- * Références (à revérifier à chaque évolution réglementaire, cf. Item 39) :
+ * Références (fiches et extraits : docs/legal/ ; à revérifier à chaque évolution, cf. Item 39) :
  * - Arrêté du 24 janvier 2017 (dépannage, réparation, entretien), art. 4 et annexe 2 :
  *   https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000033935539
  * - Débours (CGI art. 267 II 2°) : pièce achetée au nom et pour le compte du client, sur mandat

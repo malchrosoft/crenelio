@@ -994,6 +994,20 @@ $admin-sidebar-collapsed: 68px;
   font-size: 0.85rem;
 }
 
+// Saisie libre sous une liste de choix (« Autre »)
+.form-input--custom {
+  margin-top: $space-xs;
+}
+
+// Case à cocher d'un réglage (ConfigGroupForm) : case et libellé alignés
+.form-check {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-sm;
+  cursor: pointer;
+  font-weight: 600;
+}
+
 .admin-status-select {
   padding: 4px 8px;
   font-size: 0.8rem;

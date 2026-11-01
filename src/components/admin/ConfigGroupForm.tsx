@@ -3,6 +3,7 @@ import { api } from '../../api';
 import { AppConfig } from '../../types';
 import { ConfigField, ConfigGroup } from '../../config/configSchema';
 import ResetButton from './ResetButton';
+import ConfirmDialog from './ConfirmDialog';
 
 interface ConfigGroupFormProps {
   group: ConfigGroup;
@@ -22,6 +23,8 @@ const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSave
   const [values, setValues] = useState(() => pickValues(group.fields, config));
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  // Case à cocher en attente de l'acceptation de son avertissement (`confirmEnable`)
+  const [pending, setPending] = useState<ConfigField | null>(null);
 
   const stored = pickValues(group.fields, config);
   const dirty = group.fields.some(({ key }) => values[key] !== stored[key]);
@@ -58,10 +61,42 @@ const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSave
       {children}
 
       <form className="admin-settings-form" onSubmit={handleSubmit}>
-        {group.fields.map(({ key, label, type, unit, step, hint }) => {
+        {group.fields.map((field) => {
+          const { key, label, type, unit, step, hint, options, allowCustom, enableIf, disabledHint } = field;
+          const disabled =
+            enableIf !== undefined &&
+            ((enableIf.equals !== undefined && values[enableIf.key] !== enableIf.equals) ||
+              (enableIf.in !== undefined && !enableIf.in.includes(values[enableIf.key])));
           const id = `config-field-${key}`;
+          if (type === 'checkbox') {
+            return (
+              <div className="form-group" key={key}>
+                <label className="form-check" htmlFor={id}>
+                  <input
+                    id={id}
+                    type="checkbox"
+                    checked={values[key] === '1'}
+                    onChange={(e) =>
+                      e.target.checked && field.confirmEnable ? setPending(field) : update(key, e.target.checked ? '1' : '0')
+                    }
+                  />
+                  <span>{label}</span>
+                </label>
+                {hint && <p className="form-hint">{hint}</p>}
+              </div>
+            );
+          }
           const input =
-            type === 'textarea' ? (
+            type === 'select' ? (
+              <SelectField
+                id={id}
+                value={values[key]}
+                options={options ?? []}
+                allowCustom={allowCustom}
+                disabled={disabled}
+                onChange={(value) => update(key, value)}
+              />
+            ) : type === 'textarea' ? (
               <textarea
                 id={id}
                 className="form-textarea"
@@ -73,6 +108,7 @@ const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSave
                 id={id}
                 type={type}
                 step={step}
+                disabled={disabled}
                 className={unit ? 'form-input form-input--compact' : 'form-input'}
                 value={values[key]}
                 onChange={(e) => update(key, e.target.value)}
@@ -92,7 +128,11 @@ const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSave
               ) : (
                 input
               )}
-              {hint && <p className="form-hint">{hint}</p>}
+              {disabled && disabledHint ? (
+                <p className="form-hint">{disabledHint}</p>
+              ) : (
+                hint && <p className="form-hint">{hint}</p>
+              )}
             </div>
           );
         })}
@@ -112,7 +152,72 @@ const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSave
           {message && <span className="admin-settings-message">{message}</span>}
         </div>
       </form>
+
+      {pending?.confirmEnable &&
+        (() => {
+          const warning = pending.confirmEnable(config);
+          return (
+            <ConfirmDialog
+              title={warning.title}
+              confirmLabel={warning.confirmLabel}
+              onConfirm={() => {
+                update(pending.key, '1');
+                setPending(null);
+              }}
+              onCancel={() => setPending(null)}
+            >
+              {warning.paragraphs.map((text) => (
+                <p key={text}>{text}</p>
+              ))}
+            </ConfirmDialog>
+          );
+        })()}
     </section>
+  );
+};
+
+const CUSTOM = '__custom';
+
+/** Liste de choix ; avec `allowCustom`, « Autre » ouvre une saisie libre (valeur hors liste). */
+const SelectField: React.FC<{
+  id: string;
+  value: string;
+  options: { value: string; label: string }[];
+  allowCustom?: boolean;
+  disabled?: boolean;
+  onChange: (value: string) => void;
+}> = ({ id, value, options, allowCustom, disabled, onChange }) => {
+  const listed = options.some((option) => option.value === value);
+  const [custom, setCustom] = useState(Boolean(allowCustom) && !listed && value !== '');
+  return (
+    <>
+      <select
+        id={id}
+        className="form-input"
+        disabled={disabled}
+        value={custom ? CUSTOM : value}
+        onChange={(e) => {
+          const isCustom = e.target.value === CUSTOM;
+          setCustom(isCustom);
+          onChange(isCustom ? '' : e.target.value);
+        }}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+        {allowCustom && <option value={CUSTOM}>Autre (saisie libre)</option>}
+      </select>
+      {custom && (
+        <input
+          className="form-input form-input--custom"
+          aria-label="Valeur libre"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      )}
+    </>
   );
 };
 
