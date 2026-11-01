@@ -33,11 +33,10 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
   {
     id: 'contact',
     title: 'Coordonnées',
-    intro: 'Informations affichées sur la vitrine, dans les emails et sur la fiche de confirmation.',
+    intro: 'Vos nom et téléphone, affichés sur la vitrine, dans les emails et sur la fiche de confirmation.',
     fields: [
       { key: 'pro_name', label: "Nom de l'artisan", type: 'text' },
       { key: 'pro_phone', label: 'Téléphone', type: 'tel' },
-      { key: 'service_area', label: 'Zone couverte (texte affiché)', type: 'text' },
     ],
   },
   {
@@ -45,6 +44,7 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
     title: 'Page vitrine',
     intro: 'Textes de présentation de la page d’accueil. Les engagements se gèrent juste en dessous.',
     fields: [
+      { key: 'service_area', label: 'Zone couverte (texte affiché)', type: 'text', hint: 'Ex. : « Clamart et 15 km alentour ».' },
       { key: 'vitrine_tagline', label: 'Accroche', type: 'text', hint: 'Sous le nom, en haut de page et dans le pied de page.' },
       { key: 'vitrine_about', label: 'Présentation', type: 'textarea', hint: 'Section « À propos ».' },
       { key: 'vitrine_photo_url', label: 'Photo (URL)', type: 'url', hint: 'Illustration de la section « À propos ». Vide : aucune photo.' },
@@ -52,12 +52,12 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
   },
   {
     id: 'booking',
-    title: 'Réservation & créneaux',
+    title: 'Créneaux',
     fields: [
       { key: 'slot_step_minutes', label: 'Graduation des créneaux', type: 'number', unit: 'min' },
       { key: 'buffer_minutes', label: 'Temps de trajet entre deux interventions', type: 'number', unit: 'min' },
-      { key: 'min_notice_hours', label: 'Délai minimal de réservation', type: 'number', unit: 'h' },
-      { key: 'max_advance_days', label: 'Réservation possible jusqu’à', type: 'number', unit: 'jours' },
+      { key: 'min_notice_hours', label: 'Délai minimal avant un rendez-vous', type: 'number', unit: 'h' },
+      { key: 'max_advance_days', label: 'Réservation en ligne possible jusqu’à', type: 'number', unit: 'jours' },
     ],
   },
   {

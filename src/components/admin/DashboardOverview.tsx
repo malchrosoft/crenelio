@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { Map, Overlay } from 'pigeon-maps';
-import { HouseLineIcon, MapPinIcon, PlusIcon } from '@phosphor-icons/react';
+import { BuildingOfficeIcon, HouseLineIcon, MapPinIcon, PlusIcon, StorefrontIcon } from '@phosphor-icons/react';
 import { addDays, format, getISODay, isToday, isTomorrow, isYesterday, parseISO, startOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../../api';
@@ -53,6 +53,65 @@ function dashboardDays(schedules: Schedule[]): { date: Date; role: 'previous' | 
   ];
 }
 
+/** Lieu de départ de la journée : point de départ des interventions, entreprise ou siège social. */
+type OriginId = 'start' | 'premises' | 'siege';
+interface Origin {
+  id: OriginId;
+  label: string;
+  address: string;
+  at: LatLng | null;
+  /** Raison de l'indisponibilité (adresse non renseignée…), affichée dans la liste. */
+  unavailable?: string;
+}
+
+const ORIGIN_ICONS: Record<OriginId, React.ReactNode> = {
+  start: <HouseLineIcon size={16} weight="fill" aria-hidden="true" />,
+  premises: <StorefrontIcon size={16} weight="fill" aria-hidden="true" />,
+  siege: <BuildingOfficeIcon size={16} weight="fill" aria-hidden="true" />,
+};
+
+const point = (lat?: string, lng?: string): LatLng | null => (lat && lng ? [Number(lat), Number(lng)] : null);
+
+/**
+ * Lieux de départ : point de départ des interventions et adresse de l'entreprise (menu
+ * « Déplacement »), siège social (mentions légales). Toujours proposés, grisés s'ils ne sont pas
+ * renseignés ; le point de départ et l'entreprise sont regroupés s'ils coïncident.
+ */
+function originsOf(config: AppConfig): Origin[] {
+  const premisesAddress = [config.premises_address, config.premises_postal_code, config.premises_city].filter(Boolean).join(' ');
+  const premises = point(config.premises_latitude, config.premises_longitude);
+  const siege = (config.legal_adresse ?? '').replace(/\s*\n\s*/g, ', ').trim();
+  const sameAsPremises = config.start_same_as_premises === '1';
+  const start = point(config.default_latitude, config.default_longitude);
+  return [
+    {
+      id: 'start',
+      label: sameAsPremises ? "Départ des interventions (entreprise)" : 'Départ des interventions',
+      address: (sameAsPremises ? premisesAddress : config.start_address) || 'point de départ',
+      at: start,
+      unavailable: start ? undefined : 'non localisé',
+    },
+    ...(sameAsPremises
+      ? []
+      : [
+          {
+            id: 'premises' as const,
+            label: "Adresse de l'entreprise",
+            address: premisesAddress,
+            at: premises,
+            unavailable: premises ? undefined : 'non renseignée',
+          },
+        ]),
+    {
+      id: 'siege',
+      label: 'Siège social',
+      address: siege,
+      at: null,
+      unavailable: siege ? undefined : "identique à l'entreprise",
+    },
+  ];
+}
+
 function dayTitle(date: Date): string {
   const long = format(date, 'EEEE d MMMM', { locale: fr });
   if (isYesterday(date)) return `Hier · ${long}`;
@@ -63,7 +122,8 @@ function dayTitle(date: Date): string {
 
 /**
  * Tableau de bord (Item 35) : la journée de la veille, celle du jour et les deux prochains jours
- * travaillés en cartes, et la carte des interventions d'un jour, numérotées dans l'ordre horaire.
+ * travaillés en cartes, et la carte des interventions d'un jour, numérotées dans l'ordre horaire, depuis
+ * le lieu de départ choisi.
  * Les rendez-vous sans position (antérieurs à leur enregistrement) sont localisés une fois par la
  * Base Adresse Nationale, et la position est enregistrée.
  */
@@ -92,10 +152,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointments, con
   useLocateMissing(Object.values(byDay).flat(), onLocated);
 
   const mapped = byDay[mapDay] ?? [];
-  const start: LatLng | null =
-    config.default_latitude && config.default_longitude
-      ? [Number(config.default_latitude), Number(config.default_longitude)]
-      : null;
+  const { origins, origin, setOriginId } = useOrigin(config);
 
   return (
     <div className="dashboard">
@@ -168,8 +225,29 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointments, con
         })}
       </div>
 
-      <Panel className="dashboard-map" title={`Carte · ${dayTitle(parseISO(mapDay))}`}>
-        <DayMap appointments={mapped} start={start} startLabel={config.start_address || config.company_name} />
+      <Panel
+        className="dashboard-map"
+        title={`Carte · ${dayTitle(parseISO(mapDay))}`}
+        actions={
+          origins.length > 1 && (
+            <select
+              className="form-input admin-time-select"
+              value={origin?.id}
+              onChange={(e) => setOriginId(e.target.value as OriginId)}
+              aria-label="Lieu de départ"
+              title="Lieu de départ de la journée"
+            >
+              {origins.map((o) => (
+                <option key={o.id} value={o.id} disabled={Boolean(o.unavailable)}>
+                  {o.label}
+                  {o.unavailable && ` (${o.unavailable})`}
+                </option>
+              ))}
+            </select>
+          )
+        }
+      >
+        <DayMap appointments={mapped} origin={origin} />
         {mapped.some((a) => !coordinatesOf(a)) && (
           <p className="dashboard-map__missing">
             Non localisé :{' '}
@@ -185,11 +263,8 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ appointments, con
 };
 
 /** Carte d'une journée : point de départ et interventions numérotées, cadrées automatiquement. */
-const DayMap: React.FC<{ appointments: Appointment[]; start: LatLng | null; startLabel?: string }> = ({
-  appointments,
-  start,
-  startLabel,
-}) => {
+const DayMap: React.FC<{ appointments: Appointment[]; origin: Origin | null }> = ({ appointments, origin }) => {
+  const start = origin?.at ?? null;
   const ref = useRef<HTMLDivElement>(null);
   // Interventions au même endroit (même adresse) : un seul repère « 1, 2 »
   const pins = useMemo(() => {
@@ -228,8 +303,8 @@ const DayMap: React.FC<{ appointments: Appointment[]; start: LatLng | null; star
       >
         {start && (
           <Overlay anchor={start} offset={[14, 14]}>
-            <span className="dashboard-pin dashboard-pin--start" title={startLabel ? `Départ : ${startLabel}` : 'Départ'}>
-              <HouseLineIcon size={16} weight="fill" aria-hidden="true" />
+            <span className="dashboard-pin dashboard-pin--start" title={`${origin?.label} : ${origin?.address}`}>
+              {origin && ORIGIN_ICONS[origin.id]}
             </span>
           </Overlay>
         )}
@@ -249,6 +324,46 @@ const DayMap: React.FC<{ appointments: Appointment[]; start: LatLng | null; star
     </div>
   );
 };
+
+/**
+ * Lieu de départ choisi (préférence d'affichage `ui_state_dashboard`, aucune donnée personnelle) ; le
+ * siège social, saisi en texte libre, est localisé à la demande par la Base Adresse Nationale.
+ */
+function useOrigin(config: AppConfig) {
+  const [originId, setOriginIdState] = useState<OriginId>('start');
+  const [siegeAt, setSiegeAt] = useState<LatLng | null>(null);
+  const origins = useMemo(
+    () => originsOf(config).map((o) => (o.id === 'siege' ? { ...o, at: siegeAt } : o)),
+    [config, siegeAt]
+  );
+  const usable = origins.filter((o) => !o.unavailable);
+  const origin = usable.find((o) => o.id === originId) ?? usable[0] ?? null;
+
+  useEffect(() => {
+    api
+      .getUiState<{ origin?: OriginId }>('dashboard')
+      .then(({ state }) => state?.origin && setOriginIdState(state.origin))
+      .catch(() => undefined);
+  }, []);
+
+  const siegeAddress = origins.find((o) => o.id === 'siege')?.address;
+  useEffect(() => {
+    if (originId !== 'siege' || !siegeAddress || siegeAt) return;
+    fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(siegeAddress)}&limit=1`)
+      .then((res) => res.json())
+      .then((data) => {
+        const coordinates = data.features?.[0]?.geometry?.coordinates as [number, number] | undefined;
+        if (coordinates) setSiegeAt([coordinates[1], coordinates[0]]);
+      })
+      .catch(() => undefined);
+  }, [originId, siegeAddress, siegeAt]);
+
+  const setOriginId = (id: OriginId) => {
+    setOriginIdState(id);
+    api.saveUiState('dashboard', { origin: id }).catch(() => undefined);
+  };
+  return { origins, origin, setOriginId };
+}
 
 /**
  * Localise une fois les rendez-vous affichés sans position (Base Adresse Nationale, déjà utilisée à la

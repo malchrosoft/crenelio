@@ -8,13 +8,27 @@ import {
 } from '@phosphor-icons/react';
 import AdminNotices, { AdminNotice } from './AdminNotices';
 
-export type AdminTab = 'dashboard' | 'appointments' | 'calendar' | 'services' | 'hours' | 'settings' | 'zone' | 'config';
+export type AdminTab =
+  | 'dashboard'
+  | 'appointments'
+  | 'calendar'
+  | 'unavailabilities'
+  | 'services'
+  | 'hours'
+  | 'booking'
+  | 'settings'
+  | 'zone'
+  | 'company'
+  | 'site'
+  | 'account';
 
-interface NavItem {
+export interface NavItem {
   id: AdminTab;
   label: string;
   icon: React.ReactNode;
   count?: number;
+  /** Catégorie du menu : intitulé affiché avant le premier élément du groupe. */
+  group?: string;
 }
 
 interface AdminShellProps {
@@ -85,20 +99,28 @@ const AdminShell: React.FC<AdminShellProps> = ({ companyName, nav, onLogout, not
         <aside className="admin-sidebar" id="admin-sidebar">
           <nav aria-label="Gestion">
             <ul className="admin-sidebar__list">
-              {nav.items.map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    className={clsx('admin-sidebar__item', { 'admin-sidebar__item--active': nav.active === item.id })}
-                    aria-current={nav.active === item.id ? 'page' : undefined}
-                    title={collapsed ? item.label : undefined}
-                    onClick={() => nav.onSelect(item.id)}
-                  >
-                    {item.icon}
-                    <span className="admin-sidebar__label">{item.label}</span>
-                    {item.count !== undefined && <span className="admin-sidebar__count">{item.count}</span>}
-                  </button>
-                </li>
+              {nav.items.map((item, index) => (
+                <React.Fragment key={item.id}>
+                  {item.group && item.group !== nav.items[index - 1]?.group && (
+                    // Menu replié : seul le trait de séparation reste
+                    <li className="admin-sidebar__group" role="presentation">
+                      <span className="admin-sidebar__group-label">{item.group}</span>
+                    </li>
+                  )}
+                  <li>
+                    <button
+                      type="button"
+                      className={clsx('admin-sidebar__item', { 'admin-sidebar__item--active': nav.active === item.id })}
+                      aria-current={nav.active === item.id ? 'page' : undefined}
+                      title={collapsed ? item.label : undefined}
+                      onClick={() => nav.onSelect(item.id)}
+                    >
+                      {item.icon}
+                      <span className="admin-sidebar__label">{item.label}</span>
+                      {item.count !== undefined && <span className="admin-sidebar__count">{item.count}</span>}
+                    </button>
+                  </li>
+                </React.Fragment>
               ))}
             </ul>
           </nav>

@@ -8,9 +8,13 @@ import {
   XIcon,
   CarIcon,
   WrenchIcon,
-  GearSixIcon,
   MapTrifoldIcon,
   CalendarDotsIcon,
+  CalendarXIcon,
+  CalendarCheckIcon,
+  StorefrontIcon,
+  PaletteIcon,
+  ShieldCheckIcon,
   SquaresFourIcon,
 } from '@phosphor-icons/react';
 import { api, UNAUTHORIZED_EVENT } from '../api';
@@ -31,7 +35,7 @@ import ZoneWorkspace from './admin/ZoneWorkspace';
 import ResetButton from './admin/ResetButton';
 import NewAppointment from './admin/NewAppointment';
 import BrandingField from './admin/BrandingField';
-import AdminShell, { AdminTab } from './admin/AdminShell';
+import AdminShell, { AdminTab, NavItem } from './admin/AdminShell';
 
 // Calendrier (FullCalendar) chargé seulement à l'ouverture de son onglet
 const AppointmentCalendar = lazy(() => import('./admin/AppointmentCalendar'));
@@ -156,8 +160,6 @@ export const AdminDashboard: React.FC = () => {
   // chacune facultative)
   const [dateMode, setDateMode] = useState<'day' | 'range'>('day');
   const [dateEndFilter, setDateEndFilter] = useState('');
-  // Onglet Horaires : semaine type ou indisponibilités (grille)
-  const [hoursView, setHoursView] = useState<'week' | 'unavailabilities'>('week');
   // Rendez-vous ouvert dans la fenêtre de consultation / modification (calendrier ou liste)
   const [openedId, setOpenedId] = useState<number | null>(null);
 
@@ -547,7 +549,7 @@ export const AdminDashboard: React.FC = () => {
                 <code>admin123</code> est toléré en développement, mais devra être changé avant toute mise en ligne.
               </>
             ),
-            action: { label: 'Changer le mot de passe', onClick: () => setActiveTab('config') },
+            action: { label: 'Changer le mot de passe', onClick: () => setActiveTab('account') },
           },
         ]
       : []),
@@ -563,25 +565,58 @@ export const AdminDashboard: React.FC = () => {
                 dans <code>api/.env</code>). En attendant, le mot de passe seul protège l'espace Artisan.
               </>
             ),
-            action: { label: 'Ouvrir la configuration', onClick: () => setActiveTab('config') },
+            action: { label: 'Ouvrir « Compte »', onClick: () => setActiveTab('account') },
           },
         ]
       : []),
   ];
 
-  const navItems: { id: AdminTab; label: string; icon: React.ReactNode; count?: number }[] = [
+  const navItems: NavItem[] = [
     { id: 'dashboard', label: 'Tableau de bord', icon: <SquaresFourIcon {...NAV_ICON} /> },
-    { id: 'appointments', label: 'Rendez-vous', icon: <CalendarBlankIcon {...NAV_ICON} />, count: appointments.length },
-    { id: 'calendar', label: 'Calendrier', icon: <CalendarDotsIcon {...NAV_ICON} /> },
-    { id: 'services', label: 'Prestations', icon: <WrenchIcon {...NAV_ICON} />, count: services.length },
-    { id: 'hours', label: 'Horaires', icon: <ClockIcon {...NAV_ICON} /> },
-    { id: 'settings', label: 'Déplacement', icon: <CarIcon {...NAV_ICON} /> },
+    { id: 'appointments', group: 'Interventions', label: 'Rendez-vous', icon: <CalendarBlankIcon {...NAV_ICON} />, count: appointments.length },
+    { id: 'calendar', group: 'Interventions', label: 'Calendrier', icon: <CalendarDotsIcon {...NAV_ICON} /> },
+    { id: 'unavailabilities', group: 'Interventions', label: 'Indisponibilités', icon: <CalendarXIcon {...NAV_ICON} /> },
+    { id: 'services', group: 'Activité', label: 'Prestations', icon: <WrenchIcon {...NAV_ICON} />, count: services.length },
+    { id: 'hours', group: 'Activité', label: 'Horaires', icon: <ClockIcon {...NAV_ICON} /> },
+    { id: 'booking', group: 'Activité', label: 'Créneaux', icon: <CalendarCheckIcon {...NAV_ICON} /> },
+    { id: 'settings', group: 'Activité', label: 'Déplacement', icon: <CarIcon {...NAV_ICON} /> },
     // Zone d'intervention : uniquement si l'artisan se déplace chez ses clients
     ...(config.travel_mode === 'premises'
       ? []
-      : [{ id: 'zone' as const, label: "Zone d'intervention", icon: <MapTrifoldIcon {...NAV_ICON} /> }]),
-    { id: 'config', label: 'Configuration', icon: <GearSixIcon {...NAV_ICON} /> },
+      : [{ id: 'zone' as const, group: 'Activité', label: "Zone d'intervention", icon: <MapTrifoldIcon {...NAV_ICON} /> }]),
+    { id: 'company', group: 'Paramétrage', label: 'Entreprise', icon: <StorefrontIcon {...NAV_ICON} /> },
+    { id: 'site', group: 'Paramétrage', label: 'Vitrine', icon: <PaletteIcon {...NAV_ICON} /> },
+    { id: 'account', group: 'Paramétrage', label: 'Compte', icon: <ShieldCheckIcon {...NAV_ICON} /> },
   ];
+
+  /**
+   * Groupes de réglages (`CONFIG_GROUPS`, plus « Autres paramètres ») d'un écran de paramétrage, avec
+   * les éditeurs propres à certains groupes (logo et favicon, engagements de la vitrine).
+   */
+  const renderConfigGroups = (ids: string[]) =>
+    [...CONFIG_GROUPS, buildOtherGroup(config)]
+      .filter((group) => group && ids.includes(group.id))
+      .map(
+        (group) =>
+          group && (
+            <React.Fragment key={group.id}>
+              <ConfigGroupForm group={group} config={config} onSaved={setConfig}>
+                {group.id === 'identity' && (
+                  <div className="admin-settings-form">
+                    <BrandingField kind="logo" url={config.branding_logo_url} onChange={applyBranding} />
+                    <BrandingField
+                      kind="favicon"
+                      url={config.branding_favicon_url}
+                      logoUrl={config.branding_logo_url}
+                      onChange={applyBranding}
+                    />
+                  </div>
+                )}
+              </ConfigGroupForm>
+              {group.id === 'vitrine' && <EngagementsEditor config={config} onSaved={setConfig} />}
+            </React.Fragment>
+          )
+      );
 
   return (
     <AdminShell
@@ -589,7 +624,7 @@ export const AdminDashboard: React.FC = () => {
       onLogout={handleLogout}
       nav={{ items: navItems, active: activeTab, onSelect: setActiveTab }}
       notices={notices}
-      fill={!loading && ((activeTab === 'appointments' && !creatingAppointment) || activeTab === 'calendar' || (activeTab === 'hours' && hoursView === 'unavailabilities'))}
+      fill={!loading && ((activeTab === 'appointments' && !creatingAppointment) || activeTab === 'calendar' || activeTab === 'unavailabilities')}
     >
       {openedId !== null && appointments.some((a) => a.id === openedId) && (
         <AppointmentDialog
@@ -1043,66 +1078,43 @@ export const AdminDashboard: React.FC = () => {
         </div>
       ) : activeTab === 'zone' ? (
         <ZoneWorkspace config={config} onSaved={setConfig} />
-      ) : activeTab === 'hours' ? (
+      ) : activeTab === 'unavailabilities' ? (
         <div className="admin-page">
-          {/* Sous-onglets : semaine type, indisponibilités (grille) */}
-          <div className="admin-subtabs" role="tablist" aria-label="Horaires">
-            {(
-              [
-                ['week', 'Semaine type'],
-                ['unavailabilities', 'Indisponibilités'],
-              ] as const
-            ).map(([view, label]) => (
-              <button
-                key={view}
-                type="button"
-                role="tab"
-                aria-selected={hoursView === view}
-                className={clsx('admin-subtabs__tab', { 'admin-subtabs__tab--active': hoursView === view })}
-                onClick={() => setHoursView(view)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          {hoursView === 'week' ? (
-            <div className="admin-config">
-              <ScheduleEditor />
-            </div>
-          ) : (
-            <Suspense fallback={<p>Chargement…</p>}>
-              <UnavailabilitiesGrid />
-            </Suspense>
-          )}
+          <Suspense fallback={<p>Chargement…</p>}>
+            <UnavailabilitiesGrid />
+          </Suspense>
         </div>
-      ) : activeTab === 'config' ? (
+      ) : activeTab === 'hours' ? (
         <div className="admin-config">
-          {[...CONFIG_GROUPS, buildOtherGroup(config)].map(
-            (group) =>
-              group && (
-                <React.Fragment key={group.id}>
-                <ConfigGroupForm key={group.id} group={group} config={config} onSaved={setConfig}>
-                  {group.id === 'contact' && <ProEmailField config={config} onSaved={setConfig} />}
-                  {group.id === 'identity' && (
-                    <div className="admin-settings-form">
-                      <BrandingField kind="logo" url={config.branding_logo_url} onChange={applyBranding} />
-                      <BrandingField
-                        kind="favicon"
-                        url={config.branding_favicon_url}
-                        logoUrl={config.branding_logo_url}
-                        onChange={applyBranding}
-                      />
-                    </div>
-                  )}
-                </ConfigGroupForm>
-                {group.id === 'identity' && <AppearanceEditor config={config} onSaved={setConfig} />}
-                {group.id === 'vitrine' && <EngagementsEditor config={config} onSaved={setConfig} />}
-                {group.id === 'contact' && <MailStatus proEmail={config.pro_email} />}
-                {group.id === 'contact' && <CalendarFeedSettings />}
-                {group.id === 'contact' && <PasswordChange onChanged={refreshSession} />}
-                </React.Fragment>
-              )
-          )}
+          <ScheduleEditor />
+        </div>
+      ) : activeTab === 'booking' ? (
+        <div className="admin-config">{renderConfigGroups(['booking'])}</div>
+      ) : activeTab === 'company' ? (
+        <div className="admin-config">{renderConfigGroups(['identity', 'legal'])}</div>
+      ) : activeTab === 'site' ? (
+        <div className="admin-config">
+          <AppearanceEditor config={config} onSaved={setConfig} />
+          {renderConfigGroups(['vitrine', 'map'])}
+        </div>
+      ) : activeTab === 'account' ? (
+        <div className="admin-config">
+          {renderConfigGroups(['contact'])}
+          <section className="admin-config-group" aria-labelledby="config-pro-email">
+            <div className="admin-section-header">
+              <h3 className="admin-section-title" id="config-pro-email">
+                Connexion & notifications
+              </h3>
+            </div>
+            <p className="admin-settings-intro">
+              Votre adresse reçoit les codes de connexion, les demandes à valider et les fiches d'intervention.
+            </p>
+            <ProEmailField config={config} onSaved={setConfig} />
+          </section>
+          <MailStatus proEmail={config.pro_email} />
+          <CalendarFeedSettings />
+          {renderConfigGroups(['other'])}
+          <PasswordChange onChanged={refreshSession} />
         </div>
       ) : (
         <div className="admin-config">

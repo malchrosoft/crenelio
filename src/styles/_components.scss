@@ -809,6 +809,41 @@ $admin-sidebar-collapsed: 68px;
     gap: 4px;
   }
 
+  // Catégorie du menu (Interventions, Paramétrage) : losange, intitulé en couleur principale et
+  // filet qui s'efface vers la droite
+  .admin-sidebar__group {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    margin-top: $space-sm;
+    padding: $space-xs 12px $space-2xs;
+
+    &::before {
+      content: '';
+      flex-shrink: 0;
+      width: 6px;
+      height: 6px;
+      background: $primary;
+      transform: rotate(45deg);
+    }
+
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, primary-alpha(45%), transparent);
+    }
+  }
+
+  .admin-sidebar__group-label {
+    color: $primary;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
   .admin-sidebar__item {
     display: flex;
     align-items: center;
@@ -878,8 +913,25 @@ $admin-sidebar-collapsed: 68px;
     }
 
     .admin-sidebar__label,
-    .admin-sidebar__count {
+    .admin-sidebar__count,
+    .admin-sidebar__group-label {
       display: none;
+    }
+
+    // Replié : court filet dégradé centré, sans losange
+    .admin-sidebar__group {
+      justify-content: center;
+      margin-top: $space-2xs;
+      padding: $space-xs 0;
+
+      &::before {
+        display: none;
+      }
+
+      &::after {
+        flex: 0 0 60%;
+        background: linear-gradient(90deg, transparent, primary-alpha(55%), transparent);
+      }
     }
   }
 
@@ -3146,35 +3198,6 @@ $data-grid-status-width: 13em;
 .unavailability-period--past { background: $gray-100; color: $gray-600; }
 
 // -------------------------------------------------------
-// Sous-onglets d'une page (Horaires : semaine type / indisponibilités)
-// -------------------------------------------------------
-.admin-subtabs {
-  display: flex;
-  gap: $space-xs;
-  border-bottom: 1px solid $gray-200;
-
-  .admin-subtabs__tab {
-    padding: $space-xs $space-sm;
-    border: 0;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    background: none;
-    color: $gray-600;
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-    transition: color $duration-fast, border-color $duration-fast;
-
-    &:hover { color: $gray-900; }
-  }
-
-  .admin-subtabs__tab--active {
-    color: $primary;
-    border-bottom-color: $primary;
-  }
-}
-
-// -------------------------------------------------------
 // Avertissements regroupés dans le header
 // -------------------------------------------------------
 .admin-notices {
@@ -3325,7 +3348,10 @@ $data-grid-status-width: 13em;
 }
 
 .dashboard-day--today {
+  // Liseré de la couleur principale : la journée en cours se repère au premier coup d'œil
   border-color: $primary;
+  // 2 px au total (bordure + contour), halo diffus autour
+  box-shadow: 0 0 0 1px $primary, 0 0 12px 3px primary-alpha(25%);
 
   .panel__header {
     background: $primary-light;

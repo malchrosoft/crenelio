@@ -415,7 +415,7 @@ class EmailTemplates
             $appointment['client_name']
         );
 
-        $intro = 'Une nouvelle réservation vient d\'être enregistrée. Le fichier .ics joint permet de l\'ajouter directement à votre agenda.';
+        $intro = 'Un nouveau rendez-vous vient d\'être enregistré. Le fichier .ics joint permet de l\'ajouter directement à votre agenda.';
 
         $rows = array_merge(
             self::summaryRows($appointment),

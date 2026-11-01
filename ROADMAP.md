@@ -466,10 +466,15 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Points d'attention :** contrastes vérifiés dans les deux thèmes (WCAG AA, public senior), logo pensé pour fond clair (variante ou fond derrière le logo), images et illustrations, pas de flash clair au chargement (appliqué avant le premier rendu comme le thème actuel).
 - **Prérequis :** Item 2 ✅.
 
+### 38. Menu de l'Espace Pro par Catégories — ✅ Terminée
+- **Demandé le 01/11/2026.** Catégories au style de rubrique (losange, intitulé et filet en couleur principale ; filet seul en menu replié) : *Interventions* (Rendez-vous, Calendrier, Indisponibilités), *Activité* (Prestations, Horaires, Créneaux, Déplacement, Zone d'intervention), *Paramétrage* (Entreprise, Vitrine, Compte).
+- **Configuration éclatée :** les sous-onglets de « Horaires » deviennent deux écrans ; l'ancien fourre-tout « Configuration » est réparti entre Créneaux (règles de réservation), Entreprise (identité, logo, mentions légales), Vitrine (apparence, zone couverte, page vitrine, engagements, carte) et Compte (coordonnées de l'artisan, email professionnel, envoi des emails, abonnement d'agenda, autres paramètres, mot de passe en bas).
+
 ### 35. Tableau de Bord de l'Espace Pro (Jours en Cartes & Carte du Jour) — ✅ Terminée
 - **Demandé le 31/10/2026** : page d'accueil de l'espace Pro, en tête du menu.
 - **Jours affichés** (`DashboardOverview`) : le jour travaillé précédent, aujourd'hui (même non travaillé) et les deux jours travaillés suivants, d'après les horaires hebdomadaires. Une carte (`Panel`) par jour : interventions non annulées dans l'ordre horaire, numérotées, couleur du statut, horaire, client, prestation et commune ; nombre et montant du jour ; ajout d'un rendez-vous à cette date. Un clic ouvre la fenêtre du rendez-vous (`AppointmentDialog`).
 - **Carte du jour :** point de départ de l'artisan et interventions numérotées comme dans la liste (même adresse : un repère « 1, 2 »), cadrage automatique ; le bouton de chaque carte de jour change le jour affiché.
+- **Lieu de départ** (choisi sur la carte, mémorisé comme préférence d'affichage `ui_state_dashboard`) : point de départ des interventions, adresse de l'entreprise ou siège social (mentions légales, localisé à la demande). Un lieu non renseigné reste proposé, grisé avec sa raison ; point de départ et entreprise regroupés s'ils coïncident. Indépendant de l'origine du calcul des frais (`travel_fee_origin`).
 - **Positions enregistrées :** la position calculée à la réservation (frais de déplacement) est désormais conservée (`appointments.latitude` / `longitude`, migration `2026-10-31_item35_appointment_coordinates`). Les rendez-vous antérieurs sont localisés une fois par la Base Adresse Nationale à leur premier affichage, puis enregistrés (`PUT /appointments/:id/coordinates`). Donnée personnelle : effacée avec l'adresse (`anonymizeWhere`) et décrite dans la politique de confidentialité.
 
 ### 36. Suivi d'Intervention pour l'Artisan (Étoffer le Tableau de Bord)
@@ -486,7 +491,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 ### 37. Trajets & Tournées (Ordre de Passage, Suggestions de Créneaux)
 - **Demandé le 31/10/2026** : gérer les trajets et optimiser les tournées de chaque jour, voire suggérer des déplacements si c'est raisonnable.
 - **Tournée du jour :**
-  - Tracé de la tournée sur la carte du tableau de bord, du point de départ à la dernière intervention (et retour), avec distance et durée estimées.
+  - Tracé de la tournée sur la carte du tableau de bord, du lieu de départ choisi (Item 35 : départ des interventions, entreprise ou siège) à la dernière intervention (et retour), avec distance et durée estimées ; lieu de départ éventuellement propre à chaque jour.
   - **Ordre conseillé :** pour une journée aux horaires encore souples, ordre de passage le plus court (quelques adresses : calcul exact ou plus proche voisin amélioré, dans le navigateur) ; l'artisan valide, les horaires sont décalés et les clients prévenus (reprogrammation de l'Item 32).
   - **Itinéraire en un clic :** lien Google Maps à étapes (jusqu'à 10 adresses) ou étape par étape pour Waze et Plans.
 - **Temps de trajet :** aujourd'hui le moteur de créneaux réserve un temps de trajet forfaitaire. Estimation par la distance à vol d'oiseau corrigée (simple, sans service tiers), ou par un service de calcul d'itinéraire (OSRM, OpenRouteService : conditions d'usage, quotas et clé à vérifier, adresse des clients transmise à un tiers à déclarer).
@@ -514,6 +519,7 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 | **7** | **Item 29** | **Mise à jour depuis le site hébergé (espace Pro)** | Installation / Maintenance | 🔍 *Faisabilité à étudier* | Item 28 ; capacités de l'hébergement | ⚪ Incertain sur Starter et compromis de sécurité ; la mise à jour manuelle (Item 28) suffit |
 | **8** | **Item 31** | **Traduction du site (multilingue)** | Vitrine / Internationalisation | ⏳ *À faire* | — | ⚪ Utile pour une clientèle non francophone ; aucun besoin bloquant à ce jour |
 | **9** | **Item 34** | **Thème sombre (inversion des couleurs, palettes adaptées)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort ; chantier transversal coûteux (gris, fonds, états et bibliothèques à convertir) |
+| — | **Item 38** | Menu de l'espace Pro par catégories, configuration répartie en écrans (Entreprise, Vitrine, Compte, Créneaux) | Espace Pro / Navigation | ✅ **Terminé** | — | — |
 | — | **Item 35** | Tableau de bord (jours en cartes, carte du jour numérotée, positions des rendez-vous enregistrées) | Espace Pro / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 21** | Liste des interventions AG Grid Community (tri, filtres, sélection, export CSV, disposition enregistrée) ; composant `DataGrid` commun, pleine hauteur desktop/tablette, fenêtre de rendez-vous partagée avec le calendrier, avertissements regroupés dans le header, indisponibilités en grille (sous-onglet de « Horaires ») | Espace Pro / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 33** | Abonnement d'agenda de l'artisan (flux iCal privé, optionnel) | Planning / Synchronisation | ✅ **Terminé** | — | — |

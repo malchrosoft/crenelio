@@ -27,7 +27,7 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
   - **Adresse BAN (Base Adresse Nationale)** : autocomplétion via `api-adresse.data.gouv.fr`, coordonnées GPS, carte OpenStreetMap (Pigeon Maps, sans clé API).
   - **Frais de déplacement** : forfait ou paliers kilométriques, calculés depuis le point de départ ou l'adresse de l'entreprise.
   - **Zone d'intervention** : adresse hors des communes desservies ou au-delà du rayon ⇒ réservation directe bloquée. Jusqu'au rayon + 10 %, le client peut envoyer une **demande exceptionnelle** : rendez-vous « En attente », accusé de réception au client, email à l'artisan qui accepte ou refuse en un clic (`/decision/:token`). Au-delà : adresse non desservie.
-- **Abonnement d'agenda** (optionnel, onglet Configuration) : adresse privée et régénérable à laquelle l'artisan abonne Google Agenda, Outlook ou Apple Calendar ; copie à sens unique du planning (Crénelio reste la référence), indisponibilités en option, délai de rafraîchissement propre à chaque agenda.
+- **Abonnement d'agenda** (optionnel, écran « Compte ») : adresse privée et régénérable à laquelle l'artisan abonne Google Agenda, Outlook ou Apple Calendar ; copie à sens unique du planning (Crénelio reste la référence), indisponibilités en option, délai de rafraîchissement propre à chaque agenda.
 - **Annulation & reprogrammation** : le client qui annule par son lien prévient l'artisan (le fichier agenda retire l'intervention) et reçoit une confirmation ; l'artisan qui annule ou déplace un rendez-vous (planning, calendrier) prévient le client, avec un agenda mis à jour (option « Prévenir le client »). Formulaires publics plafonnés par adresse IP contre les abus.
 - **Confirmation & suivi** : récapitulatif, email de confirmation avec fichier agenda (`.ics` : créneau, tarifs, coordonnées de l'artisan, lien de gestion, rappel la veille) et lien de gestion / annulation (`/rdv/:token`).
 - **Mentions légales** : modale dédiée alimentée par la configuration.
@@ -40,7 +40,7 @@ Conçu avec **React 18 / TypeScript**, **Sass (SCSS)**, **PHP 8.2 (natif)** et *
 - **Déplacement** : mode d'intervention (à domicile ou dans les locaux), adresse de l'entreprise, frais par paliers.
 - **Zone d'intervention** (pleine page) : point de départ (adresse ou GPS), rayon, communes limitrophes, calcul des communes via `geo.api.gouv.fr` (bleu : entièrement dans le rayon, orange : partiellement), retrait d'une commune au clic droit.
 - **Configuration** : identité (nom, logo et favicon PNG/SVG avec recadrage), coordonnées, page vitrine, engagements, réservation, mentions légales ; bouton « Annuler » sur chaque formulaire.
-- **Apparence** (onglet Configuration) : couleur principale (palette lisible ou couleur libre, contrôle du contraste), arrondis, fond des pages (12 teintes claires ou teinte de la couleur principale), arrondis (sans, compact, standard, arrondi), style des boutons (standard, pilule, plat, material, relief) et texte des boutons en capitales en option, effets activables (ombres douces, verre dépoli, animations respectant « réduire les animations »), aperçu en direct ; reprise dans les emails.
+- **Apparence** (écran « Vitrine ») : couleur principale (palette lisible ou couleur libre, contrôle du contraste), arrondis, fond des pages (12 teintes claires ou teinte de la couleur principale), arrondis (sans, compact, standard, arrondi), style des boutons (standard, pilule, plat, material, relief) et texte des boutons en capitales en option, effets activables (ombres douces, verre dépoli, animations respectant « réduire les animations »), aperçu en direct ; reprise dans les emails.
 - **Liste des interventions** (onglet Rendez-vous, AG Grid Community MIT) : colonnes triables et filtrables, pagination, export CSV, actions par ligne (statut, reprogrammation, emails, effacement).
 - **Calendrier** (onglet de l'espace Pro, FullCalendar MIT) : vues mois / semaine / jour / liste, horaires de travail et indisponibilités affichés, glisser-déposer d'un rendez-vous validé par le moteur de créneaux (forçable sur confirmation), création d'un rendez-vous au clic sur un jour.
 - **RGPD** : notice d'information sous le formulaire de réservation, politique de confidentialité générée depuis la configuration (fenêtre « Mentions légales & confidentialité »), aucun cookie de traçage donc pas de bandeau, durée de conservation réglable (36 mois par défaut) avec effacement automatique, bouton « Effacer le client » pour les demandes d'effacement.
@@ -177,7 +177,7 @@ Règles d'envoi propres à OVHcloud (expéditeur, `Reply-To`, SPF/DKIM/DMARC, qu
 [DEPLOYMENT.fr.md, étape 4b](DEPLOYMENT.fr.md) et les
 [bonnes pratiques d'envoi d'e-mail](https://docs.ovhcloud.com/fr/guides/web-cloud/web-hosting/email-sending-best-practices).
 
-L'onglet *Configuration* de l'espace Pro affiche le mode d'envoi et l'expéditeur (lecture seule) et propose un **email de test**.
+L'écran *Compte* de l'espace Pro affiche le mode d'envoi et l'expéditeur (lecture seule) et propose un **email de test**.
 
 **Sans `MAIL_FROM` ni `APP_URL` exploitable (domaine réel), l'envoi est simplement désactivé** : les réservations
 aboutissent normalement et chaque tentative est journalisée en `failed` avec un motif explicite,

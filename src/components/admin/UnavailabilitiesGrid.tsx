@@ -34,7 +34,7 @@ const PeriodCell: React.FC<CustomCellRendererProps<Unavailability>> = ({ data })
   data ? <span className={`status-badge unavailability-period--${periodOf(data)}`}>{PERIOD_LABELS[periodOf(data)]}</span> : null;
 
 /**
- * Indisponibilités (congés, formation…) en grille (sous-onglet de « Horaires ») : tri, filtres,
+ * Indisponibilités (congés, formation…) en grille (écran « Indisponibilités » du menu Interventions) : tri, filtres,
  * ajout dans une fenêtre, suppression de la ligne sélectionnée. Aucun créneau n'est proposé pendant
  * ces périodes.
  */
