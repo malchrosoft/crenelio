@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { CalendarBlankIcon, EnvelopeSimpleIcon, EraserIcon, FileTextIcon, XIcon } from '@phosphor-icons/react';
+import { CalendarBlankIcon, EnvelopeSimpleIcon, EraserIcon, FileTextIcon, ReceiptIcon, XIcon } from '@phosphor-icons/react';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../../api';
@@ -25,6 +25,8 @@ interface AppointmentDialogProps {
   /** Devis prérempli depuis ce rendez-vous (prestation, déplacement), ouvert dans l'écran « Devis ». */
   onQuote?: (appointment: Appointment) => void;
   quoteError?: string | null;
+  /** Fiche « Préparer la facture » (intervention terminée), si l'artisan facture avec son logiciel. */
+  onInvoice?: (appointment: Appointment) => void;
 }
 
 const toInput = (sql: string) => format(parseISO(sql.replace(' ', 'T')), "yyyy-MM-dd'T'HH:mm");
@@ -33,7 +35,7 @@ const toInput = (sql: string) => format(parseISO(sql.replace(' ', 'T')), "yyyy-M
  * Consultation et modification d'un rendez-vous, commune au calendrier et à la liste : détail,
  * statut, nouvelle date (le client est prévenu sauf choix contraire), journal des emails, effacement.
  */
-const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onClose, onChanged, onEmails, onAnonymize, onQuote, quoteError }) => {
+const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onClose, onChanged, onEmails, onAnonymize, onQuote, quoteError, onInvoice }) => {
   const [datetime, setDatetime] = useState(toInput(appointment.start_datetime));
   const [notify, setNotify] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -186,6 +188,12 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onCl
               <button type="button" className="btn btn-secondary" onClick={() => onQuote(a)}>
                 <FileTextIcon size={16} weight="bold" aria-hidden="true" />
                 Devis
+              </button>
+            )}
+            {onInvoice && a.status === 'completed' && (
+              <button type="button" className="btn btn-secondary" onClick={() => onInvoice(a)}>
+                <ReceiptIcon size={16} weight="bold" aria-hidden="true" />
+                Préparer la facture
               </button>
             )}
             <button type="button" className="btn btn-secondary" onClick={() => onEmails(a)}>

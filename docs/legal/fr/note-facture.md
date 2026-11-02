@@ -20,6 +20,12 @@ En dessous de 25 € TTC, la note est remise à la demande du client.
 
 ## Dans Crénelio
 
-La facture est établie dans l'outil de l'artisan (Item 22, volet B) : la fiche « Préparer la facture »
-reprendra ces éléments, les débours sur une ligne distincte avec leur montant exact. Les mentions
-fiscales de la facture (numérotation, mentions de TVA, facturation électronique) relèvent de cet outil.
+La facture est établie dans l'outil de l'artisan (Item 22, volet B) ; Crénelio ne l'émet pas.
+
+- Fiche **« Préparer la facture »** (rendez-vous terminé) : client, adresse, date et lieu de la prestation,
+  référence du devis accepté, lignes détaillées (quantité, prix, TVA), totaux et mention de franchise,
+  chacun à copier ; **débours** sur une ligne distincte, au **montant exact du justificatif** saisi par
+  l'artisan avec sa référence, et alerte si le budget du mandat est dépassé.
+- **Exports CSV** : clients (import initial) et interventions terminées d'une période, débours à part.
+- Les mentions fiscales de la facture (numérotation continue, mentions de TVA, facturation électronique)
+  relèvent du logiciel de l'artisan.

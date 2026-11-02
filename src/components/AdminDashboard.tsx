@@ -46,6 +46,8 @@ const InterventionsGrid = lazy(() => import('./admin/InterventionsGrid'));
 const UnavailabilitiesGrid = lazy(() => import('./admin/UnavailabilitiesGrid'));
 const QuotesGrid = lazy(() => import('./admin/QuotesGrid'));
 const DocsViewer = lazy(() => import('./admin/DocsViewer'));
+const InvoicePrepDialog = lazy(() => import('./admin/InvoicePrepDialog'));
+const BillingExportDialog = lazy(() => import('./admin/BillingExportDialog'));
 const DashboardOverview = lazy(() => import('./admin/DashboardOverview'));
 import AdminLogin from './admin/AdminLogin';
 import type { AdminNotice } from './admin/AdminNotices';
@@ -171,6 +173,9 @@ export const AdminDashboard: React.FC = () => {
   // Devis à ouvrir dans l'écran « Devis » (créé depuis la fenêtre d'un rendez-vous)
   const [openQuoteId, setOpenQuoteId] = useState<number | null>(null);
   const [quoteError, setQuoteError] = useState<string | null>(null);
+  // Facturation dans le logiciel de l'artisan (Item 22, volet B)
+  const [invoiceFor, setInvoiceFor] = useState<Appointment | null>(null);
+  const [billingExport, setBillingExport] = useState(false);
 
   // Nouvelle prestation
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -580,6 +585,9 @@ export const AdminDashboard: React.FC = () => {
       : []),
   ];
 
+  // « Comment facturez-vous ? » : fiche et exports seulement avec le logiciel de l'artisan
+  const invoicing = config.invoicing_mode !== 'none';
+
   const navItems: NavItem[] = [
     { id: 'dashboard', label: 'Tableau de bord', icon: <SquaresFourIcon {...NAV_ICON} /> },
     { id: 'appointments', group: 'Interventions', label: 'Rendez-vous', icon: <CalendarBlankIcon {...NAV_ICON} />, count: appointments.length },
@@ -663,7 +671,21 @@ export const AdminDashboard: React.FC = () => {
             }
           }}
           quoteError={quoteError}
+          onInvoice={invoicing ? (appointment) => {
+            setOpenedId(null);
+            setInvoiceFor(appointment);
+          } : undefined}
         />
+      )}
+      {invoiceFor && (
+        <Suspense fallback={null}>
+          <InvoicePrepDialog appointment={invoiceFor} config={config} onClose={() => setInvoiceFor(null)} />
+        </Suspense>
+      )}
+      {billingExport && (
+        <Suspense fallback={null}>
+          <BillingExportDialog appointments={appointments} onClose={() => setBillingExport(false)} />
+        </Suspense>
       )}
       {emailsFor && (
         <NotificationsDialog
@@ -743,6 +765,8 @@ export const AdminDashboard: React.FC = () => {
                 appointments={filteredAppointments}
                 totalCount={appointments.length}
                 onCreate={() => setCreatingAppointment(true)}
+                onInvoice={invoicing ? setInvoiceFor : undefined}
+                onBillingExport={invoicing ? () => setBillingExport(true) : undefined}
                 filters={
                   <>
                     <div className="admin-search-wrapper">

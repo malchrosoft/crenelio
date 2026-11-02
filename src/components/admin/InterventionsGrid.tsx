@@ -5,7 +5,9 @@ import {
   ArrowSquareOutIcon,
   EnvelopeSimpleIcon,
   EraserIcon,
+  FileCsvIcon,
   PlusIcon,
+  ReceiptIcon,
   WarningCircleIcon,
 } from '@phosphor-icons/react';
 import { format, isPast, isToday, parseISO } from 'date-fns';
@@ -35,6 +37,9 @@ interface InterventionsGridProps extends InterventionActions {
   quickFilters?: React.ReactNode;
   activeFilters?: ActiveFilter[];
   onCreate: () => void;
+  /** Facturation dans le logiciel de l'artisan (Item 22, volet B) ; absents si l'artisan ne facture pas depuis Crénelio. */
+  onInvoice?: (appointment: Appointment) => void;
+  onBillingExport?: () => void;
 }
 
 const isOverdue = (a: Appointment) => {
@@ -155,6 +160,8 @@ const InterventionsGrid: React.FC<InterventionsGridProps> = ({
   quickFilters,
   activeFilters,
   onCreate,
+  onInvoice,
+  onBillingExport,
   ...actions
 }) => {
   // Colonne d'actions visible : reflet de la disposition (enregistrée avec les autres colonnes)
@@ -245,6 +252,17 @@ const InterventionsGrid: React.FC<InterventionsGridProps> = ({
             <PlusIcon size={16} weight="bold" aria-hidden="true" />
             Nouveau
           </button>
+          {onBillingExport && (
+            <button
+              type="button"
+              className="btn btn-secondary admin-btn-sm data-grid__icon-btn"
+              onClick={onBillingExport}
+              title="Exports pour la facturation (clients, interventions terminées)"
+              aria-label="Exports pour la facturation"
+            >
+              <FileCsvIcon size={16} weight="bold" aria-hidden="true" />
+            </button>
+          )}
           {selected && (
             <>
               <button
@@ -265,6 +283,17 @@ const InterventionsGrid: React.FC<InterventionsGridProps> = ({
               >
                 <EnvelopeSimpleIcon size={16} weight="bold" aria-hidden="true" />
               </button>
+              {onInvoice && selected.status === 'completed' && (
+                <button
+                  type="button"
+                  className="btn btn-secondary admin-btn-sm data-grid__icon-btn"
+                  onClick={() => onInvoice(selected)}
+                  title="Préparer la facture (valeurs à copier dans votre logiciel)"
+                  aria-label="Préparer la facture"
+                >
+                  <ReceiptIcon size={16} weight="bold" aria-hidden="true" />
+                </button>
+              )}
               {selected.client_name !== ANONYMIZED_NAME && (
                 <button
                   type="button"

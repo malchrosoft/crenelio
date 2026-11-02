@@ -117,6 +117,8 @@ INSERT IGNORE INTO `config` (`config_key`, `config_value`) VALUES
 ('quote_number_prefix',   'D'),
 ('quote_labour_rate',     ''),
 ('quote_allow_supply',    '0'),
+-- Facturation (volet B) : 'external' (logiciel de l'artisan, fiche et exports) ou 'none'
+('invoicing_mode',        'external'),
 -- Mentions de l'entreprise : forme juridique (« EI » accolé au nom d'un entrepreneur individuel,
 -- C. com. R526-27 ; forme et capital d'une société), répertoire des métiers, médiateur (C. consom. L616-1)
 ('legal_form',            'ei'),

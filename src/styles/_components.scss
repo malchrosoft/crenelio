@@ -3725,6 +3725,52 @@ $data-grid-status-width: 13em;
   }
 }
 
+// Fiche « Préparer la facture » et exports (Item 22, volet B)
+.invoice-prep {
+  h4 { margin: $space-block 0 $space-xs; font-size: 0.95rem; }
+
+  .invoice-prep__fields {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: $space-xs $space-sm;
+    margin: 0;
+
+    dt { color: $gray-500; padding-top: $space-2xs; }
+    dd { display: flex; align-items: center; gap: $space-xs; margin: 0; }
+  }
+
+  .invoice-prep__lines {
+    display: grid;
+    gap: $space-xs;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li { display: flex; align-items: center; justify-content: space-between; gap: $space-sm; }
+  }
+
+  .invoice-prep__debours {
+    .invoice-prep__debours-label { flex: 1; }
+    .form-input { width: 140px; }
+  }
+
+  .invoice-prep__total {
+    margin: $space-xs 0 0;
+    font-weight: 600;
+    text-align: right;
+  }
+}
+
+.billing-export__period {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+  margin-bottom: $space-xs;
+
+  .form-label { margin: 0; }
+  .form-input { width: auto; }
+}
+
 .quote-editor__links {
   display: flex;
   flex-wrap: wrap;

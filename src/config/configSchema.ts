@@ -85,10 +85,20 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
   },
   {
     id: 'quotes',
-    title: 'Devis & TVA',
+    title: 'Devis, TVA & facturation',
     intro:
       "Valeurs reprises sur chaque nouveau devis. Elles suivent la réglementation : à vérifier avec votre comptable lors d'un changement de régime ou de taux.",
     fields: [
+      {
+        key: 'invoicing_mode',
+        label: 'Comment facturez-vous ?',
+        type: 'select',
+        options: [
+          { value: 'external', label: 'Avec mon logiciel de facturation' },
+          { value: 'none', label: 'Je ne facture pas depuis Crénelio' },
+        ],
+        hint: '« Avec mon logiciel » : fiche « Préparer la facture » sur chaque rendez-vous et exports pour la facturation. Les devis restent proposés dans tous les cas.',
+      },
       {
         key: 'quote_vat_mode',
         label: 'Régime de TVA',
