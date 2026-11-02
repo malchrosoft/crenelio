@@ -21,7 +21,8 @@ guide privé, à recouper.
 
 ## À lire dans le texte officiel (non consulté directement)
 
-- Ordonnance n° 2026-2 et décret n° 2026-3 du 5 janvier 2026 (fonction de rétractation en ligne) ;
+- Ordonnance n° 2026-2 (L221-21 reçu et archivé le 02/11/2026) et décret n° 2026-3 du 5 janvier 2026
+  (modalités de la fonction de rétractation en ligne : articles réglementaires à lire) ;
   annexe à l'article R221-3 (version du 19 juin 2026).
 - Code de la consommation : L111-1, L111-2, L221-5, L221-9, L221-18, L221-20, L221-25, L221-28 ;
   formulaire type de rétractation (annexe à l'article R221-1) ; L616-1 (médiation).

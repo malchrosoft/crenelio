@@ -11,6 +11,7 @@ import {
   MapTrifoldIcon,
   CalendarDotsIcon,
   CalendarXIcon,
+  BookOpenTextIcon,
   FileTextIcon,
   StorefrontIcon,
   BrowserIcon,
@@ -44,6 +45,7 @@ const AppointmentCalendar = lazy(() => import('./admin/AppointmentCalendar'));
 const InterventionsGrid = lazy(() => import('./admin/InterventionsGrid'));
 const UnavailabilitiesGrid = lazy(() => import('./admin/UnavailabilitiesGrid'));
 const QuotesGrid = lazy(() => import('./admin/QuotesGrid'));
+const DocsViewer = lazy(() => import('./admin/DocsViewer'));
 const DashboardOverview = lazy(() => import('./admin/DashboardOverview'));
 import AdminLogin from './admin/AdminLogin';
 import type { AdminNotice } from './admin/AdminNotices';
@@ -150,7 +152,9 @@ export const AdminDashboard: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [config, setConfig] = useState<AppConfig>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+  // Fiche de documentation demandée par l'URL (/admin?doc=fr/debours.md, liens de l'éditeur de devis)
+  const [docPath] = useState(() => new URLSearchParams(window.location.search).get('doc'));
+  const [activeTab, setActiveTab] = useState<AdminTab>(docPath ? 'docs' : 'dashboard');
 
   // Recherche & Filtres planning
   const [searchQuery, setSearchQuery] = useState('');
@@ -593,6 +597,7 @@ export const AdminDashboard: React.FC = () => {
     { id: 'site', group: 'Paramétrage', label: 'Vitrine', icon: <BrowserIcon {...NAV_ICON} /> },
     { id: 'theme', group: 'Paramétrage', label: 'Thème', icon: <PaletteIcon {...NAV_ICON} /> },
     { id: 'account', group: 'Paramétrage', label: 'Compte', icon: <ShieldCheckIcon {...NAV_ICON} /> },
+    { id: 'docs', group: 'Aide', label: 'Documentation', icon: <BookOpenTextIcon {...NAV_ICON} /> },
   ];
 
   /**
@@ -1099,6 +1104,10 @@ export const AdminDashboard: React.FC = () => {
         </div>
       ) : activeTab === 'zone' ? (
         <ZoneWorkspace config={config} onSaved={setConfig} />
+      ) : activeTab === 'docs' ? (
+        <Suspense fallback={<p>Chargement…</p>}>
+          <DocsViewer initialPath={docPath} />
+        </Suspense>
       ) : activeTab === 'quotes' ? (
         <div className="admin-page">
           <Suspense fallback={<p>Chargement…</p>}>

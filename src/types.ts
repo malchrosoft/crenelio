@@ -273,6 +273,8 @@ export interface Quote {
   withdrawal_name: string | null;
   withdrawal_email: string | null;
   refusal_reason: string | null;
+  /** Jeton du lien client (Espace Artisan seulement, après l'envoi). */
+  token?: string | null;
   /** Page publique : rétractation en ligne encore possible. */
   can_withdraw?: boolean;
   created_at: string;

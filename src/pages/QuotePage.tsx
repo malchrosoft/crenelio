@@ -6,7 +6,7 @@ import { ArrowLeftIcon, CheckCircleIcon, XCircleIcon } from '@phosphor-icons/rea
 import { api } from '../api';
 import { AppConfig, Quote } from '../types';
 import BrandMark from '../components/BrandMark';
-import { CAPITAL_FORMS } from '../config/configSchema';
+import { companyAddress, legalIdentity } from '../utils/legalIdentity';
 import { withdrawalNotice, WithdrawalNotice } from '../utils/withdrawalNotice';
 import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, euro, lineAmount } from '../components/admin/quoteRules';
 
@@ -17,18 +17,6 @@ interface QuotePageProps {
 const longDate = (value: string | null) => (value ? format(parseISO(value.replace(' ', 'T')), 'EEEE d MMMM yyyy', { locale: fr }) : '');
 const dateTime = (value: string | null) =>
   value ? format(parseISO(value.replace(' ', 'T')), "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr }) : '';
-
-/** Identité légale de l'entreprise : « Nom – EI » ou « Raison sociale, SARL au capital de … ». */
-function legalIdentity(config: AppConfig): string {
-  const form = config.legal_form || 'ei';
-  if (form === 'ei') {
-    const mention = config.legal_ei_mention || 'EI';
-    return `${config.pro_name || config.company_name || ''} – ${mention}`;
-  }
-  const name = config.legal_raison_sociale || config.company_name || '';
-  const capital = CAPITAL_FORMS.includes(form) && config.legal_capital ? ` au capital de ${euro(config.legal_capital)}` : '';
-  return `${name}, ${form}${capital}`;
-}
 
 /**
  * Page du devis ouverte depuis l'email (/devis/:token), Item 22 : consultation avec les mentions
@@ -96,8 +84,7 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
   const vat = quote.vat_mode === 'vat';
   const urgent = Boolean(Number(quote.urgent));
   const company = config.company_name || '';
-  const address =
-    config.legal_adresse || [config.premises_address, `${config.premises_postal_code ?? ''} ${config.premises_city ?? ''}`.trim()].filter(Boolean).join(', ');
+  const address = companyAddress(config);
   const canAccept = keepParts !== null && (!debours.length || mandate !== null) && (urgent || withdrawalAck);
 
   return (
@@ -272,6 +259,11 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
           )}
         </section>
       )}
+
+      <p className="quote-page__print">
+        <Link to={`/devis/${token}/imprimer`}>Versions imprimables (devis{quote.total_debours !== '0.00' ? ', mandat de débours' : ''}
+        {urgent ? '' : ', formulaire de rétractation'})</Link>
+      </p>
 
       {config.legal_mediator && (
         <p className="form-hint quote-page__mediator">

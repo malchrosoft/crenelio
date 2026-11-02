@@ -2333,6 +2333,7 @@ $admin-sidebar-collapsed: 68px;
   }
 
   .quote-page__mediator { margin-top: $space-md; }
+  .quote-page__print { margin-top: $space-md; font-size: 0.9rem; }
 
   // Modèle d'information sur la rétractation (texte réglementaire)
   .quote-page__notice {
@@ -2353,6 +2354,132 @@ $admin-sidebar-collapsed: 68px;
     text-align: right;
 
     form { text-align: left; }
+  }
+}
+
+// Versions imprimables d'un devis (/devis/:token/imprimer) : une feuille A4 par document
+.quote-print {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: $space-md;
+
+  .quote-print__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-sm;
+    margin-bottom: $space-md;
+  }
+
+  .quote-print__docs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-xs;
+  }
+
+  .quote-print__sheet {
+    margin-bottom: $space-md;
+    padding: 32px 40px;
+    background: white;
+    border: 1px solid $gray-200;
+    border-radius: $radius-sm;
+    color: $gray-800;
+    font-size: 0.9rem;
+    line-height: $line-height-base;
+  }
+
+  .quote-print__header {
+    display: flex;
+    justify-content: space-between;
+    gap: $space-md;
+    padding-bottom: $space-block;
+    border-bottom: 2px solid $gray-800;
+  }
+
+  .quote-print__title {
+    text-align: right;
+
+    h1 { margin: 0; font-size: 1.4rem; text-transform: uppercase; }
+    p { margin: $space-2xs 0 0; }
+  }
+
+  .quote-print__block {
+    margin-top: $space-block;
+
+    h2 { margin: 0 0 $space-xs; font-size: 1rem; text-transform: uppercase; }
+    p, ul { margin: 0 0 $space-xs; }
+  }
+
+  .quote-print__lines {
+    width: 100%;
+    margin-top: $space-block;
+    border-collapse: collapse;
+
+    th, td { padding: $space-xs; border: 1px solid $gray-300; text-align: right; vertical-align: top; }
+    th { background: $gray-100; }
+    th:first-child, td:first-child { text-align: left; }
+  }
+
+  .quote-print__totals {
+    display: grid;
+    grid-template-columns: max-content 130px;
+    justify-content: end;
+    gap: $space-2xs $space-md;
+    margin: $space-xs 0;
+
+    dt { text-align: right; }
+    dd { margin: 0; text-align: right; }
+  }
+
+  .quote-print__mention { margin: $space-2xs 0; font-size: 0.8rem; }
+
+  .quote-print__notice {
+    padding: $space-sm;
+    border: 1px solid $gray-300;
+    font-size: 0.8rem;
+
+    p { margin: 0 0 $space-xs; }
+  }
+
+  .quote-print__signatures {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-md;
+    margin-top: $space-md;
+  }
+
+  .quote-print__signature {
+    min-height: 110px;
+    padding: $space-sm;
+    border: 1px solid $gray-300;
+
+    p { margin: 0 0 $space-xs; }
+  }
+
+  .quote-print__field {
+    padding-bottom: $space-md;
+    border-bottom: 1px dotted $gray-500;
+  }
+}
+
+@media print {
+  body { background: white; }
+
+  .quote-print {
+    max-width: none;
+    padding: 0;
+
+    .quote-print__toolbar { display: none; }
+
+    .quote-print__sheet {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      break-after: page;
+    }
+
+    .quote-print__sheet:last-child { break-after: auto; }
   }
 }
 
@@ -3552,6 +3679,65 @@ $data-grid-status-width: 13em;
     padding-left: $space-md;
     line-height: $line-height-base;
   }
+}
+
+.quote-reminder .quote-reminder__docs {
+  margin: $space-xs 0 0;
+}
+
+// Documentation de l'artisan (docs/legal/, Item 40)
+.docs-viewer {
+  max-width: 860px;
+
+  .docs-viewer__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-xs;
+    margin-bottom: $space-block;
+  }
+
+  .docs-viewer__path {
+    font-size: 0.8rem;
+    color: $gray-500;
+  }
+
+  .docs-viewer__content {
+    line-height: $line-height-base;
+    color: $gray-800;
+
+    h1 { font-size: 1.5rem; margin: 0 0 $space-block; }
+    h2 { font-size: 1.2rem; margin: $space-md 0 $space-xs; }
+    h3 { font-size: 1rem; margin: $space-block 0 $space-xs; }
+
+    blockquote {
+      margin: $space-sm 0;
+      padding: $space-xs $space-block;
+      border-left: 3px solid $primary;
+      background: $gray-100;
+      color: $gray-700;
+    }
+
+    table { border-collapse: collapse; margin: $space-sm 0; font-size: 0.9rem; }
+    th, td { padding: $space-xs $space-sm; border: 1px solid $gray-200; text-align: left; vertical-align: top; }
+    th { background: $gray-100; }
+    code { font-size: 0.85em; background: $gray-100; padding: 0 $space-2xs; border-radius: $radius-sm; }
+  }
+}
+
+.quote-editor__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-xs;
+}
+
+.quote-emails {
+  font-size: 0.85rem;
+  color: $gray-600;
+
+  summary { cursor: pointer; font-weight: 600; }
+  ul { margin: $space-xs 0 0; padding-left: $space-md; }
+  .quote-emails__item--failed { color: $danger; }
 }
 
 .quote-decision {

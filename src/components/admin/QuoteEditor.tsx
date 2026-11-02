@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { PaperPlaneTiltIcon, PlusIcon, TrashIcon, WarningIcon, XIcon } from '@phosphor-icons/react';
+import { ArrowSquareOutIcon, PaperPlaneTiltIcon, PlusIcon, PrinterIcon, TrashIcon, WarningIcon, XIcon } from '@phosphor-icons/react';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../../api';
-import { AppConfig, Quote, QuoteLine, QuoteLineKind, QuotePayload } from '../../types';
+import { AppConfig, Quote, QuoteLine, QuoteLineKind, QuoteNotification, QuotePayload } from '../../types';
 import ConfirmDialog from './ConfirmDialog';
 import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, euro, lineAmount, newLine, quoteTotals, vatRates } from './quoteRules';
 
@@ -256,7 +256,24 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
             save();
           }}
         >
-          {locked && quote && <QuoteDecision quote={quote} />}
+          {locked && quote && (
+            <>
+              <QuoteDecision quote={quote} />
+              {quote.token && (
+                <div className="quote-editor__links">
+                  <a className="btn btn-secondary admin-btn-sm" href={`/devis/${quote.token}/imprimer`} target="_blank" rel="noopener">
+                    <PrinterIcon size={14} weight="bold" aria-hidden="true" />
+                    Versions imprimables
+                  </a>
+                  <a className="btn btn-secondary admin-btn-sm" href={`/devis/${quote.token}`} target="_blank" rel="noopener">
+                    <ArrowSquareOutIcon size={14} weight="bold" aria-hidden="true" />
+                    Page du client
+                  </a>
+                </div>
+              )}
+              <QuoteEmails quoteId={quote.id} refreshKey={quote.status} />
+            </>
+          )}
 
           <fieldset className="quote-editor__section" disabled={locked}>
             <legend>Client et lieu d'intervention</legend>
@@ -458,6 +475,13 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
   );
 };
 
+/** Lien vers une fiche de la documentation (docs/legal/), ouverte dans un nouvel onglet de l'Espace Artisan. */
+const DocLink: React.FC<{ path: string; children: React.ReactNode }> = ({ path, children }) => (
+  <a href={`/admin?doc=${encodeURIComponent(path)}`} target="_blank" rel="noopener">
+    {children}
+  </a>
+);
+
 /** Champ de formulaire simple (libellé, aide facultative). */
 const Field: React.FC<{
   id: string;
@@ -491,8 +515,42 @@ const DeboursReminder: React.FC<{ budget: number }> = ({ budget }) => (
       <li>Refacturez le montant exact, sans marge, sur une ligne distincte ; notez « débours » dans votre livre des recettes.</li>
       <li>Jamais de carburant, de frais kilométriques ni d'outillage en débours.</li>
     </ul>
+    <p className="quote-reminder__docs">
+      En savoir plus : <DocLink path="fr/debours.md">débours et mandat</DocLink> ·{' '}
+      <DocLink path="fr/rappels-artisan.md">aide-mémoire de l'artisan</DocLink>
+    </p>
   </aside>
 );
+
+const EMAIL_LABELS: Record<QuoteNotification['type'], string> = {
+  quote_client: 'Devis envoyé au client',
+  decision_client: 'Réponse : copie au client',
+  decision_pro: 'Réponse : avis à l’artisan',
+  withdrawal_client: 'Rétractation : accusé au client',
+  withdrawal_pro: 'Rétractation : avis à l’artisan',
+};
+
+/** Journal des emails du devis (envoi, réponses, rétractation). */
+const QuoteEmails: React.FC<{ quoteId: number; refreshKey: string }> = ({ quoteId, refreshKey }) => {
+  const [emails, setEmails] = useState<QuoteNotification[] | null>(null);
+  useEffect(() => {
+    api.quoteNotifications(quoteId).then(setEmails).catch(() => setEmails([]));
+  }, [quoteId, refreshKey]);
+  if (!emails?.length) return null;
+  return (
+    <details className="quote-emails">
+      <summary>Emails du devis ({emails.length})</summary>
+      <ul>
+        {emails.map((email) => (
+          <li key={email.id} className={`quote-emails__item quote-emails__item--${email.status}`}>
+            {EMAIL_LABELS[email.type]} · {sqlDate(email.sent_at ?? email.created_at)} ·{' '}
+            {email.status === 'sent' ? 'envoyé' : email.status === 'failed' ? `échec : ${email.error_message ?? ''}` : 'en cours'}
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+};
 
 /** Réponse du client sur un devis envoyé (preuve de l'accord). */
 const QuoteDecision: React.FC<{ quote: Quote }> = ({ quote }) => (

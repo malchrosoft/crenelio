@@ -115,7 +115,7 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
         key: 'quote_allow_supply',
         label: 'Revente de fournitures (achat-revente)',
         type: 'checkbox',
-        hint: "Activité commerciale distincte : préférez les pièces achetées au nom du client (débours). Voir docs/legal/fr/achat-revente.md.",
+        hint: "Activité commerciale distincte : préférez les pièces achetées au nom du client (débours). Voir Documentation › Achat-revente.",
         confirmEnable: (config) =>
           (config.legal_form ?? 'ei') === 'ei'
             ? {

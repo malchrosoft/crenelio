@@ -34,6 +34,39 @@ Selon les sources secondaires (L221-25) : le professionnel ne peut commencer ava
 sur **demande expresse** du client ; si le client se rétracte ensuite, il doit un montant proportionnel
 au service déjà fourni. Sans demande expresse recueillie, rien n'est dû.
 
+## Exercice du droit : article L221-21 (version du 19 juin 2026)
+
+*Texte officiel, rédaction issue de l'ordonnance n° 2026-2 du 5 janvier 2026 (art. 26 : en vigueur le
+19 juin 2026 ; contrats en cours à cette date régis par les textes antérieurs). Reproduit le 02/11/2026 à
+partir du texte fourni par le mainteneur.*
+
+> Le consommateur exerce son droit de rétractation en informant le professionnel de sa décision de se
+> rétracter par l'envoi, avant l'expiration du délai prévu à l'article L. 221-18, du formulaire de
+> rétractation mentionné au 7° de l'article L. 221-5 ou de toute autre déclaration, dénuée d'ambiguïté,
+> exprimant sa volonté de se rétracter.
+>
+> Le professionnel peut également permettre au consommateur de remplir et de transmettre en ligne, sur
+> son site internet, le formulaire ou la déclaration prévus au premier alinéa. Dans cette hypothèse, le
+> professionnel communique, sans délai, au consommateur un accusé de réception de la rétractation sur un
+> support durable.
+>
+> Pour les contrats conclus à distance au moyen d'une interface en ligne, le professionnel met à la
+> disposition du consommateur, sans frais pour ce dernier, une fonctionnalité lui permettant d'exercer
+> gratuitement son droit de rétractation avant l'expiration du délai prévu à l'article L. 221-18.
+>
+> Un décret fixe les modalités de présentation et d'utilisation de cette fonctionnalité, de nature à
+> garantir un accès facile, direct et permanent du consommateur à celle-ci.
+
+**Correspondance dans Crénelio**
+
+| Exigence de L221-21 | Mise en œuvre |
+|---|---|
+| Formulaire ou toute déclaration dénuée d'ambiguïté | Formulaire de rétractation imprimable ; l'email et l'adresse de l'entreprise figurent dans le modèle d'information |
+| Envoi avant l'expiration du délai | Rétractation en ligne acceptée jusqu'à `withdrawal_until` inclus ; la date de la déclaration est enregistrée |
+| Accusé de réception sans délai, sur support durable | Email envoyé dès la confirmation (`QuoteNotifier::sendWithdrawal`), journalisé |
+| Fonctionnalité gratuite pour un contrat conclu via une interface en ligne | Bouton « Renoncer au contrat ici » sur la page du devis, sans compte ni frais |
+| Accès facile, direct et permanent (décret) | Même lien que celui de l'accord (email), bouton visible pendant tout le délai |
+
 ## Fonction de rétractation en ligne (depuis le 19 juin 2026)
 
 L'ordonnance n° 2026-2 et le décret n° 2026-3 du 5 janvier 2026 (transposition de la directive (UE)
@@ -65,4 +98,7 @@ Le modèle d'information (annexe à l'article R221-3) a été modifié en consé
   sous 14 jours) ; l'email d'accord rappelle la date limite et l'emplacement de la fonction.
 - Horodatages : la connexion MySQL est alignée sur le fuseau de l'application.
 - Page du devis : modèle d'information réglementaire affiché mot pour mot (`src/utils/withdrawalNotice.ts`).
-- À faire (étape 4) : formulaire type (annexe R221-1) et modèle d'information dans la version imprimable.
+- Versions imprimables (`/devis/:token/imprimer`) : modèle d'information dans le devis ; **formulaire type**
+  (« formulaire de rétractation mentionné au 7° de l'article L. 221-5 ») repris du modèle européen
+  (directive 2011/83/UE, annexe I B, sans télécopieur depuis le décret n° 2022-424) : **à confirmer
+  contre l'annexe à l'article R221-1 en vigueur** (texte non encore fourni).

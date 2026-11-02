@@ -5,6 +5,9 @@ documentaire de l'Item 40 : des fichiers Markdown, un dossier par langue (`fr/` 
 ils seront chargés en base et traduits ; les extraits de textes officiels restent alors cités en français,
 avec une explication traduite.
 
+Ces fiches se lisent aussi dans l'Espace Artisan (menu **Aide › Documentation**) : toute fiche ajoutée
+ici y apparaît, les liens entre fiches restent relatifs.
+
 ## Règles
 
 - Chaque fichier indique ses **sources** (lien) et la **date de la dernière vérification**.
