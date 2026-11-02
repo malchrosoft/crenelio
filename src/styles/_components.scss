@@ -3761,6 +3761,11 @@ $data-grid-status-width: 13em;
   }
 }
 
+.billing-export__format {
+  display: inline-block;
+  width: auto;
+}
+
 .billing-export__period {
   display: flex;
   align-items: center;

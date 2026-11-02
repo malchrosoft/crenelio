@@ -11,13 +11,16 @@ interface BillingExportDialogProps {
   onClose: () => void;
 }
 
-/** CSV au format attendu par les tableurs français : séparateur « ; », décimales à virgule, BOM UTF-8. */
-function downloadCsv(fileName: string, header: string[], rows: (string | number)[][]) {
+/**
+ * CSV : par défaut au format des tableurs français (séparateur « ; », décimales à virgule), BOM UTF-8.
+ * `separator` : « , » pour les imports qui l'exigent (Indy).
+ */
+function downloadCsv(fileName: string, header: string[], rows: (string | number)[][], separator = ';') {
   const cell = (value: string | number) => {
     const text = typeof value === 'number' ? value.toFixed(2).replace('.', ',') : value;
-    return /[";\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+    return /[";,\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
   };
-  const csv = '﻿' + [header, ...rows].map((row) => row.map(cell).join(';')).join('\r\n');
+  const csv = '﻿' + [header, ...rows].map((row) => row.map(cell).join(separator)).join('\r\n');
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
   const link = document.createElement('a');
   link.href = url;
@@ -29,6 +32,17 @@ function downloadCsv(fileName: string, header: string[], rows: (string | number)
 const sqlDay = (sql: string) => sql.slice(0, 10);
 
 /**
+ * Nom saisi en un seul champ découpé pour Indy : premier mot = prénom, reste = nom de famille
+ * (« Sophie Martin »). À vérifier dans Indy pour les noms composés.
+ */
+function splitName(full: string): [string, string] {
+  const [first, ...rest] = full.trim().split(/\s+/);
+  return rest.length ? [rest.join(' '), first] : [first ?? '', ''];
+}
+
+type ClientFormat = 'generic' | 'indy';
+
+/**
  * Exports pour la facturation (Item 22, volet B) : clients (import initial dans le logiciel de
  * l'artisan) et interventions terminées d'une période (montants du devis accepté, débours à part).
  * Colonnes génériques, à caler sur les imports des logiciels les plus utilisés avant de les figer.
@@ -38,6 +52,7 @@ const BillingExportDialog: React.FC<BillingExportDialogProps> = ({ appointments,
   const [start, setStart] = useState(format(startOfMonth(lastMonth), 'yyyy-MM-dd'));
   const [end, setEnd] = useState(format(endOfMonth(lastMonth), 'yyyy-MM-dd'));
   const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [clientFormat, setClientFormat] = useState<ClientFormat>('generic');
 
   useEffect(() => {
     api.listQuotes().then(setQuotes).catch(() => setQuotes([]));
@@ -58,10 +73,25 @@ const BillingExportDialog: React.FC<BillingExportDialogProps> = ({ appointments,
     for (const a of [...known].sort((x, y) => x.start_datetime.localeCompare(y.start_datetime))) {
       byKey.set((a.client_email || a.client_name).toLowerCase(), a);
     }
+    const clients = [...byKey.values()];
+    if (clientFormat === 'indy') {
+      // Modèle d'import des clients d'Indy (wikicompta.indy.fr, « Comment importer mes clients sur Indy ? ») :
+      // 17 colonnes dans cet ordre, particuliers, pays en code Alpha-2, séparateur « , »
+      downloadCsv(
+        'clients-indy.csv',
+        ['Type', 'Nom de famille', 'Prénom', "Nom d'entreprise", 'N° SIRET', 'N° de TVA', 'Adresse facturation', 'Ville facturation', 'Code postal', 'Pays (Alpha-2)', 'Adresse livraison', 'Ville livraison', 'Code postal', 'Pays', 'Téléphone', 'Email(s)', 'Informations supplémentaires'],
+        clients.map((a) => {
+          const [last, first] = splitName(a.client_name);
+          return ['PARTICULIER', last, first, '', '', '', a.address, a.city, a.postal_code, 'FR', '', '', '', '', a.client_phone, a.client_email, ''];
+        }),
+        ','
+      );
+      return;
+    }
     downloadCsv(
       'clients.csv',
       ['Nom', 'Email', 'Téléphone', 'Adresse', 'Code postal', 'Ville'],
-      [...byKey.values()].map((a) => [a.client_name, a.client_email, a.client_phone, a.address, a.postal_code, a.city])
+      clients.map((a) => [a.client_name, a.client_email, a.client_phone, a.address, a.postal_code, a.city])
     );
   }
 
@@ -110,11 +140,26 @@ const BillingExportDialog: React.FC<BillingExportDialogProps> = ({ appointments,
           <h4>Clients</h4>
           <p>
             {new Set(known.map((a) => (a.client_email || a.client_name).toLowerCase())).size} clients (données effacées exclues).{' '}
+            <select
+              className="form-input billing-export__format"
+              aria-label="Format de l'export des clients"
+              value={clientFormat}
+              onChange={(e) => setClientFormat(e.target.value as ClientFormat)}
+            >
+              <option value="generic">Tableur (séparateur « ; »)</option>
+              <option value="indy">Import Indy</option>
+            </select>{' '}
             <button type="button" className="btn btn-secondary admin-btn-sm" onClick={exportClients}>
               <DownloadSimpleIcon size={14} weight="bold" aria-hidden="true" />
               Clients
             </button>
           </p>
+          {clientFormat === 'indy' && (
+            <p className="form-hint">
+              Indy : clients importés comme particuliers, prénom = premier mot du nom (à vérifier pour les noms composés). Dans Indy :
+              Facturation › Clients › Importer des clients.
+            </p>
+          )}
           <h4>Interventions terminées</h4>
           <div className="billing-export__period">
             <label className="form-label" htmlFor="billing-start">
