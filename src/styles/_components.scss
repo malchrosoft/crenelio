@@ -3722,6 +3722,18 @@ $data-grid-status-width: 13em;
     th, td { padding: $space-xs $space-sm; border: 1px solid $gray-200; text-align: left; vertical-align: top; }
     th { background: $gray-100; }
     code { font-size: 0.85em; background: $gray-100; padding: 0 $space-2xs; border-radius: $radius-sm; }
+
+    // Énumérations : retrait du texte, puces et numéros dans la marge, sous-listes décalées
+    ul, ol {
+      margin: $space-xs 0 $space-sm;
+      padding-left: $space-md + $space-sm;
+    }
+
+    ul { list-style: disc; }
+    ol { list-style: decimal; }
+    li { margin: $space-2xs 0; }
+    li > ul, li > ol { margin: $space-2xs 0; }
+    li > p { margin: 0; }
   }
 }
 

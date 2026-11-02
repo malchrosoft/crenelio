@@ -14,7 +14,9 @@ ici y apparaît, les liens entre fiches restent relatifs.
 - Les extraits de textes officiels (Légifrance, fiches de l'administration) sont repris tels quels, entre
   guillemets ou en citation ; les sources privées (guides, sites spécialisés) sont **résumées**, jamais
   copiées.
-- Une source secondaire ne remplace pas le texte officiel : elle est signalée comme telle.
+- Une source secondaire ne remplace pas le texte officiel : elle est signalée comme telle et ne sert qu'à
+  trouver le bon texte. **Toute règle appliquée dans Crénelio doit être confirmée par le texte officiel**,
+  pour éviter les biais d'interprétation de tiers (cabinets, éditeurs, blogs).
 - À chaque évolution réglementaire (Item 39) : mettre à jour le fichier, sa date, et le code concerné
   (`api/models/Quote.php`, réglages `quote_*` / `legal_*`).
 - Ces fiches sont une aide, pas un conseil juridique : en cas de doute, l'artisan consulte son
@@ -22,14 +24,15 @@ ici y apparaît, les liens entre fiches restent relatifs.
 
 ## Fiches
 
-| Fiche | Sujet |
+| Sujet | Fiche |
 |---|---|
-| [fr/devis-depannage.md](fr/devis-depannage.md) | Devis du dépannage à domicile : document précontractuel, mentions, pièces remplacées |
-| [fr/retractation.md](fr/retractation.md) | Contrat à distance ou au domicile : rétractation, urgence, exécution anticipée |
-| [fr/retractation-modele.md](fr/retractation-modele.md) | Texte officiel du modèle d'information (annexe R221-3, 19 juin 2026) et choix d'application |
-| [fr/debours.md](fr/debours.md) | Pièces achetées au nom du client : conditions, justificatifs, chiffre d'affaires |
-| [fr/achat-revente.md](fr/achat-revente.md) | Revente de pièces : conséquences, forme juridique, alternative du débours |
-| [fr/note-facture.md](fr/note-facture.md) | Note (facture) obligatoire au-delà de 25 € TTC |
-| [fr/mentions-entreprise.md](fr/mentions-entreprise.md) | Mention « EI », SIRET, RM, assurance, médiateur, publicité des prix |
-| [fr/rappels-artisan.md](fr/rappels-artisan.md) | Aide-mémoire de l'artisan : achats, justificatifs, conservation |
-| [sources.md](sources.md) | Liste des sources, nature et date de vérification |
+| Devis du dépannage à domicile : document précontractuel, mentions, pièces remplacées | [fr/devis-depannage.md](fr/devis-depannage.md) |
+| Contrat à distance ou au domicile : rétractation, urgence, exécution anticipée | [fr/retractation.md](fr/retractation.md) |
+| Texte officiel du modèle d'information (annexe R221-3, 19 juin 2026) et choix d'application | [fr/retractation-modele.md](fr/retractation-modele.md) |
+| Pièces achetées au nom du client : conditions, justificatifs, chiffre d'affaires | [fr/debours.md](fr/debours.md) |
+| Revente de pièces : conséquences, forme juridique, alternative du débours | [fr/achat-revente.md](fr/achat-revente.md) |
+| Note (facture) obligatoire au-delà de 25 € TTC | [fr/note-facture.md](fr/note-facture.md) |
+| Mention « EI », SIRET, RM, assurance, médiateur, publicité des prix | [fr/mentions-entreprise.md](fr/mentions-entreprise.md) |
+| Aide-mémoire de l'artisan : achats, justificatifs, conservation | [fr/rappels-artisan.md](fr/rappels-artisan.md) |
+| Liste des sources, nature et date de vérification | [sources.md](sources.md) |
+|---|---|

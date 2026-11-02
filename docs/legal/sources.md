@@ -21,6 +21,10 @@ guide privé, à recouper.
 
 ## À lire dans le texte officiel (non consulté directement)
 
+**Prochaine étape (02/11/2026)** : lire chacun de ces textes dans sa version en vigueur, l'archiver mot
+pour mot dans la fiche concernée, puis aligner le code et les fiches ; ce qui ne repose encore que sur une
+source secondaire reste marqué « à confirmer ».
+
 - Ordonnance n° 2026-2 (L221-21 reçu et archivé le 02/11/2026) et décret n° 2026-3 du 5 janvier 2026
   (modalités de la fonction de rétractation en ligne : articles réglementaires à lire) ;
   annexe à l'article R221-3 (version du 19 juin 2026).

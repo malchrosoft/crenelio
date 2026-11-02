@@ -547,6 +547,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - **Durée de conservation** des devis acceptés (preuve contractuelle) au-delà de l'effacement du rendez-vous, et devis sans rendez-vous à inclure dans la purge.
   - **Débours** : relire la doctrine BOFiP (BOI-TVA-BASE-10-20-40) et faire valider le modèle par un expert-comptable.
 - **Méthode :** une page « Références réglementaires » (Item 40) date chaque vérification ; revue annuelle et à chaque loi de finances.
+- **Prochaine étape (02/11/2026) :** consulter les textes officiels listés dans [`docs/legal/sources.md`](docs/legal/sources.md) (« À lire dans le texte officiel ») et les prendre en compte ; toute règle doit reposer sur le texte officiel, jamais sur l'interprétation d'un tiers (sources secondaires = pistes, marquées « à confirmer »).
 - **Prérequis :** Item 22 (volet A).
 
 ### 40. Base Documentaire de l'Artisan (Guides, Références, Traductions)
