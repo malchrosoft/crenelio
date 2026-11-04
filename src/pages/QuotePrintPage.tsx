@@ -204,6 +204,8 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
       <section className="quote-print__block">
         <p>
           <strong>Client :</strong> {quote.client_name}
+          {quote.client_company && ` — ${quote.client_company}`}
+          {quote.client_siren && ` (SIREN/SIRET ${quote.client_siren})`}
           <br />
           <strong>Lieu d'intervention :</strong> {[quote.address, `${quote.postal_code} ${quote.city}`.trim()].filter(Boolean).join(', ')}
         </p>

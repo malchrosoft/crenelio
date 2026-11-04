@@ -138,6 +138,7 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
           <h3>Client et lieu d'intervention</h3>
           <p>
             <strong>{quote.client_name}</strong>
+            {quote.client_company && <> — {quote.client_company}{quote.client_siren ? ` (SIREN/SIRET ${quote.client_siren})` : ''}</>}
             <br />
             {[quote.address, `${quote.postal_code} ${quote.city}`.trim()].filter(Boolean).join(', ')}
           </p>

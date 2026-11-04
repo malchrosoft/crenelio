@@ -234,7 +234,7 @@ class Appointment
         Database::execute(
             "UPDATE `quotes` q
              JOIN `appointments` a ON a.id = q.appointment_id
-             SET q.client_name = ?, q.client_email = '', q.client_phone = '', q.address = '',
+             SET q.client_name = ?, q.client_email = '', q.client_phone = '', q.address = '', q.client_company = NULL, q.client_siren = NULL,
                  q.decision_ip = NULL, q.mandate_ip = NULL, q.notes = NULL, q.refusal_reason = NULL,
                  q.withdrawal_name = NULL, q.withdrawal_email = NULL, q.withdrawal_address = NULL, q.withdrawal_ip = NULL
              WHERE a.client_name <> ? AND $condition",

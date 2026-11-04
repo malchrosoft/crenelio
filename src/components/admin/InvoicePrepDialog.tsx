@@ -103,6 +103,9 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
   const clientAddress = [a.address, `${a.postal_code} ${a.city}`.trim()].filter(Boolean).join(', ');
   const fields: [string, string][] = [
     ['Client', a.client_name],
+    // CGI, annexe II, art. 242 nonies A, 1° : client professionnel
+    ...(quote?.client_company ? ([['Entreprise cliente', quote.client_company]] as [string, string][]) : []),
+    ...(quote?.client_siren ? ([['SIREN/SIRET du client', quote.client_siren]] as [string, string][]) : []),
     ['Adresse du client', clientAddress],
     ['Email', a.client_email],
     ['Date et lieu de la prestation', `${day(a.start_datetime)}, ${clientAddress}`],

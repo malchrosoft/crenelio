@@ -146,6 +146,10 @@ CREATE TABLE `quotes` (
     `client_name`     VARCHAR(255)    NOT NULL,
     `client_email`    VARCHAR(255)    NOT NULL DEFAULT '',
     `client_phone`    VARCHAR(50)     NOT NULL DEFAULT '',
+    -- Client professionnel : raison sociale et numéro d'identification (SIREN ou SIRET), mention des factures
+    -- (CGI, annexe II, art. 242 nonies A, 1°)
+    `client_company`  VARCHAR(255)    NULL,
+    `client_siren`    VARCHAR(20)     NULL,
     `address`         TEXT            NOT NULL,
     `postal_code`     VARCHAR(20)     NOT NULL DEFAULT '',
     `city`            VARCHAR(100)    NOT NULL DEFAULT '',

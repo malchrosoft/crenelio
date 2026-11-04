@@ -21,6 +21,8 @@ const EMPTY: QuotePayload = {
   client_name: '',
   client_email: '',
   client_phone: '',
+  client_company: null,
+  client_siren: null,
   address: '',
   postal_code: '',
   city: '',
@@ -43,6 +45,8 @@ function toPayload(quote: Quote): QuotePayload {
     client_name: quote.client_name,
     client_email: quote.client_email,
     client_phone: quote.client_phone,
+    client_company: quote.client_company,
+    client_siren: quote.client_siren,
     address: quote.address,
     postal_code: quote.postal_code,
     city: quote.city,
@@ -323,6 +327,19 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                 type="tel"
                 value={form.client_phone}
                 onChange={(v) => set('client_phone', v)}
+              />
+              <Field
+                id="quote-client-company"
+                label="Entreprise cliente (facultatif)"
+                value={form.client_company ?? ''}
+                onChange={(v) => set('client_company', v || null)}
+              />
+              <Field
+                id="quote-client-siren"
+                label="SIREN ou SIRET du client"
+                value={form.client_siren ?? ''}
+                onChange={(v) => set('client_siren', v || null)}
+                hint="Client professionnel : identification reprise sur la facture."
               />
               <Field id="quote-address" label="Adresse" required value={form.address} onChange={(v) => set('address', v)} />
               <Field id="quote-postal-code" label="Code postal" value={form.postal_code} onChange={(v) => set('postal_code', v)} />

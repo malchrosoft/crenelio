@@ -114,10 +114,12 @@ class QuotePdf
             !empty($quote['sent_at']) ? 'Établi le ' . self::day($quote['sent_at']) : '',
             !empty($quote['valid_until']) ? 'Valable jusqu\'au ' . self::day($quote['valid_until']) : '',
         ]));
-        self::parties($pdf, $primary, 'Client', [
+        self::parties($pdf, $primary, 'Client', array_values(array_filter([
             (string)$quote['client_name'],
+            (string)($quote['client_company'] ?? ''),
+            !empty($quote['client_siren']) ? 'SIREN/SIRET ' . $quote['client_siren'] : '',
             trim(implode(', ', array_filter([(string)$quote['address'], trim($quote['postal_code'] . ' ' . $quote['city'])]))),
-        ], 'Intervention', array_filter([
+        ])), 'Intervention', array_filter([
             (string)($quote['title'] ?: 'Travaux'),
             !empty($quote['execution_terms']) ? 'Exécution : ' . $quote['execution_terms'] : '',
             (int)$quote['urgent'] ? 'Intervention urgente expressément demandée' : '',

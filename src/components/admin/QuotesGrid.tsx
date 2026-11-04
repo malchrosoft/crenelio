@@ -63,6 +63,8 @@ const QuotesGrid: React.FC<QuotesGridProps> = ({ config, openId, onOpened }) => 
         client_name: full.client_name,
         client_email: full.client_email,
         client_phone: full.client_phone,
+        client_company: full.client_company,
+        client_siren: full.client_siren,
         address: full.address,
         postal_code: full.postal_code,
         city: full.city,

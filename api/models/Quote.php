@@ -150,6 +150,15 @@ class Quote
         unset($line);
         $data['lines'] = array_values($lines);
         $data['urgent'] = !empty($data['urgent']);
+
+        // Client professionnel : raison sociale et SIREN (9 chiffres) ou SIRET (14), facultatifs
+        $company = trim((string)($data['client_company'] ?? ''));
+        $data['client_company'] = $company === '' ? null : mb_substr($company, 0, 255);
+        $siren = preg_replace('/\s+/', '', (string)($data['client_siren'] ?? ''));
+        if ($siren !== '' && !preg_match('/^(\d{9}|\d{14})$/', $siren)) {
+            return 'Le numéro SIREN (9 chiffres) ou SIRET (14 chiffres) du client est invalide.';
+        }
+        $data['client_siren'] = $siren === '' ? null : $siren;
         // Garanties des constructeurs : seulement si le professionnel a déclaré que ses travaux peuvent en relever
         $data['builder_works'] = !empty($data['builder_works']) && Config::get('quote_builder_guarantees', '0') === '1';
 
@@ -210,13 +219,14 @@ class Quote
         Database::execute(
             'INSERT INTO `quotes` (appointment_id, client_name, client_email, client_phone, address, postal_code, city,
                 title, notes, vat_mode, validity_days, quote_price, urgent, debours_budget,
-                execution_terms, payment_terms, time_counting, builder_works, total_ht, total_vat, total_debours, total_ttc)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                execution_terms, payment_terms, time_counting, builder_works, client_company, client_siren,
+                total_ht, total_vat, total_debours, total_ttc)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $data['appointment_id'] ?? null, ...self::clientFields($data), $vatMode, $data['validity_days'],
                 $data['quote_price'], (int)$data['urgent'], $data['debours_budget'],
                 $data['execution_terms'], $data['payment_terms'], $data['time_counting'], (int)$data['builder_works'],
-                ...array_values($totals),
+                $data['client_company'], $data['client_siren'], ...array_values($totals),
             ]
         );
         $id = (int)Database::lastInsertId();
@@ -232,11 +242,11 @@ class Quote
             "UPDATE `quotes` SET client_name = ?, client_email = ?, client_phone = ?, address = ?, postal_code = ?,
                 city = ?, title = ?, notes = ?, validity_days = ?, quote_price = ?, urgent = ?, debours_budget = ?,
                 execution_terms = ?, payment_terms = ?, time_counting = ?, builder_works = ?,
-                total_ht = ?, total_vat = ?, total_debours = ?, total_ttc = ?
+                client_company = ?, client_siren = ?, total_ht = ?, total_vat = ?, total_debours = ?, total_ttc = ?
              WHERE id = ? AND status = 'draft'",
             [...self::clientFields($data), $data['validity_days'], $data['quote_price'], (int)$data['urgent'], $data['debours_budget'],
                 $data['execution_terms'], $data['payment_terms'], $data['time_counting'], (int)$data['builder_works'],
-                ...array_values($totals), $id]
+                $data['client_company'], $data['client_siren'], ...array_values($totals), $id]
         );
         if ($changed === 0 && !self::isDraft($id)) {
             return false;

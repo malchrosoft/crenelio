@@ -244,6 +244,9 @@ export interface Quote {
   client_name: string;
   client_email: string;
   client_phone: string;
+  /** Client professionnel (facultatif) : raison sociale et SIREN ou SIRET. */
+  client_company: string | null;
+  client_siren: string | null;
   address: string;
   postal_code: string;
   city: string;
@@ -291,7 +294,7 @@ export interface Quote {
 /** Champs modifiables d'un brouillon. */
 export type QuotePayload = Pick<
   Quote,
-  'client_name' | 'client_email' | 'client_phone' | 'address' | 'postal_code' | 'city' | 'title' | 'notes' | 'validity_days' | 'execution_terms' | 'payment_terms' | 'time_counting'
+  'client_name' | 'client_email' | 'client_phone' | 'client_company' | 'client_siren' | 'address' | 'postal_code' | 'city' | 'title' | 'notes' | 'validity_days' | 'execution_terms' | 'payment_terms' | 'time_counting'
 > & {
   builder_works: boolean;
   appointment_id?: number | null;

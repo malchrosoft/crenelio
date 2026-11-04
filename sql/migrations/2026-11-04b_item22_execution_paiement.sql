@@ -33,6 +33,8 @@ BEGIN
 END$$
 DELIMITER ;
 
+CALL `crenelio_add_column`('quotes', 'client_company', 'VARCHAR(255) NULL AFTER `client_phone`');
+CALL `crenelio_add_column`('quotes', 'client_siren', 'VARCHAR(20) NULL AFTER `client_company`');
 CALL `crenelio_add_column`('quotes', 'execution_terms', 'VARCHAR(255) NULL AFTER `urgent`');
 CALL `crenelio_add_column`('quotes', 'payment_terms', 'VARCHAR(500) NULL AFTER `execution_terms`');
 CALL `crenelio_add_column`('quotes', 'time_counting', 'VARCHAR(255) NULL AFTER `payment_terms`');
