@@ -3,6 +3,7 @@ import { AppConfig, Service } from '../types';
 import HeroSection from '../components/vitrine/HeroSection';
 import AboutSection from '../components/vitrine/AboutSection';
 import ServicesSection from '../components/vitrine/ServicesSection';
+import PricingSection from '../components/vitrine/PricingSection';
 import EngagementsSection from '../components/vitrine/EngagementsSection';
 import MapSection from '../components/vitrine/MapSection';
 import ContactSection from '../components/vitrine/ContactSection';
@@ -75,6 +76,7 @@ const VitrinePage: React.FC<VitrinePageProps> = ({ config, services }) => {
         <MapSection config={config} />
         <AboutSection config={config} />
         <ServicesSection services={services} />
+        <PricingSection config={config} services={services} />
         <EngagementsSection config={config} />
         <ContactSection config={config} />
       </main>

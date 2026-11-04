@@ -122,7 +122,26 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
         hint: "Imprimée sur les devis sans TVA. Mentions de l'article 293 E du CGI : « 293 B » pour la franchise en base, « 293 B bis » pour la franchise à destination d'un autre État membre ; « Autre » seulement sur avis de votre comptable.",
       },
       { key: 'quote_vat_rates', label: 'Taux de TVA proposés', type: 'text', unit: '%', hint: 'Séparés par des virgules, taux normal en premier (ex. : 20,10,5.5).' },
-      { key: 'quote_labour_rate', label: 'Taux horaire de main-d’œuvre', type: 'number', unit: '€ HT/h', hint: 'Prérempli sur les lignes de main-d’œuvre.' },
+      {
+        key: 'quote_labour_rate',
+        label: 'Taux horaire de main-d’œuvre',
+        type: 'number',
+        unit: '€ HT/h',
+        hint: 'Prérempli sur les lignes de main-d’œuvre et publié TTC dans les tarifs de la vitrine (arrêté du 24 janvier 2017, art. 2 et 3).',
+      },
+      {
+        key: 'quote_default_price',
+        label: 'Coût d’établissement d’un devis',
+        type: 'number',
+        unit: '€ TTC',
+        hint: 'Vide ou 0 : devis gratuit. Publié dans les tarifs et prérempli sur chaque nouveau devis (arrêté du 24 janvier 2017, art. 2).',
+      },
+      {
+        key: 'pricing_exclusions',
+        label: 'Ce que les prix ne comprennent pas',
+        type: 'textarea',
+        hint: 'Affiché avec les tarifs et sous le total de la réservation (arrêté du 3 décembre 1987, art. 3). Ex. : les pièces.',
+      },
       { key: 'quote_validity_days', label: 'Durée de validité', type: 'number', unit: 'jours' },
       {
         key: 'quote_payment_terms',

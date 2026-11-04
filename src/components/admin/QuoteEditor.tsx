@@ -81,6 +81,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
           validity_days: Number(config.quote_validity_days || 30),
           payment_terms: config.quote_payment_terms || null,
           time_counting: config.quote_time_counting || null,
+          quote_price: Number(config.quote_default_price || 0) > 0 ? Number(config.quote_default_price) : null,
         },
   );
   const [busy, setBusy] = useState(false);

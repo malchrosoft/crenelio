@@ -46,6 +46,7 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
             <ul className="footer-links">
               <li><a href="/#">Accueil</a></li>
               <li><a href="/#prestations">Prestations</a></li>
+              <li><a href="/#tarifs">Tarifs</a></li>
               <li><a href="/#zone">Zone d'intervention</a></li>
               <li><a href="/#contact">Contact</a></li>
               <li>

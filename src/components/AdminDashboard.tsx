@@ -972,7 +972,7 @@ export const AdminDashboard: React.FC = () => {
                         />
                       </div>
                       <div className="field-number">
-                        <label className="form-label">Prix (€)</label>
+                        <label className="form-label">Prix TTC (€)</label>
                         <input
                           type="number"
                           className="form-input"
@@ -1019,7 +1019,7 @@ export const AdminDashboard: React.FC = () => {
                       </span>
                       <span className="badge badge-price">
                         <CurrencyEurIcon size={14} weight="fill" aria-hidden="true" />
-                        {s.price} €
+                        {s.price} € TTC
                       </span>
                       {s.travel_fee_mode !== 'none' && (
                         <span className="badge badge-travel">
@@ -1123,7 +1123,7 @@ export const AdminDashboard: React.FC = () => {
                       />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Prix (€)</label>
+                      <label className="form-label">Prix TTC (€)</label>
                       <input
                         type="number"
                         className="form-input"

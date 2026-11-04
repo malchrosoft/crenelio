@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { ClockIcon, CurrencyEurIcon } from '@phosphor-icons/react';
 import { Service } from '../types';
+import { publicAmount } from '../utils/pricing';
 
 interface ServiceSelectorProps {
   services: Service[];
@@ -26,8 +27,7 @@ export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
       <div className="services-grid">
         {services.map((service) => {
           const isSelected = selectedService?.id === service.id;
-          const priceNum = typeof service.price === 'number' ? service.price : parseFloat(service.price || '0');
-          const priceLabel = priceNum > 0 ? `${priceNum.toFixed(2).replace('.', ',')} €` : 'Gratuit';
+          const priceLabel = publicAmount(Number(service.price) || 0);
 
           return (
             <div

@@ -5,7 +5,8 @@ import { Appointment } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../api';
-import { formatEuro, formatKm } from '../utils/format';
+import { formatKm } from '../utils/format';
+import { publicAmount } from '../utils/pricing';
 
 interface BookingConfirmationProps {
   appointment: Appointment;
@@ -127,13 +128,13 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         )}
         <div className="summary-row">
           <span className="summary-label">Prestation :</span>
-          <span className="summary-value">{formatEuro(servicePrice)}</span>
+          <span className="summary-value">{publicAmount(servicePrice)}</span>
         </div>
         {travelFee > 0 && (
           <div className="summary-row">
             <span className="summary-label">Frais de déplacement :</span>
             <span className="summary-value">
-              {formatEuro(travelFee)}
+              {publicAmount(travelFee)}
               {distanceKm !== null && (
                 <span className="summary-distance">
                   <MapPinIcon size={13} weight="fill" aria-hidden="true" />
@@ -144,8 +145,8 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
           </div>
         )}
         <div className="summary-row summary-row--total">
-          <span className="summary-label">Total estimé :</span>
-          <span className="summary-value">{formatEuro(servicePrice + travelFee)}</span>
+          <span className="summary-label">Total TTC :</span>
+          <span className="summary-value">{publicAmount(servicePrice + travelFee)}</span>
         </div>
       </div>
 

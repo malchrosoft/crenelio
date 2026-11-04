@@ -393,6 +393,57 @@
 }
 
 // -------------------------------------------------------
+// Section Tarifs (arrêté du 24 janvier 2017, art. 2 et 3)
+// -------------------------------------------------------
+.vitrine-pricing {
+  max-width: 720px;
+  margin: 0 auto;
+  background: white;
+  border: 1px solid $gray-100;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: $space-md;
+    padding: $space-md 24px;
+    line-height: $line-height-base;
+
+    & + & {
+      border-top: 1px solid $gray-100;
+    }
+
+    @include mobile {
+      grid-template-columns: 1fr;
+      gap: $space-xs;
+    }
+
+    dt {
+      font-weight: 700;
+      color: $gray-900;
+    }
+
+    dd {
+      margin: 0;
+      color: $gray-700;
+    }
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__hint {
+    display: block;
+    color: $gray-500;
+    font-size: 0.9rem;
+  }
+}
+
+// -------------------------------------------------------
 // Section Engagements
 // -------------------------------------------------------
 // Colonnes fixées selon le nombre de cartes (cf. EngagementsSection) ; la dernière rangée est centrée

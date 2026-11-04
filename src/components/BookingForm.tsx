@@ -4,7 +4,8 @@ import AddressAutocomplete from './AddressAutocomplete';
 import InterventionMap from './InterventionMap';
 import { api } from '../api';
 import { Service, Slot, BookingPayload, AddressResult, TravelQuote } from '../types';
-import { formatEuro, formatKm } from '../utils/format';
+import { formatKm } from '../utils/format';
+import { publicAmount } from '../utils/pricing';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -24,6 +25,8 @@ interface BookingFormProps {
   error: string | null;
   /** Information RGPD affichée juste avant la validation (parcours client uniquement). */
   privacyNotice?: React.ReactNode;
+  /** Précisions sur les prix sous le total (TVA, éléments non compris, coût du devis). */
+  pricingNotice?: React.ReactNode;
 }
 
 export const BookingForm: React.FC<BookingFormProps> = ({
@@ -39,6 +42,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   loading,
   error,
   privacyNotice,
+  pricingNotice,
 }) => {
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
@@ -200,7 +204,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         <div className="summary-row">
           <span className="summary-label">Tarif de la prestation :</span>
           <span className="summary-value">
-            {formatEuro(travelQuote?.service_price ?? parseFloat(String(service.price)))}
+            {publicAmount(travelQuote?.service_price ?? parseFloat(String(service.price)))}
           </span>
         </div>
 
@@ -213,7 +217,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                 <span className="summary-value--pending">À calculer selon l'adresse</span>
               ) : (
                 <>
-                  {formatEuro(travelQuote.travel_fee)}
+                  {publicAmount(travelQuote.travel_fee)}
                   {travelQuote.distance_km !== null && (
                     <span className="summary-distance">
                       <MapPinIcon size={13} weight="fill" aria-hidden="true" />
@@ -227,13 +231,14 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         )}
 
         <div className="summary-row summary-row--total">
-          <span className="summary-label">Total estimé :</span>
+          <span className="summary-label">Total TTC :</span>
           <span className="summary-value">
             {quoteLoading && !travelQuote
               ? '…'
-              : formatEuro(travelQuote?.total ?? parseFloat(String(service.price)))}
+              : publicAmount(travelQuote?.total ?? parseFloat(String(service.price)))}
           </span>
         </div>
+        {pricingNotice}
       </div>
 
       {error && (

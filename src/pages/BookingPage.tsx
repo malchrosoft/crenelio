@@ -13,6 +13,7 @@ import Footer from '../components/vitrine/Footer';
 import ConfirmDialog from '../components/admin/ConfirmDialog';
 import PrivacyNotice from '../components/PrivacyNotice';
 import { isPremisesOnly, premisesLabel } from '../utils/zone';
+import PricingNotice from '../components/PricingNotice';
 
 interface BookingPageProps {
   config: AppConfig;
@@ -181,6 +182,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ config, services }) => {
                   loading={loading}
                   error={error}
                   privacyNotice={<PrivacyNotice config={config} />}
+                  pricingNotice={<PricingNotice config={config} />}
                 />
               );
             })()}

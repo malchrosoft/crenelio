@@ -65,6 +65,9 @@ INSERT IGNORE INTO `config` (`config_key`, `config_value`) VALUES
 ('quote_number_prefix',   'D'),
 ('quote_labour_rate',     ''),
 ('quote_allow_supply',    '0'),
+-- Information du public sur les prix : coût du devis (vide = gratuit) et éléments non compris (arrêtés de 2017 et 1987)
+('quote_default_price',   ''),
+('pricing_exclusions',    'Pièces et fournitures non comprises : chiffrées sur devis avant toute intervention.'),
 -- Devis : modalités de paiement et décompte du temps par défaut ; n° de TVA intracommunautaire (R111-2 5°)
 ('quote_payment_terms',   'Paiement à réception de la facture, par virement, chèque ou espèces.'),
 ('quote_time_counting',   ''),
@@ -86,5 +89,5 @@ INSERT IGNORE INTO `config` (`config_key`, `config_value`) VALUES
 
 -- Version du schéma : nom de la dernière migration de sql/migrations/ (Item 27, cf. GET /api/health).
 -- À mettre à jour à chaque nouvelle migration.
-INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-11-04b_item22_execution_paiement')
+INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-11-05_item22_prix_ttc')
 ON DUPLICATE KEY UPDATE `config_value` = VALUES(`config_value`);
