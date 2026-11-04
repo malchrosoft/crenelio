@@ -253,6 +253,12 @@ export interface Quote {
   vat_mode: 'franchise' | 'vat';
   validity_days: number;
   quote_price: string | null;
+  /** Date ou délai d'exécution, modalités de paiement, décompte du temps (C. consom. L221-5 3°, R221-2 4° ; arrêté 2017). */
+  execution_terms: string | null;
+  payment_terms: string | null;
+  time_counting: string | null;
+  /** Travaux relevant des garanties des constructeurs : garanties imprimées, attestation décennale jointe. */
+  builder_works: number;
   urgent: number;
   total_ht: string;
   total_vat: string;
@@ -284,8 +290,9 @@ export interface Quote {
 /** Champs modifiables d'un brouillon. */
 export type QuotePayload = Pick<
   Quote,
-  'client_name' | 'client_email' | 'client_phone' | 'address' | 'postal_code' | 'city' | 'title' | 'notes' | 'validity_days'
+  'client_name' | 'client_email' | 'client_phone' | 'address' | 'postal_code' | 'city' | 'title' | 'notes' | 'validity_days' | 'execution_terms' | 'payment_terms' | 'time_counting'
 > & {
+  builder_works: boolean;
   appointment_id?: number | null;
   quote_price: number | null;
   urgent: boolean;
@@ -315,3 +322,13 @@ export interface QuoteNotification {
   sent_at: string | null;
   created_at: string;
 }
+
+/** Attestation d'assurance décennale du professionnel (C. assur. L243-2). */
+export interface InsuranceAttestationStatus {
+  exists: boolean;
+  size: number | null;
+  uploaded_at: string | null;
+  valid_until: string | null;
+  valid: boolean;
+}
+

@@ -7,6 +7,7 @@ import { api } from '../api';
 import { AppConfig, Quote, QuoteLine } from '../types';
 import { LINE_KIND_LABELS, euro, lineAmount } from '../components/admin/quoteRules';
 import { companyAddress, legalIdentity } from '../utils/legalIdentity';
+import { attestationUrl, BUILDER_GUARANTEES } from '../utils/builderGuarantees';
 import { withdrawalNotice } from '../utils/withdrawalNotice';
 
 interface QuotePrintPageProps {
@@ -102,6 +103,12 @@ const SheetHeader: React.FC<{ config: AppConfig; title: string; reference: strin
         <>
           <br />
           SIRET {config.legal_siret}
+        </>
+      )}
+      {config.legal_vat_number && (
+        <>
+          <br />
+          N° TVA {config.legal_vat_number}
         </>
       )}
       {config.legal_rm && (
@@ -202,6 +209,9 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
       </section>
 
       <Lines lines={lines} vat={vat} />
+      {quote.time_counting && lines.some((line) => line.kind === 'labour') && (
+        <p className="quote-print__mention">{quote.time_counting}</p>
+      )}
       <dl className="quote-print__totals">
         <dt>{vat ? 'Total HT' : 'Total'}</dt>
         <dd>{euro(quote.total_ht)}</dd>
@@ -224,6 +234,16 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
           Pièces achetées au nom et pour le compte du client : voir le mandat de débours (document distinct), estimées à{' '}
           {euro(quote.total_debours)}, dans la limite de {euro(quote.debours_budget ?? quote.total_debours)}. Non comprises dans le total
           du devis.
+        </p>
+      )}
+      {quote.execution_terms && (
+        <p className="quote-print__mention">
+          <strong>Exécution :</strong> {quote.execution_terms}
+        </p>
+      )}
+      {quote.payment_terms && (
+        <p className="quote-print__mention">
+          <strong>Paiement :</strong> {quote.payment_terms}
         </p>
       )}
       <p className="quote-print__mention">
@@ -283,6 +303,23 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
           </div>
         )}
       </section>
+
+      {Number(quote.builder_works) === 1 && (
+        <section className="quote-print__block">
+          <h2>Garanties légales des constructeurs</h2>
+          <ul>
+            {BUILDER_GUARANTEES.map((text) => (
+              <li key={text}>{text}</li>
+            ))}
+          </ul>
+          <p>
+            Attestation d'assurance de responsabilité décennale jointe (Code des assurances, art. L243-2) :{' '}
+            <a href={attestationUrl(token)} target="_blank" rel="noopener">
+              consulter l'attestation (PDF)
+            </a>
+          </p>
+        </section>
+      )}
 
       {config.legal_mediator && (
         <p className="quote-print__mention">Médiation de la consommation : {config.legal_mediator}</p>

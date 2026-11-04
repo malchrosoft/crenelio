@@ -21,6 +21,7 @@ require_once __DIR__ . '/../controllers/HealthController.php';
 require_once __DIR__ . '/../controllers/UiStateController.php';
 require_once __DIR__ . '/../controllers/CalendarFeedController.php';
 require_once __DIR__ . '/../controllers/QuoteController.php';
+require_once __DIR__ . '/../controllers/InsuranceController.php';
 
 $router = new Router();
 
@@ -37,6 +38,7 @@ $healthController      = new HealthController();
 $uiStateController     = new UiStateController();
 $calendarFeedController = new CalendarFeedController();
 $quoteController       = new QuoteController();
+$insuranceController   = new InsuranceController();
 
 // Routes de l'espace Artisan : refusées (401) sans session ouverte, cf. core/Auth.php
 $admin = fn(callable $handler) => Auth::guard($handler);
@@ -141,10 +143,17 @@ $router->post('/quotes',                    $admin([$quoteController, 'store']))
 $router->get('/quotes/token/:token',        [$quoteController, 'showByToken']);
 $router->post('/quotes/token/:token/decision', [$quoteController, 'decide']);
 $router->post('/quotes/token/:token/withdraw', [$quoteController, 'withdraw']);
+$router->get('/quotes/token/:token/attestation', [$quoteController, 'attestation']);
 $router->get('/quotes/:id',                 $admin([$quoteController, 'show']));
 $router->put('/quotes/:id',                 $admin([$quoteController, 'update']));
 $router->delete('/quotes/:id',              $admin([$quoteController, 'destroy']));
 $router->post('/quotes/:id/send',           $admin([$quoteController, 'send']));
 $router->get('/quotes/:id/notifications',   $admin([$quoteController, 'notifications']));
+
+// Attestation d'assurance décennale jointe aux devis (C. assur. L243-2)
+$router->get('/admin/insurance-attestation',       $admin([$insuranceController, 'status']));
+$router->get('/admin/insurance-attestation/file',  $admin([$insuranceController, 'file']));
+$router->post('/admin/insurance-attestation',      $admin([$insuranceController, 'upload']));
+$router->delete('/admin/insurance-attestation',    $admin([$insuranceController, 'destroy']));
 
 return $router;

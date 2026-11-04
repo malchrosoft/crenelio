@@ -79,6 +79,9 @@ class Quote
             'postal_code'    => $appointment['postal_code'],
             'city'           => $appointment['city'],
             'title'          => $appointment['service_name'],
+            // Date d'exécution (L221-5 3°) : celle du rendez-vous
+            'execution_terms' => 'Le ' . date('d/m/Y', strtotime((string)$appointment['start_datetime']))
+                . ' à ' . date('H\\hi', strtotime((string)$appointment['start_datetime'])),
             'lines'          => $lines,
         ];
     }
@@ -147,6 +150,19 @@ class Quote
         unset($line);
         $data['lines'] = array_values($lines);
         $data['urgent'] = !empty($data['urgent']);
+        // Garanties des constructeurs : seulement si le professionnel a déclaré que ses travaux peuvent en relever
+        $data['builder_works'] = !empty($data['builder_works']) && Config::get('quote_builder_guarantees', '0') === '1';
+
+        // Exécution, paiement (L221-5 3°, R111-1 2°, R221-2 4°) et décompte du temps (arrêté du
+        // 24 janvier 2017, art. 2) : valeurs par défaut des réglages, figées sur le devis
+        foreach ([
+            'execution_terms' => [255, null],
+            'payment_terms'   => [500, 'quote_payment_terms'],
+            'time_counting'   => [255, 'quote_time_counting'],
+        ] as $field => [$max, $default]) {
+            $value = array_key_exists($field, $data) ? trim((string)$data[$field]) : (string)($default ? Config::get($default, '') : '');
+            $data[$field] = $value === '' ? null : mb_substr($value, 0, $max);
+        }
 
         // Budget maximum du mandat de débours : au moins le montant estimé des pièces
         $debours = self::totals($data['lines'])['total_debours'];
@@ -194,11 +210,13 @@ class Quote
         Database::execute(
             'INSERT INTO `quotes` (appointment_id, client_name, client_email, client_phone, address, postal_code, city,
                 title, notes, vat_mode, validity_days, quote_price, urgent, debours_budget,
-                total_ht, total_vat, total_debours, total_ttc)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                execution_terms, payment_terms, time_counting, builder_works, total_ht, total_vat, total_debours, total_ttc)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $data['appointment_id'] ?? null, ...self::clientFields($data), $vatMode, $data['validity_days'],
-                $data['quote_price'], (int)$data['urgent'], $data['debours_budget'], ...array_values($totals),
+                $data['quote_price'], (int)$data['urgent'], $data['debours_budget'],
+                $data['execution_terms'], $data['payment_terms'], $data['time_counting'], (int)$data['builder_works'],
+                ...array_values($totals),
             ]
         );
         $id = (int)Database::lastInsertId();
@@ -213,9 +231,12 @@ class Quote
         $changed = Database::execute(
             "UPDATE `quotes` SET client_name = ?, client_email = ?, client_phone = ?, address = ?, postal_code = ?,
                 city = ?, title = ?, notes = ?, validity_days = ?, quote_price = ?, urgent = ?, debours_budget = ?,
+                execution_terms = ?, payment_terms = ?, time_counting = ?, builder_works = ?,
                 total_ht = ?, total_vat = ?, total_debours = ?, total_ttc = ?
              WHERE id = ? AND status = 'draft'",
-            [...self::clientFields($data), $data['validity_days'], $data['quote_price'], (int)$data['urgent'], $data['debours_budget'], ...array_values($totals), $id]
+            [...self::clientFields($data), $data['validity_days'], $data['quote_price'], (int)$data['urgent'], $data['debours_budget'],
+                $data['execution_terms'], $data['payment_terms'], $data['time_counting'], (int)$data['builder_works'],
+                ...array_values($totals), $id]
         );
         if ($changed === 0 && !self::isDraft($id)) {
             return false;

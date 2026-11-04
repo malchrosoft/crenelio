@@ -124,6 +124,18 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
       { key: 'quote_vat_rates', label: 'Taux de TVA proposés', type: 'text', unit: '%', hint: 'Séparés par des virgules, taux normal en premier (ex. : 20,10,5.5).' },
       { key: 'quote_labour_rate', label: 'Taux horaire de main-d’œuvre', type: 'number', unit: '€ HT/h', hint: 'Prérempli sur les lignes de main-d’œuvre.' },
       { key: 'quote_validity_days', label: 'Durée de validité', type: 'number', unit: 'jours' },
+      {
+        key: 'quote_payment_terms',
+        label: 'Modalités de paiement',
+        type: 'textarea',
+        hint: 'Reprises sur chaque nouveau devis (C. consom. R111-1, 2° et R221-2, 4°) : moment du paiement et moyens acceptés.',
+      },
+      {
+        key: 'quote_time_counting',
+        label: 'Décompte du temps estimé',
+        type: 'text',
+        hint: "Imprimé sous la main-d'œuvre (arrêté du 24 janvier 2017, art. 2). Ex. : « Temps décompté par quart d'heure entamé ».",
+      },
       { key: 'quote_number_prefix', label: 'Préfixe de numérotation', type: 'text', hint: 'Ex. : D → D-2026-0001.' },
       {
         key: 'quote_allow_supply',
@@ -168,6 +180,12 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
         hint: "Vide : l'adresse de l'entreprise (menu « Déplacement ») est utilisée. À renseigner seulement si le siège est ailleurs (domiciliation…).",
       },
       { key: 'legal_siret', label: 'SIRET', type: 'text' },
+      {
+        key: 'legal_vat_number',
+        label: 'N° de TVA intracommunautaire',
+        type: 'text',
+        hint: 'Si vous êtes assujetti à la TVA (C. consom. R111-2, 5°) : affiché sur les devis. Vide en franchise en base.',
+      },
       {
         key: 'legal_form',
         label: 'Forme juridique',
@@ -216,6 +234,12 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
         hint: 'Nom, coordonnées et adresse du site internet du médiateur dont vous relevez (C. consom. L616-1 et R616-1).',
       },
       { key: 'legal_naf', label: 'Code NAF / APE', type: 'text' },
+      {
+        key: 'quote_builder_guarantees',
+        label: 'Mes travaux peuvent relever des garanties des constructeurs (décennale, bon fonctionnement, parfait achèvement)',
+        type: 'checkbox',
+        hint: "Travaux constituant un ouvrage ou touchant un élément d'équipement de l'ouvrage (C. civ. 1792 et suivants) : case proposée sur chaque devis, garanties rappelées et attestation d'assurance décennale jointe (C. assur. L243-2). À qualifier avec votre assureur.",
+      },
       { key: 'legal_assurance', label: 'Assurance professionnelle', type: 'text', hint: "Assureur, ses coordonnées et la couverture géographique du contrat (C. consom. R111-2, 9°)." },
       {
         key: 'legal_hebergeur',
@@ -236,7 +260,7 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
 
 /** Clés gérées ailleurs (« Zone & déplacement », engagements, fichiers de branding) ou jamais éditables. */
 // Clés gérées par un écran dédié (déplacement, zone, logo, thème, email professionnel vérifié…)
-const EXCLUDED_KEY = /^(travel_|premises_|zone_|start_|default_(latitude|longitude)$|admin_password|pro_email$|branding_|theme_|rgpd_last_purge|schema_version$|ui_state_|vitrine_engagement_\d+(_icon)?$)/;
+const EXCLUDED_KEY = /^(travel_|premises_|zone_|start_|default_(latitude|longitude)$|admin_password|pro_email$|branding_|theme_|rgpd_last_purge|schema_version$|ui_state_|insurance_attestation_until$|vitrine_engagement_\d+(_icon)?$)/;
 
 const DESCRIBED_KEYS = new Set(CONFIG_GROUPS.flatMap((group) => group.fields.map((f) => f.key)));
 

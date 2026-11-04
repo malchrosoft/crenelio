@@ -671,9 +671,13 @@ class EmailTemplates
             self::escape($quote['title'] ?: 'votre intervention')
         );
         $rows = self::quoteRows($quote);
+        $guarantees = (int)$quote['builder_works']
+            ? ' Travaux relevant des garanties des constructeurs (Code civil, articles 1792 et suivants) : l\'attestation d\'assurance de responsabilité décennale est jointe à ce message.'
+            : '';
         $outro = (float)$quote['total_debours'] > 0
             ? 'Les pièces sont présentées dans un <strong>mandat de débours</strong> distinct : vous choisissez de les faire acheter en votre nom par le professionnel, ou de les fournir vous-même.'
             : 'Rien n\'est dû tant que vous n\'avez pas accepté le devis.';
+        $outro .= $guarantees;
         $url = self::quoteUrl($quote);
 
         return [
@@ -815,6 +819,9 @@ class EmailTemplates
             }
         }
         $rows['Total du devis TTC'] = self::money((float)$quote['total_ttc']);
+        if (!empty($quote['execution_terms'])) {
+            $rows['Exécution'] = self::escape((string)$quote['execution_terms']);
+        }
         if ((float)$quote['total_debours'] > 0) {
             $rows['Pièces (mandat de débours, à part)'] = self::money((float)$quote['total_debours']);
         }

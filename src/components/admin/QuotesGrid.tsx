@@ -71,7 +71,11 @@ const QuotesGrid: React.FC<QuotesGridProps> = ({ config, openId, onOpened }) => 
         validity_days: full.validity_days,
         quote_price: full.quote_price === null ? null : Number(full.quote_price),
         urgent: Boolean(Number(full.urgent)),
+        builder_works: Boolean(Number(full.builder_works)),
         debours_budget: full.debours_budget === null ? null : Number(full.debours_budget),
+        execution_terms: full.execution_terms,
+        payment_terms: full.payment_terms,
+        time_counting: full.time_counting,
         lines: full.lines ?? [],
       });
       upsert(copy);

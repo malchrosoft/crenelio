@@ -35,8 +35,11 @@ et [textes/code-artisanat.md](textes/code-artisanat.md) :
     obligatoire », avec l'assuré (dénomination, adresse, numéro d'identification), l'assureur, le numéro
     du contrat, la **période de validité**, la date d'établissement, les activités couvertes, l'étendue
     géographique et les formules imposées sur la nature, le montant et la durée de la garantie.
-  - **Dans Crénelio** (écart n° 10) : le professionnel ne rédige rien ; il dépose l'attestation reçue de son
-    assureur (PDF) et indique sa date de fin de validité, pour être averti avant son expiration.
+  - **Dans Crénelio** : le professionnel déclare dans l'écran Entreprise que ses travaux peuvent relever des
+    garanties des constructeurs, puis dépose l'attestation reçue de son assureur (PDF) avec sa date de fin
+    de validité (avertissement 30 jours avant). Sur chaque devis concerné (case « Travaux relevant des
+    garanties des constructeurs »), les garanties sont rappelées et l'attestation est **jointe à l'email
+    d'envoi** et consultable depuis le devis ; sans attestation valide, l'envoi est refusé.
 - **Garanties légales** (C. consom. R111-1, 3° : « ou de toute autre garantie légale applicable ») : pour
   des travaux constituant un **ouvrage** ([textes/code-civil.md](textes/code-civil.md)), l'entrepreneur lié
   au client par un contrat de louage d'ouvrage est « réputé constructeur » (1792-1) et doit :

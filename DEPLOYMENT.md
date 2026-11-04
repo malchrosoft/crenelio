@@ -325,7 +325,7 @@ OVH can link a hosting folder to a **GitHub** repository (the only supported pla
   version** (e.g. `deploy`), never `main` directly.
 - **The target folder must be empty** when you link it.
 - **Every domain pointing to that folder** is linked to Git at once (*Multisite* tab).
-- **What is not in the repository** — `api/.env`, `api/storage/branding/*`, `api/storage/zone/*` —
+- **What is not in the repository** — `api/.env`, `api/storage/branding/*`, `api/storage/zone/*`, `api/storage/insurance/*` —
   must be uploaded by FTP and must never be committed.
 - **No SQL migration is run**: update the database by hand (see below).
 
@@ -370,7 +370,7 @@ Since the target folder must be empty, on an existing site:
 
 ### 4. Restore the installation-specific files
 
-By FTP, upload `api/.env` and the contents of `api/storage/branding/` and `api/storage/zone/`
+By FTP, upload `api/.env` and the contents of `api/storage/branding/`, `api/storage/zone/` and `api/storage/insurance/`
 again, then check write permissions (step 6) and test (step 7).
 
 ### 5. Automatic deployment (webhook)
@@ -449,7 +449,7 @@ If using FileZilla, right-click files → **File permissions...** → set numeri
 
 ### Writable storage
 
-`api/storage/branding/`, `api/storage/zone/` and `api/storage/auth/` must be **writable by PHP** (`755`, or `775` if
+`api/storage/branding/`, `api/storage/zone/`, `api/storage/insurance/` (ten-year liability insurance certificate attached to quotes) and `api/storage/auth/` must be **writable by PHP** (`755`, or `775` if
 saving fails). They are not versioned (each installation has its own files): create them on the
 server if your upload skipped the empty folders. The folder is never served directly
 (`api/storage/.htaccess` denies access); files go through the API.

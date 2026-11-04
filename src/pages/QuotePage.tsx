@@ -7,6 +7,7 @@ import { api } from '../api';
 import { AppConfig, Quote } from '../types';
 import BrandMark from '../components/BrandMark';
 import { companyAddress, legalIdentity } from '../utils/legalIdentity';
+import { attestationUrl, BUILDER_GUARANTEES } from '../utils/builderGuarantees';
 import { withdrawalNotice, WithdrawalNotice } from '../utils/withdrawalNotice';
 import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, euro, lineAmount } from '../components/admin/quoteRules';
 
@@ -113,6 +114,12 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
                 SIRET {config.legal_siret}
               </>
             )}
+            {config.legal_vat_number && (
+              <>
+                <br />
+                N° TVA {config.legal_vat_number}
+              </>
+            )}
             {config.legal_rm && (
               <>
                 <br />
@@ -152,6 +159,9 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
         <p>{quote.title || '—'}</p>
         {quote.notes && <p className="form-hint">{quote.notes}</p>}
         <LinesTable lines={services} vat={vat} />
+        {quote.time_counting && services.some((line) => line.kind === 'labour') && (
+          <p className="form-hint">{quote.time_counting}</p>
+        )}
         <dl className="quote-totals">
           <dt>{vat ? 'Total HT' : 'Total'}</dt>
           <dd>{euro(quote.total_ht)}</dd>
@@ -165,6 +175,20 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
           )}
           <dt className="quote-totals__total">Total du devis TTC</dt>
           <dd className="quote-totals__total">{euro(quote.total_ttc)}</dd>
+        </dl>
+        <dl className="quote-page__terms">
+          {quote.execution_terms && (
+            <>
+              <dt>Exécution</dt>
+              <dd>{quote.execution_terms}</dd>
+            </>
+          )}
+          {quote.payment_terms && (
+            <>
+              <dt>Paiement</dt>
+              <dd>{quote.payment_terms}</dd>
+            </>
+          )}
         </dl>
       </section>
 
@@ -267,6 +291,23 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
         <Link to={`/devis/${token}/imprimer`}>Versions imprimables (devis{quote.total_debours !== '0.00' ? ', mandat de débours' : ''}
         {urgent ? '' : ', formulaire de rétractation'})</Link>
       </p>
+
+      {Number(quote.builder_works) === 1 && (
+        <section className="quote-page__section">
+          <h3>Garanties légales des constructeurs</h3>
+          <ul>
+            {BUILDER_GUARANTEES.map((text) => (
+              <li key={text}>{text}</li>
+            ))}
+          </ul>
+          <p>
+            Attestation d'assurance de responsabilité décennale jointe (Code des assurances, art. L243-2) :{' '}
+            <a href={attestationUrl(token)} target="_blank" rel="noopener">
+              consulter l'attestation (PDF)
+            </a>
+          </p>
+        </section>
+      )}
 
       {config.legal_mediator && (
         <p className="form-hint quote-page__mediator">

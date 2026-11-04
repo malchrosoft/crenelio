@@ -178,6 +178,7 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
                 <dd>
                   {config.company_name} — {legalIdentity(config)}
                   {config.legal_siret ? ` — SIRET ${config.legal_siret}` : ''}
+                  {config.legal_vat_number ? ` — N° TVA ${config.legal_vat_number}` : ''}
                 </dd>
                 {fields.map(([label, value]) => (
                   <React.Fragment key={label}>

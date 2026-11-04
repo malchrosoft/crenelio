@@ -327,7 +327,7 @@ OVH sait lier un dossier de l'hébergement à un dépôt **GitHub** (seule plate
   la version compilée** (par ex. `deploy`), jamais `main` directement.
 - **Le dossier cible doit être vide** au moment de l'association.
 - **Tous les domaines du dossier** sont associés à Git en même temps (onglet *Multisite*).
-- **Ce qui n'est pas dans le dépôt** — `api/.env`, `api/storage/branding/*`, `api/storage/zone/*` —
+- **Ce qui n'est pas dans le dépôt** — `api/.env`, `api/storage/branding/*`, `api/storage/zone/*`, `api/storage/insurance/*` —
   doit être déposé par FTP et ne doit jamais être commité.
 - **Aucune migration SQL n'est jouée** : la base se met à jour à la main (voir plus bas).
 
@@ -372,7 +372,7 @@ Le dossier cible devant être vide, sur un site existant :
 
 ### 4. Remettre les fichiers propres à l'installation
 
-Par FTP, redéposez `api/.env` et le contenu de `api/storage/branding/` et `api/storage/zone/`,
+Par FTP, redéposez `api/.env` et le contenu de `api/storage/branding/`, `api/storage/zone/` et `api/storage/insurance/`,
 puis contrôlez les droits d'écriture (étape 6) et testez (étape 7).
 
 ### 5. Déploiement automatique (webhook)
@@ -452,7 +452,7 @@ Dans FileZilla : clic droit sur le fichier → **Droits d'accès au fichier...**
 
 ### Dossiers accessibles en écriture
 
-`api/storage/branding/`, `api/storage/zone/` et `api/storage/auth/` doivent être **accessibles en écriture par PHP**
+`api/storage/branding/`, `api/storage/zone/`, `api/storage/insurance/` (attestation d'assurance décennale jointe aux devis) et `api/storage/auth/` doivent être **accessibles en écriture par PHP**
 (`755`, ou `775` si l'enregistrement échoue). Ils ne sont pas versionnés, chaque installation a
 ses propres fichiers : créez-les sur le serveur si votre envoi a ignoré les dossiers vides.
 Le dossier n'est jamais servi directement (`api/storage/.htaccess` en interdit l'accès) : les

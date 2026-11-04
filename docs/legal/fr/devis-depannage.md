@@ -60,6 +60,11 @@ Arrêté du 24 janvier 2017, version consolidée : [textes/arretes.md](textes/ar
   consommateur précédée de la mention manuscrite " Lu et approuvé ". »
 - **Note** (art. 5) : voir [note-facture.md](note-facture.md).
 
+**Dans Crénelio** : la date ou le délai d'exécution et les modalités de paiement (C. consom. L221-5, 3° ;
+R221-2, 4°) sont saisis sur chaque devis et obligatoires pour l'envoyer ; le décompte du temps estimé
+(art. 2) est imprimé sous la main-d'œuvre ; le n° de TVA intracommunautaire de l'entreprise (R111-2, 5°)
+figure à côté du SIRET.
+
 ## Pièces remplacées
 
 L'arrêté (art. 4, III et annexe 2) impose d'informer le client qu'il peut **conserver les pièces,

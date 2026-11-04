@@ -20,6 +20,7 @@ import {
   QuotePayload,
   QuoteDecisionPayload,
   QuoteNotification,
+  InsuranceAttestationStatus,
 } from './types';
 
 const BASE_URL = '/api';
@@ -151,6 +152,15 @@ export const api = {
   sendQuote: (id: number) =>
     request<Quote & { notifications: { type: string; status: string }[] }>('POST', `/quotes/${id}/send`),
   quoteNotifications: (id: number) => request<QuoteNotification[]>('GET', `/quotes/${id}/notifications`),
+  // Attestation d'assurance décennale (C. assur. L243-2)
+  insuranceAttestation: () => request<InsuranceAttestationStatus>('GET', '/admin/insurance-attestation'),
+  uploadInsuranceAttestation: (validUntil: string, file: Blob | null) => {
+    const form = new FormData();
+    form.append('valid_until', validUntil);
+    if (file) form.append('file', file);
+    return request<InsuranceAttestationStatus>('POST', '/admin/insurance-attestation', form);
+  },
+  deleteInsuranceAttestation: () => request<InsuranceAttestationStatus>('DELETE', '/admin/insurance-attestation'),
   // Page publique du devis (lien à jeton)
   getQuoteByToken: (token: string) => request<Quote>('GET', `/quotes/token/${token}`),
   decideQuote: (token: string, payload: QuoteDecisionPayload) =>

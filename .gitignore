@@ -8,6 +8,9 @@ api/public/assets/
 # Logo & favicon propres à chaque installation
 api/storage/branding/*
 !api/storage/branding/.gitkeep
+# Attestation d'assurance décennale du professionnel (Item 22)
+api/storage/insurance/*
+!api/storage/insurance/.gitkeep
 api/storage/zone/*
 !api/storage/zone/.gitkeep
 # Clé de signature et compteur d'échecs de connexion (Item 12)

@@ -11,13 +11,16 @@ require_once __DIR__ . '/../models/QuoteNotification.php';
 require_once __DIR__ . '/../models/Config.php';
 require_once __DIR__ . '/Mailer.php';
 require_once __DIR__ . '/EmailTemplates.php';
+require_once __DIR__ . '/InsuranceAttestation.php';
 
 class QuoteNotifier
 {
     /** Devis envoyé au client, avec le lien de réponse. */
     public static function sendQuote(array $quote, array $config): array
     {
-        return [self::toClient($quote, 'quote_client', EmailTemplates::quoteClient($quote, $config))];
+        // Attestation d'assurance décennale jointe au devis (C. assur. L243-2)
+        $attachment = (int)$quote['builder_works'] ? InsuranceAttestation::attachment() : null;
+        return [self::toClient($quote, 'quote_client', EmailTemplates::quoteClient($quote, $config), $attachment)];
     }
 
     /** Réponse du client : exemplaire au client (accepté) ou accusé (refusé), et avis à l'artisan. */
@@ -39,10 +42,10 @@ class QuoteNotifier
         ]));
     }
 
-    private static function toClient(array $quote, string $type, array $message): ?array
+    private static function toClient(array $quote, string $type, array $message, ?array $attachment = null): ?array
     {
         $email = trim((string)$quote['client_email']);
-        return $email === '' ? null : self::dispatch($quote, $type, $email, (string)$quote['client_name'], $message, self::proAddress());
+        return $email === '' ? null : self::dispatch($quote, $type, $email, (string)$quote['client_name'], $message, self::proAddress(), $attachment);
     }
 
     private static function toPro(array $quote, string $type, array $message): ?array
@@ -64,12 +67,12 @@ class QuoteNotifier
      *
      * @return array{type: string, status: string}
      */
-    private static function dispatch(array $quote, string $type, string $recipient, string $name, array $message, ?string $replyTo): array
+    private static function dispatch(array $quote, string $type, string $recipient, string $name, array $message, ?string $replyTo, ?array $attachment = null): array
     {
         $id = QuoteNotification::createPending((int)$quote['id'], $type, $recipient, $message['subject']);
         try {
             $replyTo = $replyTo !== null && strcasecmp($replyTo, MAIL_FROM) !== 0 ? $replyTo : null;
-            Mailer::send($recipient, $name, $message['subject'], $message['html'], $message['text'], null, $replyTo,
+            Mailer::send($recipient, $name, $message['subject'], $message['html'], $message['text'], $attachment, $replyTo,
                 EmailTemplates::inlineImages($message['html']));
             QuoteNotification::markSent($id);
             return ['type' => $type, 'status' => 'sent'];

@@ -29,7 +29,11 @@ const EMPTY: QuotePayload = {
   validity_days: 30,
   quote_price: null,
   urgent: false,
+  builder_works: false,
   debours_budget: null,
+  execution_terms: null,
+  payment_terms: null,
+  time_counting: null,
   lines: [],
 };
 
@@ -47,7 +51,11 @@ function toPayload(quote: Quote): QuotePayload {
     validity_days: quote.validity_days,
     quote_price: quote.quote_price === null ? null : Number(quote.quote_price),
     urgent: Boolean(Number(quote.urgent)),
+    builder_works: Boolean(Number(quote.builder_works)),
     debours_budget: quote.debours_budget === null ? null : Number(quote.debours_budget),
+    execution_terms: quote.execution_terms,
+    payment_terms: quote.payment_terms,
+    time_counting: quote.time_counting,
     lines: (quote.lines ?? []).map((line) => ({ ...line })),
   };
 }
@@ -62,7 +70,14 @@ const sqlDate = (value: string | null) => (value ? format(parseISO(value.replace
 const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSaved, onDeleted }) => {
   const vatMode: 'franchise' | 'vat' = quote?.vat_mode ?? (config.quote_vat_mode === 'vat' ? 'vat' : 'franchise');
   const [form, setForm] = useState<QuotePayload>(() =>
-    quote ? toPayload(quote) : { ...EMPTY, validity_days: Number(config.quote_validity_days || 30) },
+    quote
+      ? toPayload(quote)
+      : {
+          ...EMPTY,
+          validity_days: Number(config.quote_validity_days || 30),
+          payment_terms: config.quote_payment_terms || null,
+          time_counting: config.quote_time_counting || null,
+        },
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -322,6 +337,19 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
               Danger pour les personnes ou les locaux : pas de délai de rétractation, mais seulement pour les pièces et travaux strictement
               nécessaires. Tout le reste fait l'objet d'un devis séparé.
             </p>
+            {config.quote_builder_guarantees === '1' && (
+              <>
+                <label className="form-check quote-editor__urgent">
+                  <input type="checkbox" checked={form.builder_works} onChange={(e) => set('builder_works', e.target.checked)} />
+                  <span>Travaux relevant des garanties des constructeurs</span>
+                </label>
+                <p className="form-hint">
+                  Ouvrage ou élément d'équipement d'un ouvrage (C. civ. 1792 et suivants) : les garanties sont rappelées sur le devis et
+                  votre attestation d'assurance décennale lui est jointe (C. assur. L243-2). Un simple dépannage n'en relève pas en
+                  principe.
+                </p>
+              </>
+            )}
           </fieldset>
 
           <fieldset className="quote-editor__section" disabled={locked}>
@@ -395,6 +423,31 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
 
           <fieldset className="quote-editor__section" disabled={locked}>
             <legend>Conditions</legend>
+            <div className="quote-editor__grid">
+              <Field
+                id="quote-execution"
+                label="Date ou délai d'exécution"
+                value={form.execution_terms ?? ''}
+                onChange={(v) => set('execution_terms', v || null)}
+                hint="Obligatoire avant l'envoi (C. consom. L221-5, 3°). Ex. : « Le 12/11/2026 à 9h00 », « Sous 15 jours »."
+              />
+              <Field
+                id="quote-payment"
+                label="Modalités de paiement"
+                value={form.payment_terms ?? ''}
+                onChange={(v) => set('payment_terms', v || null)}
+                hint="Obligatoire avant l'envoi (R221-2, 4°) : moment et moyens de paiement."
+              />
+              {form.lines.some((line) => line.kind === 'labour') && (
+                <Field
+                  id="quote-time-counting"
+                  label="Décompte du temps estimé"
+                  value={form.time_counting ?? ''}
+                  onChange={(v) => set('time_counting', v || null)}
+                  hint="Arrêté du 24 janvier 2017, art. 2. Ex. : « Temps décompté par quart d'heure entamé »."
+                />
+              )}
+            </div>
             <div className="quote-editor__grid">
               <Field
                 id="quote-validity"

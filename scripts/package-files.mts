@@ -18,6 +18,7 @@ export const SITE_FILES = [
 export const STORAGE_SKELETON = [
   'api/storage/.htaccess',
   'api/storage/branding/.gitkeep',
+  'api/storage/insurance/.gitkeep',
   'api/storage/zone/.gitkeep',
   'api/storage/auth/.gitkeep',
 ];

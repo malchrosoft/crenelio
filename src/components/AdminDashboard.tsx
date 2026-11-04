@@ -22,6 +22,7 @@ import {
 import { api, UNAUTHORIZED_EVENT } from '../api';
 import {
   Appointment,
+  InsuranceAttestationStatus,
   Service,
   AppConfig,
   TravelFeeMode,
@@ -60,9 +61,11 @@ import CalendarFeedSettings from './admin/CalendarFeedSettings';
 import AppearanceEditor from './admin/AppearanceEditor';
 import PasswordChange from './admin/PasswordChange';
 import ProEmailField from './admin/ProEmailField';
+import InsuranceAttestationField from './admin/InsuranceAttestationField';
 import { applyFavicon } from '../utils/favicon';
 import { applyDocumentTitle } from '../utils/documentTitle';
-import { format, isPast, isToday, parseISO } from 'date-fns';
+import { addDays, format, isPast, isToday, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const NAV_ICON = { size: 20, weight: 'fill' as const, 'aria-hidden': true };
 
@@ -175,6 +178,12 @@ export const AdminDashboard: React.FC = () => {
   const [quoteError, setQuoteError] = useState<string | null>(null);
   // Facturation dans le logiciel de l'artisan (Item 22, volet B)
   const [invoiceFor, setInvoiceFor] = useState<Appointment | null>(null);
+  // Attestation d'assurance décennale (C. assur. L243-2), suivie si les garanties des constructeurs sont déclarées
+  const [insurance, setInsurance] = useState<InsuranceAttestationStatus | null>(null);
+  const builderGuarantees = config.quote_builder_guarantees === '1';
+  useEffect(() => {
+    if (isAuthenticated && builderGuarantees) api.insuranceAttestation().then(setInsurance).catch(() => setInsurance(null));
+  }, [isAuthenticated, builderGuarantees]);
   const [billingExport, setBillingExport] = useState(false);
 
   // Nouvelle prestation
@@ -583,6 +592,24 @@ export const AdminDashboard: React.FC = () => {
           },
         ]
       : []),
+    // Attestation décennale manquante, échue ou à renouveler dans les 30 jours (C. assur. L243-2)
+    ...(builderGuarantees && insurance && (!insurance.valid || (insurance.valid_until ?? '') <= format(addDays(new Date(), 30), 'yyyy-MM-dd'))
+      ? [
+          {
+            id: 'insurance-attestation',
+            level: 'warning' as const,
+            title: insurance.valid ? 'Attestation décennale bientôt échue' : 'Attestation décennale à déposer',
+            text: (
+              <>
+                {insurance.valid
+                  ? `Valable jusqu'au ${format(parseISO(insurance.valid_until!), 'd MMMM yyyy', { locale: fr })} : déposez la nouvelle dès réception.`
+                  : 'Sans attestation valide, les devis de travaux relevant des garanties des constructeurs ne peuvent pas être envoyés.'}
+              </>
+            ),
+            action: { label: 'Ouvrir « Entreprise »', onClick: () => setActiveTab('company') },
+          },
+        ]
+      : []),
   ];
 
   // « Comment facturez-vous ? » : fiche et exports seulement avec le logiciel de l'artisan
@@ -629,6 +656,11 @@ export const AdminDashboard: React.FC = () => {
                       logoUrl={config.branding_logo_url}
                       onChange={applyBranding}
                     />
+                  </div>
+                )}
+                {group.id === 'legal' && config.quote_builder_guarantees === '1' && (
+                  <div className="admin-settings-form">
+                    <InsuranceAttestationField onChange={setInsurance} />
                   </div>
                 )}
               </ConfigGroupForm>

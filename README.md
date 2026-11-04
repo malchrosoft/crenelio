@@ -260,6 +260,8 @@ consultable depuis l'Espace Artisan (bouton « Emails » d'un rendez-vous) et re
 | `GET` / `PUT` / `DELETE` | `/api/quotes/:id` | Détail ; modification et suppression d'un brouillon uniquement |
 | `POST` | `/api/quotes/:id/send` | Envoi : numéro (`D-AAAA-0001`), lien client, échéance et email au client (email du client et `APP_URL` exigés) ; le devis n'est plus modifiable |
 | `GET` | `/api/quotes/:id/notifications` | Journal des emails du devis |
+| `GET` | `/api/quotes/token/:token/attestation` | Attestation d'assurance décennale jointe à un devis de travaux relevant des garanties des constructeurs (PDF) |
+| `GET` / `POST` / `DELETE` | `/api/admin/insurance-attestation` | Attestation d'assurance décennale : état, dépôt du PDF avec sa fin de validité (`file`, `valid_until`), suppression ; `/file` pour la consulter |
 | `GET` | `/api/quotes/token/:token` | Consultation publique par le client (lien à jeton) |
 | `POST` | `/api/quotes/token/:token/withdraw` | Rétractation en ligne (`name`, `email` de l'accusé de réception) pendant le délai : accusé au client, avis à l'artisan ; plafonnée par `RateLimit` |
 | `POST` | `/api/quotes/token/:token/decision` | Réponse du client (`accept` / `refuse`) : pour accepter, `keep_parts` (pièces remplacées ou décharge), `debours_mandate` (accord distinct, `true` ou `false`) s'il y a des débours, `withdrawal_ack` hors intervention urgente (`early_execution` facultatif) ; plafonnée par `RateLimit` |

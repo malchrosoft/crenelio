@@ -65,6 +65,13 @@ INSERT IGNORE INTO `config` (`config_key`, `config_value`) VALUES
 ('quote_number_prefix',   'D'),
 ('quote_labour_rate',     ''),
 ('quote_allow_supply',    '0'),
+-- Devis : modalités de paiement et décompte du temps par défaut ; n° de TVA intracommunautaire (R111-2 5°)
+('quote_payment_terms',   'Paiement à réception de la facture, par virement, chèque ou espèces.'),
+('quote_time_counting',   ''),
+('legal_vat_number',      ''),
+-- Garanties des constructeurs et attestation décennale (C. civ. 1792, C. assur. L243-2)
+('quote_builder_guarantees', '0'),
+('insurance_attestation_until', ''),
 -- Facturation (volet B) : 'external' (logiciel de l'artisan, fiche et exports) ou 'none'
 ('invoicing_mode',        'external'),
 -- Mentions de l'entreprise : forme juridique (« EI » accolé au nom d'un entrepreneur individuel,
@@ -77,5 +84,5 @@ INSERT IGNORE INTO `config` (`config_key`, `config_value`) VALUES
 
 -- Version du schéma : nom de la dernière migration de sql/migrations/ (Item 27, cf. GET /api/health).
 -- À mettre à jour à chaque nouvelle migration.
-INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-11-04_item22_textes_officiels')
+INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-11-04b_item22_execution_paiement')
 ON DUPLICATE KEY UPDATE `config_value` = VALUES(`config_value`);

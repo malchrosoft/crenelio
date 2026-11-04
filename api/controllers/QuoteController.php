@@ -9,6 +9,7 @@ require_once __DIR__ . '/../models/Appointment.php';
 require_once __DIR__ . '/../models/Config.php';
 require_once __DIR__ . '/../models/QuoteNotification.php';
 require_once __DIR__ . '/../core/QuoteNotifier.php';
+require_once __DIR__ . '/../core/InsuranceAttestation.php';
 require_once __DIR__ . '/../core/RateLimit.php';
 require_once __DIR__ . '/../core/Response.php';
 
@@ -88,6 +89,17 @@ class QuoteController
         if (!filter_var(trim((string)$quote['client_email']), FILTER_VALIDATE_EMAIL)) {
             Response::json(['error' => "Renseignez l'email du client : le devis lui est envoyé avec un lien pour répondre."], 400);
         }
+        // Informations précontractuelles obligatoires (C. consom. L221-5 3°, R221-2 4°)
+        if (trim((string)$quote['execution_terms']) === '') {
+            Response::json(['error' => "Indiquez la date ou le délai d'exécution des travaux (information obligatoire)."], 400);
+        }
+        if (trim((string)$quote['payment_terms']) === '') {
+            Response::json(['error' => 'Indiquez les modalités de paiement (information obligatoire).'], 400);
+        }
+        // Travaux relevant des garanties des constructeurs : attestation décennale jointe (C. assur. L243-2)
+        if ((int)$quote['builder_works'] && !InsuranceAttestation::isValid()) {
+            Response::json(['error' => "Déposez une attestation d'assurance décennale en cours de validité (écran Entreprise) : elle doit être jointe au devis (C. assur. L243-2)."], 400);
+        }
         if (APP_URL === '') {
             Response::json(['error' => "Adresse du site inconnue (APP_URL dans api/.env) : impossible de créer le lien du devis."], 503);
         }
@@ -97,6 +109,19 @@ class QuoteController
         $quote = Quote::find((int)$quote['id']);
         $quote['notifications'] = QuoteNotifier::sendQuote($quote, Config::getAll());
         Response::json($quote);
+    }
+
+    /**
+     * GET /quotes/token/:token/attestation — Attestation d'assurance décennale jointe au devis (L243-2),
+     * pour un devis de travaux relevant des garanties des constructeurs.
+     */
+    public function attestation(array $params): void
+    {
+        $quote = Quote::findByToken((string)($params['token'] ?? ''));
+        if (!$quote || !(int)$quote['builder_works'] || !InsuranceAttestation::path()) {
+            Response::json(['error' => 'Attestation indisponible.'], 404);
+        }
+        InsuranceAttestation::serve();
     }
 
     /** GET /quotes/:id/notifications — Journal des emails du devis. */

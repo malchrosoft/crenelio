@@ -2333,6 +2333,16 @@ $admin-sidebar-collapsed: 68px;
   }
 
   .quote-page__mediator { margin-top: $space-md; }
+
+  .quote-page__terms {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: $space-2xs $space-sm;
+    margin: $space-sm 0 0;
+
+    dt { font-weight: 600; color: $gray-600; }
+    dd { margin: 0; }
+  }
   .quote-page__print { margin-top: $space-md; font-size: 0.9rem; }
 
   // Modèle d'information sur la rétractation (texte réglementaire)
@@ -3786,6 +3796,27 @@ $data-grid-status-width: 13em;
 
   .form-label { margin: 0; }
   .form-input { width: auto; }
+}
+
+// Attestation d'assurance décennale (écran Entreprise, C. assur. L243-2)
+.insurance-attestation {
+  .insurance-attestation__state {
+    margin: 0 0 $space-xs;
+    font-weight: 600;
+    color: $success;
+  }
+
+  .insurance-attestation__state--expired { color: $danger; }
+
+  .insurance-attestation__form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-xs;
+
+    .form-label { margin: 0; }
+    .form-input { width: auto; }
+  }
 }
 
 .quote-editor__links {

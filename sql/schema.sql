@@ -182,6 +182,15 @@ CREATE TABLE `quotes` (
     -- Contrat à distance ou hors établissement (C. consom. L221-18) : rétractation de 14 jours, sauf
     -- travaux d'entretien ou de réparation urgents expressément demandés par le client (L221-28 8°)
     `urgent`          BOOLEAN         NOT NULL DEFAULT FALSE,
+    -- Date ou délai d'exécution (C. consom. L221-5 3°) et modalités de paiement et d'exécution (R111-1 2°,
+    -- R221-2 4°), figés sur le devis ; décompte du temps estimé de la main-d'œuvre (arrêté du 24 janvier
+    -- 2017, art. 2)
+    `execution_terms` VARCHAR(255)  NULL,
+    `payment_terms`   VARCHAR(500)  NULL,
+    `time_counting`   VARCHAR(255)  NULL,
+    -- Travaux relevant des garanties des constructeurs (C. civ. 1792 et suivants) : garanties imprimées et
+    -- attestation d'assurance décennale jointe au devis (C. assur. L243-2)
+    `builder_works`   BOOLEAN       NOT NULL DEFAULT FALSE,
     -- Demande expresse du client de commencer avant la fin du délai de rétractation (L221-25)
     `early_execution` BOOLEAN         NOT NULL DEFAULT FALSE,
     `withdrawal_until` DATE           NULL,
