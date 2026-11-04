@@ -161,7 +161,7 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
               <dd>{euro(quote.total_vat)}</dd>
             </>
           ) : (
-            <dd className="quote-totals__mention">{config.quote_vat_exemption || 'TVA non applicable, art. 293 B du CGI'}</dd>
+            <dd className="quote-totals__mention">{config.quote_vat_exemption || 'TVA non applicable, article 293 B du CGI'}</dd>
           )}
           <dt className="quote-totals__total">Total du devis TTC</dt>
           <dd className="quote-totals__total">{euro(quote.total_ttc)}</dd>
@@ -203,15 +203,16 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
       {quote.status === 'sent' && (
         <section className="quote-page__section">
           <h3>Pièces remplacées</h3>
-          <p>Vous pouvez conserver les pièces, éléments ou appareils remplacés. Souhaitez-vous les conserver ?</p>
+          {/* Annexe 2 de l'arrêté du 24 janvier 2017 ; la réponse en ligne tient lieu de « Lu et approuvé » */}
+          <p>Souhaitez-vous conserver les pièces, éléments ou appareils remplacés ?</p>
           <fieldset className="quote-page__choice" aria-label="Pièces remplacées">
             <label className="form-check">
               <input type="radio" name="keep-parts" checked={keepParts === true} onChange={() => setKeepParts(true)} />
-              <span>Oui, je les conserve</span>
+              <span>OUI</span>
             </label>
             <label className="form-check">
               <input type="radio" name="keep-parts" checked={keepParts === false} onChange={() => setKeepParts(false)} />
-              <span>Non, je les laisse à l'artisan (décharge)</span>
+              <span>NON (je les laisse au professionnel : décharge)</span>
             </label>
           </fieldset>
         </section>
@@ -249,8 +250,10 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
                   <label className="form-check">
                     <input type="checkbox" checked={early} onChange={(e) => setEarly(e.target.checked)} />
                     <span>
+                      {/* Demande expresse et reconnaissance de la perte du droit après exécution complète (L221-25, L221-28 1°) */}
                       Je demande expressément que l'intervention commence avant la fin du délai de rétractation. Si je me rétracte
-                      ensuite, je paierai un montant proportionnel au service déjà fourni.
+                      ensuite, je paierai un montant proportionnel au service déjà fourni. Je reconnais qu'une fois la prestation
+                      entièrement exécutée, je ne disposerai plus du droit de rétractation.
                     </span>
                   </label>
                 </>

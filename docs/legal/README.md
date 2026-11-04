@@ -34,5 +34,11 @@ ici y apparaît, les liens entre fiches restent relatifs.
 | Note (facture) obligatoire au-delà de 25 € TTC | [fr/note-facture.md](fr/note-facture.md) |
 | Mention « EI », SIRET, RM, assurance, médiateur, publicité des prix | [fr/mentions-entreprise.md](fr/mentions-entreprise.md) |
 | Aide-mémoire de l'artisan : achats, justificatifs, conservation | [fr/rappels-artisan.md](fr/rappels-artisan.md) |
+| Textes officiels, mot pour mot : Code de la consommation | [fr/textes/code-consommation.md](fr/textes/code-consommation.md) |
+| Textes officiels : Code de commerce (EI, sociétés) | [fr/textes/code-commerce.md](fr/textes/code-commerce.md) |
+| Textes officiels : Code général des impôts (débours, franchise) | [fr/textes/code-general-impots.md](fr/textes/code-general-impots.md) |
+| Textes officiels : Code de l'artisanat (qualité d'artisan) | [fr/textes/code-artisanat.md](fr/textes/code-artisanat.md) |
+| Textes officiels : arrêtés de 1983 (note) et de 2017 (devis du dépannage) | [fr/textes/arretes.md](fr/textes/arretes.md) |
+| Doctrine fiscale (BOFiP) : débours, pièces détachées | [fr/textes/bofip.md](fr/textes/bofip.md) |
 | Liste des sources, nature et date de vérification | [sources.md](sources.md) |
 |---|---|

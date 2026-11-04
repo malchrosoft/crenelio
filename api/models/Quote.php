@@ -22,6 +22,10 @@ class Quote
     /** Types de ligne ; `supply` (achat-revente) n'est accepté que si `quote_allow_supply` vaut 1. */
     public const KINDS = ['labour', 'service', 'travel', 'debours', 'supply'];
 
+    /** Devis avec le statut de son rendez-vous (prestation exécutée : L221-28 1°). */
+    private const SELECT = 'SELECT q.*, a.status AS appointment_status
+        FROM `quotes` q LEFT JOIN `appointments` a ON a.id = q.appointment_id';
+
     /** Statuts dans lesquels le devis n'est plus modifiable (envoyé au client ou décidé). */
     private const LOCKED = ['sent', 'accepted', 'refused', 'expired', 'withdrawn'];
 
@@ -39,7 +43,7 @@ class Quote
     public static function find(int $id): ?array
     {
         self::expireOutdated();
-        return self::withLines(Database::fetchOne('SELECT * FROM `quotes` WHERE id = ?', [$id]));
+        return self::withLines(Database::fetchOne(self::SELECT . ' WHERE q.id = ?', [$id]));
     }
 
     public static function findByToken(string $token): ?array
@@ -48,7 +52,7 @@ class Quote
             return null;
         }
         self::expireOutdated();
-        return self::withLines(Database::fetchOne('SELECT * FROM `quotes` WHERE token = ?', [$token]));
+        return self::withLines(Database::fetchOne(self::SELECT . ' WHERE q.token = ?', [$token]));
     }
 
     /** Brouillon prérempli depuis un rendez-vous : client, prestation et frais de déplacement. */
@@ -267,8 +271,8 @@ class Quote
 
     /**
      * Réponses du client (preuve : date et IP de chacune).
-     * - Devis : accepté hors urgence ⇒ fin du délai de rétractation (14 jours, L221-18) ; exécution
-     *   anticipée seulement sur sa demande expresse (L221-25).
+     * - Devis : accepté hors urgence ⇒ fin du délai de rétractation (`withdrawalDeadline`, L221-18 et
+     *   L221-19) ; exécution anticipée seulement sur sa demande expresse (L221-25).
      * - Mandat de débours, accord distinct : `$mandate` null s'il n'y a pas de débours ; false si le client
      *   fournit lui-même les pièces.
      * false si le devis n'attend plus de réponse.
@@ -276,16 +280,17 @@ class Quote
     public static function decide(int $id, bool $accepted, ?bool $keepParts, ?bool $mandate, bool $earlyExecution, ?string $reason): bool
     {
         $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+        $deadline = $accepted ? self::withdrawalDeadline(new DateTimeImmutable('today')) : null;
         return Database::execute(
             "UPDATE `quotes` SET status = ?, decided_at = NOW(), decision_ip = ?, keep_parts = ?,
                 debours_mandate = ?, mandate_decided_at = IF(? IS NULL, NULL, NOW()), mandate_ip = IF(? IS NULL, NULL, ?),
                 early_execution = ?, refusal_reason = ?,
-                withdrawal_until = IF(? AND NOT urgent, DATE_ADD(CURDATE(), INTERVAL 14 DAY), NULL)
+                withdrawal_until = IF(urgent, NULL, ?)
              WHERE id = ? AND status = 'sent' AND valid_until >= CURDATE()",
             [
                 $accepted ? 'accepted' : 'refused', $ip, $keepParts === null ? null : (int)$keepParts,
                 $mandate === null ? null : (int)$mandate, $mandate, $mandate, $ip,
-                (int)$earlyExecution, $reason, (int)$accepted, $id,
+                (int)$earlyExecution, $reason, $deadline, $id,
             ]
         ) > 0;
     }
@@ -300,16 +305,54 @@ class Quote
         return Database::execute(
             "UPDATE `quotes` SET status = 'withdrawn', withdrawn_at = NOW(), withdrawal_name = ?,
                 withdrawal_email = ?, withdrawal_ip = ?
-             WHERE id = ? AND status = 'accepted' AND NOT urgent AND withdrawal_until >= CURDATE()",
+             WHERE id = ? AND status = 'accepted' AND NOT urgent AND withdrawal_until >= CURDATE()
+               AND NOT (early_execution AND EXISTS (SELECT 1 FROM `appointments` a
+                   WHERE a.id = `quotes`.appointment_id AND a.status = 'completed'))",
             [$name, $email, $_SERVER['REMOTE_ADDR'] ?? null, $id]
         ) > 0;
     }
 
-    /** Rétractation encore possible (même règle que `withdraw`). */
+    /**
+     * Rétractation encore possible (même règle que `withdraw`) : pas après une prestation entièrement
+     * exécutée à la demande expresse du client (L221-28 1°, rendez-vous « terminé »).
+     */
     public static function canWithdraw(array $quote): bool
     {
-        return $quote['status'] === 'accepted' && !(int)$quote['urgent']
+        $executed = (int)$quote['early_execution'] && ($quote['appointment_status'] ?? null) === 'completed';
+        return $quote['status'] === 'accepted' && !(int)$quote['urgent'] && !$executed
             && $quote['withdrawal_until'] !== null && $quote['withdrawal_until'] >= date('Y-m-d');
+    }
+
+    /**
+     * Dernier jour du délai de rétractation (C. consom. L221-18 et L221-19) : le jour de la conclusion
+     * n'est pas compté ; le délai expire à la fin du quatorzième jour, prorogé au premier jour ouvrable
+     * suivant s'il tombe un samedi, un dimanche ou un jour férié.
+     */
+    public static function withdrawalDeadline(DateTimeImmutable $conclusion): string
+    {
+        $day = $conclusion->modify('+14 days');
+        while ((int)$day->format('N') >= 6 || in_array($day->format('m-d'), self::holidays((int)$day->format('Y')), true)) {
+            $day = $day->modify('+1 day');
+        }
+        return $day->format('Y-m-d');
+    }
+
+    /** Jours fériés légaux (C. trav. L3133-1), dont ceux qui dépendent de Pâques (sans extension PHP). */
+    private static function holidays(int $year): array
+    {
+        // Pâques (algorithme de Meeus, calendrier grégorien)
+        $a = $year % 19; $b = intdiv($year, 100); $c = $year % 100;
+        $d = intdiv($b, 4); $e = $b % 4; $f = intdiv($b + 8, 25); $g = intdiv($b - $f + 1, 3);
+        $h = (19 * $a + $b - $d - $g + 15) % 30; $i = intdiv($c, 4); $k = $c % 4;
+        $l = (32 + 2 * $e + 2 * $i - $h - $k) % 7; $m = intdiv($a + 11 * $h + 22 * $l, 451);
+        $month = intdiv($h + $l - 7 * $m + 114, 31); $dayOfMonth = (($h + $l - 7 * $m + 114) % 31) + 1;
+        $easter = new DateTimeImmutable(sprintf('%d-%02d-%02d', $year, $month, $dayOfMonth));
+        return [
+            '01-01', '05-01', '05-08', '07-14', '08-15', '11-01', '11-11', '12-25',
+            $easter->modify('+1 day')->format('m-d'),  // lundi de Pâques
+            $easter->modify('+39 days')->format('m-d'), // Ascension
+            $easter->modify('+50 days')->format('m-d'), // lundi de Pentecôte
+        ];
     }
 
     public static function isLocked(array $quote): bool

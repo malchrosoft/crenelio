@@ -41,3 +41,8 @@ npm-debug.log*
 
 # Python
 __pycache__/
+
+# Dépôt des textes officiels à lire (Légifrance, PDF volumineux) : seuls les extraits
+# reportés dans docs/legal/fr/textes/ sont versionnés
+/docs/legal/textes-officiels/*
+!/docs/legal/textes-officiels/A-DEPOSER.md

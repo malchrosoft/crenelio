@@ -44,6 +44,22 @@ Contrat conclu **hors établissement** (au domicile du client) ou à distance, e
 Voir [retractation.md](retractation.md) et, pour l'identité de l'entreprise,
 [mentions-entreprise.md](mentions-entreprise.md).
 
+## Texte officiel (vérifié le 04/11/2026)
+
+Arrêté du 24 janvier 2017, version consolidée : [textes/arretes.md](textes/arretes.md). Précisions :
+
+- **Avant le contrat** (art. 2) : taux horaires de main-d'œuvre **TTC**, **modalités de décompte du temps
+  estimé**, prix TTC des forfaits, frais de déplacement, devis payant ou gratuit **et son coût**, toute
+  autre condition de rémunération ; ces informations doivent être **aisément accessibles sur tout espace
+  de communication en ligne** du professionnel (art. 3) : la vitrine est concernée.
+- **Devis hors établissement** (art. 4, II) : il prend la forme du contrat des articles L221-5 et L221-9 du
+  Code de la consommation, avec taux horaire et **temps estimé** (ou forfait) de chaque prestation, produits
+  avec prix unitaire, unité et quantité, frais de déplacement.
+- **Pièces remplacées** (art. 4, III et annexe 2) : modèle-type mot pour mot :
+  « Souhaitez-vous conserver les pièces, éléments ou appareils remplacés ? OUI □ NON □ — Signature du
+  consommateur précédée de la mention manuscrite " Lu et approuvé ". »
+- **Note** (art. 5) : voir [note-facture.md](note-facture.md).
+
 ## Pièces remplacées
 
 L'arrêté (art. 4, III et annexe 2) impose d'informer le client qu'il peut **conserver les pièces,

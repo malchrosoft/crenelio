@@ -724,7 +724,7 @@ class EmailTemplates
             $outro = sprintf(
                 'Vous pouvez vous rétracter sans motif jusqu\'au %s inclus, depuis la page du devis (« Renoncer au contrat ici ») ; un accusé de réception vous sera envoyé par email.%s',
                 self::escape(self::formatDate((string)$quote['withdrawal_until'])),
-                $quote['early_execution'] ? ' Vous avez demandé que l\'intervention commence avant la fin de ce délai : en cas de rétractation, le service déjà fourni reste dû à proportion.' : ''
+                $quote['early_execution'] ? ' Vous avez expressément demandé que l\'intervention commence avant la fin de ce délai : en cas de rétractation, le service déjà fourni reste dû à proportion, et une fois la prestation entièrement exécutée, vous ne disposerez plus du droit de rétractation.' : ''
             );
         }
 

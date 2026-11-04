@@ -19,17 +19,23 @@ guide privé, à recouper.
 | [La Cité des entreprises : décret n° 2026-3](https://www.lacitedesentreprises.com/droit-des-affaires/obligation-daffichage-du-bouton-de-retractation-en-ligne-les-precisions-apportees-par-le-decret-n-2026-3-du-5-janvier-2026/) | Secondaire | Contenu de la déclaration, accusé de réception, information précontractuelle |
 | [Lettre des réseaux : rétractation et prestation de services](https://www.lettredesreseaux.com/droit-de-retractation-et-contrat-de-prestation-de-services.html) | Secondaire | L221-25 (exécution anticipée) |
 
-## À lire dans le texte officiel (non consulté directement)
+## Textes officiels lus (04/11/2026)
 
-**Prochaine étape (02/11/2026)** : lire chacun de ces textes dans sa version en vigueur, l'archiver mot
-pour mot dans la fiche concernée, puis aligner le code et les fiches ; ce qui ne repose encore que sur une
-source secondaire reste marqué « à confirmer ».
+Fichiers Légifrance déposés par le mainteneur, reproduits mot pour mot dans [fr/textes/](fr/textes/) :
 
-- Ordonnance n° 2026-2 (L221-21 reçu et archivé le 02/11/2026) et décret n° 2026-3 du 5 janvier 2026
-  (modalités de la fonction de rétractation en ligne : articles réglementaires à lire) ;
-  annexe à l'article R221-3 (version du 19 juin 2026).
-- Code de la consommation : L111-1, L111-2, L221-5, L221-9, L221-18, L221-20, L221-25, L221-28 ;
-  formulaire type de rétractation (annexe à l'article R221-1) ; L616-1 (médiation).
-- Code de commerce : R526-27 (dénomination de l'entrepreneur individuel).
-- CGI : art. 267 II 2° ; BOFiP BOI-TVA-BASE-10-20-40 (débours) ; art. 293 B (franchise en base).
-- Arrêté n° 83-50/A du 3 octobre 1983 (note de prestation de services).
+| Texte | Fiche |
+|---|---|
+| C. consom. L111-1, L111-2, L112-1, L112-3, L221-5, L221-8 à L221-10, L221-18 à L221-25, L221-27, L221-28, L616-1, R111-1, R111-2, R221-2, R221-3, D221-5 (décret n° 2026-3), R616-1, annexe R221-1 | [code-consommation.md](fr/textes/code-consommation.md) |
+| Annexe à l'article R221-3 | [retractation-modele.md](fr/retractation-modele.md) |
+| C. com. R526-27, R123-237, R123-238 | [code-commerce.md](fr/textes/code-commerce.md) |
+| CGI 267, 293 B, 293 E | [code-general-impots.md](fr/textes/code-general-impots.md) |
+| Code de l'artisanat L121-1, L211-1, L241-2 | [code-artisanat.md](fr/textes/code-artisanat.md) |
+| Arrêté n° 83-50/A du 3 octobre 1983 ; arrêté du 24 janvier 2017 | [arretes.md](fr/textes/arretes.md) |
+| BOFiP BOI-TVA-BASE-10-10-30 (III), BOI-TVA-BASE-10-20-40-30 (§ 130), BOI-TVA-BASE-10-20-40-20 (§ 40, 70, 140-150), téléchargés le 04/11/2026 | [bofip.md](fr/textes/bofip.md) |
+
+## Encore à lire
+
+- Régime **micro-entrepreneur** (URSSAF, CSS) : exclusion des débours du chiffre d'affaires déclaré et
+  mention « débours » au livre des recettes, encore issues de sources secondaires.
+- Code civil, articles 1792 et suivants (garanties des constructeurs), si des garanties légales doivent
+  figurer sur les devis (C. consom. R111-1, 3°).

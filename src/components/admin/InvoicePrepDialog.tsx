@@ -118,7 +118,7 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
     ...fields.map(([label, value]) => `${label} : ${value}`),
     '',
     ...services.map(lineText),
-    vat ? `Total HT : ${num(totals.ht)} € · TVA : ${num(totals.tva)} € · Total TTC : ${num(totals.ttc)} €` : `Total : ${num(totals.ttc)} € — ${config.quote_vat_exemption || 'TVA non applicable, art. 293 B du CGI'}`,
+    vat ? `Total HT : ${num(totals.ht)} € · TVA : ${num(totals.tva)} € · Total TTC : ${num(totals.ttc)} €` : `Total : ${num(totals.ttc)} € — ${config.quote_vat_exemption || 'TVA non applicable, article 293 B du CGI'}`,
     ...(debours.length ? ['', ...debours.map(lineText), `Total débours : ${num(totals.debours)} €`, `Net à payer : ${num(totals.total)} €`] : []),
   ].join('\n');
 
@@ -194,7 +194,7 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
               </ul>
               <p className="invoice-prep__total">
                 {vat ? `Total HT ${euro(totals.ht)} · TVA ${euro(totals.tva)} · ` : ''}Total TTC {euro(totals.ttc)}
-                {!vat && <span className="form-hint"> — {config.quote_vat_exemption || 'TVA non applicable, art. 293 B du CGI'}</span>}
+                {!vat && <span className="form-hint"> — {config.quote_vat_exemption || 'TVA non applicable, article 293 B du CGI'}</span>}
               </p>
 
               {debours.length > 0 && (
@@ -250,7 +250,7 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
                   Facture : à respecter
                 </p>
                 <ul>
-                  <li>Facture obligatoire au-delà de 25 € TTC, remise dès la prestation rendue et avant tout paiement.</li>
+                  <li>Note (facture) obligatoire dès 25 € TTC, remise dès la prestation rendue et avant tout paiement ; double conservé deux ans.</li>
                   <li>Identité légale « {legalIdentity(config)} », SIRET, date, numéro de facture de votre logiciel.</li>
                   <li>Débours : ligne distincte, montant exact, copie du justificatif remise au client ; « débours » dans votre livre des recettes, hors chiffre d'affaires.</li>
                   <li>Conservez les originaux des tickets et factures des pièces avancées.</li>

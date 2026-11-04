@@ -3,7 +3,30 @@
 *Dernière vérification : 01/11/2026. Base légale : CGI art. 267 II 2° (sommes remboursées aux
 intermédiaires qui effectuent des dépenses au nom et pour le compte de leurs commettants). Sources
 secondaires résumées : Portail auto-entrepreneur, Legifiscal, Dougs (voir [sources](../sources.md)).
-Doctrine BOFiP à relire ; validation par un expert-comptable recommandée.*
+Doctrine BOFiP lue le 04/11/2026 ; validation par un expert-comptable recommandée.*
+
+## Textes officiels (vérifié le 04/11/2026)
+
+- **Loi** : CGI, article 267, II, 2° ([textes/code-general-impots.md](textes/code-general-impots.md)).
+- **Doctrine** : BOI-TVA-BASE-10-10-30, III, § 200 à 230 et BOI-TVA-BASE-10-20-40-30, § 130
+  ([textes/bofip.md](textes/bofip.md)). Les **quatre conditions cumulatives** :
+  1. agir en vertu d'un **mandat préalable et explicite** (« et non pas présumé ») au nom et pour le
+     compte du mandant ;
+  2. **rendre compte exactement** au client de l'engagement et du montant des dépenses ;
+  3. porter ces dépenses dans des **comptes de passage** (pour qui ne tient pas de comptabilité
+     commerciale : des « comptes spécifiques », BOI-TVA-BASE-10-20-40-20 § 70) ;
+  4. **justifier** de la nature ou du montant exact des débours (factures des fournisseurs, comptes rendus
+     adressés au client…).
+- **Agir au nom du client** (§ 220) : le contrat avec le fournisseur mentionne qu'il est passé au nom
+  d'autrui, ou **la facture est adressée directement au client** ; si elle est adressée à l'artisan, elle
+  doit faire apparaître qu'il agit au nom d'autrui (nom et adresse du client).
+- **Exclu** (§ 210, § 230) : les dépenses engagées pour sa propre entreprise et les simples charges
+  d'exploitation répercutées sur la clientèle.
+
+Le mandat **distinct et préalable** de Crénelio, la facture au nom du client et la reddition de compte
+(fiche « Préparer la facture », copie du justificatif) répondent à ces conditions. Reste propre au régime
+micro-entrepreneur (non traité par ces textes fiscaux) : l'exclusion des débours du chiffre d'affaires
+déclaré à l'URSSAF, issue de sources secondaires.
 
 ## Pourquoi c'est important pour un micro-entrepreneur
 

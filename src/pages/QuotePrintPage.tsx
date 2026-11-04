@@ -218,7 +218,7 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
           <strong>{euro(quote.total_ttc)}</strong>
         </dd>
       </dl>
-      {!vat && <p className="quote-print__mention">{config.quote_vat_exemption || 'TVA non applicable, art. 293 B du CGI'}</p>}
+      {!vat && <p className="quote-print__mention">{config.quote_vat_exemption || 'TVA non applicable, article 293 B du CGI'}</p>}
       {Number(quote.total_debours) > 0 && (
         <p className="quote-print__mention">
           Pièces achetées au nom et pour le compte du client : voir le mandat de débours (document distinct), estimées à{' '}
@@ -233,16 +233,17 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
 
       <section className="quote-print__block">
         <h2>Pièces remplacées</h2>
-        <p>Le professionnel vous informe que vous pouvez conserver les pièces, éléments ou appareils remplacés.</p>
+        {/* Annexe 2 de l'arrêté du 24 janvier 2017, mot pour mot */}
+        <p>Souhaitez-vous conserver les pièces, éléments ou appareils remplacés ?</p>
         {quote.keep_parts !== null ? (
           <p>
-            Réponse du client en ligne : {Number(quote.keep_parts) ? 'je les conserve' : "je les laisse au professionnel (décharge)"}, le{' '}
-            {moment(quote.decided_at)}.
+            Réponse du client en ligne le {moment(quote.decided_at)} : {Number(quote.keep_parts) ? 'OUI' : 'NON (décharge)'}.
           </p>
         ) : (
           <p>
-            Je souhaite conserver les pièces remplacées : ☐ Oui ☐ Non
-            <br />« Lu et approuvé », date et signature du client :
+            OUI □ NON □
+            <br />
+            Signature du consommateur précédée de la mention manuscrite " Lu et approuvé ".
           </p>
         )}
       </section>
@@ -271,10 +272,13 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
             ))}
             {quote.decided_at ? (
               Number(quote.early_execution) ? (
-                <p>Le client a expressément demandé que l'intervention commence avant la fin du délai de rétractation.</p>
+                <p>
+                  Le client a expressément demandé que l'intervention commence avant la fin du délai de rétractation et reconnu qu'une
+                  fois la prestation entièrement exécutée, il ne disposera plus du droit de rétractation.
+                </p>
               ) : null
             ) : (
-              <p>☐ Je demande expressément que l'intervention commence avant la fin du délai de rétractation.</p>
+              <p>☐ Je demande expressément que l'intervention commence avant la fin du délai de rétractation. Si je me rétracte ensuite, je paierai un montant proportionnel au service déjà fourni. Je reconnais qu'une fois la prestation entièrement exécutée, je ne disposerai plus du droit de rétractation.</p>
             )}
           </div>
         )}
@@ -351,27 +355,30 @@ const MandateSheet: React.FC<{ quote: Quote; config: AppConfig; lines: QuoteLine
 };
 
 /**
- * Formulaire type de rétractation (annexe à l'article R221-1 du Code de la consommation).
- * Texte du modèle européen (directive 2011/83/UE, annexe I B), sans télécopieur (décret n° 2022-424) :
- * À CONFIRMER contre la version en vigueur sur Légifrance (docs/legal/fr/retractation.md).
+ * Formulaire type de rétractation : annexe à l'article R221-1 du Code de la consommation (modifiée par le
+ * décret n° 2022-424), reproduite mot pour mot (docs/legal/fr/textes/code-consommation.md). Seules les
+ * zones prévues par le modèle sont complétées : coordonnées du professionnel et contrat visé.
  */
 const WithdrawalFormSheet: React.FC<{ quote: Quote; config: AppConfig }> = ({ quote, config }) => (
   <>
     <SheetHeader config={config} title="Formulaire de rétractation" reference={`Devis n° ${quote.number}`} />
     <section className="quote-print__block quote-print__form">
       <p>
-        <strong>Modèle de formulaire de rétractation</strong>
+        <strong>MODÈLE DE FORMULAIRE DE RÉTRACTATION</strong>
       </p>
       <p>(Veuillez compléter et renvoyer le présent formulaire uniquement si vous souhaitez vous rétracter du contrat.)</p>
       <p>
-        À l'attention de {config.company_name}, {companyAddress(config)}
+        A l'attention de {config.company_name}, {companyAddress(config)}
         {config.pro_email ? `, ${config.pro_email}` : ''} :
       </p>
       <p>
         Je/nous (*) vous notifie/notifions (*) par la présente ma/notre (*) rétractation du contrat portant sur la vente du bien (*)/pour la
         prestation de services (*) ci-dessous :
       </p>
-      <p className="quote-print__field">Devis n° {quote.number}{quote.title ? ` — ${quote.title}` : ''}</p>
+      <p className="quote-print__field">
+        Devis n° {quote.number}
+        {quote.title ? ` — ${quote.title}` : ''}
+      </p>
       <p className="quote-print__field">Commandé le (*)/reçu le (*) : {quote.decided_at ? day(quote.decided_at) : ''}</p>
       <p className="quote-print__field">Nom du (des) consommateur(s) :</p>
       <p className="quote-print__field">Adresse du (des) consommateur(s) :</p>

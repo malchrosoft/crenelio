@@ -60,7 +60,7 @@ INSERT INTO `schedules` (`day_of_week`, `is_active`, `morning_start`, `morning_e
 INSERT IGNORE INTO `config` (`config_key`, `config_value`) VALUES
 ('quote_vat_mode',        'franchise'),
 ('quote_vat_rates',       '20,10,5.5'),
-('quote_vat_exemption',   'TVA non applicable, art. 293 B du CGI'),
+('quote_vat_exemption',   'TVA non applicable, article 293 B du CGI'),
 ('quote_validity_days',   '30'),
 ('quote_number_prefix',   'D'),
 ('quote_labour_rate',     ''),
@@ -77,5 +77,5 @@ INSERT IGNORE INTO `config` (`config_key`, `config_value`) VALUES
 
 -- Version du schéma : nom de la dernière migration de sql/migrations/ (Item 27, cf. GET /api/health).
 -- À mettre à jour à chaque nouvelle migration.
-INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-11-01_item22_quotes')
+INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-11-04_item22_textes_officiels')
 ON DUPLICATE KEY UPDATE `config_value` = VALUES(`config_value`);

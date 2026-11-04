@@ -1,6 +1,6 @@
 # Rétractation : contrat à distance ou au domicile du client
 
-*Dernière vérification : 02/11/2026. Sources : fiche DGCCRF « Dépannage à domicile » (officielle) ; INC ;
+*Dernière vérification : 04/11/2026 (textes officiels : [textes/code-consommation.md](textes/code-consommation.md)). Sources : fiche DGCCRF « Dépannage à domicile » (officielle) ; INC ;
 sources secondaires sur L221-25. Articles du Code de la consommation à relire dans leur version
 consolidée (voir [sources](../sources.md)).*
 
@@ -15,8 +15,7 @@ L221-18). Le professionnel doit l'en informer avant la conclusion, et remettre :
 > comprendre sous peine de nullité les informations des articles L. 111-1 et L. 111-2 du Code de la
 > consommation. » (fiche DGCCRF)
 
-Si l'information sur la rétractation manque, le délai est prolongé (jusqu'à 12 mois selon les sources
-secondaires ; à confirmer dans L221-20).
+Si l'information sur la rétractation manque, le délai est prolongé de douze mois (L221-20, confirmé).
 
 ## Exception : l'urgence
 
@@ -30,9 +29,40 @@ Tout travail **supplémentaire** proposé sur place reste soumis au délai de 14
 
 ## Commencer avant la fin du délai
 
-Selon les sources secondaires (L221-25) : le professionnel ne peut commencer avant la fin du délai que
+Selon L221-25 (texte officiel ci-dessus) : le professionnel ne peut commencer avant la fin du délai que
 sur **demande expresse** du client ; si le client se rétracte ensuite, il doit un montant proportionnel
 au service déjà fourni. Sans demande expresse recueillie, rien n'est dû.
+
+## Ce que disent les textes officiels (vérifié le 04/11/2026)
+
+Texte intégral : [textes/code-consommation.md](textes/code-consommation.md).
+
+- **Délai** (L221-18) : quatorze jours à compter **de la conclusion du contrat** pour une prestation de
+  services. **Calcul** (L221-19) : le jour de la conclusion n'est pas compté ; le délai expire à la fin du
+  dernier jour ; s'il tombe un samedi, un dimanche ou un jour férié ou chômé, il est prorogé jusqu'au
+  premier jour ouvrable suivant. → `Quote::withdrawalDeadline` (jours fériés légaux, Pâques calculée).
+- **Information manquante** (L221-20) : délai prolongé de douze mois ; ramené à quatorze jours à compter
+  de la réception de l'information si elle est fournie entre-temps.
+- **Exécution anticipée** (L221-25) : demande expresse recueillie « par tout moyen » à distance, « sur
+  papier ou sur support durable » hors établissement ; le professionnel **demande au consommateur de
+  reconnaître** qu'après exécution complète il ne disposera plus du droit de rétractation. Sans demande
+  expresse recueillie, ou sans l'information du 9° de L221-5, **aucune somme n'est due**.
+  → texte de la case complété (page, version imprimable, email d'accord).
+- **Exceptions** (L221-28) : 1° service pleinement exécuté avant la fin du délai, avec accord exprès et
+  reconnaissance de la perte du droit → `Quote::canWithdraw` refuse la rétractation quand le rendez-vous
+  du devis est « terminé » et que l'exécution anticipée avait été demandée ; 8° travaux urgents
+  expressément sollicités, dans la limite du strictement nécessaire.
+- **Information** (L221-5, 7° et 10°) : conditions, délai, modalités, formulaire type et emplacement de la
+  fonction de rétractation ; si le droit n'existe pas (urgence), l'information que le consommateur n'en
+  bénéficie pas.
+- **Hors établissement** (L221-9) : exemplaire daté du contrat, papier signé ou support durable, avec
+  toutes les informations de L221-5 et **accompagné du formulaire type**. (L221-10) : **aucun paiement ni
+  contrepartie avant sept jours** à compter de la conclusion, sauf travaux urgents (4°).
+- **Fonction en ligne** (D221-5, créé par le décret n° 2026-3) : libellés « renoncer au contrat ici » et
+  « confirmer la rétractation », déclaration (nom et prénom, contrat, moyen électronique de l'accusé),
+  accusé de réception reprenant le contenu, la date et l'heure. Conforme à l'implémentation.
+- **Formulaire type** (annexe à l'article R221-1, décret n° 2022-424) : reproduit mot pour mot dans la
+  version imprimable.
 
 ## Exercice du droit : article L221-21 (version du 19 juin 2026)
 
@@ -71,7 +101,7 @@ partir du texte fourni par le mainteneur.*
 
 L'ordonnance n° 2026-2 et le décret n° 2026-3 du 5 janvier 2026 (transposition de la directive (UE)
 2023/2673) imposent, pour tout contrat à distance conclu **via une interface en ligne**, une fonction de
-rétractation gratuite (sources secondaires concordantes, articles à relire sur Légifrance) :
+rétractation gratuite (**confirmé par l'article D221-5**, texte dans [textes/code-consommation.md](textes/code-consommation.md)) :
 
 - identifiée par les mots « **renoncer au contrat ici** » ou une formule analogue dénuée d'ambiguïté ;
 - visible, directement et facilement accessible **pendant tout le délai** de rétractation ;
@@ -98,7 +128,5 @@ Le modèle d'information (annexe à l'article R221-3) a été modifié en consé
   sous 14 jours) ; l'email d'accord rappelle la date limite et l'emplacement de la fonction.
 - Horodatages : la connexion MySQL est alignée sur le fuseau de l'application.
 - Page du devis : modèle d'information réglementaire affiché mot pour mot (`src/utils/withdrawalNotice.ts`).
-- Versions imprimables (`/devis/:token/imprimer`) : modèle d'information dans le devis ; **formulaire type**
-  (« formulaire de rétractation mentionné au 7° de l'article L. 221-5 ») repris du modèle européen
-  (directive 2011/83/UE, annexe I B, sans télécopieur depuis le décret n° 2022-424) : **à confirmer
-  contre l'annexe à l'article R221-1 en vigueur** (texte non encore fourni).
+- Versions imprimables (`/devis/:token/imprimer`) : modèle d'information dans le devis ; formulaire type
+  de l'annexe à l'article R221-1, **mot pour mot** (confirmé le 04/11/2026).

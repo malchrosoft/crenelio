@@ -347,7 +347,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                   <dd>{euro(totals.vat)}</dd>
                 </>
               ) : (
-                <dd className="quote-totals__mention">{config.quote_vat_exemption || 'TVA non applicable, art. 293 B du CGI'}</dd>
+                <dd className="quote-totals__mention">{config.quote_vat_exemption || 'TVA non applicable, article 293 B du CGI'}</dd>
               )}
               <dt className="quote-totals__total">Total du devis TTC</dt>
               <dd className="quote-totals__total">{euro(totals.ttc)}</dd>

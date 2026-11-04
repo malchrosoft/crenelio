@@ -21,6 +21,16 @@ L'artisan achète la pièce **à son nom**, puis la refacture au client (avec ou
 - L'artisan devient **vendeur** : facture d'achat à son nom, garanties légales dues au client sur la
   pièce, stock éventuel.
 
+## TVA des pièces posées (artisan assujetti)
+
+BOI-TVA-BASE-10-20-40-20, § 140 et 150 ([textes/bofip.md](textes/bofip.md)) : les **fournitures**
+(matières transformées ou consommées) suivent le prix du service ; les **pièces détachées** (objets
+normalisés simplement posés) sont une **vente au taux qui leur est propre**, sauf si leur valeur est
+inférieure à celle de la pose ou si elles ont été adaptées. Simplification admise : pièces et fournitures
+suivent le régime de la prestation si leur valeur globale **n'excède pas 50 % du coût total** ; sinon la
+vente des pièces est mentionnée **distinctement** sur la facture. À intégrer au taux des lignes
+« fourniture revendue » (Item 39).
+
 ## Société
 
 La revente doit entrer dans l'**objet social** ; les pièces sont facturées avec la TVA de la société.
