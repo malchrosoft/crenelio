@@ -6,7 +6,7 @@ import { fr } from 'date-fns/locale';
 import { api } from '../../api';
 import { AppConfig, Quote, QuoteLine, QuoteLineKind, QuoteNotification, QuotePayload } from '../../types';
 import ConfirmDialog from './ConfirmDialog';
-import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, euro, lineAmount, newLine, quoteTotals, vatRates } from './quoteRules';
+import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, euro, lineAmount, newLine, quoteTotals, supplyVatCheck, vatRates } from './quoteRules';
 
 interface QuoteEditorProps {
   /** Devis existant ; `null` : nouveau brouillon (créé au premier enregistrement). */
@@ -93,6 +93,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
   const allowSupply = config.quote_allow_supply === '1';
   const rates = vatRates(config);
   const totals = useMemo(() => quoteTotals(form.lines, vatMode), [form.lines, vatMode]);
+  const supplyVat = useMemo(() => supplyVatCheck(form.lines, vatMode), [form.lines, vatMode]);
   const hasDebours = form.lines.some((line) => line.kind === 'debours');
 
   useEffect(() => {
@@ -392,6 +393,21 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                   </button>
                 ))}
               </div>
+            )}
+
+            {supplyVat && (
+              <p className="quote-editor__vat-check">
+                <WarningIcon size={16} weight="fill" aria-hidden="true" />
+                <span>
+                  Fournitures revendues : {supplyVat.share} % du coût total HT.{' '}
+                  {supplyVat.followsService
+                    ? supplyVat.rateMismatch
+                      ? "Jusqu'à 50 %, pièces et fournitures suivent en principe le régime de la prestation : appliquez-leur le même taux de TVA."
+                      : "Jusqu'à 50 %, pièces et fournitures suivent le régime de la prestation (même taux de TVA)."
+                    : "Au-delà de 50 %, les pièces détachées sont vendues au taux qui leur est propre, la pose à son propre taux, sur des lignes distinctes, sauf pièces adaptées pour être posées (ajustage, découpage, soudure)."}{' '}
+                  Comparaison globale admise par l'administration (BOI-TVA-BASE-10-20-40-20, § 150) ; à vérifier avec votre comptable.
+                </span>
+              </p>
             )}
 
             <dl className="quote-totals">

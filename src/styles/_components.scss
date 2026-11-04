@@ -3654,6 +3654,25 @@ $data-grid-status-width: 13em;
   }
 }
 
+.quote-editor__vat-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: $space-block;
+  padding: $space-sm $space-block;
+  border-radius: $radius-sm;
+  background: $warning-light;
+  color: $gray-800;
+  font-size: 0.85rem;
+  line-height: $line-height-base;
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: $warning;
+  }
+}
+
 .quote-totals {
   display: grid;
   grid-template-columns: max-content 140px;

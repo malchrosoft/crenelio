@@ -28,8 +28,13 @@ BOI-TVA-BASE-10-20-40-20, § 140 et 150 ([textes/bofip.md](textes/bofip.md)) : l
 normalisés simplement posés) sont une **vente au taux qui leur est propre**, sauf si leur valeur est
 inférieure à celle de la pose ou si elles ont été adaptées. Simplification admise : pièces et fournitures
 suivent le régime de la prestation si leur valeur globale **n'excède pas 50 % du coût total** ; sinon la
-vente des pièces est mentionnée **distinctement** sur la facture. À intégrer au taux des lignes
-« fourniture revendue » (Item 39).
+vente des pièces est mentionnée **distinctement** sur la facture.
+
+Dans Crénelio (devis avec TVA) : l'éditeur calcule la part des lignes « fourniture revendue » dans le
+coût total HT (débours exclus, hors chiffre d'affaires) et le rappelle sous les lignes : jusqu'à 50 %, même
+taux que la prestation ; au-delà, taux propre des pièces, sur des lignes distinctes (ce que fait déjà le
+devis). Ce contrôle est **indicatif** : la comparaison se fait en principe pièce par pièce, et seul le
+professionnel sait si une pièce a été adaptée. Le taux reste son choix, à valider avec son comptable.
 
 ## Société
 
