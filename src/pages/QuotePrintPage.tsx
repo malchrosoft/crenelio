@@ -8,7 +8,7 @@ import { AppConfig, Quote, QuoteLine } from '../types';
 import { LINE_KIND_LABELS, euro, lineAmount } from '../components/admin/quoteRules';
 import { companyAddress, legalIdentity } from '../utils/legalIdentity';
 import { attestationUrl, BUILDER_GUARANTEES } from '../utils/builderGuarantees';
-import { withdrawalNotice } from '../utils/withdrawalNotice';
+import { ONLINE_FORM_NOTICE, withdrawalNotice } from '../utils/withdrawalNotice';
 
 interface QuotePrintPageProps {
   config: AppConfig;
@@ -424,6 +424,8 @@ const WithdrawalFormSheet: React.FC<{ quote: Quote; config: AppConfig }> = ({ qu
       <p className="quote-print__field">Date :</p>
       <p>(*) Rayez la mention inutile.</p>
     </section>
+    {/* Information sur le formulaire prérempli en ligne (écart 13), hors du modèle réglementaire */}
+    <p className="quote-print__mention">{ONLINE_FORM_NOTICE}</p>
   </>
 );
 

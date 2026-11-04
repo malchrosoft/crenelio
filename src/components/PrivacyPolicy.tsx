@@ -48,7 +48,7 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ config }) => {
         <li>
           <strong>Devis :</strong> nom, coordonnées et lieu d'intervention repris du rendez-vous, puis, si vous
           répondez en ligne, la date, l'adresse IP de la réponse et vos choix (conservation des pièces remplacées,
-          mandat d'achat des pièces en votre nom). Ils servent à établir le devis et à prouver votre accord. Même
+          mandat d'achat des pièces en votre nom) et, si vous vous rétractez en ligne, votre déclaration (nom, adresse, email de l'accusé de réception, date et adresse IP). Ils servent à établir le devis et à prouver votre accord. Même
           base légale ; effacés avec le rendez-vous.
         </li>
         <li>

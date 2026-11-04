@@ -278,6 +278,7 @@ export interface Quote {
   withdrawn_at: string | null;
   withdrawal_name: string | null;
   withdrawal_email: string | null;
+  withdrawal_address?: string | null;
   refusal_reason: string | null;
   /** Jeton du lien client (Espace Artisan seulement, après l'envoi). */
   token?: string | null;

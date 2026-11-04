@@ -48,3 +48,11 @@ export function withdrawalNotice(party: WithdrawalNoticeParty): WithdrawalNotice
     ],
   };
 }
+
+/**
+ * Information du client sur le formulaire prérempli en ligne (écart 13), identique à
+ * `QuotePdf::ONLINE_FORM_NOTICE` (PHP) : complète le modèle réglementaire sans le modifier.
+ */
+export const ONLINE_FORM_NOTICE =
+  'Pour vous rétracter plus simplement, un formulaire déjà rempli avec les références de votre contrat vous attend en ligne : il vous suffit de le vérifier puis de le valider. Un accusé de réception vous est aussitôt envoyé par email (Code de la consommation, articles L221-21 et D221-5).';
+

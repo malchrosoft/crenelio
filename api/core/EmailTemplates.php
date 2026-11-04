@@ -12,6 +12,7 @@
 
 require_once __DIR__ . '/Branding.php';
 require_once __DIR__ . '/LegalTexts.php';
+require_once __DIR__ . '/QuotePdf.php';
 
 class EmailTemplates
 {
@@ -650,6 +651,13 @@ class EmailTemplates
     // Devis (Item 22) — cadre légal : docs/legal/
     // -----------------------------------------------------------------
 
+    /** Formulaire de rétractation en ligne prérempli (/devis/:token/retractation), null sans APP_URL. */
+    public static function quoteWithdrawalUrl(array $quote): ?string
+    {
+        $url = self::quoteUrl($quote);
+        return $url === null ? null : $url . '/retractation';
+    }
+
     /** Lien public du devis (/devis/:token), null sans APP_URL. */
     public static function quoteUrl(array $quote): ?string
     {
@@ -781,7 +789,17 @@ class EmailTemplates
         foreach ($notice['sections'] as $title => $paragraphs) {
             $html .= $section($title, $paragraphs);
         }
-        return $html . $section('Formulaire de rétractation', LegalTexts::withdrawalForm($config, $quote));
+        // Formulaire type joint en PDF remplissable (L221-9) ; accès au formulaire prérempli en ligne
+        $online = self::quoteWithdrawalUrl($quote);
+        return $html . sprintf(
+            '<div style="margin:20px 0 0;padding:14px 16px;border:1px solid %s;border-radius:8px;">'
+            . '<p style="margin:0 0 6px;font-weight:700;color:%s;">Formulaire de rétractation</p>'
+            . '<p style="margin:0 0 6px;font-size:13px;line-height:1.5;color:%s;">Le formulaire type est joint à ce message (PDF remplissable).</p>'
+            . '<p style="margin:0 0 10px;font-size:13px;line-height:1.5;color:%s;">%s</p>%s</div>',
+            self::GRAY_200, self::GRAY_800, self::GRAY_500, self::GRAY_500,
+            self::escape(QuotePdf::ONLINE_FORM_NOTICE),
+            $online ? sprintf('<a href="%s" style="color:%s;font-weight:600;">Remplir le formulaire en ligne</a>', self::escape($online), self::primary($config)) : ''
+        );
     }
 
     /**

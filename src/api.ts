@@ -165,8 +165,8 @@ export const api = {
   getQuoteByToken: (token: string) => request<Quote>('GET', `/quotes/token/${token}`),
   decideQuote: (token: string, payload: QuoteDecisionPayload) =>
     request<{ status: Quote['status'] }>('POST', `/quotes/token/${token}/decision`, payload),
-  withdrawQuote: (token: string, name: string, email: string) =>
-    request<{ status: 'withdrawn'; withdrawn_at: string }>('POST', `/quotes/token/${token}/withdraw`, { name, email }),
+  withdrawQuote: (token: string, name: string, email: string, address = '') =>
+    request<{ status: 'withdrawn'; withdrawn_at: string }>('POST', `/quotes/token/${token}/withdraw`, { name, email, address }),
 
   // Moteur de créneaux
   getSlots: (serviceId: number, date: string) =>

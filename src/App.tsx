@@ -12,6 +12,7 @@ import BookingPage from './pages/BookingPage';
 import AppointmentManagePage from './pages/AppointmentManagePage';
 import QuotePage from './pages/QuotePage';
 import QuotePrintPage from './pages/QuotePrintPage';
+import QuoteWithdrawalPage from './pages/QuoteWithdrawalPage';
 
 /**
  * Composant racine de Crénelio.
@@ -24,6 +25,7 @@ import QuotePrintPage from './pages/QuotePrintPage';
  *   /rdv/:token → Gestion d'un rendez-vous depuis le lien reçu par email
  *   /devis/:token → Devis : consultation, accord, mandat de débours, rétractation en ligne
  *   /devis/:token/imprimer → Versions imprimables (devis, mandat de débours, formulaire de rétractation)
+ *   /devis/:token/retractation → Formulaire de rétractation en ligne prérempli (annexe R221-1)
  */
 export const App: React.FC = () => {
   const [config, setConfig] = useState<AppConfig>({});
@@ -57,6 +59,7 @@ export const App: React.FC = () => {
       <Route path="/decision/:token" element={<DecisionPage config={config} />} />
       <Route path="/devis/:token" element={<QuotePage config={config} />} />
       <Route path="/devis/:token/imprimer" element={<QuotePrintPage config={config} />} />
+      <Route path="/devis/:token/retractation" element={<QuoteWithdrawalPage config={config} />} />
       <Route
         path="/rdv/:token"
         element={<AppointmentManagePage config={config} />}

@@ -8,7 +8,7 @@ import { AppConfig, Quote } from '../types';
 import BrandMark from '../components/BrandMark';
 import { companyAddress, legalIdentity } from '../utils/legalIdentity';
 import { attestationUrl, BUILDER_GUARANTEES } from '../utils/builderGuarantees';
-import { withdrawalNotice, WithdrawalNotice } from '../utils/withdrawalNotice';
+import { ONLINE_FORM_NOTICE, withdrawalNotice, WithdrawalNotice } from '../utils/withdrawalNotice';
 import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, euro, lineAmount } from '../components/admin/quoteRules';
 
 interface QuotePageProps {
@@ -38,18 +38,12 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
   const [early, setEarly] = useState(false);
   const [refusing, setRefusing] = useState(false);
   const [reason, setReason] = useState('');
-  // Rétractation en ligne
-  const [withdrawing, setWithdrawing] = useState(false);
-  const [withdrawName, setWithdrawName] = useState('');
-  const [withdrawEmail, setWithdrawEmail] = useState('');
 
   const load = () =>
     api
       .getQuoteByToken(token)
       .then((q) => {
         setQuote(q);
-        setWithdrawName(q.client_name);
-        setWithdrawEmail(q.client_email);
       })
       .catch((err: Error) => setError(err.message));
 
@@ -393,53 +387,22 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
         </p>
       )}
 
+      {quote.status === 'withdrawn' && (
+        <p className="quote-page__print">
+          <a href={`/api/quotes/token/${token}/declaration.pdf`}>Télécharger la déclaration de rétractation (PDF)</a>
+        </p>
+      )}
+
       {quote.can_withdraw && (
         <section className="quote-page__section quote-withdrawal">
-          {withdrawing ? (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                run(() => api.withdrawQuote(token, withdrawName.trim(), withdrawEmail.trim()));
-              }}
-            >
-              <h3>Déclaration de rétractation</h3>
-              <p>
-                Contrat concerné : devis {quote.number}
-                {quote.title ? ` — ${quote.title}` : ''}, accepté le {longDate(quote.decided_at)}.
-              </p>
-              <div className="form-group">
-                <label className="form-label" htmlFor="withdraw-name">
-                  Nom et prénom
-                </label>
-                <input id="withdraw-name" className="form-input" required value={withdrawName} onChange={(e) => setWithdrawName(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="withdraw-email">
-                  Email pour recevoir l'accusé de réception
-                </label>
-                <input
-                  id="withdraw-email"
-                  type="email"
-                  className="form-input"
-                  required
-                  value={withdrawEmail}
-                  onChange={(e) => setWithdrawEmail(e.target.value)}
-                />
-              </div>
-              <div className="decision-card__actions">
-                <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => setWithdrawing(false)}>
-                  Retour
-                </button>
-                <button type="submit" className="btn btn-danger" disabled={busy}>
-                  Confirmer la rétractation
-                </button>
-              </div>
-            </form>
-          ) : (
-            <button type="button" className="btn btn-secondary" onClick={() => setWithdrawing(true)}>
+          {/* Information sur le formulaire prérempli (écart 13) ; fonction de rétractation (D221-5) */}
+          <p>{ONLINE_FORM_NOTICE}</p>
+          <div className="decision-card__actions">
+            <Link to={`/devis/${token}/retractation`} className="btn btn-secondary">
               Renoncer au contrat ici
-            </button>
-          )}
+            </Link>
+            <a href={`/api/quotes/token/${token}/formulaire.pdf`}>Télécharger le formulaire de rétractation (PDF remplissable)</a>
+          </div>
         </section>
       )}
     </QuoteLayout>

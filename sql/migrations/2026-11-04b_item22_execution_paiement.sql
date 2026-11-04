@@ -36,6 +36,7 @@ DELIMITER ;
 CALL `crenelio_add_column`('quotes', 'execution_terms', 'VARCHAR(255) NULL AFTER `urgent`');
 CALL `crenelio_add_column`('quotes', 'payment_terms', 'VARCHAR(500) NULL AFTER `execution_terms`');
 CALL `crenelio_add_column`('quotes', 'time_counting', 'VARCHAR(255) NULL AFTER `payment_terms`');
+CALL `crenelio_add_column`('quotes', 'withdrawal_address', 'VARCHAR(500) NULL AFTER `withdrawal_email`');
 CALL `crenelio_add_column`('quotes', 'builder_works', 'BOOLEAN NOT NULL DEFAULT FALSE AFTER `time_counting`');
 
 DROP PROCEDURE IF EXISTS `crenelio_add_column`;

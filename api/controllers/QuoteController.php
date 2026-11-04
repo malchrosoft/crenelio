@@ -10,6 +10,7 @@ require_once __DIR__ . '/../models/Config.php';
 require_once __DIR__ . '/../models/QuoteNotification.php';
 require_once __DIR__ . '/../core/QuoteNotifier.php';
 require_once __DIR__ . '/../core/InsuranceAttestation.php';
+require_once __DIR__ . '/../core/QuotePdf.php';
 require_once __DIR__ . '/../core/RateLimit.php';
 require_once __DIR__ . '/../core/Response.php';
 
@@ -124,6 +125,29 @@ class QuoteController
         InsuranceAttestation::serve();
     }
 
+    /**
+     * GET /quotes/token/:token/formulaire.pdf — Formulaire type de rétractation remplissable, prérempli
+     * (annexe R221-1) ; GET …/declaration.pdf — déclaration validée en ligne (L221-21, D221-5).
+     */
+    public function withdrawalPdf(array $params): void
+    {
+        $quote = Quote::findByToken((string)($params['token'] ?? ''));
+        $declaration = ($params['document'] ?? '') === 'declaration';
+        if (!$quote || !in_array($quote['status'], ['accepted', 'withdrawn'], true) || (int)$quote['urgent']
+            || ($declaration && $quote['status'] !== 'withdrawn')) {
+            Response::json(['error' => 'Document indisponible.'], 404);
+        }
+        $config = Config::getAll();
+        $pdf = $declaration
+            ? QuotePdf::withdrawalDeclaration($quote, $config)
+            : QuotePdf::withdrawalForm($quote, $config, EmailTemplates::quoteWithdrawalUrl($quote));
+        header('Content-Type: application/pdf');
+        header(sprintf('Content-Disposition: attachment; filename="%s-%s.pdf"', $declaration ? 'declaration-retractation' : 'formulaire-retractation', $quote['number']));
+        header('Cache-Control: private, no-store');
+        echo $pdf;
+        exit;
+    }
+
     /** GET /quotes/:id/notifications — Journal des emails du devis. */
     public function notifications(array $params): void
     {
@@ -222,7 +246,8 @@ class QuoteController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             Response::json(['error' => "Indiquez l'adresse email où recevoir l'accusé de réception."], 400);
         }
-        if (!Quote::withdraw((int)$quote['id'], mb_substr($name, 0, 255), mb_substr($email, 0, 255))) {
+        $address = trim((string)($body['address'] ?? ''));
+        if (!Quote::withdraw((int)$quote['id'], mb_substr($name, 0, 255), mb_substr($email, 0, 255), $address === '' ? null : mb_substr($address, 0, 500))) {
             Response::json(['error' => 'La rétractation n\'est plus possible pour ce devis.'], 409);
         }
         $quote = Quote::find((int)$quote['id']);

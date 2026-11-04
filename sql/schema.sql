@@ -198,6 +198,7 @@ CREATE TABLE `quotes` (
     `withdrawn_at`     DATETIME       NULL,
     `withdrawal_name`  VARCHAR(255)   NULL,
     `withdrawal_email` VARCHAR(255)   NULL,
+    `withdrawal_address` VARCHAR(500) NULL,
     `withdrawal_ip`    VARCHAR(45)    NULL,
     `refusal_reason`  TEXT            NULL,
     `created_at`      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,

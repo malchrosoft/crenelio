@@ -144,6 +144,7 @@ $router->get('/quotes/token/:token',        [$quoteController, 'showByToken']);
 $router->post('/quotes/token/:token/decision', [$quoteController, 'decide']);
 $router->post('/quotes/token/:token/withdraw', [$quoteController, 'withdraw']);
 $router->get('/quotes/token/:token/attestation', [$quoteController, 'attestation']);
+$router->get('/quotes/token/:token/:document.pdf', [$quoteController, 'withdrawalPdf']);
 $router->get('/quotes/:id',                 $admin([$quoteController, 'show']));
 $router->put('/quotes/:id',                 $admin([$quoteController, 'update']));
 $router->delete('/quotes/:id',              $admin([$quoteController, 'destroy']));

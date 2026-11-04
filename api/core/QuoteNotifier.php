@@ -12,6 +12,7 @@ require_once __DIR__ . '/../models/Config.php';
 require_once __DIR__ . '/Mailer.php';
 require_once __DIR__ . '/EmailTemplates.php';
 require_once __DIR__ . '/InsuranceAttestation.php';
+require_once __DIR__ . '/QuotePdf.php';
 
 class QuoteNotifier
 {
@@ -27,7 +28,7 @@ class QuoteNotifier
     public static function sendDecision(array $quote, array $config): array
     {
         return array_values(array_filter([
-            self::toClient($quote, 'decision_client', EmailTemplates::quoteDecisionClient($quote, $config)),
+            self::toClient($quote, 'decision_client', EmailTemplates::quoteDecisionClient($quote, $config), self::withdrawalFormAttachment($quote, $config)),
             self::toPro($quote, 'decision_pro', EmailTemplates::quoteDecisionPro($quote, $config)),
         ]));
     }
@@ -37,8 +38,8 @@ class QuoteNotifier
     {
         return array_values(array_filter([
             self::dispatch($quote, 'withdrawal_client', (string)$quote['withdrawal_email'], (string)$quote['withdrawal_name'],
-                EmailTemplates::quoteWithdrawal($quote, $config, false), self::proAddress()),
-            self::toPro($quote, 'withdrawal_pro', EmailTemplates::quoteWithdrawal($quote, $config, true)),
+                EmailTemplates::quoteWithdrawal($quote, $config, false), self::proAddress(), self::declarationAttachment($quote, $config)),
+            self::toPro($quote, 'withdrawal_pro', EmailTemplates::quoteWithdrawal($quote, $config, true), self::declarationAttachment($quote, $config)),
         ]));
     }
 
@@ -48,12 +49,35 @@ class QuoteNotifier
         return $email === '' ? null : self::dispatch($quote, $type, $email, (string)$quote['client_name'], $message, self::proAddress(), $attachment);
     }
 
-    private static function toPro(array $quote, string $type, array $message): ?array
+    private static function toPro(array $quote, string $type, array $message, ?array $attachment = null): ?array
     {
         $pro = self::proAddress();
         $client = trim((string)$quote['client_email']);
         return $pro === null ? null : self::dispatch($quote, $type, $pro, '', $message,
-            filter_var($client, FILTER_VALIDATE_EMAIL) ? $client : null);
+            filter_var($client, FILTER_VALIDATE_EMAIL) ? $client : null, $attachment);
+    }
+
+    /** Formulaire type remplissable joint à l'exemplaire du contrat (L221-9), sauf intervention urgente. */
+    private static function withdrawalFormAttachment(array $quote, array $config): ?array
+    {
+        if ($quote['status'] !== 'accepted' || (int)$quote['urgent']) {
+            return null;
+        }
+        return [
+            'filename' => 'formulaire-retractation-' . $quote['number'] . '.pdf',
+            'mime'     => 'application/pdf',
+            'content'  => QuotePdf::withdrawalForm($quote, $config, EmailTemplates::quoteWithdrawalUrl($quote)),
+        ];
+    }
+
+    /** Déclaration de rétractation validée en ligne (contenu, date et heure), jointe aux accusés. */
+    private static function declarationAttachment(array $quote, array $config): array
+    {
+        return [
+            'filename' => 'declaration-retractation-' . $quote['number'] . '.pdf',
+            'mime'     => 'application/pdf',
+            'content'  => QuotePdf::withdrawalDeclaration($quote, $config),
+        ];
     }
 
     private static function proAddress(): ?string

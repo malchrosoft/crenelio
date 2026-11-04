@@ -321,15 +321,15 @@ class Quote
      * obligatoire depuis le 19 juin 2026) : devis accepté, hors intervention urgente, jusqu'à la fin du
      * délai inclus. Conserve la déclaration (nom, email de l'accusé de réception, date, IP).
      */
-    public static function withdraw(int $id, string $name, string $email): bool
+    public static function withdraw(int $id, string $name, string $email, ?string $address = null): bool
     {
         return Database::execute(
             "UPDATE `quotes` SET status = 'withdrawn', withdrawn_at = NOW(), withdrawal_name = ?,
-                withdrawal_email = ?, withdrawal_ip = ?
+                withdrawal_email = ?, withdrawal_address = ?, withdrawal_ip = ?
              WHERE id = ? AND status = 'accepted' AND NOT urgent AND withdrawal_until >= CURDATE()
                AND NOT (early_execution AND EXISTS (SELECT 1 FROM `appointments` a
                    WHERE a.id = `quotes`.appointment_id AND a.status = 'completed'))",
-            [$name, $email, $_SERVER['REMOTE_ADDR'] ?? null, $id]
+            [$name, $email, $address, $_SERVER['REMOTE_ADDR'] ?? null, $id]
         ) > 0;
     }
 
