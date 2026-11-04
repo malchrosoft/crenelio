@@ -11,6 +11,7 @@
  */
 
 require_once __DIR__ . '/Branding.php';
+require_once __DIR__ . '/LegalTexts.php';
 
 class EmailTemplates
 {
@@ -732,11 +733,55 @@ class EmailTemplates
             );
         }
 
+        // Exemplaire du contrat sur support durable : informations de L221-5 et formulaire type (L221-9)
+        $outro .= self::quoteContractDetails($quote, $config, $url);
+
         return [
             'subject' => $subject,
             'html'    => self::layout($company, 'Devis accepté', $intro, $rows, $outro, $url && !(int)$quote['urgent'] ? ['url' => $url, 'label' => 'Voir le devis'] : null, $config),
             'text'    => self::plainText('Devis accepté', $intro, $rows, $outro, $url, $config, 'Voir le devis'),
         ];
+    }
+
+    /**
+     * Informations du contrat reprises dans l'exemplaire envoyé au client (C. consom. L221-5 et L221-9) :
+     * entreprise, exécution, paiement, réclamations, médiateur, garanties, modèle d'information sur la
+     * rétractation et formulaire type (textes de `LegalTexts`, identiques à la page et à l'impression).
+     */
+    private static function quoteContractDetails(array $quote, array $config, ?string $url): string
+    {
+        $section = fn(string $title, array $paragraphs) => sprintf(
+            '<p style="margin:20px 0 6px;font-weight:700;color:%s;">%s</p>%s',
+            self::GRAY_800,
+            self::escape($title),
+            implode('', array_map(fn($p) => '<p style="margin:0 0 6px;font-size:13px;line-height:1.5;color:' . self::GRAY_500 . ';">' . self::escape($p) . '</p>', $paragraphs))
+        );
+        $html = $section('Entreprise', LegalTexts::companyLines($config));
+        $terms = array_filter([
+            !empty($quote['execution_terms']) ? 'Exécution : ' . $quote['execution_terms'] : '',
+            !empty($quote['payment_terms']) ? 'Paiement : ' . $quote['payment_terms'] : '',
+            !empty($quote['time_counting']) ? $quote['time_counting'] : '',
+            $quote['vat_mode'] === 'vat' ? '' : (string)(($config['quote_vat_exemption'] ?? '') ?: 'TVA non applicable, article 293 B du CGI'),
+            !empty($config['legal_complaints']) ? 'Réclamations : ' . $config['legal_complaints'] : '',
+            !empty($config['legal_mediator']) ? 'Médiation de la consommation : ' . $config['legal_mediator'] : '',
+        ]);
+        $html .= $section('Conditions', $terms);
+        if ((int)$quote['builder_works']) {
+            $html .= $section('Garanties légales des constructeurs', array_merge(
+                LegalTexts::builderGuarantees(),
+                ["Attestation d'assurance de responsabilité décennale jointe à l'envoi du devis (Code des assurances, art. L243-2)."]
+            ));
+        }
+        if ((int)$quote['urgent']) {
+            $html .= $section('Droit de rétractation', ['Intervention urgente expressément demandée : pas de droit de rétractation (article L221-28, 8°, du Code de la consommation), dans la limite des pièces de rechange et travaux strictement nécessaires.']);
+            return $html;
+        }
+        $notice = LegalTexts::withdrawalNotice($config, $url ?? '');
+        $html .= $section($notice['title'], []);
+        foreach ($notice['sections'] as $title => $paragraphs) {
+            $html .= $section($title, $paragraphs);
+        }
+        return $html . $section('Formulaire de rétractation', LegalTexts::withdrawalForm($config, $quote));
     }
 
     /**

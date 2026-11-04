@@ -69,6 +69,8 @@ INSERT IGNORE INTO `config` (`config_key`, `config_value`) VALUES
 ('quote_payment_terms',   'Paiement à réception de la facture, par virement, chèque ou espèces.'),
 ('quote_time_counting',   ''),
 ('legal_vat_number',      ''),
+-- Traitement des réclamations (C. consom. R111-1, 2°)
+('legal_complaints',      'Toute réclamation peut être adressée par email ou par courrier aux coordonnées de l''entreprise indiquées ci-dessus.'),
 -- Garanties des constructeurs et attestation décennale (C. civ. 1792, C. assur. L243-2)
 ('quote_builder_guarantees', '0'),
 ('insurance_attestation_until', ''),

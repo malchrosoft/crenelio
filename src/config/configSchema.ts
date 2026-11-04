@@ -228,6 +228,12 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
         hint: "Ex. : « Registre national des entreprises (métiers de l'artisanat) » ou « RCS Versailles » (C. consom. R111-2, 3° ; C. com. R123-237).",
       },
       {
+        key: 'legal_complaints',
+        label: 'Traitement des réclamations',
+        type: 'textarea',
+        hint: 'Comment le client vous adresse une réclamation et sous quel délai vous répondez (C. consom. R111-1, 2°) : affiché sur les devis.',
+      },
+      {
         key: 'legal_mediator',
         label: 'Médiateur de la consommation',
         type: 'textarea',

@@ -263,6 +263,10 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
                   <li>Client professionnel : son nom complet, son adresse et son numéro d'identification (SIREN) ; nature des opérations (CGI, annexe II, art. 242 nonies A).</li>
                   <li>Débours : ligne distincte, montant exact, copie du justificatif remise au client ; « débours » dans votre livre des recettes, hors chiffre d'affaires.</li>
                   <li>Conservez les originaux des tickets et factures des pièces avancées.</li>
+                  <li>
+                    Devis signé au domicile du client (contrat hors établissement) : aucun paiement ni acompte avant sept jours après la
+                    signature, sauf travaux d'entretien ou de réparation urgents (C. consom. L221-10).
+                  </li>
                 </ul>
                 <p className="quote-reminder__docs">
                   En savoir plus :{' '}

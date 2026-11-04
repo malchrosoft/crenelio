@@ -321,6 +321,7 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
         </section>
       )}
 
+      {config.legal_complaints && <p className="quote-print__mention">Réclamations : {config.legal_complaints}</p>}
       {config.legal_mediator && (
         <p className="quote-print__mention">Médiation de la consommation : {config.legal_mediator}</p>
       )}

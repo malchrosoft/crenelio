@@ -309,6 +309,7 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
         </section>
       )}
 
+      {config.legal_complaints && <p className="form-hint quote-page__mediator">Réclamations : {config.legal_complaints}</p>}
       {config.legal_mediator && (
         <p className="form-hint quote-page__mediator">
           Médiation de la consommation : en cas de litige, vous pouvez recourir gratuitement au médiateur {config.legal_mediator}.

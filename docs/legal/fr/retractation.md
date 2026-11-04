@@ -135,5 +135,7 @@ Le modèle d'information (annexe à l'article R221-3) a été modifié en consé
   sous 14 jours) ; l'email d'accord rappelle la date limite et l'emplacement de la fonction.
 - Horodatages : la connexion MySQL est alignée sur le fuseau de l'application.
 - Page du devis : modèle d'information réglementaire affiché mot pour mot (`src/utils/withdrawalNotice.ts`).
+- **Exemplaire du contrat** (L221-9) : l'email envoyé au client après son accord reprend toutes les
+  informations du contrat, le modèle d'information et le formulaire type (`LegalTexts.php`).
 - Versions imprimables (`/devis/:token/imprimer`) : modèle d'information dans le devis ; formulaire type
   de l'annexe à l'article R221-1, **mot pour mot** (confirmé le 04/11/2026).

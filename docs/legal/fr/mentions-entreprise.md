@@ -57,6 +57,8 @@ et [textes/code-artisanat.md](textes/code-artisanat.md) :
   Un simple dépannage ou un entretien qui ne crée pas d'ouvrage et ne touche pas à un élément
   d'équipement de l'ouvrage n'entre pas, en principe, dans ce régime : c'est au professionnel de
   qualifier ses travaux, au besoin avec son assureur.
+- **Réclamations** (C. consom. R111-1, 2°) : modalités de traitement des réclamations, réglage
+  `legal_complaints` affiché sur les devis.
 - **Médiateur** (C. consom. R616-1) : coordonnées **et adresse du site internet** du médiateur, de manière
   visible sur le site, les conditions générales ou les bons de commande.
 - **Mot « artisan »** (C. artisanat L241-2) : amende de 7 500 € pour l'usage du mot « artisan » ou de ses
