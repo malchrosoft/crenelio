@@ -57,3 +57,7 @@ Source : Légifrance, Code de commerce (LEGITEXT000005634379).
 > - " société européenne " ou des initiales " SE " ;
 >
 > b) De l'énonciation du montant du capital social qui peut être arrondi à la valeur entière inférieure. Dans le cas d'augmentation de capital résultant de l'exercice, pouvant avoir lieu à tout moment, des droits attachés à des valeurs mobilières donnant accès au capital, de levées d'option de souscription d'actions possibles à tout moment ou du paiement de dividende en actions, et sauf si l'augmentation du capital dépasse 10 % de son montant antérieur, la société n'est tenue de mentionner le nouveau montant du capital dans les actes et documents énumérés à l'alinéa premier qu'à l'expiration d'un délai de trois ans à compter de la constatation de l'augmentation.
+
+### Article L123-28
+
+> Par dérogation aux dispositions des articles L. 123-12 à L. 123-23, les personnes physiques bénéficiant du régime défini à l'article 50-0 du code général des impôts peuvent ne pas établir de comptes annuels. Elles tiennent un livre mentionnant chronologiquement le montant et l'origine des recettes qu'elles perçoivent au titre de leur activité professionnelle. Elles tiennent également, lorsque leur commerce principal est de vendre des marchandises, objets, fournitures et denrées à emporter ou à consommer sur place, ou de fournir le logement, un registre récapitulé par année, présentant le détail de leurs achats. Un décret fixe les conditions dans lesquelles ce livre et ce registre sont tenus.

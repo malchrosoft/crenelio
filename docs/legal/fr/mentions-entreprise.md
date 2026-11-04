@@ -22,6 +22,9 @@ et [textes/code-artisanat.md](textes/code-artisanat.md) :
   assujetti ; assurance avec **coordonnées de l'assureur et couverture géographique** ; conditions
   générales s'il en utilise ; modalités de paiement, d'exécution et de traitement des réclamations ;
   garanties légales ; médiateur.
+- **Garanties légales** (C. consom. R111-1, 3° : « ou de toute autre garantie légale applicable ») : pour
+  des travaux constituant un ouvrage, responsabilité de plein droit du constructeur (C. civ. 1792,
+  [textes/code-civil.md](textes/code-civil.md)) ; à préciser avec les articles 1792-1 et suivants.
 - **Médiateur** (C. consom. R616-1) : coordonnées **et adresse du site internet** du médiateur, de manière
   visible sur le site, les conditions générales ou les bons de commande.
 - **Mot « artisan »** (C. artisanat L241-2) : amende de 7 500 € pour l'usage du mot « artisan » ou de ses

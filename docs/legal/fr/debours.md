@@ -24,9 +24,25 @@ Doctrine BOFiP lue le 04/11/2026 ; validation par un expert-comptable recommand�
   d'exploitation répercutées sur la clientèle.
 
 Le mandat **distinct et préalable** de Crénelio, la facture au nom du client et la reddition de compte
-(fiche « Préparer la facture », copie du justificatif) répondent à ces conditions. Reste propre au régime
-micro-entrepreneur (non traité par ces textes fiscaux) : l'exclusion des débours du chiffre d'affaires
-déclaré à l'URSSAF, issue de sources secondaires.
+(fiche « Préparer la facture », copie du justificatif) répondent à ces conditions. 
+
+### Micro-entrepreneur : chiffre d'affaires et livre des recettes (vérifié le 04/11/2026)
+
+- **Cotisations** (C. sécu. soc. L613-7, [textes/code-securite-sociale.md](textes/code-securite-sociale.md)) :
+  calculées sur « le montant de leur **chiffre d'affaires** ou de leurs recettes **effectivement
+  réalisés** » des bénéficiaires des régimes des articles 50-0 et 102 ter du CGI. **Aucun article ne
+  mentionne explicitement les débours.** Leur exclusion découle de ce qu'ils ne sont pas le chiffre
+  d'affaires de l'entrepreneur : des sommes avancées au nom et pour le compte du client, aux conditions
+  de l'article 267, II, 2° du CGI et de la doctrine ci-dessus. Une source secondaire affirmant qu'elle est
+  « ancrée dans l'article L613-7 » va plus loin que le texte.
+- **Seuils** (CGI 50-0, 1, version du 31/10/2026, [textes/code-general-impots.md](textes/code-general-impots.md)) :
+  **83 600 €** de chiffre d'affaires hors taxes pour les prestations de services, **203 100 €** pour la
+  vente de marchandises ; actualisés tous les trois ans.
+- **Livre des recettes** (C. com. L123-28 et CGI 50-0, 5) : un livre « mentionnant chronologiquement le
+  montant et l'origine des recettes », « servi au jour le jour », **appuyé des factures et de toutes autres
+  pièces justificatives**. Les textes n'imposent pas de mention « débours » : l'inscrire à part (ou dans un
+  registre annexé) est une **bonne pratique** pour expliquer l'écart entre les encaissements et le
+  chiffre d'affaires déclaré, à valider avec l'expert-comptable.
 
 ## Pourquoi c'est important pour un micro-entrepreneur
 
@@ -45,7 +61,8 @@ client**, le montant n'entre pas dans le chiffre d'affaires et ne supporte pas d
 3. **Remboursement au montant exact**, sans marge ; pas de TVA ajoutée par un artisan en franchise.
 4. **Ligne distincte** sur la facture, séparée du prix de la prestation.
 5. **Justificatifs** : conserver les originaux (contrôle), en remettre une copie au client.
-6. Dans le **livre des recettes**, indiquer « débours » à côté du montant.
+6. Dans le **livre des recettes**, indiquer « débours » à côté du montant (bonne pratique : les textes
+   imposent un livre chronologique des recettes appuyé des justificatifs, sans exiger cette mention).
 
 ## Ce qui ne peut pas être un débours
 

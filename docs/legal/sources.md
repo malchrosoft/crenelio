@@ -27,15 +27,20 @@ Fichiers Légifrance déposés par le mainteneur, reproduits mot pour mot dans [
 |---|---|
 | C. consom. L111-1, L111-2, L112-1, L112-3, L221-5, L221-8 à L221-10, L221-18 à L221-25, L221-27, L221-28, L616-1, R111-1, R111-2, R221-2, R221-3, D221-5 (décret n° 2026-3), R616-1, annexe R221-1 | [code-consommation.md](fr/textes/code-consommation.md) |
 | Annexe à l'article R221-3 | [retractation-modele.md](fr/retractation-modele.md) |
-| C. com. R526-27, R123-237, R123-238 | [code-commerce.md](fr/textes/code-commerce.md) |
-| CGI 267, 293 B, 293 E | [code-general-impots.md](fr/textes/code-general-impots.md) |
+| C. com. R526-27, R123-237, R123-238, L123-28 (livre des recettes) | [code-commerce.md](fr/textes/code-commerce.md) |
+| CGI 50-0 (régime micro, seuils, livre des recettes), 267, 293 B, 293 E | [code-general-impots.md](fr/textes/code-general-impots.md) |
+| Code civil, article 1792 (responsabilité du constructeur d'un ouvrage) | [code-civil.md](fr/textes/code-civil.md) |
+| C. sécu. soc. L613-7 (cotisations du micro-entrepreneur) | [code-securite-sociale.md](fr/textes/code-securite-sociale.md) |
 | Code de l'artisanat L121-1, L211-1, L241-2 | [code-artisanat.md](fr/textes/code-artisanat.md) |
 | Arrêté n° 83-50/A du 3 octobre 1983 ; arrêté du 24 janvier 2017 | [arretes.md](fr/textes/arretes.md) |
 | BOFiP BOI-TVA-BASE-10-10-30 (III), BOI-TVA-BASE-10-20-40-30 (§ 130), BOI-TVA-BASE-10-20-40-20 (§ 40, 70, 140-150), téléchargés le 04/11/2026 | [bofip.md](fr/textes/bofip.md) |
 
 ## Encore à lire
 
-- Régime **micro-entrepreneur** (URSSAF, CSS) : exclusion des débours du chiffre d'affaires déclaré et
-  mention « débours » au livre des recettes, encore issues de sources secondaires.
-- Code civil, articles 1792 et suivants (garanties des constructeurs), si des garanties légales doivent
-  figurer sur les devis (C. consom. R111-1, 3°).
+- Aucun texte n'exclut **explicitement** les débours du chiffre d'affaires du micro-entrepreneur
+  (C. sécu. soc. L613-7, CGI 50-0 lus le 04/11/2026) : l'exclusion se déduit de CGI 267 II 2° et de la
+  doctrine ; la mention « débours » au livre des recettes est une bonne pratique, non une obligation.
+- Code civil, articles 1792-1 à 1792-6 (qui est « constructeur », garantie de bon fonctionnement,
+  garantie de parfait achèvement, réception) : pour décider quelles garanties légales indiquer sur les
+  devis (C. consom. R111-1, 3° ; écart n° 4). L'article 1792 seul vise le **constructeur d'un ouvrage** :
+  il ne couvre pas, en principe, un simple dépannage ou une réparation qui ne constitue pas un ouvrage.

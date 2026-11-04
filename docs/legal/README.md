@@ -39,6 +39,8 @@ ici y apparaît, les liens entre fiches restent relatifs.
 | Textes officiels : Code général des impôts (débours, franchise) | [fr/textes/code-general-impots.md](fr/textes/code-general-impots.md) |
 | Textes officiels : Code de l'artisanat (qualité d'artisan) | [fr/textes/code-artisanat.md](fr/textes/code-artisanat.md) |
 | Textes officiels : arrêtés de 1983 (note) et de 2017 (devis du dépannage) | [fr/textes/arretes.md](fr/textes/arretes.md) |
+| Textes officiels : Code de la sécurité sociale (cotisations du micro-entrepreneur) | [fr/textes/code-securite-sociale.md](fr/textes/code-securite-sociale.md) |
+| Textes officiels : Code civil (responsabilité du constructeur d'un ouvrage) | [fr/textes/code-civil.md](fr/textes/code-civil.md) |
 | Doctrine fiscale (BOFiP) : débours, pièces détachées | [fr/textes/bofip.md](fr/textes/bofip.md) |
 | Liste des sources, nature et date de vérification | [sources.md](sources.md) |
 |---|---|
