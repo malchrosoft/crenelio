@@ -571,8 +571,16 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Lecture dans l'Espace Artisan (02/11/2026) :** écran « Documentation » (groupe *Aide*, `DocsViewer`) : fiches `docs/legal/**/*.md` embarquées dans le bundle (`import.meta.glob`, rendu `marked`), liens entre fiches suivis, liens externes dans un nouvel onglet ; liens contextuels depuis l'éditeur de devis (`/admin?doc=fr/debours.md`).
 - **Amorcée (01/11/2026) :** [`docs/legal/`](docs/legal/README.md) : fiches devis, rétractation, débours, note, mentions et aide-mémoire de l'artisan, extraits officiels et liste des sources datée.
 - **Forme :** fichiers Markdown versionnés par langue (`docs/legal/<langue>/…`, puis en base pour la traduction), embarqués dans le bundle, sans service tiers ni stockage serveur (offre Starter) ; repli sur le français pour une page non traduite.
+- **Recherche textuelle (demandée le 04/11/2026) :** champ de recherche dans l'écran Aide › Documentation, sur le texte de toutes les fiches (dont les textes officiels de `docs/legal/fr/textes/`) : résultats avec le titre de la fiche, un extrait et le terme surligné, ouverture de la fiche à l'endroit trouvé ; insensible aux accents et à la casse ; recherche faite dans le navigateur (fiches déjà embarquées), sans service tiers ; à étendre aux langues traduites.
 - **Lien avec l'Item 31 :** même mécanisme de traduction ; l'Item 31 traite la partie publique (clients), celui-ci la partie artisan.
 - **Prérequis :** aucun ; contenu juridique après l'Item 39.
+
+### 41. Largeur de la Vitrine et du Pied de Page (Personnalisation d'Apparence)
+- **Demandé le 04/11/2026** : exploiter toute la largeur de l'écran (`width: 100%`) pour le **pied de page** et pour le **contenu de la vitrine**, selon le choix du professionnel.
+- **Constat :** le contenu est aujourd'hui centré dans des colonnes de largeur fixe (`.container` à 960 px dans `_base.scss`, sections de la vitrine entre 560 et 900 px dans `_vitrine.scss`) : sur grand écran, de larges marges vides.
+- **Proposition :** réglage dans l'écran **Thème** (prolonge l'Item 2) : largeur du contenu « Centrée » (actuelle, par défaut) ou « Pleine largeur », et largeur du pied de page indépendante ; appliqué par une variable CSS (comme `--color-primary`, `src/utils/theme.ts`), aperçu en direct comme les autres réglages d'apparence.
+- **Points d'attention :** garder une **longueur de ligne lisible** pour les textes (présentation, mentions) même en pleine largeur (colonne de texte limitée, grilles qui s'étalent : prestations, engagements, carte) ; marges latérales minimales ; rendu mobile inchangé.
+- **Prérequis :** Item 2 ✅.
 
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
@@ -591,6 +599,7 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 | **9** | **Item 34** | **Thème sombre (inversion des couleurs, palettes adaptées)** | Design / UI | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort ; chantier transversal coûteux (gris, fonds, états et bibliothèques à convertir) |
 | — | **Item 39** | **Veille & ajustements réglementaires (publicité des prix, assurance, seuils de TVA, conservation)** | Conformité | ⏳ *À faire* | Item 22 | 🟡 Obligations du devis en ligne à compléter |
 | — | **Item 40** | **Base documentaire de l'artisan, traduite (anglais, portugais, espagnol…)** | Documentation / Internationalisation | ⏳ *À faire* | — | ⚪ Artisans d'expression étrangère ; lié à l'Item 31 |
+| — | **Item 41** | **Largeur de la vitrine et du pied de page (centrée ou pleine largeur)** | Design / Personnalisation | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort sur grand écran ; réglage du professionnel |
 | — | **Item 38** | Menu de l'espace Artisan par catégories, configuration répartie en écrans (Entreprise, Vitrine, Thème, Compte ; créneaux sous Horaires) | Espace Artisan / Navigation | ✅ **Terminé** | — | — |
 | — | **Item 35** | Tableau de bord (jours en cartes, carte du jour numérotée, positions des rendez-vous enregistrées) | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 21** | Liste des interventions AG Grid Community (tri, filtres, sélection, export CSV, disposition enregistrée) ; composant `DataGrid` commun, pleine hauteur desktop/tablette, fenêtre de rendez-vous partagée avec le calendrier, avertissements regroupés dans le header, indisponibilités en grille (sous-onglet de « Horaires ») | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |
