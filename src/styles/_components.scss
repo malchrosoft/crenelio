@@ -3657,6 +3657,10 @@ $data-grid-status-width: 13em;
 .form-label-row {
   display: flex;
   align-items: center;
+
+  .field-help {
+    flex-shrink: 0;
+  }
   gap: $space-xs;
   margin-bottom: $space-xs;
 
@@ -3685,10 +3689,6 @@ $data-grid-status-width: 13em;
     border-color: $primary;
     color: $primary;
   }
-}
-
-.form-check + .field-help {
-  margin-left: $space-xs;
 }
 
 .field-help__dialog {

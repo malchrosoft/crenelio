@@ -401,22 +401,26 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
               onChange={(v) => set('title', v)}
               hint="Mention obligatoire du devis : décrivez précisément la réparation ou l'entretien."
             />
-            <label className="form-check quote-editor__urgent">
-              <input type="checkbox" checked={form.urgent} onChange={(e) => set('urgent', e.target.checked)} />
-              <span>Intervention urgente demandée par le client</span>
-            </label>
-            <FieldHelp topic="urgent" />
+            <div className="form-label-row">
+              <label className="form-check quote-editor__urgent">
+                <input type="checkbox" checked={form.urgent} onChange={(e) => set('urgent', e.target.checked)} />
+                <span>Intervention urgente demandée par le client</span>
+              </label>
+              <FieldHelp topic="urgent" />
+            </div>
             <p className="form-hint">
               Danger pour les personnes ou les locaux : pas de délai de rétractation, mais seulement pour les pièces et travaux strictement
               nécessaires. Tout le reste fait l'objet d'un devis séparé.
             </p>
             {config.quote_builder_guarantees === '1' && (
               <>
-                <label className="form-check quote-editor__urgent">
-                  <input type="checkbox" checked={form.builder_works} onChange={(e) => set('builder_works', e.target.checked)} />
-                  <span>Travaux relevant des garanties des constructeurs</span>
-                </label>
-                <FieldHelp topic="builder_works" />
+                <div className="form-label-row">
+                  <label className="form-check quote-editor__urgent">
+                    <input type="checkbox" checked={form.builder_works} onChange={(e) => set('builder_works', e.target.checked)} />
+                    <span>Travaux relevant des garanties des constructeurs</span>
+                  </label>
+                  <FieldHelp topic="builder_works" />
+                </div>
                 <p className="form-hint">
                   Ouvrage ou élément d'équipement d'un ouvrage (C. civ. 1792 et suivants) : les garanties sont rappelées sur le devis et
                   votre attestation d'assurance décennale lui est jointe (C. assur. L243-2). Un simple dépannage n'en relève pas en

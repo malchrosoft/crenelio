@@ -3,6 +3,8 @@ import { api } from '../../api';
 import { AppConfig } from '../../types';
 import { ConfigField, ConfigGroup } from '../../config/configSchema';
 import ResetButton from './ResetButton';
+import FieldHelp from './FieldHelp';
+import { hasFieldHelp } from '../../config/fieldHelp';
 import ConfirmDialog from './ConfirmDialog';
 
 interface ConfigGroupFormProps {
@@ -71,17 +73,20 @@ const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSave
           if (type === 'checkbox') {
             return (
               <div className="form-group" key={key}>
-                <label className="form-check" htmlFor={id}>
-                  <input
-                    id={id}
-                    type="checkbox"
-                    checked={values[key] === '1'}
-                    onChange={(e) =>
-                      e.target.checked && field.confirmEnable ? setPending(field) : update(key, e.target.checked ? '1' : '0')
-                    }
-                  />
-                  <span>{label}</span>
-                </label>
+                <div className="form-label-row">
+                  <label className="form-check" htmlFor={id}>
+                    <input
+                      id={id}
+                      type="checkbox"
+                      checked={values[key] === '1'}
+                      onChange={(e) =>
+                        e.target.checked && field.confirmEnable ? setPending(field) : update(key, e.target.checked ? '1' : '0')
+                      }
+                    />
+                    <span>{label}</span>
+                  </label>
+                  {hasFieldHelp(key) && <FieldHelp topic={key} />}
+                </div>
                 {hint && <p className="form-hint">{hint}</p>}
               </div>
             );
@@ -117,9 +122,12 @@ const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSave
 
           return (
             <div className="form-group" key={key}>
-              <label className="form-label" htmlFor={id}>
-                {label}
-              </label>
+              <div className="form-label-row">
+                <label className="form-label" htmlFor={id}>
+                  {label}
+                </label>
+                {hasFieldHelp(key) && <FieldHelp topic={key} />}
+              </div>
               {unit ? (
                 <div className="form-field-unit">
                   {input}
