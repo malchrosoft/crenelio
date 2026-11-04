@@ -28,6 +28,9 @@ et [textes/code-artisanat.md](textes/code-artisanat.md) :
   dérivés dans l'appellation, l'enseigne, la promotion ou la publicité sans détenir la qualité d'artisan
   (L211-1 : diplôme, titre ou expérience). Les activités de bâtiment et de fluides exigent en outre une
   qualification professionnelle (L121-1).
+  **Dans Crénelio** : aucun texte vu par le public n'emploie le mot « artisan » (« le professionnel », nom
+  de l'entreprise) ; l'accroche et la présentation saisies par le professionnel restent sous sa
+  responsabilité : ne pas y écrire « artisan » sans en avoir la qualité.
 
 ## Entrepreneur individuel (« EI »)
 

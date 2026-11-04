@@ -152,7 +152,7 @@ class QuoteController
             Response::json(['error' => 'Indiquez si vous souhaitez conserver les pièces remplacées.'], 400);
         }
         if ($accepted && $hasDebours && $mandate === null) {
-            Response::json(['error' => "Répondez au mandat de débours : l'artisan achète les pièces en votre nom, ou vous les fournissez."], 400);
+            Response::json(['error' => "Répondez au mandat de débours : le professionnel achète les pièces en votre nom, ou vous les fournissez."], 400);
         }
         if ($accepted && !$quote['urgent'] && empty($body['withdrawal_ack'])) {
             Response::json(['error' => 'Confirmez avoir pris connaissance de votre droit de rétractation.'], 400);

@@ -116,10 +116,10 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
             <Link
               to="/admin"
               className="footer-bottom__admin"
-              title="Espace d'administration artisan"
+              title="Espace de gestion du professionnel"
             >
               <LockKeyIcon size={14} weight="fill" aria-hidden="true" />
-              Espace Artisan
+              Accès professionnel
             </Link>
           </div>
         </div>

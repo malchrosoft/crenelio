@@ -14,7 +14,7 @@ interface HeroSectionProps {
  */
 const HeroSection: React.FC<HeroSectionProps> = ({ config, ctaRef }) => {
   const companyName = config.company_name || 'Crénelio';
-  const tagline = config.vitrine_tagline || 'Votre artisan de confiance, à domicile';
+  const tagline = config.vitrine_tagline || 'Votre professionnel de confiance, à domicile';
 
   return (
     <section className="vitrine-hero" aria-labelledby="hero-title">

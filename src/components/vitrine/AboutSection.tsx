@@ -13,7 +13,7 @@ interface AboutSectionProps {
 const AboutSection: React.FC<AboutSectionProps> = ({ config }) => {
   const aboutText =
     config.vitrine_about ||
-    'Artisan qualifié et expérimenté, j\'interviens rapidement chez vous pour tous vos travaux. Devis gratuit, travail soigné et garanti.';
+    'Professionnel qualifié et expérimenté, j\'interviens rapidement chez vous pour tous vos travaux. Devis gratuit, travail soigné et garanti.';
 
   return (
     <section
@@ -27,7 +27,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ config }) => {
             {config.vitrine_photo_url ? (
               <img
                 src={config.vitrine_photo_url}
-                alt={`Portrait de ${config.pro_name || 'l\'artisan'}`}
+                alt={`Portrait de ${config.pro_name || 'votre professionnel'}`}
                 loading="lazy"
               />
             ) : (
@@ -45,7 +45,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ config }) => {
               </h2>
             )}
             <p className="about-role">
-              {config.company_name || 'Artisan à domicile'}
+              {config.company_name || 'Interventions à domicile'}
             </p>
             <p className="about-text">{aboutText}</p>
 

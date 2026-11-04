@@ -178,7 +178,7 @@ class EmailTemplates
         $company = $config['company_name'] ?? 'Crénelio';
         $subject = sprintf('Demande d\'intervention transmise — %s', $company);
         $intro = sprintf(
-            'Bonjour %s, votre adresse se situe juste au-delà de notre zone d\'intervention habituelle. Votre demande a bien été transmise : le créneau ci-dessous est réservé le temps que l\'artisan l\'examine.',
+            'Bonjour %s, votre adresse se situe juste au-delà de notre zone d\'intervention habituelle. Votre demande a bien été transmise : le créneau ci-dessous est réservé le temps que le professionnel l\'examine.',
             self::escape($appointment['client_name'])
         );
         $rows = self::summaryRows($appointment);
@@ -672,7 +672,7 @@ class EmailTemplates
         );
         $rows = self::quoteRows($quote);
         $outro = (float)$quote['total_debours'] > 0
-            ? 'Les pièces sont présentées dans un <strong>mandat de débours</strong> distinct : vous choisissez de les faire acheter en votre nom par l\'artisan, ou de les fournir vous-même.'
+            ? 'Les pièces sont présentées dans un <strong>mandat de débours</strong> distinct : vous choisissez de les faire acheter en votre nom par le professionnel, ou de les fournir vous-même.'
             : 'Rien n\'est dû tant que vous n\'avez pas accepté le devis.';
         $url = self::quoteUrl($quote);
 
@@ -717,7 +717,7 @@ class EmailTemplates
                 ? self::escape('Donné : achat des pièces en votre nom, dans la limite de ' . self::money((float)$quote['debours_budget']))
                 : 'Refusé : vous fournissez les pièces';
         }
-        $rows['Pièces remplacées'] = $quote['keep_parts'] ? 'Vous les conservez' : 'Laissées à l\'artisan (décharge)';
+        $rows['Pièces remplacées'] = $quote['keep_parts'] ? 'Vous les conservez' : 'Laissées au professionnel (décharge)';
         if ((int)$quote['urgent']) {
             $outro = 'Intervention urgente demandée par vous : pas de délai de rétractation, dans la limite des pièces et travaux strictement nécessaires.';
         } else {
@@ -753,7 +753,7 @@ class EmailTemplates
                     ? self::escape('Donné, budget ' . self::money((float)$quote['debours_budget']) . ' : pièces à acheter au nom du client')
                     : 'Refusé : le client fournit les pièces';
             }
-            $rows['Pièces remplacées'] = $quote['keep_parts'] ? 'Le client les conserve' : 'Laissées à l\'artisan (décharge)';
+            $rows['Pièces remplacées'] = $quote['keep_parts'] ? 'Le client les conserve' : 'Laissées au professionnel (décharge)';
             $rows['Rétractation'] = (int)$quote['urgent']
                 ? 'Intervention urgente : aucun délai'
                 : self::escape('Jusqu\'au ' . self::formatDate((string)$quote['withdrawal_until']) . ($quote['early_execution'] ? ' (exécution anticipée demandée)' : ' : ne pas commencer avant, sauf demande expresse'));

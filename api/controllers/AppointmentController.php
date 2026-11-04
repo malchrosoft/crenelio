@@ -393,7 +393,7 @@ class AppointmentController
 
         $accepted = $action === 'accept';
         $id = (int)$appointment['id'];
-        if (!Appointment::decide($id, $accepted ? 'confirmed' : 'cancelled', $accepted ? null : "Demande hors zone refusée par l'artisan")) {
+        if (!Appointment::decide($id, $accepted ? 'confirmed' : 'cancelled', $accepted ? null : "Demande hors zone refusée par le professionnel")) {
             Response::json(['error' => 'Demande déjà traitée.'], 409);
         }
 
@@ -492,7 +492,7 @@ class AppointmentController
         if ($appointment['status'] === 'pending' && !empty($appointment['decision_token'])
             && in_array($status, ['confirmed', 'cancelled'], true)) {
             $accepted = $status === 'confirmed';
-            Appointment::decide($id, $status, $accepted ? null : ($reason ?? "Demande hors zone refusée par l'artisan"));
+            Appointment::decide($id, $status, $accepted ? null : ($reason ?? "Demande hors zone refusée par le professionnel"));
             $updated = Appointment::find($id);
             if ($notify) {
                 $config = Config::getAll();

@@ -175,7 +175,7 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
             Je soussigné(e) <strong>{quote.client_name}</strong> donne mandat à <strong>{company}</strong> d'acheter,{' '}
             <strong>en mon nom et pour mon compte</strong>, les pièces ci-dessous, dans la limite de{' '}
             <strong>{euro(quote.debours_budget ?? quote.total_debours)}</strong>. La facture du fournisseur est établie à mon nom ; je
-            rembourse le montant exact du justificatif, dont une copie m'est remise. Il ne s'agit pas d'une vente par l'artisan.
+            rembourse le montant exact du justificatif, dont une copie m'est remise. Il ne s'agit pas d'une vente par le professionnel.
           </p>
           <LinesTable lines={debours} vat={false} />
           <dl className="quote-totals">

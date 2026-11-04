@@ -335,7 +335,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
               />
               {coordinates && (
                 <div className="form-gps-status">
-                  ✓ Coordonnées GPS validées pour le déplacement de l'artisan
+                  ✓ Coordonnées GPS validées pour le déplacement du professionnel
                 </div>
               )}
               {!coordinates && needsCoordinates && (
@@ -391,14 +391,14 @@ export const BookingForm: React.FC<BookingFormProps> = ({
               {adminMode
                 ? "Vous pouvez tout de même forcer l'enregistrement de ce rendez-vous."
                 : travelQuote.can_request_exception
-                ? "La réservation directe n'est pas possible, mais un déplacement exceptionnel reste envisageable : envoyez une demande pour ce créneau, l'artisan l'acceptera ou la refusera."
+                ? "La réservation directe n'est pas possible, mais un déplacement exceptionnel reste envisageable : envoyez une demande pour ce créneau, le professionnel l'acceptera ou la refusera."
                 : "Cette adresse n'est pas desservie."}
             </p>
             {canRequest && requestState === 'sent' && (
               <p className="booking-out-of-zone__sent">
                 <CheckCircleIcon size={18} weight="fill" aria-hidden="true" />
                 Demande transmise : vous allez recevoir un email de confirmation de la transmission. Le créneau
-                est réservé le temps que l'artisan accepte ou refuse votre demande ; vous serez prévenu par email.
+                est réservé le temps que le professionnel accepte ou refuse votre demande ; vous serez prévenu par email.
               </p>
             )}
             {canRequest && requestState !== 'sent' && proPhone && (

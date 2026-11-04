@@ -70,7 +70,7 @@ export const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         </h2>
         <p className="confirmation-subtitle">
           {isCancelled
-            ? 'Ce créneau a été libéré dans le planning de l’artisan.'
+            ? 'Ce créneau a été libéré dans le planning du professionnel.'
             : showNewBooking
               ? 'Un e-mail récapitulatif a été envoyé avec toutes les informations nécessaires.'
               : 'Retrouvez ici le détail de votre intervention et annulez-la si besoin.'}
