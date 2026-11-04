@@ -63,7 +63,7 @@ class Mailer
     /**
      * Envoie un message. Lève une RuntimeException en cas d'échec.
      *
-     * @param array{filename: string, mime: string, content: string}|null $attachment
+     * @param array{filename: string, mime: string, content: string}|list<array{filename: string, mime: string, content: string}>|null $attachment
      * @param list<array{cid: string, mime: string, content: string}>     $inline Images référencées par `cid:` dans le HTML
      */
     public static function send(
@@ -274,7 +274,7 @@ class Mailer
      * Structure : mixed → [related → [alternative → [texte, HTML], images intégrées], pièce jointe].
      * La couche `related` n'est ajoutée que s'il y a des images intégrées.
      *
-     * @param array{filename: string, mime: string, content: string}|null $attachment
+     * @param array{filename: string, mime: string, content: string}|list<array{filename: string, mime: string, content: string}>|null $attachment
      * @param list<array{cid: string, mime: string, content: string}>     $inline
      */
     private static function buildMimeMessage(
@@ -348,14 +348,16 @@ class Mailer
 
         $parts = ['--' . $mixedBoundary, ...$alternative];
 
-        if ($attachment !== null) {
+        // Une pièce jointe, ou une liste de pièces jointes (devis, mandat, formulaire de rétractation…)
+        $attachments = $attachment === null ? [] : (isset($attachment['filename']) ? [$attachment] : $attachment);
+        foreach ($attachments as $file) {
             $parts = array_merge($parts, [
                 '--' . $mixedBoundary,
-                'Content-Type: ' . $attachment['mime'] . '; name="' . $attachment['filename'] . '"',
+                'Content-Type: ' . $file['mime'] . '; name="' . $file['filename'] . '"',
                 'Content-Transfer-Encoding: base64',
-                'Content-Disposition: attachment; filename="' . $attachment['filename'] . '"',
+                'Content-Disposition: attachment; filename="' . $file['filename'] . '"',
                 '',
-                chunk_split(base64_encode($attachment['content']), 76, "\r\n"),
+                chunk_split(base64_encode($file['content']), 76, "\r\n"),
             ]);
         }
 

@@ -1,8 +1,9 @@
 <?php
 /**
  * SimplePdf — Générateur de PDF minimal, sans bibliothèque ni extension optionnelle (offre Starter :
- * PHP natif, mbstring seulement). Pages A4, texte en Helvetica (encodage WinAnsi), retour à la ligne,
- * traits, et **champs de formulaire remplissables** (AcroForm) pour le formulaire de rétractation.
+ * PHP natif, mbstring et zlib seulement). Pages A4, texte en Helvetica (encodage WinAnsi), retour à la
+ * ligne, couleurs, traits et rectangles, images PNG (logo, transparence comprise), pied de page numéroté,
+ * et **champs de formulaire remplissables** (AcroForm) pour le formulaire de rétractation.
  *
  * Coordonnées en points depuis le **coin supérieur gauche** (converties pour le PDF).
  */
@@ -28,6 +29,12 @@ class SimplePdf
     /** @var array<int, array<int, array{name: string, rect: float[], value: string, multiline: bool}>> */
     private array $fields = [];
     private float $y = self::MARGIN;
+    /** @var array<int, string> Objets image (XObject) déjà prêts, nom => corps de l'objet et éventuel masque */
+    private array $images = [];
+    /** Pied de page : texte à gauche, « page n / total » à droite (gris). */
+    private string $footer = '';
+    /** Couleur du texte courant (RVB 0..1). */
+    private array $color = [0.12, 0.16, 0.23];
 
     public function __construct(private string $title = '')
     {
@@ -114,6 +121,186 @@ class SimplePdf
         $this->y += $height + 10;
     }
 
+
+    /** Couleur « #rrggbb » en RVB 0..1 (repli : gris foncé). */
+    public static function rgb(string $hex, array $fallback = [0.12, 0.16, 0.23]): array
+    {
+        if (!preg_match('/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i', $hex, $m)) {
+            return $fallback;
+        }
+        return [hexdec($m[1]) / 255, hexdec($m[2]) / 255, hexdec($m[3]) / 255];
+    }
+
+    /** Mélange une couleur avec le blanc (`$amount` de 0 à 1 : part de la couleur). */
+    public static function tint(array $rgb, float $amount): array
+    {
+        return array_map(fn($c) => 1 - (1 - $c) * $amount, $rgb);
+    }
+
+    public function setColor(array $rgb): void
+    {
+        $this->color = $rgb;
+    }
+
+    public function setFooter(string $text): void
+    {
+        $this->footer = $text;
+    }
+
+    /** Positionne le curseur (points depuis le haut). */
+    public function setY(float $y): void
+    {
+        $this->y = $y;
+    }
+
+    /** Saut de page si la place restante est insuffisante. */
+    public function keep(float $height): void
+    {
+        $this->ensureSpace($height);
+    }
+
+    /** Texte sur une ligne à une position donnée (`$align` : left, right) ; n'avance pas le curseur. */
+    public function textAt(string $text, float $x, float $yTop, float $size = 10, bool $bold = false, string $align = 'left', ?array $rgb = null): void
+    {
+        if ($align === 'right') {
+            $x -= $this->textWidth($text, $size, $bold);
+        }
+        $this->pages[count($this->pages) - 1] .= sprintf(
+            "BT %.3F %.3F %.3F rg /%s %.1F Tf %.2F %.2F Td %s Tj ET\n",
+            ...[...($rgb ?? $this->color), $bold ? 'F2' : 'F1', $size, $x, self::HEIGHT - $yTop - $size, self::string($text)]
+        );
+    }
+
+    /** Rectangle plein et/ou bordé (couleurs RVB 0..1 ; null : pas de remplissage ou de bordure). */
+    public function rect(float $x, float $yTop, float $w, float $h, ?array $fill, ?array $stroke = null, float $lineWidth = 0.5): void
+    {
+        $ops = '';
+        if ($fill) {
+            $ops .= sprintf('%.3F %.3F %.3F rg ', ...$fill);
+        }
+        if ($stroke) {
+            $ops .= sprintf('%.3F %.3F %.3F RG %.2F w ', ...[...$stroke, $lineWidth]);
+        }
+        $op = $fill && $stroke ? 'B' : ($fill ? 'f' : 'S');
+        $this->pages[count($this->pages) - 1] .= sprintf("%s%.2F %.2F %.2F %.2F re %s\n", $ops, $x, self::HEIGHT - $yTop - $h, $w, $h, $op);
+    }
+
+    /** Trait horizontal coloré entre deux abscisses (n'avance pas le curseur). */
+    public function hline(float $x1, float $x2, float $yTop, array $rgb, float $width = 0.5): void
+    {
+        $y = self::HEIGHT - $yTop;
+        $this->pages[count($this->pages) - 1] .= sprintf("%.3F %.3F %.3F RG %.2F w %.2F %.2F m %.2F %.2F l S\n", ...[...$rgb, $width, $x1, $y, $x2, $y]);
+    }
+
+    /**
+     * Image PNG (8 bits ; niveaux de gris, RVB, palette, avec ou sans transparence) placée en haut à
+     * gauche à (`$x`, `$yTop`), dans une boîte de `$maxW` × `$maxH` points ; renvoie la taille affichée,
+     * ou null si le PNG n'est pas pris en charge (alors ignoré).
+     *
+     * @return array{0: float, 1: float}|null
+     */
+    public function image(string $png, float $x, float $yTop, float $maxW, float $maxH): ?array
+    {
+        $image = self::parsePng($png);
+        if ($image === null) {
+            return null;
+        }
+        $name = 'Im' . (count($this->images) + 1);
+        $this->images[$name] = $image;
+        $scale = min($maxW / $image['width'], $maxH / $image['height']);
+        $w = $image['width'] * $scale;
+        $h = $image['height'] * $scale;
+        $this->pages[count($this->pages) - 1] .= sprintf("q %.2F 0 0 %.2F %.2F %.2F cm /%s Do Q\n", $w, $h, $x, self::HEIGHT - $yTop - $h, $name);
+        return [$w, $h];
+    }
+
+    /**
+     * Décode un PNG pour le PDF. Sans transparence : données IDAT reprises telles quelles (prédicteur PNG).
+     * Avec canal alpha : lignes défiltrées en PHP, couleurs et masque recompressés séparément.
+     *
+     * @return array{width: int, height: int, colorSpace: string, bpc: int, data: string, predictor: ?int, colors: int, smask: ?string}|null
+     */
+    private static function parsePng(string $png): ?array
+    {
+        if (substr($png, 0, 8) !== "\x89PNG\r\n\x1a\n") {
+            return null;
+        }
+        $pos = 8;
+        $idat = '';
+        $palette = '';
+        $header = null;
+        while ($pos + 8 <= strlen($png)) {
+            $len = unpack('N', substr($png, $pos, 4))[1];
+            $type = substr($png, $pos + 4, 4);
+            $data = substr($png, $pos + 8, $len);
+            $pos += 12 + $len;
+            if ($type === 'IHDR') {
+                $header = unpack('Nwidth/Nheight/Cbits/Ccolor/Ccompression/Cfilter/Cinterlace', $data);
+            } elseif ($type === 'PLTE') {
+                $palette = $data;
+            } elseif ($type === 'IDAT') {
+                $idat .= $data;
+            } elseif ($type === 'IEND') {
+                break;
+            }
+        }
+        if (!$header || $header['bits'] !== 8 || $header['interlace'] !== 0) {
+            return null;
+        }
+        [$w, $h, $ct] = [$header['width'], $header['height'], $header['color']];
+        $channels = [0 => 1, 2 => 3, 3 => 1, 4 => 2, 6 => 4][$ct] ?? null;
+        if ($channels === null) {
+            return null;
+        }
+        $space = $ct === 3
+            ? sprintf('[/Indexed /DeviceRGB %d <%s>]', strlen($palette) / 3 - 1, bin2hex($palette))
+            : (in_array($ct, [0, 4], true) ? '/DeviceGray' : '/DeviceRGB');
+        if ($ct !== 4 && $ct !== 6) {
+            return ['width' => $w, 'height' => $h, 'colorSpace' => $space, 'bpc' => 8, 'data' => $idat,
+                'predictor' => 15, 'colors' => $channels, 'smask' => null];
+        }
+        // Canal alpha : défiltrage des lignes (filtres PNG 0 à 4), puis séparation couleur / masque
+        $raw = @gzuncompress($idat);
+        if ($raw === false) {
+            return null;
+        }
+        $stride = $w * $channels;
+        $color = '';
+        $alpha = '';
+        $prev = str_repeat("\0", $stride);
+        $colorBytes = $channels - 1;
+        for ($row = 0, $offset = 0; $row < $h; $row++) {
+            $filter = ord($raw[$offset]);
+            $line = substr($raw, $offset + 1, $stride);
+            $offset += $stride + 1;
+            $out = $line;
+            for ($i = 0; $i < $stride; $i++) {
+                $a = $i >= $channels ? ord($out[$i - $channels]) : 0;
+                $b = ord($prev[$i]);
+                $c = $i >= $channels ? ord($prev[$i - $channels]) : 0;
+                $x = ord($line[$i]);
+                switch ($filter) {
+                    case 1: $x += $a; break;
+                    case 2: $x += $b; break;
+                    case 3: $x += ($a + $b) >> 1; break;
+                    case 4:
+                        $p = $a + $b - $c;
+                        $pa = abs($p - $a); $pb = abs($p - $b); $pc = abs($p - $c);
+                        $x += ($pa <= $pb && $pa <= $pc) ? $a : ($pb <= $pc ? $b : $c);
+                        break;
+                }
+                $out[$i] = chr($x & 0xFF);
+            }
+            $prev = $out;
+            for ($i = 0; $i < $stride; $i += $channels) {
+                $color .= substr($out, $i, $colorBytes);
+                $alpha .= $out[$i + $colorBytes];
+            }
+        }
+        return ['width' => $w, 'height' => $h, 'colorSpace' => $space, 'bpc' => 8, 'data' => gzcompress($color),
+            'predictor' => null, 'colors' => $colorBytes, 'smask' => gzcompress($alpha)];
+    }
+
     /** Document PDF complet. */
     public function output(): string
     {
@@ -127,9 +314,40 @@ class SimplePdf
         $fontId = $add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
         $boldId = $add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
 
+        // Images partagées par toutes les pages
+        $xobjects = '';
+        foreach ($this->images as $name => $image) {
+            $smask = '';
+            if ($image['smask'] !== null) {
+                $maskId = $add(sprintf(
+                    "<< /Type /XObject /Subtype /Image /Width %d /Height %d /ColorSpace /DeviceGray /BitsPerComponent 8 /Filter /FlateDecode /Length %d >>\nstream\n%s\nendstream",
+                    $image['width'], $image['height'], strlen($image['smask']), $image['smask']
+                ));
+                $smask = " /SMask $maskId 0 R";
+            }
+            $parms = $image['predictor'] !== null
+                ? sprintf(' /DecodeParms << /Predictor 15 /Colors %d /BitsPerComponent 8 /Columns %d >>', $image['colors'], $image['width'])
+                : '';
+            $id = $add(sprintf(
+                "<< /Type /XObject /Subtype /Image /Width %d /Height %d /ColorSpace %s /BitsPerComponent 8 /Filter /FlateDecode%s%s /Length %d >>\nstream\n%s\nendstream",
+                $image['width'], $image['height'], $image['colorSpace'], $parms, $smask, strlen($image['data']), $image['data']
+            ));
+            $xobjects .= "/$name $id 0 R ";
+        }
+
         $pageIds = [];
         $fieldIds = [];
+        $total = count($this->pages);
         foreach ($this->pages as $index => $content) {
+            if ($this->footer !== '') {
+                $y = self::MARGIN / 2;
+                $content .= sprintf(
+                    "0.45 0.5 0.56 rg BT /F1 8 Tf %.2F %.2F Td %s Tj ET BT /F1 8 Tf %.2F %.2F Td %s Tj ET\n",
+                    self::MARGIN, $y, self::string($this->footer),
+                    self::WIDTH - self::MARGIN - $this->textWidth(sprintf('Page %d / %d', $index + 1, $total), 8), $y,
+                    self::string(sprintf('Page %d / %d', $index + 1, $total))
+                );
+            }
             $streamId = $add(sprintf("<< /Length %d >>\nstream\n%s\nendstream", strlen($content), $content));
             $annots = [];
             foreach ($this->fields[$index] as $field) {
@@ -152,8 +370,8 @@ class SimplePdf
                 $fieldIds[] = "$id 0 R";
             }
             $pageIds[] = $add(sprintf(
-                '<< /Type /Page /Parent %d 0 R /MediaBox [0 0 %.2F %.2F] /Resources << /Font << /F1 %d 0 R /F2 %d 0 R >> >> /Contents %d 0 R%s >>',
-                $pagesId, self::WIDTH, self::HEIGHT, $fontId, $boldId, $streamId,
+                '<< /Type /Page /Parent %d 0 R /MediaBox [0 0 %.2F %.2F] /Resources << /Font << /F1 %d 0 R /F2 %d 0 R >>%s >> /Contents %d 0 R%s >>',
+                $pagesId, self::WIDTH, self::HEIGHT, $fontId, $boldId, $xobjects ? " /XObject << $xobjects>>" : '', $streamId,
                 $annots ? ' /Annots [' . implode(' ', $annots) . ']' : ''
             ));
         }
@@ -183,8 +401,8 @@ class SimplePdf
         $this->ensureSpace($leading);
         $this->y += $size;
         $this->pages[count($this->pages) - 1] .= sprintf(
-            "BT /%s %.1F Tf %.2F %.2F Td %s Tj ET\n",
-            $bold ? 'F2' : 'F1', $size, self::MARGIN + $indent, self::HEIGHT - $this->y, self::string($line)
+            "BT %.3F %.3F %.3F rg /%s %.1F Tf %.2F %.2F Td %s Tj ET\n",
+            ...[...$this->color, $bold ? 'F2' : 'F1', $size, self::MARGIN + $indent, self::HEIGHT - $this->y, self::string($line)]
         );
         $this->y += $leading - $size;
     }

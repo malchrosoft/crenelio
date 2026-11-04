@@ -46,7 +46,7 @@ class LegalTexts
             !empty($config['legal_vat_number']) ? 'N° TVA ' . $config['legal_vat_number'] : '',
             (string)($config['legal_rm'] ?? ''),
             !empty($config['legal_assurance']) ? 'Assurance : ' . $config['legal_assurance'] : '',
-            implode(' · ', array_filter([(string)($config['pro_phone'] ?? ''), (string)($config['pro_email'] ?? '')])),
+            implode(' · ', array_filter([trim((string)($config['pro_phone'] ?? '')), trim((string)($config['pro_email'] ?? ''))])),
         ]));
     }
 

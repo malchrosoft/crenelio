@@ -2345,6 +2345,13 @@ $admin-sidebar-collapsed: 68px;
   }
   .quote-page__print { margin-top: $space-md; font-size: 0.9rem; }
 
+  .quote-page__downloads {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-xs $space-sm;
+  }
+
   // Formulaire de rétractation en ligne (annexe R221-1) : paragraphes du modèle aérés
   &.quote-withdrawal-form p { margin: 0 0 $space-sm; line-height: $line-height-base; }
 

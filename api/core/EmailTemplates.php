@@ -686,6 +686,7 @@ class EmailTemplates
         $outro = (float)$quote['total_debours'] > 0
             ? 'Les pièces sont présentées dans un <strong>mandat de débours</strong> distinct : vous choisissez de les faire acheter en votre nom par le professionnel, ou de les fournir vous-même.'
             : 'Rien n\'est dû tant que vous n\'avez pas accepté le devis.';
+        $outro .= ' Le devis' . ((float)$quote['total_debours'] > 0 ? ' et le mandat de débours sont joints' : ' est joint') . ' à ce message en PDF.';
         $outro .= $guarantees;
         $url = self::quoteUrl($quote);
 
@@ -794,7 +795,7 @@ class EmailTemplates
         return $html . sprintf(
             '<div style="margin:20px 0 0;padding:14px 16px;border:1px solid %s;border-radius:8px;">'
             . '<p style="margin:0 0 6px;font-weight:700;color:%s;">Formulaire de rétractation</p>'
-            . '<p style="margin:0 0 6px;font-size:13px;line-height:1.5;color:%s;">Le formulaire type est joint à ce message (PDF remplissable).</p>'
+            . '<p style="margin:0 0 6px;font-size:13px;line-height:1.5;color:%s;">Le devis, le cas échéant le mandat de débours, et le formulaire type de rétractation (PDF remplissable) sont joints à ce message.</p>'
             . '<p style="margin:0 0 10px;font-size:13px;line-height:1.5;color:%s;">%s</p>%s</div>',
             self::GRAY_200, self::GRAY_800, self::GRAY_500, self::GRAY_500,
             self::escape(QuotePdf::ONLINE_FORM_NOTICE),

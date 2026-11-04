@@ -69,6 +69,17 @@ const QuotePrintPage: React.FC<QuotePrintPageProps> = ({ config }) => {
             </button>
           ))}
         </div>
+        {/* PDF générés par le serveur (logo, couleurs du thème) pour le document affiché */}
+        {quote && docs.length === 1 && docs[0] !== 'retractation' && (
+          <a className="btn btn-secondary" href={`/api/quotes/token/${token}/${docs[0] === 'devis' ? 'devis' : 'mandat'}.pdf`}>
+            Télécharger en PDF
+          </a>
+        )}
+        {quote && docs.length === 1 && docs[0] === 'retractation' && quote.status !== 'sent' && (
+          <a className="btn btn-secondary" href={`/api/quotes/token/${token}/formulaire.pdf`}>
+            Télécharger en PDF
+          </a>
+        )}
         <button type="button" className="btn btn-primary" onClick={() => window.print()} disabled={!quote}>
           <PrinterIcon size={18} weight="fill" aria-hidden="true" />
           Imprimer / PDF

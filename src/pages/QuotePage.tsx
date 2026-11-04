@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ArrowLeftIcon, CheckCircleIcon, XCircleIcon } from '@phosphor-icons/react';
+import { ArrowLeftIcon, CheckCircleIcon, DownloadSimpleIcon, XCircleIcon } from '@phosphor-icons/react';
 import { api } from '../api';
 import { AppConfig, Quote } from '../types';
 import BrandMark from '../components/BrandMark';
@@ -281,9 +281,18 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
         </section>
       )}
 
-      <p className="quote-page__print">
-        <Link to={`/devis/${token}/imprimer`}>Versions imprimables (devis{quote.total_debours !== '0.00' ? ', mandat de débours' : ''}
-        {urgent ? '' : ', formulaire de rétractation'})</Link>
+      <p className="quote-page__print quote-page__downloads">
+        <a className="btn btn-secondary admin-btn-sm" href={`/api/quotes/token/${token}/devis.pdf`}>
+          <DownloadSimpleIcon size={14} weight="bold" aria-hidden="true" />
+          Devis (PDF)
+        </a>
+        {Number(quote.total_debours) > 0 && (
+          <a className="btn btn-secondary admin-btn-sm" href={`/api/quotes/token/${token}/mandat.pdf`}>
+            <DownloadSimpleIcon size={14} weight="bold" aria-hidden="true" />
+            Mandat de débours (PDF)
+          </a>
+        )}
+        <Link to={`/devis/${token}/imprimer`}>Versions imprimables</Link>
       </p>
 
       {Number(quote.builder_works) === 1 && (

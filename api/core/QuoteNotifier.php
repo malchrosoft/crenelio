@@ -19,17 +19,25 @@ class QuoteNotifier
     /** Devis envoyé au client, avec le lien de réponse. */
     public static function sendQuote(array $quote, array $config): array
     {
-        // Attestation d'assurance décennale jointe au devis (C. assur. L243-2)
-        $attachment = (int)$quote['builder_works'] ? InsuranceAttestation::attachment() : null;
-        return [self::toClient($quote, 'quote_client', EmailTemplates::quoteClient($quote, $config), $attachment)];
+        // Devis et mandat de débours en PDF, attestation d'assurance décennale (C. assur. L243-2)
+        $attachments = self::documents($quote, $config);
+        if ((int)$quote['builder_works'] && ($attestation = InsuranceAttestation::attachment())) {
+            $attachments[] = $attestation;
+        }
+        return [self::toClient($quote, 'quote_client', EmailTemplates::quoteClient($quote, $config), $attachments)];
     }
 
     /** Réponse du client : exemplaire au client (accepté) ou accusé (refusé), et avis à l'artisan. */
     public static function sendDecision(array $quote, array $config): array
     {
         return array_values(array_filter([
-            self::toClient($quote, 'decision_client', EmailTemplates::quoteDecisionClient($quote, $config), self::withdrawalFormAttachment($quote, $config)),
-            self::toPro($quote, 'decision_pro', EmailTemplates::quoteDecisionPro($quote, $config)),
+            // Exemplaire : devis et mandat avec la trace de l'accord, formulaire de rétractation remplissable
+            self::toClient($quote, 'decision_client', EmailTemplates::quoteDecisionClient($quote, $config),
+                $quote['status'] === 'accepted'
+                    ? array_values(array_filter([...self::documents($quote, $config), self::withdrawalFormAttachment($quote, $config)]))
+                    : null),
+            self::toPro($quote, 'decision_pro', EmailTemplates::quoteDecisionPro($quote, $config),
+                $quote['status'] === 'accepted' ? self::documents($quote, $config) : null),
         ]));
     }
 
@@ -41,6 +49,24 @@ class QuoteNotifier
                 EmailTemplates::quoteWithdrawal($quote, $config, false), self::proAddress(), self::declarationAttachment($quote, $config)),
             self::toPro($quote, 'withdrawal_pro', EmailTemplates::quoteWithdrawal($quote, $config, true), self::declarationAttachment($quote, $config)),
         ]));
+    }
+
+    /** Devis complet et, s'il y a des débours, mandat de débours, en PDF. */
+    private static function documents(array $quote, array $config): array
+    {
+        $files = [[
+            'filename' => 'devis-' . $quote['number'] . '.pdf',
+            'mime'     => 'application/pdf',
+            'content'  => QuotePdf::quote($quote, $config),
+        ]];
+        if ((float)$quote['total_debours'] > 0) {
+            $files[] = [
+                'filename' => 'mandat-debours-' . $quote['number'] . '.pdf',
+                'mime'     => 'application/pdf',
+                'content'  => QuotePdf::mandate($quote, $config),
+            ];
+        }
+        return $files;
     }
 
     private static function toClient(array $quote, string $type, array $message, ?array $attachment = null): ?array

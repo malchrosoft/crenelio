@@ -126,23 +126,33 @@ class QuoteController
     }
 
     /**
-     * GET /quotes/token/:token/formulaire.pdf — Formulaire type de rétractation remplissable, prérempli
-     * (annexe R221-1) ; GET …/declaration.pdf — déclaration validée en ligne (L221-21, D221-5).
+     * GET /quotes/token/:token/:document.pdf — `devis` (devis complet), `mandat` (mandat de débours),
+     * `formulaire` (formulaire type de rétractation remplissable, annexe R221-1), `declaration`
+     * (déclaration de rétractation validée en ligne, L221-21 et D221-5).
      */
     public function withdrawalPdf(array $params): void
     {
         $quote = Quote::findByToken((string)($params['token'] ?? ''));
-        $declaration = ($params['document'] ?? '') === 'declaration';
-        if (!$quote || !in_array($quote['status'], ['accepted', 'withdrawn'], true) || (int)$quote['urgent']
-            || ($declaration && $quote['status'] !== 'withdrawn')) {
+        $document = (string)($params['document'] ?? '');
+        $available = $quote !== null && match ($document) {
+            'devis'       => true,
+            'mandat'      => (float)$quote['total_debours'] > 0,
+            'formulaire'  => in_array($quote['status'], ['accepted', 'withdrawn'], true) && !(int)$quote['urgent'],
+            'declaration' => $quote['status'] === 'withdrawn',
+            default       => false,
+        };
+        if (!$available) {
             Response::json(['error' => 'Document indisponible.'], 404);
         }
         $config = Config::getAll();
-        $pdf = $declaration
-            ? QuotePdf::withdrawalDeclaration($quote, $config)
-            : QuotePdf::withdrawalForm($quote, $config, EmailTemplates::quoteWithdrawalUrl($quote));
+        [$pdf, $name] = match ($document) {
+            'devis'       => [QuotePdf::quote($quote, $config), 'devis'],
+            'mandat'      => [QuotePdf::mandate($quote, $config), 'mandat-debours'],
+            'formulaire'  => [QuotePdf::withdrawalForm($quote, $config, EmailTemplates::quoteWithdrawalUrl($quote)), 'formulaire-retractation'],
+            'declaration' => [QuotePdf::withdrawalDeclaration($quote, $config), 'declaration-retractation'],
+        };
         header('Content-Type: application/pdf');
-        header(sprintf('Content-Disposition: attachment; filename="%s-%s.pdf"', $declaration ? 'declaration-retractation' : 'formulaire-retractation', $quote['number']));
+        header(sprintf('Content-Disposition: attachment; filename="%s-%s.pdf"', $name, $quote['number']));
         header('Cache-Control: private, no-store');
         echo $pdf;
         exit;

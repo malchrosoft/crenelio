@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowSquareOutIcon, PaperPlaneTiltIcon, PlusIcon, PrinterIcon, TrashIcon, WarningIcon, XIcon } from '@phosphor-icons/react';
+import { ArrowSquareOutIcon, DownloadSimpleIcon, PaperPlaneTiltIcon, PlusIcon, PrinterIcon, TrashIcon, WarningIcon, XIcon } from '@phosphor-icons/react';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../../api';
@@ -280,6 +280,16 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                     <PrinterIcon size={14} weight="bold" aria-hidden="true" />
                     Versions imprimables
                   </a>
+                  <a className="btn btn-secondary admin-btn-sm" href={`/api/quotes/token/${quote.token}/devis.pdf`}>
+                    <DownloadSimpleIcon size={14} weight="bold" aria-hidden="true" />
+                    Devis (PDF)
+                  </a>
+                  {Number(quote.total_debours) > 0 && (
+                    <a className="btn btn-secondary admin-btn-sm" href={`/api/quotes/token/${quote.token}/mandat.pdf`}>
+                      <DownloadSimpleIcon size={14} weight="bold" aria-hidden="true" />
+                      Mandat (PDF)
+                    </a>
+                  )}
                   <a className="btn btn-secondary admin-btn-sm" href={`/devis/${quote.token}`} target="_blank" rel="noopener">
                     <ArrowSquareOutIcon size={14} weight="bold" aria-hidden="true" />
                     Page du client
