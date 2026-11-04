@@ -37,6 +37,13 @@ au service déjà fourni. Sans demande expresse recueillie, rien n'est dû.
 
 Texte intégral : [textes/code-consommation.md](textes/code-consommation.md).
 
+- **Définitions** (L221-1) : contrat **à distance** = conclu sans présence physique simultanée, par le
+  recours exclusif à des techniques de communication à distance jusqu'à la conclusion ; contrat **hors
+  établissement** = conclu en présence physique simultanée hors du lieu d'activité habituel, **y compris à
+  la suite d'une sollicitation du consommateur** (devis signé au domicile du client), ou à distance
+  immédiatement après une sollicitation personnelle faite hors de ce lieu. Un contrat qui transfère la
+  propriété d'un bien **et** fournit une prestation est **assimilé à une vente** (II) : à surveiller pour
+  les lignes « fourniture revendue » (délai à compter de la réception du bien).
 - **Délai** (L221-18) : quatorze jours à compter **de la conclusion du contrat** pour une prestation de
   services. **Calcul** (L221-19) : le jour de la conclusion n'est pas compté ; le délai expire à la fin du
   dernier jour ; s'il tombe un samedi, un dimanche ou un jour férié ou chômé, il est prorogé jusqu'au

@@ -22,9 +22,38 @@ et [textes/code-artisanat.md](textes/code-artisanat.md) :
   assujetti ; assurance avec **coordonnées de l'assureur et couverture géographique** ; conditions
   générales s'il en utilise ; modalités de paiement, d'exécution et de traitement des réclamations ;
   garanties légales ; médiateur.
+- **Assurance décennale** (C. assur. L241-1, L243-2 et L243-3, [textes/code-assurances.md](textes/code-assurances.md)) :
+  toute personne dont la responsabilité décennale peut être engagée (C. civ. 1792 et suivants) doit être
+  assurée ; la justification prend la forme d'une **attestation d'assurance jointe aux devis et factures**,
+  selon un modèle fixé par arrêté. Sanction : six mois d'emprisonnement et 75 000 € d'amende (L243-3).
+  Une simple mention ne suffit pas : l'attestation elle-même doit accompagner le devis.
+  - **Champ** (L243-1-1) : sont exclus certains ouvrages (infrastructures, réseaux, canalisations, ouvrages
+    d'énergie… sauf s'ils sont accessoires à un ouvrage soumis) et les **ouvrages existants avant
+    l'ouverture du chantier**, sauf s'ils sont totalement incorporés dans l'ouvrage neuf.
+  - **Modèle d'attestation** (A243-2 à A243-5, arrêté du 5 janvier 2016) : document **délivré et signé par
+    l'assureur**, intitulé « Attestation d'assurance » et « Assurance de responsabilité décennale
+    obligatoire », avec l'assuré (dénomination, adresse, numéro d'identification), l'assureur, le numéro
+    du contrat, la **période de validité**, la date d'établissement, les activités couvertes, l'étendue
+    géographique et les formules imposées sur la nature, le montant et la durée de la garantie.
+  - **Dans Crénelio** (écart n° 10) : le professionnel ne rédige rien ; il dépose l'attestation reçue de son
+    assureur (PDF) et indique sa date de fin de validité, pour être averti avant son expiration.
 - **Garanties légales** (C. consom. R111-1, 3° : « ou de toute autre garantie légale applicable ») : pour
-  des travaux constituant un ouvrage, responsabilité de plein droit du constructeur (C. civ. 1792,
-  [textes/code-civil.md](textes/code-civil.md)) ; à préciser avec les articles 1792-1 et suivants.
+  des travaux constituant un **ouvrage** ([textes/code-civil.md](textes/code-civil.md)), l'entrepreneur lié
+  au client par un contrat de louage d'ouvrage est « réputé constructeur » (1792-1) et doit :
+  - la **garantie décennale** (1792, 1792-2) : dommages compromettant la solidité de l'ouvrage ou le
+    rendant impropre à sa destination, et éléments d'équipement faisant « indissociablement corps » avec
+    l'ouvrage (dépose impossible sans détériorer l'ouvrage) ; dix ans à compter de la réception (1792-4-1) ;
+  - la **garantie de bon fonctionnement** des autres éléments d'équipement : **deux ans minimum** à compter
+    de la réception (1792-3) ;
+  - la **garantie de parfait achèvement** : **un an** à compter de la réception, pour les désordres
+    signalés ; hors usure normale (1792-6).
+
+  Toute clause qui exclut ou limite ces garanties est **réputée non écrite** (1792-5). La **réception**
+  est l'acte par lequel le client accepte l'ouvrage, avec ou sans réserves (1792-6). Les équipements dont
+  la fonction exclusive est l'activité professionnelle du client en sont exclus (1792-7).
+  Un simple dépannage ou un entretien qui ne crée pas d'ouvrage et ne touche pas à un élément
+  d'équipement de l'ouvrage n'entre pas, en principe, dans ce régime : c'est au professionnel de
+  qualifier ses travaux, au besoin avec son assureur.
 - **Médiateur** (C. consom. R616-1) : coordonnées **et adresse du site internet** du médiateur, de manière
   visible sur le site, les conditions générales ou les bons de commande.
 - **Mot « artisan »** (C. artisanat L241-2) : amende de 7 500 € pour l'usage du mot « artisan » ou de ses
@@ -59,6 +88,17 @@ Les documents d'une société indiquent sa dénomination, sa **forme juridique**
 
 Tout professionnel qui traite avec des particuliers doit leur permettre de recourir gratuitement à un
 médiateur et en communiquer les coordonnées (C. consom. L616-1). Réglage `legal_mediator`.
+
+## Prix affichés (arrêté du 3 décembre 1987, texte officiel lu le 04/11/2026)
+
+[textes/arretes.md](textes/arretes.md) :
+
+- **Art. 1** : toute information sur les prix, quel que soit le support (vitrine, réservation), fait
+  apparaître la **somme totale TTC** effectivement payée, en euros.
+- **Art. 3** : si le prix annoncé ne comprend pas un élément **indispensable** à la prestation (pièces,
+  frais de déplacement…), il faut l'**indiquer explicitement**.
+- **Art. 14** : pour une prestation proposée à distance (la réservation en ligne en est une), le prix est
+  indiqué **de façon précise, par tout moyen faisant preuve, avant la conclusion** du contrat.
 
 ## Publicité du dépannage à domicile (fiche DGCCRF)
 

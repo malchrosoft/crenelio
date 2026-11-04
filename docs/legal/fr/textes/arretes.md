@@ -221,3 +221,34 @@
 > OUI □ NON □
 >
 > Signature du consommateur précédée de la mention manuscrite " Lu et approuvé ".
+
+### Arrêté du 3 décembre 1987 relatif à l'information du consommateur sur les prix (extraits)
+
+*NOR : ECOC8700137A ; dernière mise à jour des données de ce texte : 23 mars 2005. Texte Légifrance collé
+par le mainteneur le 04/11/2026 ; seuls les articles utiles à Crénelio sont reproduits.*
+
+> **Article 1** (en vigueur depuis le 01 janvier 2002 ; modifié par Arrêté 2001-12-21 art. 1 JORF 29 décembre 2001 en vigueur le 1er janvier 2002)
+>
+> Toute information sur les prix de produits ou de services doit faire apparaître, quel que soit le support utilisé, la somme totale toutes taxes comprises qui devra être effectivement payée par le consommateur, exprimée en euros.
+>
+> Toutefois, peuvent être ajoutés à la somme annoncée les frais ou rémunérations correspondant à des prestations supplémentaires exceptionnelles expressément réclamées par le consommateur et dont le coût a fait l'objet d'un accord préalable.
+>
+> **Article 3** (en vigueur depuis le 10 décembre 1987)
+>
+> Lorsque le prix annoncé ne comprend pas un élément ou une prestation de services indispensables à l'emploi ou à la finalité du produit ou du service proposés, cette particularité doit être indiquée explicitement.
+>
+> **Article 13** (en vigueur depuis le 10 décembre 1987)
+>
+> Le prix de toute prestation de services doit faire l'objet d'un affichage dans les lieux où la prestation est proposée au public.
+>
+> L'affichage consiste en l'indication sur un document unique de la liste des prestations de services offertes et du prix de chacune d'elles. Ce document, exposé à la vue du public, doit être parfaitement lisible de l'endroit où la clientèle est habituellement reçue.
+>
+> En outre, le prix de tout ou partie des prestations proposées au public doit faire l'objet d'un affichage lisible de l'extérieur, selon des modalités fixées par arrêté du ministre chargé de l'économie.
+>
+> **Article 14** (en vigueur depuis le 10 décembre 1987 ; modifié par ARRÊTÉ du 4 juillet 2014 - art. 3 (V))
+>
+> Le prix de tout produit ou de toute prestation de services proposés au consommateur selon une technique de communication à distance doit être indiqué de façon précise au consommateur, par tout moyen faisant preuve, avant la conclusion du contrat.
+>
+> Constitue une technique de communication à distance au sens du présent arrêté toute technique permettant au consommateur, hors des lieux habituels de réception de la clientèle, de commander un produit ou de demander la réalisation d'un service.
+>
+> Sont notamment considérés comme des techniques de communication à distance la télématique, le téléphone, la vidéotransmission, la voie postale et la distribution d'imprimés.

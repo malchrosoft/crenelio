@@ -106,6 +106,13 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
     ['Adresse du client', clientAddress],
     ['Email', a.client_email],
     ['Date et lieu de la prestation', `${day(a.start_datetime)}, ${clientAddress}`],
+    // CGI, annexe II, art. 242 nonies A, 8° bis : nature des opérations facturées
+    [
+      'Nature des opérations',
+      quote?.lines?.some((line) => line.kind === 'supply')
+        ? 'Prestations de services et livraisons de biens'
+        : 'Exclusivement des prestations de services',
+    ],
     ...(quote ? ([['Référence du devis', `Devis ${quote.number} accepté le ${day(quote.decided_at ?? quote.created_at)}`]] as [string, string][]) : []),
   ];
 
@@ -251,7 +258,8 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
                 </p>
                 <ul>
                   <li>Note (facture) obligatoire dès 25 € TTC, remise dès la prestation rendue et avant tout paiement ; double conservé deux ans.</li>
-                  <li>Identité légale « {legalIdentity(config)} », SIRET, date, numéro de facture de votre logiciel.</li>
+                  <li>Identité légale « {legalIdentity(config)} », SIRET, date d'émission, numéro unique et chronologique de votre logiciel.</li>
+                  <li>Client professionnel : son nom complet, son adresse et son numéro d'identification (SIREN) ; nature des opérations (CGI, annexe II, art. 242 nonies A).</li>
                   <li>Débours : ligne distincte, montant exact, copie du justificatif remise au client ; « débours » dans votre livre des recettes, hors chiffre d'affaires.</li>
                   <li>Conservez les originaux des tickets et factures des pièces avancées.</li>
                 </ul>

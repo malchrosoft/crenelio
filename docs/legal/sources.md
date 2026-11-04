@@ -25,22 +25,21 @@ Fichiers Légifrance déposés par le mainteneur, reproduits mot pour mot dans [
 
 | Texte | Fiche |
 |---|---|
-| C. consom. L111-1, L111-2, L112-1, L112-3, L221-5, L221-8 à L221-10, L221-18 à L221-25, L221-27, L221-28, L616-1, R111-1, R111-2, R221-2, R221-3, D221-5 (décret n° 2026-3), R616-1, annexe R221-1 | [code-consommation.md](fr/textes/code-consommation.md) |
+| C. consom. L111-1, L111-2, L112-1, L112-3, L221-1, L221-5, L221-8 à L221-10, L221-18 à L221-25, L221-27, L221-28, L616-1, R111-1, R111-2, R221-2, R221-3, D221-5 (décret n° 2026-3), R616-1, annexe R221-1 | [code-consommation.md](fr/textes/code-consommation.md) |
 | Annexe à l'article R221-3 | [retractation-modele.md](fr/retractation-modele.md) |
 | C. com. R526-27, R123-237, R123-238, L123-28 (livre des recettes) | [code-commerce.md](fr/textes/code-commerce.md) |
 | CGI 50-0 (régime micro, seuils, livre des recettes), 267, 293 B, 293 E | [code-general-impots.md](fr/textes/code-general-impots.md) |
-| Code civil, article 1792 (responsabilité du constructeur d'un ouvrage) | [code-civil.md](fr/textes/code-civil.md) |
+| Code des assurances, L241-1, L243-1-1, L243-2, L243-3, A243-2 à A243-5 (assurance décennale, champ, attestation jointe aux devis et son modèle, arrêté du 5 janvier 2016) | [code-assurances.md](fr/textes/code-assurances.md) |
+| Code civil, articles 1792 à 1792-7 (constructeur, garanties décennale, de bon fonctionnement et de parfait achèvement, réception) | [code-civil.md](fr/textes/code-civil.md) |
+| CGI, annexe II, art. 242 nonies et 242 nonies A (mentions des factures) | [code-general-impots-annexe-2.md](fr/textes/code-general-impots-annexe-2.md) |
 | C. sécu. soc. L613-7 (cotisations du micro-entrepreneur) | [code-securite-sociale.md](fr/textes/code-securite-sociale.md) |
 | Code de l'artisanat L121-1, L211-1, L241-2 | [code-artisanat.md](fr/textes/code-artisanat.md) |
-| Arrêté n° 83-50/A du 3 octobre 1983 ; arrêté du 24 janvier 2017 | [arretes.md](fr/textes/arretes.md) |
+| Arrêté n° 83-50/A du 3 octobre 1983 ; arrêté du 24 janvier 2017 ; arrêté du 3 décembre 1987 (art. 1, 3, 13, 14) | [arretes.md](fr/textes/arretes.md) |
 | BOFiP BOI-TVA-BASE-10-10-30 (III), BOI-TVA-BASE-10-20-40-30 (§ 130), BOI-TVA-BASE-10-20-40-20 (§ 40, 70, 140-150), téléchargés le 04/11/2026 | [bofip.md](fr/textes/bofip.md) |
 
 ## Encore à lire
 
+
 - Aucun texte n'exclut **explicitement** les débours du chiffre d'affaires du micro-entrepreneur
   (C. sécu. soc. L613-7, CGI 50-0 lus le 04/11/2026) : l'exclusion se déduit de CGI 267 II 2° et de la
   doctrine ; la mention « débours » au livre des recettes est une bonne pratique, non une obligation.
-- Code civil, articles 1792-1 à 1792-6 (qui est « constructeur », garantie de bon fonctionnement,
-  garantie de parfait achèvement, réception) : pour décider quelles garanties légales indiquer sur les
-  devis (C. consom. R111-1, 3° ; écart n° 4). L'article 1792 seul vise le **constructeur d'un ouvrage** :
-  il ne couvre pas, en principe, un simple dépannage ou une réparation qui ne constitue pas un ouvrage.
