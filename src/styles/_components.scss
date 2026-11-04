@@ -3654,6 +3654,74 @@ $data-grid-status-width: 13em;
   }
 }
 
+.form-label-row {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+  margin-bottom: $space-xs;
+
+  .form-label {
+    margin-bottom: 0;
+  }
+}
+
+// Aide « ? » d'un champ délicat (FieldHelp, Item 40)
+.field-help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid $gray-300;
+  border-radius: 50%;
+  background: white;
+  color: $gray-600;
+  cursor: pointer;
+  vertical-align: middle;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+.form-check + .field-help {
+  margin-left: $space-xs;
+}
+
+.field-help__dialog {
+  max-width: 560px;
+}
+
+.field-help__body {
+  h4 {
+    margin: $space-md 0 $space-xs;
+    font-size: 0.9rem;
+    color: $gray-900;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  p,
+  ul {
+    margin: 0;
+    color: $gray-700;
+    line-height: $line-height-base;
+  }
+
+  ul {
+    padding-left: 20px;
+  }
+
+  .btn {
+    margin-top: $space-md;
+  }
+}
+
 .quote-editor__goods {
   display: flex;
   flex-wrap: wrap;
@@ -3747,6 +3815,65 @@ $data-grid-status-width: 13em;
     align-items: center;
     gap: $space-xs;
     margin-bottom: $space-block;
+  }
+
+  .docs-viewer__search {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    margin-left: auto;
+    color: $gray-500;
+
+    .form-input {
+      width: 260px;
+    }
+  }
+
+  .docs-viewer__results ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .docs-viewer__result {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2xs;
+    width: 100%;
+    padding: $space-block 0;
+    border: 0;
+    border-bottom: 1px solid $gray-200;
+    background: none;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+
+    &:hover .docs-viewer__result-title,
+    &:focus-visible .docs-viewer__result-title {
+      text-decoration: underline;
+    }
+  }
+
+  .docs-viewer__result-title {
+    font-weight: 700;
+    color: $primary;
+  }
+
+  .docs-viewer__result-meta {
+    font-size: 0.8rem;
+    color: $gray-500;
+  }
+
+  .docs-viewer__result-excerpt {
+    color: $gray-700;
+    line-height: $line-height-base;
+  }
+
+  mark,
+  .docs-viewer__hit {
+    background: primary-alpha(25%);
+    color: inherit;
+    border-radius: $radius-sm;
   }
 
   .docs-viewer__path {

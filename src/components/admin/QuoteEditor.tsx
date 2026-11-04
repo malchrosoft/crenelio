@@ -6,6 +6,8 @@ import { fr } from 'date-fns/locale';
 import { api } from '../../api';
 import { AppConfig, Quote, QuoteLine, QuoteLineKind, QuoteNotification, QuotePayload } from '../../types';
 import ConfirmDialog from './ConfirmDialog';
+import FieldHelp from './FieldHelp';
+import { FieldHelpKey } from '../../config/fieldHelp';
 import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, euro, lineAmount, newLine, quoteTotals, supplyVatCheck, vatRates } from './quoteRules';
 
 interface QuoteEditorProps {
@@ -301,6 +303,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                   <label className="form-label" htmlFor="quote-goods-received">
                     Pièces vendues remises au client le
                   </label>
+                  <FieldHelp topic="goods_received" />
                   <input
                     id="quote-goods-received"
                     type="date"
@@ -376,6 +379,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
               />
               <Field
                 id="quote-client-siren"
+                help="client_siren"
                 label="SIREN ou SIRET du client"
                 value={form.client_siren ?? ''}
                 onChange={(v) => set('client_siren', v || null)}
@@ -391,6 +395,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
             <legend>Travaux</legend>
             <Field
               id="quote-title"
+                help="title"
               label="Nature exacte des travaux"
               value={form.title}
               onChange={(v) => set('title', v)}
@@ -400,6 +405,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
               <input type="checkbox" checked={form.urgent} onChange={(e) => set('urgent', e.target.checked)} />
               <span>Intervention urgente demandée par le client</span>
             </label>
+            <FieldHelp topic="urgent" />
             <p className="form-hint">
               Danger pour les personnes ou les locaux : pas de délai de rétractation, mais seulement pour les pièces et travaux strictement
               nécessaires. Tout le reste fait l'objet d'un devis séparé.
@@ -410,6 +416,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                   <input type="checkbox" checked={form.builder_works} onChange={(e) => set('builder_works', e.target.checked)} />
                   <span>Travaux relevant des garanties des constructeurs</span>
                 </label>
+                <FieldHelp topic="builder_works" />
                 <p className="form-hint">
                   Ouvrage ou élément d'équipement d'un ouvrage (C. civ. 1792 et suivants) : les garanties sont rappelées sur le devis et
                   votre attestation d'assurance décennale lui est jointe (C. assur. L243-2). Un simple dépannage n'en relève pas en
@@ -485,6 +492,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                 <div className="quote-editor__grid">
                   <Field
                     id="quote-debours-budget"
+                help="debours_budget"
                     label="Budget maximum du mandat (€)"
                     type="number"
                     value={form.debours_budget === null ? '' : String(form.debours_budget)}
@@ -508,6 +516,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
             <div className="quote-editor__grid">
               <Field
                 id="quote-execution"
+                help="execution_terms"
                 label="Date ou délai d'exécution"
                 value={form.execution_terms ?? ''}
                 onChange={(v) => set('execution_terms', v || null)}
@@ -515,6 +524,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
               />
               <Field
                 id="quote-payment"
+                help="payment_terms"
                 label="Modalités de paiement"
                 value={form.payment_terms ?? ''}
                 onChange={(v) => set('payment_terms', v || null)}
@@ -523,6 +533,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
               {form.lines.some((line) => line.kind === 'labour') && (
                 <Field
                   id="quote-time-counting"
+                help="time_counting"
                   label="Décompte du temps estimé"
                   value={form.time_counting ?? ''}
                   onChange={(v) => set('time_counting', v || null)}
@@ -540,6 +551,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
               />
               <Field
                 id="quote-price"
+                help="quote_price"
                 label="Prix du devis (vide : gratuit)"
                 type="number"
                 value={form.quote_price === null ? '' : String(form.quote_price)}
@@ -626,11 +638,16 @@ const Field: React.FC<{
   type?: string;
   required?: boolean;
   hint?: string;
-}> = ({ id, label, value, onChange, type = 'text', required, hint }) => (
+  /** Aide « ? » (comment, pourquoi, textes), cf. `src/config/fieldHelp.ts`. */
+  help?: FieldHelpKey;
+}> = ({ id, label, value, onChange, type = 'text', required, hint, help }) => (
   <div className="form-group">
-    <label className="form-label" htmlFor={id}>
-      {label}
-    </label>
+    <div className="form-label-row">
+      <label className="form-label" htmlFor={id}>
+        {label}
+      </label>
+      {help && <FieldHelp topic={help} />}
+    </div>
     <input id={id} className="form-input" type={type} required={required} value={value} onChange={(e) => onChange(e.target.value)} />
     {hint && <p className="form-hint">{hint}</p>}
   </div>
