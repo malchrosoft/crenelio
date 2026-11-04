@@ -195,9 +195,14 @@ CREATE TABLE `quotes` (
     -- Travaux relevant des garanties des constructeurs (C. civ. 1792 et suivants) : garanties imprimées et
     -- attestation d'assurance décennale jointe au devis (C. assur. L243-2)
     `builder_works`   BOOLEAN       NOT NULL DEFAULT FALSE,
+    -- Fourniture revendue : contrat assimilé à une vente (C. consom. L221-1, II), délai de rétractation
+    -- à compter de la prise de possession du bien (L221-18, 2°)
+    `sale`            BOOLEAN       NOT NULL DEFAULT FALSE,
     -- Demande expresse du client de commencer avant la fin du délai de rétractation (L221-25)
     `early_execution` BOOLEAN         NOT NULL DEFAULT FALSE,
     `withdrawal_until` DATE           NULL,
+    -- Vente : date de remise du bien au client, saisie par le professionnel ; fixe `withdrawal_until`
+    `goods_received_at` DATE          NULL,
     -- Déclaration de rétractation en ligne (« Renoncer au contrat ici ») : nom, email de l'accusé, date, IP
     `withdrawn_at`     DATETIME       NULL,
     `withdrawal_name`  VARCHAR(255)   NULL,

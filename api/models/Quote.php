@@ -303,7 +303,8 @@ class Quote
     /**
      * Réponses du client (preuve : date et IP de chacune).
      * - Devis : accepté hors urgence ⇒ fin du délai de rétractation (`withdrawalDeadline`, L221-18 et
-     *   L221-19) ; exécution anticipée seulement sur sa demande expresse (L221-25).
+     *   L221-19) ; exécution anticipée seulement sur sa demande expresse (L221-25). Vente (`sale`) : le
+     *   délai court de la prise de possession du bien (L221-18, 2°), fixé par `receiveGoods`.
      * - Mandat de débours, accord distinct : `$mandate` null s'il n'y a pas de débours ; false si le client
      *   fournit lui-même les pièces.
      * false si le devis n'attend plus de réponse.
@@ -316,7 +317,7 @@ class Quote
             "UPDATE `quotes` SET status = ?, decided_at = NOW(), decision_ip = ?, keep_parts = ?,
                 debours_mandate = ?, mandate_decided_at = IF(? IS NULL, NULL, NOW()), mandate_ip = IF(? IS NULL, NULL, ?),
                 early_execution = ?, refusal_reason = ?,
-                withdrawal_until = IF(urgent, NULL, ?)
+                withdrawal_until = IF(urgent OR sale, NULL, ?)
              WHERE id = ? AND status = 'sent' AND valid_until >= CURDATE()",
             [
                 $accepted ? 'accepted' : 'refused', $ip, $keepParts === null ? null : (int)$keepParts,
@@ -336,7 +337,8 @@ class Quote
         return Database::execute(
             "UPDATE `quotes` SET status = 'withdrawn', withdrawn_at = NOW(), withdrawal_name = ?,
                 withdrawal_email = ?, withdrawal_address = ?, withdrawal_ip = ?
-             WHERE id = ? AND status = 'accepted' AND NOT urgent AND withdrawal_until >= CURDATE()
+             WHERE id = ? AND status = 'accepted' AND NOT urgent
+               AND (withdrawal_until >= CURDATE() OR (sale AND goods_received_at IS NULL))
                AND NOT (early_execution AND EXISTS (SELECT 1 FROM `appointments` a
                    WHERE a.id = `quotes`.appointment_id AND a.status = 'completed'))",
             [$name, $email, $address, $_SERVER['REMOTE_ADDR'] ?? null, $id]
@@ -350,8 +352,28 @@ class Quote
     public static function canWithdraw(array $quote): bool
     {
         $executed = (int)$quote['early_execution'] && ($quote['appointment_status'] ?? null) === 'completed';
-        return $quote['status'] === 'accepted' && !(int)$quote['urgent'] && !$executed
-            && $quote['withdrawal_until'] !== null && $quote['withdrawal_until'] >= date('Y-m-d');
+        $open = $quote['withdrawal_until'] !== null
+            ? $quote['withdrawal_until'] >= date('Y-m-d')
+            : (int)$quote['sale'] && $quote['goods_received_at'] === null;
+        return $quote['status'] === 'accepted' && !(int)$quote['urgent'] && !$executed && $open;
+    }
+
+    /**
+     * Vente : date à laquelle le client a pris possession du bien (L221-18, 2°), saisie par le
+     * professionnel ; fixe la fin du délai de rétractation (L221-19). Le client peut se rétracter dès la
+     * conclusion du contrat. Pas de date future ; false si le devis n'est pas une vente acceptée.
+     */
+    public static function receiveGoods(int $id, string $date): bool
+    {
+        $day = DateTimeImmutable::createFromFormat('!Y-m-d', $date);
+        if (!$day || $day->format('Y-m-d') !== $date || $day > new DateTimeImmutable('today')) {
+            return false;
+        }
+        return Database::execute(
+            "UPDATE `quotes` SET goods_received_at = ?, withdrawal_until = ?
+             WHERE id = ? AND status = 'accepted' AND sale AND NOT urgent",
+            [$date, self::withdrawalDeadline($day), $id]
+        ) > 0;
     }
 
     /**
@@ -419,6 +441,11 @@ class Quote
                 ]
             );
         }
+        // Fourniture revendue : transfert de propriété d'un bien, contrat assimilé à une vente (L221-1, II)
+        Database::execute(
+            "UPDATE `quotes` SET sale = EXISTS (SELECT 1 FROM `quote_lines` WHERE quote_id = ? AND kind = 'supply') WHERE id = ?",
+            [$quoteId, $quoteId]
+        );
     }
 
     private static function withLines(?array $quote): ?array

@@ -195,6 +195,7 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
     phone: config.pro_phone || '',
     email: config.pro_email || '',
     withdrawalUrl: `${window.location.origin}/devis/${token}`,
+    sale: Boolean(Number(quote.sale)),
   });
 
   return (

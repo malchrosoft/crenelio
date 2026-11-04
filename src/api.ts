@@ -151,6 +151,8 @@ export const api = {
   /** Numéro, lien et email au client (`notifications` : résultat de l'envoi). */
   sendQuote: (id: number) =>
     request<Quote & { notifications: { type: string; status: string }[] }>('POST', `/quotes/${id}/send`),
+  /** Vente : remise du bien au client, départ du délai de rétractation (L221-18, 2°). */
+  quoteGoodsReceived: (id: number, date: string) => request<Quote>('PUT', `/quotes/${id}/goods-received`, { date }),
   quoteNotifications: (id: number) => request<QuoteNotification[]>('GET', `/quotes/${id}/notifications`),
   // Attestation d'assurance décennale (C. assur. L243-2)
   insuranceAttestation: () => request<InsuranceAttestationStatus>('GET', '/admin/insurance-attestation'),

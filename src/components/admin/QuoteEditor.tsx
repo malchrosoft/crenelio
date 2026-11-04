@@ -126,6 +126,22 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
     }
   }
 
+  const [goodsDate, setGoodsDate] = useState(quote?.goods_received_at ?? '');
+
+  async function receiveGoods() {
+    if (!quote) return;
+    setBusy(true);
+    setError(null);
+    try {
+      onSaved(await api.quoteGoodsReceived(quote.id, goodsDate));
+      setInfo('Date de remise enregistrée : fin du délai de rétractation calculée.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function send() {
     setConfirm(null);
     const saved = await save();
@@ -280,6 +296,28 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
           {locked && quote && (
             <>
               <QuoteDecision quote={quote} />
+              {quote.status === 'accepted' && Number(quote.sale) > 0 && !Number(quote.urgent) && (
+                <div className="quote-editor__goods">
+                  <label className="form-label" htmlFor="quote-goods-received">
+                    Pièces vendues remises au client le
+                  </label>
+                  <input
+                    id="quote-goods-received"
+                    type="date"
+                    className="form-input form-input--compact"
+                    max={format(new Date(), 'yyyy-MM-dd')}
+                    value={goodsDate}
+                    onChange={(e) => setGoodsDate(e.target.value)}
+                  />
+                  <button type="button" className="btn btn-secondary admin-btn-sm" disabled={busy || !goodsDate} onClick={receiveGoods}>
+                    Enregistrer
+                  </button>
+                  <p className="form-hint">
+                    Devis assimilé à une vente (fourniture revendue, C. consom. L221-1, II) : le délai de rétractation de quatorze jours
+                    court de la prise de possession des pièces par le client (L221-18, 2°), en général le jour de la pose.
+                  </p>
+                </div>
+              )}
               {quote.token && (
                 <div className="quote-editor__links">
                   <a className="btn btn-secondary admin-btn-sm" href={`/devis/${quote.token}/imprimer`} target="_blank" rel="noopener">
@@ -682,7 +720,9 @@ const QuoteDecision: React.FC<{ quote: Quote }> = ({ quote }) => (
         <dd>
           {Number(quote.urgent)
             ? 'Intervention urgente : pas de délai'
-            : `Jusqu'au ${sqlDate(quote.withdrawal_until)}${Number(quote.early_execution) ? ' (exécution anticipée demandée)' : ''}`}
+            : quote.withdrawal_until
+              ? `Jusqu'au ${sqlDate(quote.withdrawal_until)}${Number(quote.early_execution) ? ' (exécution anticipée demandée)' : ''}`
+              : 'Vente : ouverte jusqu’à quatorze jours après la remise des pièces (date à saisir)'}
         </dd>
       </>
     )}

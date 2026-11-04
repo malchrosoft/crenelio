@@ -89,5 +89,5 @@ INSERT IGNORE INTO `config` (`config_key`, `config_value`) VALUES
 
 -- Version du schéma : nom de la dernière migration de sql/migrations/ (Item 27, cf. GET /api/health).
 -- À mettre à jour à chaque nouvelle migration.
-INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-11-05_item22_prix_ttc')
+INSERT INTO `config` (`config_key`, `config_value`) VALUES ('schema_version', '2026-11-05b_item22_vente')
 ON DUPLICATE KEY UPDATE `config_value` = VALUES(`config_value`);

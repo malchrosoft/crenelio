@@ -113,6 +113,19 @@ class QuoteController
     }
 
     /**
+     * PUT /quotes/:id/goods-received — Vente (fourniture revendue) : date de remise du bien au client,
+     * point de départ du délai de rétractation (C. consom. L221-18, 2°).
+     */
+    public function goodsReceived(array $params): void
+    {
+        $quote = self::findOr404((int)($params['id'] ?? 0));
+        if (!Quote::receiveGoods((int)$quote['id'], (string)(Response::body()['date'] ?? ''))) {
+            Response::json(['error' => 'Date invalide, ou devis qui n\'est pas une vente acceptée.'], 400);
+        }
+        Response::json(Quote::find((int)$quote['id']));
+    }
+
+    /**
      * GET /quotes/token/:token/attestation — Attestation d'assurance décennale jointe au devis (L243-2),
      * pour un devis de travaux relevant des garanties des constructeurs.
      */

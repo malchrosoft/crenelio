@@ -176,7 +176,7 @@ class QuotePdf
         if ((int)$quote['urgent']) {
             self::small($pdf, "Intervention urgente expressément demandée par le client : pas de droit de rétractation (article L221-28 du Code de la consommation), dans la limite des pièces de rechange et travaux strictement nécessaires pour répondre à l'urgence.");
         } else {
-            $notice = LegalTexts::withdrawalNotice($config, (string)(EmailTemplates::quoteWithdrawalUrl($quote) ?? ''));
+            $notice = LegalTexts::withdrawalNotice($config, (string)(EmailTemplates::quoteWithdrawalUrl($quote) ?? ''), (bool)(int)$quote['sale']);
             self::small($pdf, $notice['title'], 'left', true);
             foreach ($notice['sections'] as $title => $paragraphs) {
                 self::small($pdf, $title, 'left', true);

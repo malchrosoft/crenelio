@@ -149,6 +149,7 @@ $router->get('/quotes/:id',                 $admin([$quoteController, 'show']));
 $router->put('/quotes/:id',                 $admin([$quoteController, 'update']));
 $router->delete('/quotes/:id',              $admin([$quoteController, 'destroy']));
 $router->post('/quotes/:id/send',           $admin([$quoteController, 'send']));
+$router->put('/quotes/:id/goods-received',  $admin([$quoteController, 'goodsReceived']));
 $router->get('/quotes/:id/notifications',   $admin([$quoteController, 'notifications']));
 
 // Attestation d'assurance décennale jointe aux devis (C. assur. L243-2)

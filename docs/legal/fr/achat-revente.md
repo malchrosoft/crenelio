@@ -33,7 +33,11 @@ vente des pièces est mentionnée **distinctement** sur la facture.
 Dans Crénelio (devis avec TVA) : l'éditeur calcule la part des lignes « fourniture revendue » dans le
 coût total HT (débours exclus, hors chiffre d'affaires) et le rappelle sous les lignes : jusqu'à 50 %, même
 taux que la prestation ; au-delà, taux propre des pièces, sur des lignes distinctes (ce que fait déjà le
-devis). Ce contrôle est **indicatif** : la comparaison se fait en principe pièce par pièce, et seul le
+devis). Un devis qui comporte une fourniture revendue est assimilé à une **vente** (C. consom. L221-1, II) : le
+délai de rétractation court de la remise des pièces au client (L221-18, 2°), date à saisir dans le devis
+accepté ; voir [retractation-modele.md](retractation-modele.md).
+
+Le contrôle de TVA est **indicatif** : la comparaison se fait en principe pièce par pièce, et seul le
 professionnel sait si une pièce a été adaptée. Le taux reste son choix, à valider avec son comptable.
 
 ## Société

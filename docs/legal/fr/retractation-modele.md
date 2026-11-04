@@ -10,11 +10,11 @@ Reproduit le 02/11/2026 à partir du texte fourni par le mainteneur.*
 
 | Instruction | Choix | Raison |
 |---|---|---|
-| (1) | a) « de la conclusion du contrat. » | Contrat de service : le délai court de l'acceptation du devis |
+| (1) | a) « de la conclusion du contrat. » ; b) « où vous-même […] prend physiquement possession du bien. » si le devis comporte une fourniture revendue | Contrat de service : le délai court de l'acceptation du devis. Fourniture revendue : contrat assimilé à une vente (L221-1, II), délai à compter de la prise de possession (L221-18, 2°), date de remise saisie par le professionnel |
 | (2) | Entreprise : nom, adresse, téléphone, email (`company_name`, `legal_adresse` ou locaux, `pro_phone`, `pro_email`) | Instruction (2) |
 | (3) | Premier texte (fonctionnalité de rétractation en ligne), avec l'adresse de la page du devis | Fonction obligatoire pour un contrat conclu en ligne |
-| (4) | Omis | Réservé aux contrats de vente |
-| (5) | Omis | Le client ne reçoit pas de bien vendu par l'artisan : les pièces sont achetées en son nom (débours). **À revoir si la revente de fournitures est activée** (Item 39) |
+| (4) | Omis | Vente : sans objet, le professionnel propose de récupérer le bien ((5) a) |
+| (5) | Service : omis (pièces achetées au nom du client, débours). Vente : a) « Nous récupérerons le bien », b) « Nous prendrons en charge les frais de renvoi du bien. », c) texte sur la dépréciation | Choix le plus protecteur, retenu par défaut le 05/11/2026 ; à rendre réglable si un professionnel préfère un renvoi par le client |
 | (6) | Texte des prestations de services (« la prestation de services ») | Exécution anticipée sur demande expresse |
 
 Le paragraphe « Effets de rétractation » est repris tel quel, y compris la mention des frais de

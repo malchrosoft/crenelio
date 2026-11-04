@@ -63,12 +63,14 @@ class LegalTexts
 
     /**
      * Modèle d'information sur la rétractation (annexe à l'article R221-3, version du 19 juin 2026), complété
-     * pour un contrat de service conclu en ligne : instructions (1) a, (2), (3) et (6) ; (4) et (5) omis.
+     * pour un contrat conclu en ligne : instructions (2), (3) et (6) ; (1) a pour un contrat de service, ou
+     * (1) b et (5) a, b, c pour un devis assimilé à une vente (`$sale`, fourniture revendue, L221-1, II) :
+     * le professionnel récupère le bien à ses frais, (4) est donc sans objet.
      * Texte réglementaire : ne pas reformuler (cf. `withdrawalNotice.ts`).
      *
      * @return array{title: string, sections: array<string, string[]>}
      */
-    public static function withdrawalNotice(array $config, string $withdrawalUrl): array
+    public static function withdrawalNotice(array $config, string $withdrawalUrl, bool $sale = false): array
     {
         $notifyTo = implode(', ', array_filter([
             (string)($config['company_name'] ?? ''), self::companyAddress($config),
@@ -79,14 +81,17 @@ class LegalTexts
             'sections' => [
                 'Droit de rétractation' => [
                     'Vous avez le droit de vous rétracter du présent contrat sans donner de motif dans un délai de quatorze jours.',
-                    'Le délai de rétractation expire quatorze jours après le jour de la conclusion du contrat.',
+                    'Le délai de rétractation expire quatorze jours après le jour ' . ($sale
+                        ? "où vous-même, ou un tiers autre que le transporteur et désigné par vous, prend physiquement possession du bien."
+                        : 'de la conclusion du contrat.'),
                     "Pour exercer le droit de rétractation, vous devez nous notifier ($notifyTo) votre décision de rétractation du présent contrat au moyen d'une déclaration dénuée d'ambiguïté (par exemple, lettre envoyée par la poste ou courrier électronique). Vous pouvez utiliser le modèle de formulaire de rétractation mais ce n'est pas obligatoire. Vous pouvez également exercer votre droit de rétractation en ligne sur $withdrawalUrl. Si vous utilisez cette fonctionnalité en ligne, nous vous enverrons, dans les meilleurs délais, un accusé de réception de la rétractation sur un support durable (par exemple, par courriel), y compris son contenu ainsi que la date et l'heure de sa soumission.",
                     "Pour que le délai de rétractation soit respecté, il suffit que vous transmettiez votre communication relative à l'exercice du droit de rétractation avant l'expiration du délai de rétractation.",
                 ],
-                'Effets de rétractation' => [
+                'Effets de rétractation' => array_values(array_filter([
                     "En cas de rétractation de votre part du présent contrat, nous vous rembourserons tous les paiements reçus de vous, y compris les frais de livraison (à l'exception des frais supplémentaires découlant du fait que vous avez choisi, le cas échéant, un mode de livraison autre que le mode moins coûteux de livraison standard proposé par nous) sans retard excessif et, en tout état de cause, au plus tard quatorze jours à compter du jour où nous sommes informés de votre décision de rétractation du présent contrat. Nous procéderons au remboursement en utilisant le même moyen de paiement que celui que vous aurez utilisé pour la transaction initiale, sauf si vous convenez expressément d'un moyen différent ; en tout état de cause, ce remboursement n'occasionnera pas de frais pour vous.",
+                    $sale ? "Nous récupérerons le bien. Nous prendrons en charge les frais de renvoi du bien. Votre responsabilité n'est engagée qu'à l'égard de la dépréciation du bien résultant de manipulations autres que celles nécessaires pour établir la nature, les caractéristiques et le bon fonctionnement de ce bien." : '',
                     "Si vous avez demandé de commencer la prestation de services pendant le délai de rétractation, vous devrez nous payer un montant proportionnel à ce qui vous a été fourni jusqu'au moment où vous nous avez informé de votre rétractation du présent contrat, par rapport à l'ensemble des prestations prévues par le contrat.",
-                ],
+                ])),
             ],
         ];
     }

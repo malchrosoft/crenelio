@@ -258,6 +258,7 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
                   phone: config.pro_phone || '',
                   email: config.pro_email || '',
                   withdrawalUrl: `${window.location.origin}/devis/${token}`,
+                  sale: Boolean(Number(quote.sale)),
                 })}
               />
               {quote.status === 'sent' && (
@@ -379,6 +380,9 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
           <span>
             Devis accepté le {dateTime(quote.decided_at)}. Un exemplaire vous a été envoyé par email.
             {!urgent && quote.withdrawal_until && <> Rétractation possible jusqu'au {longDate(quote.withdrawal_until)} inclus.</>}
+            {!urgent && !quote.withdrawal_until && Number(quote.sale) > 0 && (
+              <> Rétractation possible dès maintenant et jusqu'à quatorze jours après la remise des pièces vendues.</>
+            )}
           </span>
         </div>
       )}

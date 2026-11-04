@@ -3654,6 +3654,19 @@ $data-grid-status-width: 13em;
   }
 }
 
+.quote-editor__goods {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-sm;
+  margin-top: $space-block;
+
+  .form-hint {
+    flex-basis: 100%;
+    margin: 0;
+  }
+}
+
 .quote-editor__vat-check {
   display: flex;
   align-items: flex-start;

@@ -278,6 +278,10 @@ export interface Quote {
   mandate_decided_at: string | null;
   early_execution: number;
   withdrawal_until: string | null;
+  /** Fourniture revendue : contrat assimilé à une vente (L221-1, II). */
+  sale: number | string;
+  /** Vente : remise du bien au client, départ du délai de rétractation (L221-18, 2°). */
+  goods_received_at: string | null;
   withdrawn_at: string | null;
   withdrawal_name: string | null;
   withdrawal_email: string | null;

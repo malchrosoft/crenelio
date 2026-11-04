@@ -785,7 +785,7 @@ class EmailTemplates
             $html .= $section('Droit de rétractation', ['Intervention urgente expressément demandée : pas de droit de rétractation (article L221-28, 8°, du Code de la consommation), dans la limite des pièces de rechange et travaux strictement nécessaires.']);
             return $html;
         }
-        $notice = LegalTexts::withdrawalNotice($config, $url ?? '');
+        $notice = LegalTexts::withdrawalNotice($config, $url ?? '', (bool)(int)($quote['sale'] ?? 0));
         $html .= $section($notice['title'], []);
         foreach ($notice['sections'] as $title => $paragraphs) {
             $html .= $section($title, $paragraphs);
