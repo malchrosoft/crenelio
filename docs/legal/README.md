@@ -10,11 +10,11 @@ ici y apparaît, les liens entre fiches restent relatifs.
 
 ## Traductions
 
-`en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/` et, pour le plaisir, `fr-chti/` (ch'ti) (05/11/2026) reprennent les fiches de `fr/` sous le même nom, et `README.md`
+`en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` et, pour le plaisir, `fr-chti/` (ch'ti) (05/11/2026) reprennent les fiches de `fr/` sous le même nom, et `README.md`
 pour le sommaire. Les textes officiels (`fr/textes/`) et `sources.md` ne sont pas traduits : ils sont
 cités en français. **La version française fait foi** ; toute modification d'une fiche française se
-reporte dans ses traductions (ou les signale comme en retard). Arabe (`ar/`, écriture de droite à
-gauche) prévu ; l'écran gère déjà le sens d'écriture.
+reporte dans ses traductions (ou les signale comme en retard). L'arabe (`ar/`) s'écrit de droite à
+gauche ; ses citations officielles, en français, restent affichées de gauche à droite.
 
 ## Règles
 

@@ -12,8 +12,8 @@ ajoutée ichi, all' apparaît là-bas, et les liens intre fiches i restent relat
 
 ## Traductions
 
-`en/`, `es/`, `pt/`, `hy/` (05/11/2026) i r'prenn'tent les fiches d'`fr/` sous l'même nom, et `README.md`
-pour l'sommaire ; `fr-chti/` ch'est l'même cosse in ch'ti, pour l'plaisir. Les textes officiels (`fr/textes/`)
+`en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` et, pour s'amuser, `fr-chti/` (ch'ti) (05/11/2026) i r'prenn'tent les fiches d'`fr/` sous l'même nom, et `README.md`
+pour l'sommaire. Les textes officiels (`fr/textes/`)
 et `sources.md` i sont point traduits : on les cite in français. **Ch'est l'version française qui fait foi** ;
 toute modification d'eune fiche française, faut l'reporter dins ses traductions (ou dire qu'all' sont in
 r'tard). L'arabe (`ar/`, écriture d'droite à gauche) est prévu ; l'écran i gère déjà l'sens d'écriture.

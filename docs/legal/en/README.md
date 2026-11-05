@@ -10,12 +10,25 @@ French, with a translated explanation.
 These sheets can also be read in the Espace Artisan (Tradesperson area) (menu **Aide › Documentation**):
 any sheet added here appears there; links between sheets remain relative.
 
+## Translations
+
+`en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` and, for fun, `fr-chti/` (Ch'ti) (05/11/2026) contain the sheets of `fr/` under the same name, and `README.md`
+for the table of contents. Official texts (`fr/textes/`) and `sources.md` are not translated: they are
+quoted in French. **The French version prevails**; any change to a French sheet is carried over
+to its translations (or they are flagged as out of date). Arabic (`ar/`, right-to-left script)
+is planned; the screen already handles the writing direction.
+
 ## Rules
 
 - Each file states its **sources** (link) and the **date of the last check**.
 - Extracts from official texts (Légifrance, government information sheets) are reproduced as is, in
   quotation marks or as quotations; private sources (guides, specialised websites) are **summarised**,
   never copied.
+- Presentation of a quoted official text (as on Légifrance): a `### Article …` heading, then a
+  `>` quotation in which **each *alinéa* is a separate paragraph** (enumerations « 1° », « a) », « II. - » included,
+  separated by an empty `>` line); the version notice (« Modifié par… », « Création… ») as the first
+  paragraph, then « NOTA : » alone on its line. The Documentation screen derives the layout from it; the text
+  itself is never modified.
 - A secondary source does not replace the official text: it is flagged as such and only serves to find
   the right text. **Any rule applied in Crénelio must be confirmed by the official text**, to avoid
   interpretation bias from third parties (law firms, publishers, blogs).

@@ -12,7 +12,7 @@ Jedes hier hinzugefügte Merkblatt erscheint dort, die Links zwischen den Merkbl
 
 ## Übersetzungen
 
-`en/`, `es/`, `pt/`, `hy/` (05/11/2026) übernehmen die Merkblätter aus `fr/` unter demselben Namen, dazu
+`en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` und, zum Vergnügen, `fr-chti/` (Ch'ti) (05/11/2026) übernehmen die Merkblätter aus `fr/` unter demselben Namen, dazu
 `README.md` für das Inhaltsverzeichnis. Die amtlichen Texte (`fr/textes/`) und `sources.md` werden nicht übersetzt:
 Sie werden auf Französisch zitiert. **Die französische Fassung ist maßgeblich**; jede Änderung eines
 französischen Merkblatts wird in seine Übersetzungen übernommen (oder diese werden als veraltet gekennzeichnet).

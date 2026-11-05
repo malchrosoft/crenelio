@@ -12,7 +12,7 @@ qui vi compare; i collegamenti tra le schede restano relativi.
 
 ## Traduzioni
 
-`en/`, `es/`, `pt/`, `hy/` (05/11/2026) riprendono le schede di `fr/` con lo stesso nome, e `README.md`
+`en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` e, per divertimento, `fr-chti/` (ch'ti) (05/11/2026) riprendono le schede di `fr/` con lo stesso nome, e `README.md`
 per il sommario. I testi ufficiali (`fr/textes/`) e `sources.md` non sono tradotti: sono
 citati in francese. **Fa fede la versione francese**; ogni modifica di una scheda francese si
 riporta nelle sue traduzioni (oppure queste vengono segnalate come non aggiornate). Arabo (`ar/`, scrittura da destra a

@@ -10,12 +10,25 @@ con una explicación traducida.
 Estas fichas también se leen en el Espacio Artesano (menú **Aide › Documentation** (Ayuda › Documentación)): toda ficha añadida
 aquí aparece en él; los enlaces entre fichas siguen siendo relativos.
 
+## Traducciones
+
+`en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` y, por diversión, `fr-chti/` (ch'ti) (05/11/2026) recogen las fichas de `fr/` con el mismo nombre, y `README.md`
+para el índice. Los textos oficiales (`fr/textes/`) y `sources.md` no se traducen: se
+citan en francés. **Prevalece la versión francesa**; toda modificación de una ficha francesa se
+traslada a sus traducciones (o se señalan como desactualizadas). El árabe (`ar/`, escritura de derecha a
+izquierda) está previsto; la pantalla ya gestiona el sentido de escritura.
+
 ## Reglas
 
 - Cada archivo indica sus **fuentes** (enlace) y la **fecha de la última verificación**.
 - Los extractos de textos oficiales (Légifrance, fichas de la administración) se reproducen tal cual, entre
   comillas o como cita; las fuentes privadas (guías, sitios especializados) se **resumen**, nunca
   se copian.
+- Presentación de un texto oficial citado (como en Légifrance): un título `### Article …`, luego una
+  cita `>` en la que **cada apartado (*alinéa*) es un párrafo** (enumeraciones « 1° », « a) », « II. - » incluidas,
+  separados por una línea `>` vacía); la mención de versión (« Modifié par… », « Création… ») como primer
+  apartado, y luego « NOTA : » solo en su línea. La pantalla Documentación deriva de ello el formato; el texto
+  en sí nunca se modifica.
 - Una fuente secundaria no sustituye al texto oficial: se señala como tal y solo sirve para
   encontrar el texto correcto. **Toda regla aplicada en Crénelio debe confirmarse con el texto oficial**,
   para evitar sesgos de interpretación de terceros (despachos, editoriales, blogs).

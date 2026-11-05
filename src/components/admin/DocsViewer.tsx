@@ -64,6 +64,11 @@ const LAW_SUBITEM = /^[a-h]\) /;
 const LAW_TITLE = /^(Article|Annexe)\s+\S+$|^\d{1,4}$/;
 
 function styleOfficialTexts(container: HTMLElement) {
+  // Citations officielles toujours en français : de gauche à droite, même dans une fiche en arabe
+  for (const quote of container.querySelectorAll('blockquote')) {
+    quote.setAttribute('lang', 'fr');
+    quote.setAttribute('dir', 'ltr');
+  }
   for (const p of container.querySelectorAll<HTMLParagraphElement>('blockquote p')) {
     const text = p.textContent?.trim() ?? '';
     if (LAW_TITLE.test(text)) p.classList.add('law-title');

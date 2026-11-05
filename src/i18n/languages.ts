@@ -26,6 +26,10 @@ export const LANGUAGES: Language[] = [
   { code: 'pl', label: 'Polski', frenchLabel: 'Polonais', dir: 'ltr' },
   { code: 'uk', label: 'Українська', frenchLabel: 'Ukrainien', dir: 'ltr' },
   { code: 'ru', label: 'Русский', frenchLabel: 'Russe', dir: 'ltr' },
+  { code: 'tr', label: 'Türkçe', frenchLabel: 'Turc', dir: 'ltr' },
+  { code: 'ro', label: 'Română', frenchLabel: 'Roumain', dir: 'ltr' },
+  { code: 'gcf-gp', label: 'Kréyòl gwadloupéyen', frenchLabel: 'Créole guadeloupéen', dir: 'ltr' },
+  { code: 'gcf-mq', label: 'Kréyòl matinik', frenchLabel: 'Créole martiniquais', dir: 'ltr' },
   // Variante régionale du français, pour le plaisir (le français fait foi)
   { code: 'fr-chti', label: "Ch'ti", frenchLabel: "Ch'ti", dir: 'ltr' },
   { code: 'ar', label: 'العربية', frenchLabel: 'Arabe', dir: 'rtl' },
