@@ -15,8 +15,7 @@ aquí aparece en él; los enlaces entre fichas siguen siendo relativos.
 `en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` y, por diversión, `fr-chti/` (ch'ti) (05/11/2026) recogen las fichas de `fr/` con el mismo nombre, y `README.md`
 para el índice. Los textos oficiales (`fr/textes/`) y `sources.md` no se traducen: se
 citan en francés. **Prevalece la versión francesa**; toda modificación de una ficha francesa se
-traslada a sus traducciones (o se señalan como desactualizadas). El árabe (`ar/`, escritura de derecha a
-izquierda) está previsto; la pantalla ya gestiona el sentido de escritura.
+traslada a sus traducciones (o se señalan como desactualizadas). El árabe (`ar/`) se escribe de derecha a izquierda; sus citas oficiales, en francés, se siguen mostrando de izquierda a derecha.
 
 ## Reglas
 

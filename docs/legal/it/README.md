@@ -15,8 +15,7 @@ qui vi compare; i collegamenti tra le schede restano relativi.
 `en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` e, per divertimento, `fr-chti/` (ch'ti) (05/11/2026) riprendono le schede di `fr/` con lo stesso nome, e `README.md`
 per il sommario. I testi ufficiali (`fr/textes/`) e `sources.md` non sono tradotti: sono
 citati in francese. **Fa fede la versione francese**; ogni modifica di una scheda francese si
-riporta nelle sue traduzioni (oppure queste vengono segnalate come non aggiornate). Arabo (`ar/`, scrittura da destra a
-sinistra) previsto; lo schermo gestisce già il senso di scrittura.
+riporta nelle sue traduzioni (oppure queste vengono segnalate come non aggiornate). L'arabo (`ar/`) si scrive da destra a sinistra; le sue citazioni ufficiali, in francese, restano visualizzate da sinistra a destra.
 
 ## Regole
 

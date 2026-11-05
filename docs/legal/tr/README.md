@@ -15,8 +15,7 @@ Belgeler) menüsü): buraya eklenen her fiş orada görünür, fişler arasında
 `en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` ve, keyif için, `fr-chti/` (ch'ti) (05/11/2026) `fr/` fişlerini aynı adla yeniden verir, `README.md`
 ise içindekiler içindir. Resmî metinler (`fr/textes/`) ve `sources.md` çevrilmez: Fransızca olarak
 alıntılanır. **Fransızca sürüm esastır**; bir Fransızca fişte yapılan her değişiklik çevirilerine
-aktarılır (ya da çeviriler geride kaldı diye işaretlenir). Arapça (`ar/`, sağdan sola yazı) planlanmıştır;
-ekran yazı yönünü zaten yönetiyor.
+aktarılır (ya da çeviriler geride kaldı diye işaretlenir). Arapça (`ar/`) sağdan sola yazılır; Fransızca resmî alıntıları soldan sağa gösterilmeye devam eder.
 
 ## Kurallar
 

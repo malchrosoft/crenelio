@@ -12,11 +12,10 @@ ajouté isi ka parèt la, lien ant fich-la ka rété relatif.
 
 ## Tradiksyon
 
-`en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/` (kréyòl gwadloupéyen), `gcf-mq/`, `tr/`, `ar/`, `ro/` (kréyòl matinik) épi, pou plézi, `fr-chti/` (ch'ti) (05/11/2026) ka rété fich `fr/`-la épi menm non-an, épi `README.md`
+`en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/` (kréyòl gwadloupéyen), `gcf-mq/` (kréyòl matinik), `tr/`, `ar/`, `ro/` épi, pou plézi, `fr-chti/` (ch'ti) (05/11/2026) ka rété fich `fr/`-la épi menm non-an, épi `README.md`
 pou somè-a. Tèks ofisyèl-la (`fr/textes/`) épi `sources.md` pa tradui : yo
 sité an fransé. **Sé vèsyon fransé-a ki ka fè fwa** ; tout chanjman an fich fransé dwèt pòté adan
-tradiksyon'y (ou siyalé kon an rita). Arab (`ar/`, ékriti ki ka alé adwat
-agoch) prévwè ; ékran-an ja ka jéré sans ékriti-a.
+tradiksyon'y (ou siyalé kon an rita). Arab (`ar/`) ka ékri adwat agoch ; sitasyon ofisyèl li, an fransé, ka rété afiché agoch adwat.
 
 ## Règ
 

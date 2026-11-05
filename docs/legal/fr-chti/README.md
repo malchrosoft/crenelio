@@ -16,7 +16,7 @@ ajoutée ichi, all' apparaît là-bas, et les liens intre fiches i restent relat
 pour l'sommaire. Les textes officiels (`fr/textes/`)
 et `sources.md` i sont point traduits : on les cite in français. **Ch'est l'version française qui fait foi** ;
 toute modification d'eune fiche française, faut l'reporter dins ses traductions (ou dire qu'all' sont in
-r'tard). L'arabe (`ar/`, écriture d'droite à gauche) est prévu ; l'écran i gère déjà l'sens d'écriture.
+r'tard). L'arabe (`ar/`) i s'écrit d'droite à gauche ; ses citations officielles, in français, i restent affichées d'gauche à droite.
 
 ## Règles
 

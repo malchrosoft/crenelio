@@ -12,12 +12,11 @@ ou ajouté isi ka parèt la, lyen ant fich yo ka rété rélatif.
 
 ## Tradiksyon
 
-`en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/` (kréyòl gwadloupéyen), `gcf-mq/`, `tr/`, `ar/`, `ro/`
-(kréyòl matinitjé) é, pou plézi, `fr-chti/` (ch'ti) (05/11/2026) ka répran fich a `fr/` épi menm non-la, é
+`en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/` (kréyòl gwadloupéyen), `gcf-mq/` (kréyòl matinitjé), `tr/`, `ar/`, `ro/`
+ é, pou plézi, `fr-chti/` (ch'ti) (05/11/2026) ka répran fich a `fr/` épi menm non-la, é
 `README.md` pou sonmè-la. Tèks ofisyèl yo (`fr/textes/`) é `sources.md` pa tradui : yo sité an fransé.
 **Sé vèsyon fransé-la ki ka fè lwa** ; tout chanjman asi on fich fransé fò répòté-y adan tradiksyon a-y
-(oben sinyalé yo an rèta). Arab (`ar/`, ka ékri dépi dwèt pou alé agòch) prévwa ; ékran-la ja ka jéré sans
-a lékriti-la.
+(oben sinyalé yo an rèta). Arab (`ar/`) ka ékri dépi dwèt pou alé agòch ; sitasyon ofisyèl a-y, an fransé, ka rété afiché dépi gòch pou alé adwèt.
 
 ## Règ
 

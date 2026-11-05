@@ -15,8 +15,7 @@ aici apare acolo, iar legăturile dintre fișe rămân relative.
 `en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` și, de plăcere, `fr-chti/` (ch'ti) (05/11/2026) preiau fișele din `fr/` sub același nume, iar `README.md`
 pentru cuprins. Textele oficiale (`fr/textes/`) și `sources.md` nu sunt traduse: ele sunt
 citate în franceză. **Versiunea franceză face fidă**; orice modificare a unei fișe franceze se
-transpune în traducerile sale (sau acestea sunt semnalate ca rămase în urmă). Araba (`ar/`, scriere de la dreapta la
-stânga) este prevăzută; ecranul gestionează deja sensul scrierii.
+transpune în traducerile sale (sau acestea sunt semnalate ca rămase în urmă). Araba (`ar/`) se scrie de la dreapta la stânga; citatele sale oficiale, în franceză, rămân afișate de la stânga la dreapta.
 
 ## Reguli
 

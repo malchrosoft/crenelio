@@ -15,8 +15,7 @@ tutaj pojawia się tam, a linki między kartami pozostają względne.
 `en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` oraz, dla przyjemności, `fr-chti/` (ch'ti) (05/11/2026) powtarzają karty z `fr/` pod tą samą nazwą, a `README.md`
 służy za spis treści. Teksty urzędowe (`fr/textes/`) i `sources.md` nie są tłumaczone: są
 cytowane po francusku. **Wiążąca jest wersja francuska**; każdą zmianę karty francuskiej
-przenosi się do jej tłumaczeń (albo oznacza je jako nieaktualne). Arabski (`ar/`, pismo od prawej do
-lewej) jest planowany; ekran obsługuje już kierunek pisma.
+przenosi się do jej tłumaczeń (albo oznacza je jako nieaktualne). Arabski (`ar/`) zapisuje się od prawej do lewej; jego cytaty urzędowe, po francusku, pozostają wyświetlane od lewej do prawej.
 
 ## Zasady
 

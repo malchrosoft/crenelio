@@ -16,7 +16,7 @@ Jedes hier hinzugefügte Merkblatt erscheint dort, die Links zwischen den Merkbl
 `README.md` für das Inhaltsverzeichnis. Die amtlichen Texte (`fr/textes/`) und `sources.md` werden nicht übersetzt:
 Sie werden auf Französisch zitiert. **Die französische Fassung ist maßgeblich**; jede Änderung eines
 französischen Merkblatts wird in seine Übersetzungen übernommen (oder diese werden als veraltet gekennzeichnet).
-Arabisch (`ar/`, Schrift von rechts nach links) ist vorgesehen; der Bildschirm unterstützt die Schreibrichtung bereits.
+Arabisch (`ar/`) wird von rechts nach links geschrieben; seine amtlichen Zitate, auf Französisch, werden weiterhin von links nach rechts angezeigt.
 
 ## Regeln
 

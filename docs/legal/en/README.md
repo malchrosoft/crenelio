@@ -15,8 +15,7 @@ any sheet added here appears there; links between sheets remain relative.
 `en/`, `es/`, `pt/`, `hy/`, `it/`, `de/`, `pl/`, `uk/`, `ru/`, `gcf-gp/`, `gcf-mq/`, `tr/`, `ar/`, `ro/` and, for fun, `fr-chti/` (Ch'ti) (05/11/2026) contain the sheets of `fr/` under the same name, and `README.md`
 for the table of contents. Official texts (`fr/textes/`) and `sources.md` are not translated: they are
 quoted in French. **The French version prevails**; any change to a French sheet is carried over
-to its translations (or they are flagged as out of date). Arabic (`ar/`, right-to-left script)
-is planned; the screen already handles the writing direction.
+to its translations (or they are flagged as out of date). Arabic (`ar/`) is written right to left; its official quotations, in French, remain displayed left to right.
 
 ## Rules
 
