@@ -21,6 +21,13 @@ export const LANGUAGES: Language[] = [
   { code: 'es', label: 'Español', frenchLabel: 'Espagnol', dir: 'ltr' },
   { code: 'pt', label: 'Português', frenchLabel: 'Portugais', dir: 'ltr' },
   { code: 'hy', label: 'Հայերեն', frenchLabel: 'Arménien', dir: 'ltr' },
+  { code: 'it', label: 'Italiano', frenchLabel: 'Italien', dir: 'ltr' },
+  { code: 'de', label: 'Deutsch', frenchLabel: 'Allemand', dir: 'ltr' },
+  { code: 'pl', label: 'Polski', frenchLabel: 'Polonais', dir: 'ltr' },
+  { code: 'uk', label: 'Українська', frenchLabel: 'Ukrainien', dir: 'ltr' },
+  { code: 'ru', label: 'Русский', frenchLabel: 'Russe', dir: 'ltr' },
+  // Variante régionale du français, pour le plaisir (le français fait foi)
+  { code: 'fr-chti', label: "Ch'ti", frenchLabel: "Ch'ti", dir: 'ltr' },
   { code: 'ar', label: 'العربية', frenchLabel: 'Arabe', dir: 'rtl' },
 ];
 
