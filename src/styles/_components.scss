@@ -3920,13 +3920,58 @@ $data-grid-status-width: 13em;
     h2 { font-size: 1.2rem; margin: $space-md 0 $space-xs; }
     h3 { font-size: 1rem; margin: $space-block 0 $space-xs; }
 
+    // Texte officiel cité : présentation de Légifrance (article encadré, version en petit, alinéas)
     blockquote {
-      margin: $space-sm 0;
-      padding: $space-xs $space-block;
+      margin: $space-sm 0 $space-md;
+      padding: $space-block $space-md;
+      border: 1px solid $gray-200;
       // Côté du début de ligne : à gauche, à droite en arabe (dir="rtl")
       border-inline-start: 3px solid $primary;
-      background: $gray-100;
-      color: $gray-700;
+      border-radius: $radius-sm;
+      background: white;
+      color: $gray-800;
+      line-height: $line-height-relaxed;
+
+      p {
+        margin: 0 0 $space-sm;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .law-title {
+        font-weight: 700;
+        color: $gray-900;
+
+        &:not(:first-child) {
+          margin-top: $space-md;
+        }
+      }
+
+      // Tirets du texte d'origine (« - des prestations… ») : tiret, pas de puce
+      ul {
+        list-style-type: '– ';
+      }
+
+      .law-meta {
+        font-size: 0.8rem;
+        font-style: italic;
+        color: $gray-500;
+      }
+
+      .law-note {
+        margin-top: $space-md;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.04em;
+        color: $gray-600;
+      }
+
+      // Énumérations : un alinéa par point, comme sur Légifrance ; sous-points a), b) légèrement en retrait
+      .law-item--sub {
+        margin-inline-start: 1.5em;
+      }
     }
 
     table { border-collapse: collapse; margin: $space-sm 0; font-size: 0.9rem; }

@@ -48,7 +48,19 @@ Source : Légifrance, Code de la consommation (LEGITEXT000006069565), document g
 
 ### Article L221-1
 
-> I. - Pour l'application du présent titre, sont considérés comme : 1° Contrat à distance : tout contrat conclu entre un professionnel et un consommateur, dans le cadre d'un système organisé de vente ou de prestation de services à distance, sans la présence physique simultanée du professionnel et du consommateur, par le recours exclusif à une ou plusieurs techniques de communication à distance jusqu'à la conclusion du contrat ; 2° Contrat hors établissement : tout contrat conclu entre un professionnel et un consommateur : a) Dans un lieu qui n'est pas celui où le professionnel exerce son activité en permanence ou de manière habituelle, en la présence physique simultanée des parties, y compris à la suite d'une sollicitation ou d'une offre faite par le consommateur ; b) Ou dans le lieu où le professionnel exerce son activité en permanence ou de manière habituelle ou au moyen d'une technique de communication à distance, immédiatement après que le consommateur a été sollicité personnellement et individuellement dans un lieu différent de celui où le professionnel exerce en permanence ou de manière habituelle son activité et où les parties étaient, physiquement et simultanément, présentes ; c) Ou pendant une excursion organisée par le professionnel ayant pour but ou pour effet de promouvoir et de vendre des biens ou des services au consommateur. II. - Les dispositions du présent titre s'appliquent aux contrats portant sur la vente d'un ou plusieurs biens, au sens de l'article 528 du code civil, et au contrat en vertu duquel le professionnel fournit ou s'engage à fournir un service au consommateur en contrepartie duquel le consommateur en paie ou s'engage à en payer le prix. Le contrat ayant pour objet à la fois le transfert de propriété d'un bien et la fourniture d'une prestation de services, y compris la prestation de livraison de biens, est assimilée à un contrat de vente.
+> I. - Pour l'application du présent titre, sont considérés comme :
+>
+> 1° Contrat à distance : tout contrat conclu entre un professionnel et un consommateur, dans le cadre d'un système organisé de vente ou de prestation de services à distance, sans la présence physique simultanée du professionnel et du consommateur, par le recours exclusif à une ou plusieurs techniques de communication à distance jusqu'à la conclusion du contrat ;
+>
+> 2° Contrat hors établissement : tout contrat conclu entre un professionnel et un consommateur :
+>
+> a) Dans un lieu qui n'est pas celui où le professionnel exerce son activité en permanence ou de manière habituelle, en la présence physique simultanée des parties, y compris à la suite d'une sollicitation ou d'une offre faite par le consommateur ;
+>
+> b) Ou dans le lieu où le professionnel exerce son activité en permanence ou de manière habituelle ou au moyen d'une technique de communication à distance, immédiatement après que le consommateur a été sollicité personnellement et individuellement dans un lieu différent de celui où le professionnel exerce en permanence ou de manière habituelle son activité et où les parties étaient, physiquement et simultanément, présentes ;
+>
+> c) Ou pendant une excursion organisée par le professionnel ayant pour but ou pour effet de promouvoir et de vendre des biens ou des services au consommateur.
+>
+> II. - Les dispositions du présent titre s'appliquent aux contrats portant sur la vente d'un ou plusieurs biens, au sens de l'article 528 du code civil, et au contrat en vertu duquel le professionnel fournit ou s'engage à fournir un service au consommateur en contrepartie duquel le consommateur en paie ou s'engage à en payer le prix. Le contrat ayant pour objet à la fois le transfert de propriété d'un bien et la fourniture d'une prestation de services, y compris la prestation de livraison de biens, est assimilée à un contrat de vente.
 >
 > III. - Les dispositions du présent titre s'appliquent également aux contrats par lesquels le professionnel fournit ou s'engage à fournir au consommateur un contenu numérique sans support matériel ou un service numérique et pour lesquels le consommateur lui fournit ou s'engage à lui fournir des données à caractère personnel, sauf lorsque ces données sont exclusivement traitées par lui pour fournir le contenu numérique sans support matériel ou le service numérique, ou lui permettre de remplir les obligations légales qui lui incombent.
 
@@ -276,15 +288,77 @@ Source : Légifrance, Code de la consommation (LEGITEXT000006069565), document g
 
 ### Article R111-1
 
-> Pour l'application des 1° et 3° à 6° de l'article L. 111-1, le professionnel communique au consommateur les informations suivantes : 1° Son nom ou sa dénomination sociale, l'adresse géographique de son établissement et, si elle est différente, celle du siège social, son numéro de téléphone et son adresse électronique ; 2° Les modalités de paiement, de livraison et d'exécution du contrat ainsi que celles prévues par le professionnel pour le traitement des réclamations ; 3° L'existence et les modalités de mise en œuvre de la garantie légale de conformité mentionnée aux articles L. 217-3 et suivants et aux articles L. 224-25-12 et suivants du code de la consommation, de la garantie légale des vices cachés mentionnée aux articles 1641 à 1649 du code civil ou de toute autre garantie légale applicable ; 4° L'existence et les modalités de mise en œuvre de la garantie commerciale mentionnée aux articles L. 217-21 et suivants et du service après-vente mentionné aux articles L. 217-25 et suivants ; 5° S'il y a lieu, la durée du contrat ou, s'il s'agit d'un contrat à durée indéterminée ou à tacite reconduction, les conditions de sa résiliation ; 6° S'il y a lieu, les fonctionnalités du contenu numérique, y compris les mesures de protection technique applicables, ainsi que toute compatibilité et interopérabilité pertinentes avec certains biens, contenus numériques ou services numériques ainsi qu'avec certains matériels ou logiciels, dont le professionnel a ou devrait raisonnablement avoir connaissance ; 7° Les coordonnées du ou des médiateurs de la consommation dont il relève conformément à l'article L. 616-1. Pour l'application des 3° et 4°, le professionnel utilise, respectivement, les termes de “ garantie légale ” et les termes de “ garantie commerciale ” lorsqu'il propose cette dernière en sus des garanties légales.
+> Pour l'application des 1° et 3° à 6° de l'article L. 111-1, le professionnel communique au consommateur les informations suivantes :
+>
+> 1° Son nom ou sa dénomination sociale, l'adresse géographique de son établissement et, si elle est différente, celle du siège social, son numéro de téléphone et son adresse électronique ;
+>
+> 2° Les modalités de paiement, de livraison et d'exécution du contrat ainsi que celles prévues par le professionnel pour le traitement des réclamations ;
+>
+> 3° L'existence et les modalités de mise en œuvre de la garantie légale de conformité mentionnée aux articles L. 217-3 et suivants et aux articles L. 224-25-12 et suivants du code de la consommation, de la garantie légale des vices cachés mentionnée aux articles 1641 à 1649 du code civil ou de toute autre garantie légale applicable ;
+>
+> 4° L'existence et les modalités de mise en œuvre de la garantie commerciale mentionnée aux articles L. 217-21 et suivants et du service après-vente mentionné aux articles L. 217-25 et suivants ;
+>
+> 5° S'il y a lieu, la durée du contrat ou, s'il s'agit d'un contrat à durée indéterminée ou à tacite reconduction, les conditions de sa résiliation ;
+>
+> 6° S'il y a lieu, les fonctionnalités du contenu numérique, y compris les mesures de protection technique applicables, ainsi que toute compatibilité et interopérabilité pertinentes avec certains biens, contenus numériques ou services numériques ainsi qu'avec certains matériels ou logiciels, dont le professionnel a ou devrait raisonnablement avoir connaissance ;
+>
+> 7° Les coordonnées du ou des médiateurs de la consommation dont il relève conformément à l'article L. 616-1. Pour l'application des 3° et 4°, le professionnel utilise, respectivement, les termes de “ garantie légale ” et les termes de “ garantie commerciale ” lorsqu'il propose cette dernière en sus des garanties légales.
 
 ### Article R111-2
 
-> Pour l'application des dispositions de l'article L. 111-2, outre les informations prévues à l'article R. 111-1, le professionnel communique au consommateur ou met à sa disposition les informations suivantes : 1° Le statut et la forme juridique de l'entreprise ; 2° Les coordonnées permettant d'entrer en contact rapidement et de communiquer directement avec lui ; 3° Le cas échéant, le numéro d'inscription au registre du commerce et des sociétés ou au Registre national des entreprises en tant qu'entreprise du secteur des métiers et de l'artisanat ; 4° Si son activité est soumise à un régime d'autorisation, le nom et l'adresse de l'autorité ayant délivré l'autorisation ; 5° S'il est assujetti à la taxe sur la valeur ajoutée et identifié par un numéro individuel en application de l'article 286 ter du code général des impôts, son numéro individuel d'identification ; 6° S'il est membre d'une profession réglementée, son titre professionnel, l'Etat membre de l'Union européenne dans lequel il a été octroyé ainsi que, le cas échéant, le nom de l'ordre ou de l'organisme professionnel auprès duquel il est inscrit ; 7° Les conditions générales, s'il en utilise ; 8° Le cas échéant, les clauses contractuelles relatives à la législation applicable et la juridiction compétente ; 9° L'éventuelle garantie financière ou assurance de responsabilité professionnelle souscrite par lui, les coordonnées de l'assureur ou du garant ainsi que la couverture géographique du contrat ou de l'engagement.
+> Pour l'application des dispositions de l'article L. 111-2, outre les informations prévues à l'article R. 111-1, le professionnel communique au consommateur ou met à sa disposition les informations suivantes :
+>
+> 1° Le statut et la forme juridique de l'entreprise ;
+>
+> 2° Les coordonnées permettant d'entrer en contact rapidement et de communiquer directement avec lui ;
+>
+> 3° Le cas échéant, le numéro d'inscription au registre du commerce et des sociétés ou au Registre national des entreprises en tant qu'entreprise du secteur des métiers et de l'artisanat ;
+>
+> 4° Si son activité est soumise à un régime d'autorisation, le nom et l'adresse de l'autorité ayant délivré l'autorisation ;
+>
+> 5° S'il est assujetti à la taxe sur la valeur ajoutée et identifié par un numéro individuel en application de l'article 286 ter du code général des impôts, son numéro individuel d'identification ;
+>
+> 6° S'il est membre d'une profession réglementée, son titre professionnel, l'Etat membre de l'Union européenne dans lequel il a été octroyé ainsi que, le cas échéant, le nom de l'ordre ou de l'organisme professionnel auprès duquel il est inscrit ;
+>
+> 7° Les conditions générales, s'il en utilise ;
+>
+> 8° Le cas échéant, les clauses contractuelles relatives à la législation applicable et la juridiction compétente ;
+>
+> 9° L'éventuelle garantie financière ou assurance de responsabilité professionnelle souscrite par lui, les coordonnées de l'assureur ou du garant ainsi que la couverture géographique du contrat ou de l'engagement.
 
 ### Article R221-2
 
-> En application des 4°, 5° et 6° de l'article L. 221-5, le professionnel communique au consommateur les informations suivantes : 1° Son nom ou sa dénomination sociale, l'adresse géographique où le professionnel est établi, son numéro de téléphone et son adresse électronique ainsi que, le cas échéant, l'adresse géographique et l'identité du professionnel pour le compte duquel il agit ; 2° S'il y a lieu, les moyens de communication en ligne complémentaires à ceux mentionnés au 1°. Ces moyens garantissent au consommateur d'être en mesure de conserver tous les échanges écrits avec le professionnel sur un support durable, y compris la date et l'heure de ces échanges ; 3° Si elle diffère de l'adresse fournie au 1°, l'adresse géographique de son siège commercial et, s'il y a lieu, celle du professionnel pour le compte duquel il agit, à laquelle le consommateur peut adresser une éventuelle réclamation ; 4° Les modalités de paiement, de livraison et d'exécution prévues dans le contrat ; 5° S'il y a lieu, les modalités de traitement prévues pour le traitement des réclamations ; 6° S'il y a lieu, l'existence et les modalités de mise en œuvre de la garantie légale de conformité mentionnées aux articles L. 217-3 et suivants et aux articles L. 224-25-12 et suivants, de la garantie des vices cachés mentionnés aux articles 1641 à 1649 du code civil, ou de toute autre garantie légale applicable ; 7° S'il y a lieu, l'existence et les modalités de mise en œuvre de la garantie commerciale et du service après-vente mentionnées aux articles L. 217-21 et suivants ; 8° S'il y a lieu, la durée du contrat ou, s'il s'agit d'un contrat à durée indéterminée ou à tacite reconduction, les conditions de résiliation ; 9° S'il y a lieu, la fonctionnalité des biens comportant des éléments, des contenus et des services numériques, y compris les mesures de protection technique applicables ; 10° S'il y a lieu, toute compatibilité et interopérabilité pertinentes des biens comportant des éléments, des contenus et des services numériques dont le professionnel a ou devrait raisonnablement avoir connaissance ; 11° Les coordonnées du ou des médiateurs de la consommation compétents auxquels le consommateur peut recourir en application de l'article L. 616-1 ; 12° Le coût de l'utilisation de la technique de communication à distance pour la conclusion du contrat lorsque ce coût est calculé sur une base autre que le tarif de base ; 13° S'il y a lieu, l'existence de codes de conduite applicables au contrat et les modalités pour en obtenir une copie ; 14° S'il y a lieu, la durée minimale des obligations contractuelles du consommateur ; 15° S'il y a lieu, l'existence d'une caution ou d'autres garanties financières à payer ou à fournir par le consommateur à la demande du professionnel ainsi que les conditions y afférentes.
+> En application des 4°, 5° et 6° de l'article L. 221-5, le professionnel communique au consommateur les informations suivantes :
+>
+> 1° Son nom ou sa dénomination sociale, l'adresse géographique où le professionnel est établi, son numéro de téléphone et son adresse électronique ainsi que, le cas échéant, l'adresse géographique et l'identité du professionnel pour le compte duquel il agit ;
+>
+> 2° S'il y a lieu, les moyens de communication en ligne complémentaires à ceux mentionnés au 1°. Ces moyens garantissent au consommateur d'être en mesure de conserver tous les échanges écrits avec le professionnel sur un support durable, y compris la date et l'heure de ces échanges ;
+>
+> 3° Si elle diffère de l'adresse fournie au 1°, l'adresse géographique de son siège commercial et, s'il y a lieu, celle du professionnel pour le compte duquel il agit, à laquelle le consommateur peut adresser une éventuelle réclamation ;
+>
+> 4° Les modalités de paiement, de livraison et d'exécution prévues dans le contrat ;
+>
+> 5° S'il y a lieu, les modalités de traitement prévues pour le traitement des réclamations ;
+>
+> 6° S'il y a lieu, l'existence et les modalités de mise en œuvre de la garantie légale de conformité mentionnées aux articles L. 217-3 et suivants et aux articles L. 224-25-12 et suivants, de la garantie des vices cachés mentionnés aux articles 1641 à 1649 du code civil, ou de toute autre garantie légale applicable ;
+>
+> 7° S'il y a lieu, l'existence et les modalités de mise en œuvre de la garantie commerciale et du service après-vente mentionnées aux articles L. 217-21 et suivants ;
+>
+> 8° S'il y a lieu, la durée du contrat ou, s'il s'agit d'un contrat à durée indéterminée ou à tacite reconduction, les conditions de résiliation ;
+>
+> 9° S'il y a lieu, la fonctionnalité des biens comportant des éléments, des contenus et des services numériques, y compris les mesures de protection technique applicables ;
+>
+> 10° S'il y a lieu, toute compatibilité et interopérabilité pertinentes des biens comportant des éléments, des contenus et des services numériques dont le professionnel a ou devrait raisonnablement avoir connaissance ;
+>
+> 11° Les coordonnées du ou des médiateurs de la consommation compétents auxquels le consommateur peut recourir en application de l'article L. 616-1 ;
+>
+> 12° Le coût de l'utilisation de la technique de communication à distance pour la conclusion du contrat lorsque ce coût est calculé sur une base autre que le tarif de base ;
+>
+> 13° S'il y a lieu, l'existence de codes de conduite applicables au contrat et les modalités pour en obtenir une copie ;
+>
+> 14° S'il y a lieu, la durée minimale des obligations contractuelles du consommateur ;
+>
+> 15° S'il y a lieu, l'existence d'une caution ou d'autres garanties financières à payer ou à fournir par le consommateur à la demande du professionnel ainsi que les conditions y afférentes.
 
 ### Article R221-3
 

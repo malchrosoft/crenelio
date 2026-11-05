@@ -6,7 +6,25 @@ Source : Légifrance, Code de l'artisanat (LEGITEXT000006075116).
 
 ### Article L121-1
 
-> Quels que soient le statut juridique et les caractéristiques de l'entreprise, ne peuvent être exercées que par une personne qualifiée professionnellement ou sous le contrôle effectif et permanent de celle-ci les activités suivantes : 1° L'entretien et la réparation des véhicules terrestres à moteur et des machines agricoles, forestières et de travaux publics ; 2° La construction, l'entretien et la réparation des bâtiments ; 3° La mise en place, l'entretien et la réparation des réseaux et des équipements utilisant les fluides, ainsi que des matériels et équipements destinés à l'alimentation en gaz, au chauffage des immeubles et aux installations électriques ; 4° Le ramonage ; 5° Les soins esthétiques à la personne autres que médicaux et paramédicaux et les modelages esthétiques de confort sans finalité médicale. On entend par modelage toute manœuvre superficielle externe réalisée sur la peau du visage et du corps humain dans un but exclusivement esthétique et de confort, à l'exclusion de toute finalité médicale et thérapeutique. Cette manœuvre peut être soit manuelle, éventuellement pour assurer la pénétration d'un produit cosmétique, soit facilitée par un appareil à visée esthétique ; 6° La réalisation de prothèses dentaires ; 7° La préparation ou la fabrication de produits frais de boulangerie, pâtisserie, boucherie, charcuterie et poissonnerie, ainsi que la préparation ou la fabrication de glaces alimentaires artisanales ; 8° L'activité de maréchal-ferrant ; 9° La coiffure.
+> Quels que soient le statut juridique et les caractéristiques de l'entreprise, ne peuvent être exercées que par une personne qualifiée professionnellement ou sous le contrôle effectif et permanent de celle-ci les activités suivantes :
+>
+> 1° L'entretien et la réparation des véhicules terrestres à moteur et des machines agricoles, forestières et de travaux publics ;
+>
+> 2° La construction, l'entretien et la réparation des bâtiments ;
+>
+> 3° La mise en place, l'entretien et la réparation des réseaux et des équipements utilisant les fluides, ainsi que des matériels et équipements destinés à l'alimentation en gaz, au chauffage des immeubles et aux installations électriques ;
+>
+> 4° Le ramonage ;
+>
+> 5° Les soins esthétiques à la personne autres que médicaux et paramédicaux et les modelages esthétiques de confort sans finalité médicale. On entend par modelage toute manœuvre superficielle externe réalisée sur la peau du visage et du corps humain dans un but exclusivement esthétique et de confort, à l'exclusion de toute finalité médicale et thérapeutique. Cette manœuvre peut être soit manuelle, éventuellement pour assurer la pénétration d'un produit cosmétique, soit facilitée par un appareil à visée esthétique ;
+>
+> 6° La réalisation de prothèses dentaires ;
+>
+> 7° La préparation ou la fabrication de produits frais de boulangerie, pâtisserie, boucherie, charcuterie et poissonnerie, ainsi que la préparation ou la fabrication de glaces alimentaires artisanales ;
+>
+> 8° L'activité de maréchal-ferrant ;
+>
+> 9° La coiffure.
 
 ### Article L211-1
 

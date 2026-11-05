@@ -53,6 +53,27 @@ function loadAll(): Promise<Record<string, string>> {
   return allDocs;
 }
 
+/**
+ * Textes officiels cités (citations Markdown) présentés comme sur Légifrance, sans toucher au texte :
+ * titre ou numéro d'article isolé en gras, mention de version en petit, « NOTA » en intertitre, un alinéa par point, sous-points a), b) en retrait.
+ */
+const LAW_META = /^(Modifié par|Modifiés par|Création|Créé par|Version en vigueur|En vigueur|Abrogé par|Transféré par|Rectifié par)\b/;
+const LAW_ITEM = /^(\d+° |[IVX]+\s?\.\s?-)/;
+const LAW_SUBITEM = /^[a-h]\) /;
+/** Titre seul sur sa ligne : « Article 4 », « Annexe 1 », numéro de paragraphe du BOFiP (« 140 »). */
+const LAW_TITLE = /^(Article|Annexe)\s+\S+$|^\d{1,4}$/;
+
+function styleOfficialTexts(container: HTMLElement) {
+  for (const p of container.querySelectorAll<HTMLParagraphElement>('blockquote p')) {
+    const text = p.textContent?.trim() ?? '';
+    if (LAW_TITLE.test(text)) p.classList.add('law-title');
+    else if (LAW_META.test(text) && text.length < 240) p.classList.add('law-meta');
+    else if (/^NOTA\s*:?$/.test(text)) p.classList.add('law-note');
+    else if (LAW_ITEM.test(text)) p.classList.add('law-item');
+    else if (LAW_SUBITEM.test(text)) p.classList.add('law-item', 'law-item--sub');
+  }
+}
+
 /** Surligne les termes dans le contenu rendu et fait défiler jusqu'à la première occurrence. */
 function highlight(container: HTMLElement, terms: string[]) {
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
@@ -163,7 +184,9 @@ const DocsViewer: React.FC<DocsViewerProps> = ({ initialPath }) => {
   const html = useMemo(() => (markdown === null ? '' : (marked.parse(markdown, { async: false }) as string)), [markdown]);
 
   useEffect(() => {
-    if (contentRef.current && hits.length > 0) highlight(contentRef.current, hits);
+    if (!contentRef.current) return;
+    styleOfficialTexts(contentRef.current);
+    if (hits.length > 0) highlight(contentRef.current, hits);
   }, [html, hits]);
 
   useEffect(() => {

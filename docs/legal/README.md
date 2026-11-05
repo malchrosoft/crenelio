@@ -22,6 +22,11 @@ gauche) prévu ; l'écran gère déjà le sens d'écriture.
 - Les extraits de textes officiels (Légifrance, fiches de l'administration) sont repris tels quels, entre
   guillemets ou en citation ; les sources privées (guides, sites spécialisés) sont **résumées**, jamais
   copiées.
+- Présentation d'un texte officiel cité (comme sur Légifrance) : un titre `### Article …`, puis une
+  citation `>` dont **chaque alinéa est un paragraphe** (énumérations « 1° », « a) », « II. - » comprises,
+  séparés par une ligne `>` vide) ; la mention de version (« Modifié par… », « Création… ») en premier
+  alinéa, puis « NOTA : » seul sur sa ligne. L'écran Documentation en tire la mise en forme ; le texte
+  lui-même n'est jamais modifié.
 - Une source secondaire ne remplace pas le texte officiel : elle est signalée comme telle et ne sert qu'à
   trouver le bon texte. **Toute règle appliquée dans Crénelio doit être confirmée par le texte officiel**,
   pour éviter les biais d'interprétation de tiers (cabinets, éditeurs, blogs).
