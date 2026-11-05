@@ -8,6 +8,14 @@ avec une explication traduite.
 Ces fiches se lisent aussi dans l'Espace Artisan (menu **Aide › Documentation**) : toute fiche ajoutée
 ici y apparaît, les liens entre fiches restent relatifs.
 
+## Traductions
+
+`en/`, `es/`, `pt/`, `hy/` (05/11/2026) reprennent les fiches de `fr/` sous le même nom, et `README.md`
+pour le sommaire. Les textes officiels (`fr/textes/`) et `sources.md` ne sont pas traduits : ils sont
+cités en français. **La version française fait foi** ; toute modification d'une fiche française se
+reporte dans ses traductions (ou les signale comme en retard). Arabe (`ar/`, écriture de droite à
+gauche) prévu ; l'écran gère déjà le sens d'écriture.
+
 ## Règles
 
 - Chaque fichier indique ses **sources** (lien) et la **date de la dernière vérification**.
@@ -45,4 +53,3 @@ ici y apparaît, les liens entre fiches restent relatifs.
 | Textes officiels : Code civil (constructeur, garanties décennale, biennale, de parfait achèvement) | [fr/textes/code-civil.md](fr/textes/code-civil.md) |
 | Doctrine fiscale (BOFiP) : débours, pièces détachées | [fr/textes/bofip.md](fr/textes/bofip.md) |
 | Liste des sources, nature et date de vérification | [sources.md](sources.md) |
-|---|---|

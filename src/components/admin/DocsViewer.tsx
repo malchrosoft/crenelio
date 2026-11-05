@@ -1,12 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { marked } from 'marked';
-import { ArrowLeftIcon, BookOpenTextIcon, MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react';
+import { ArrowLeftIcon, BookOpenTextIcon, MagnifyingGlassIcon, TranslateIcon, XIcon } from '@phosphor-icons/react';
 import { DocsSearchResult, fold, queryTerms, searchDocs } from '../../utils/docsSearch';
+import { DEFAULT_LANGUAGE, LANGUAGES, languageOf, useLanguagePreference } from '../../i18n/languages';
 
 /**
  * Documentation de l'artisan (Item 40) : fiches Markdown de `docs/legal/`, embarquées dans le bundle
  * (aucun service tiers, aucun stockage serveur) et chargées à la demande. Liens entre fiches suivis
  * dans l'écran ; liens externes ouverts dans un nouvel onglet. Contenu versionné du dépôt (de confiance).
+ *
+ * Traductions : `docs/legal/<langue>/` reprend les noms des fiches de `fr/` (et `README.md` pour le
+ * sommaire). L'écran raisonne sur le chemin français (« canonique ») et affiche la traduction de la
+ * langue choisie si elle existe, sinon le français ; les textes officiels (`fr/textes/`) restent en
+ * français. Langue par défaut : préférence de l'écran Compte ; sélecteur pour changer en lecture.
  */
 const FILES = import.meta.glob('../../../docs/legal/**/*.md', { query: '?raw', import: 'default' }) as Record<
   string,
@@ -16,6 +22,27 @@ const FILES = import.meta.glob('../../../docs/legal/**/*.md', { query: '?raw', i
 const ROOT = '../../../docs/legal/';
 /** Chemin d'une fiche relatif à `docs/legal/` (ex. `fr/debours.md`) ; l'index est `README.md`. */
 export const DOCS_INDEX = 'README.md';
+
+const TRANSLATIONS = LANGUAGES.map((l) => l.code).filter((code) => code !== DEFAULT_LANGUAGE);
+const translationOf = (path: string) => (TRANSLATIONS.includes(path.split('/')[0]) ? path.split('/')[0] : null);
+
+/** Langues disposant d'une documentation traduite (sommaire présent). */
+const DOC_LANGUAGES = LANGUAGES.filter((l) => l.code === DEFAULT_LANGUAGE || FILES[`${ROOT}${l.code}/README.md`]);
+
+/** Fiche à afficher pour un chemin canonique : traduction si elle existe, sinon français. */
+function localize(path: string, lang: string): string {
+  if (lang === DEFAULT_LANGUAGE || path.startsWith('fr/textes/')) return path;
+  const candidate = path === DOCS_INDEX ? `${lang}/README.md` : path.startsWith('fr/') ? `${lang}/${path.slice(3)}` : null;
+  return candidate && FILES[ROOT + candidate] ? candidate : path;
+}
+
+/** Chemin canonique (français) d'une fiche, traduite ou non. */
+function canonical(path: string): string {
+  const lang = translationOf(path);
+  if (!lang) return path;
+  const rest = path.slice(lang.length + 1);
+  return rest === 'README.md' ? DOCS_INDEX : `fr/${rest}`;
+}
 
 let allDocs: Promise<Record<string, string>> | null = null;
 /** Toutes les fiches, chargées une seule fois (première recherche). */
@@ -73,7 +100,17 @@ interface DocsViewerProps {
 }
 
 const DocsViewer: React.FC<DocsViewerProps> = ({ initialPath }) => {
-  const [path, setPath] = useState(initialPath && FILES[ROOT + initialPath] ? initialPath : DOCS_INDEX);
+  const [preferred] = useLanguagePreference();
+  /** Langue de lecture : la préférence, sauf choix dans le sélecteur (non enregistré). */
+  const [chosen, setChosen] = useState<string | null>(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('lang');
+    return fromUrl && DOC_LANGUAGES.some((l) => l.code === fromUrl) ? fromUrl : null;
+  });
+  const lang = DOC_LANGUAGES.some((l) => l.code === (chosen ?? preferred)) ? (chosen ?? preferred) : DEFAULT_LANGUAGE;
+  /** Chemin canonique (français) de la fiche ouverte. */
+  const [path, setPath] = useState(initialPath && FILES[ROOT + initialPath] ? canonical(initialPath) : DOCS_INDEX);
+  const shown = localize(path, lang);
+  const shownLang = translationOf(shown) ?? DEFAULT_LANGUAGE;
   const [history, setHistory] = useState<string[]>([]);
   const [markdown, setMarkdown] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -89,13 +126,39 @@ const DocsViewer: React.FC<DocsViewerProps> = ({ initialPath }) => {
     }
     let current = true;
     const timer = window.setTimeout(() => {
-      loadAll().then((docs) => current && setResults(searchDocs(docs, query)));
+      loadAll().then((docs) => {
+        if (!current) return;
+        // Une version par fiche, dans la langue de lecture (repli sur le français), indexée par chemin canonique
+        const set: Record<string, string> = {};
+        for (const key of Object.keys(docs).filter((key) => !translationOf(key))) set[key] = docs[localize(key, lang)];
+        setResults(searchDocs(set, query));
+      });
     }, 200);
     return () => {
       current = false;
       window.clearTimeout(timer);
     };
-  }, [query]);
+  }, [query, lang]);
+
+  // Adresse tenue à jour : `doc` (fiche, chemin français) et `lang` (langue choisie dans le sélecteur) ;
+  // un rechargement ou un lien copié rouvre la même fiche dans la même langue. Retirés en quittant l'écran.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('doc', path);
+    if (chosen) url.searchParams.set('lang', chosen);
+    else url.searchParams.delete('lang');
+    window.history.replaceState(window.history.state, '', url);
+  }, [path, chosen]);
+
+  useEffect(
+    () => () => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('doc');
+      url.searchParams.delete('lang');
+      window.history.replaceState(window.history.state, '', url);
+    },
+    [],
+  );
 
   const html = useMemo(() => (markdown === null ? '' : (marked.parse(markdown, { async: false }) as string)), [markdown]);
 
@@ -105,10 +168,10 @@ const DocsViewer: React.FC<DocsViewerProps> = ({ initialPath }) => {
 
   useEffect(() => {
     setMarkdown(null);
-    const load = FILES[ROOT + path];
+    const load = FILES[ROOT + shown];
     if (load) load().then(setMarkdown);
-    else setMarkdown(`Fiche introuvable : \`${path}\``);
-  }, [path]);
+    else setMarkdown(`Fiche introuvable : \`${shown}\``);
+  }, [shown]);
 
 
   function open(next: string, terms: string[] = []) {
@@ -134,8 +197,8 @@ const DocsViewer: React.FC<DocsViewerProps> = ({ initialPath }) => {
     }
     if (href.split('#')[0].endsWith('.md')) {
       e.preventDefault();
-      const target = resolve(path, href);
-      if (FILES[ROOT + target]) open(target);
+      const target = resolve(shown, href);
+      if (FILES[ROOT + target]) open(canonical(target));
     }
   }
 
@@ -162,7 +225,24 @@ const DocsViewer: React.FC<DocsViewerProps> = ({ initialPath }) => {
             Sommaire
           </button>
         )}
-        <span className="docs-viewer__path">docs/legal/{path}</span>
+        <span className="docs-viewer__path">docs/legal/{shown}</span>
+        {DOC_LANGUAGES.length > 1 && (
+          <label className="docs-viewer__language" title="Langue de la documentation">
+            <TranslateIcon size={18} weight="fill" aria-hidden="true" />
+            <select
+              className="form-input form-input--compact"
+              aria-label="Langue de la documentation"
+              value={lang}
+              onChange={(e) => setChosen(e.target.value)}
+            >
+              {DOC_LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <label className="docs-viewer__search">
           <MagnifyingGlassIcon size={16} weight="bold" aria-hidden="true" />
           <input
@@ -191,7 +271,7 @@ const DocsViewer: React.FC<DocsViewerProps> = ({ initialPath }) => {
                 <button type="button" className="docs-viewer__result" onClick={() => openResult(result)}>
                   <span className="docs-viewer__result-title">{result.title}</span>
                   <span className="docs-viewer__result-meta">
-                    docs/legal/{result.path} · {result.count} occurrence{result.count > 1 ? 's' : ''}
+                    docs/legal/{localize(result.path, lang)} · {result.count} occurrence{result.count > 1 ? 's' : ''}
                   </span>
                   <span className="docs-viewer__result-excerpt">
                     {result.excerpt.map((part, i) => (part.match ? <mark key={i}>{part.text}</mark> : <React.Fragment key={i}>{part.text}</React.Fragment>))}
@@ -204,8 +284,20 @@ const DocsViewer: React.FC<DocsViewerProps> = ({ initialPath }) => {
       ) : markdown === null ? (
         <p>Chargement…</p>
       ) : (
-        // Contenu Markdown du dépôt (fiches versionnées), jamais une saisie utilisateur
-        <div ref={contentRef} className="docs-viewer__content" onClick={handleClick} dangerouslySetInnerHTML={{ __html: html }} />
+        <>
+          {shownLang !== lang && !path.startsWith('fr/textes/') && (
+            <p className="docs-viewer__fallback">Cette fiche n'est pas encore traduite : version française.</p>
+          )}
+          {/* Contenu Markdown du dépôt (fiches versionnées), jamais une saisie utilisateur */}
+          <div
+            ref={contentRef}
+            className="docs-viewer__content"
+            lang={shownLang}
+            dir={languageOf(shownLang).dir}
+            onClick={handleClick}
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        </>
       )}
     </div>
   );

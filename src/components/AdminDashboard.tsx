@@ -57,6 +57,7 @@ import NotificationsDialog from './admin/NotificationsDialog';
 import ConfirmDialog from './admin/ConfirmDialog';
 import ToggleGroup from './admin/ToggleGroup';
 import MailStatus from './admin/MailStatus';
+import LanguageSettings from './admin/LanguageSettings';
 import CalendarFeedSettings from './admin/CalendarFeedSettings';
 import AppearanceEditor from './admin/AppearanceEditor';
 import PasswordChange from './admin/PasswordChange';
@@ -1207,6 +1208,7 @@ export const AdminDashboard: React.FC = () => {
           </section>
           <MailStatus proEmail={config.pro_email} />
           <CalendarFeedSettings />
+          <LanguageSettings />
           {renderConfigGroups(['other'])}
           <PasswordChange onChanged={refreshSession} />
         </div>

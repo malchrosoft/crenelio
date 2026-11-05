@@ -3817,6 +3817,37 @@ $data-grid-status-width: 13em;
     margin-bottom: $space-block;
   }
 
+  // Sélecteur de langue isolé, mis en valeur (icône de traduction à gauche)
+  .docs-viewer__language {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    margin-left: auto;
+    padding: $space-xs $space-sm $space-xs $space-block;
+    border: 1px solid primary-alpha(30%);
+    border-radius: $radius-sm;
+    background: primary-tint(6%);
+    color: $primary;
+
+    .form-input {
+      width: auto;
+      font-weight: 600;
+    }
+  }
+
+  .docs-viewer__language + .docs-viewer__search {
+    margin-left: 0;
+  }
+
+  .docs-viewer__fallback {
+    margin: 0 0 $space-block;
+    padding: $space-sm $space-block;
+    border-radius: $radius-sm;
+    background: $warning-light;
+    color: $gray-800;
+    font-size: 0.85rem;
+  }
+
   .docs-viewer__search {
     display: flex;
     align-items: center;
@@ -3892,7 +3923,8 @@ $data-grid-status-width: 13em;
     blockquote {
       margin: $space-sm 0;
       padding: $space-xs $space-block;
-      border-left: 3px solid $primary;
+      // Côté du début de ligne : à gauche, à droite en arabe (dir="rtl")
+      border-inline-start: 3px solid $primary;
       background: $gray-100;
       color: $gray-700;
     }
