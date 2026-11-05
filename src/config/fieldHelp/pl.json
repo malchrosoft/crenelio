@@ -1,0 +1,140 @@
+{
+  "labels": {
+    "how": "Jak wypełnić",
+    "why": "Dlaczego",
+    "refs": "Teksty",
+    "doc": "Przeczytaj kartę w Dokumentacji"
+  },
+  "entries": {
+    "title": {
+      "title": "Dokładny charakter prac",
+      "how": "Proszę dokładnie opisać naprawę lub konserwację do wykonania (np. „Wymiana grupy bezpieczeństwa podgrzewacza wody”), a nie tylko kategorię („Hydraulika”).",
+      "why": "Obowiązkowa informacja w kosztorysie (devis) usługi awaryjnej, naprawy lub konserwacji: klient musi dokładnie wiedzieć, co akceptuje."
+    },
+    "urgent": {
+      "title": "Interwencja pilna",
+      "how": "Proszę zaznaczyć tylko wtedy, gdy klient sam poprosił o pilną interwencję u siebie. Kosztorys ogranicza się wtedy do części i prac ściśle niezbędnych do usunięcia sytuacji pilnej.",
+      "why": "W takim przypadku klientowi nie przysługuje prawo odstąpienia od umowy w odniesieniu do tych prac. Wszystko, co wykracza poza sytuację pilną, nadal podlega terminowi czternastu dni."
+    },
+    "builder_works": {
+      "title": "Prace objęte gwarancjami wykonawców budowlanych",
+      "how": "Proszę zaznaczyć w przypadku prac budowlanych (obiekt lub nierozłączne elementy wyposażenia). Kosztorys drukuje wtedy gwarancje ustawowe, a wysyłka wymaga ważnego zaświadczenia o ubezpieczeniu dziesięcioletnim (assurance décennale), dołączanego automatycznie.",
+      "why": "Te prace pociągają za sobą Pana/Pani odpowiedzialność dziesięcioletnią, która musi być ubezpieczona; zaświadczenie należy dołączać do kosztorysów i faktur."
+    },
+    "client_siren": {
+      "title": "SIREN lub SIRET klienta",
+      "how": "Tylko dla klienta będącego przedsiębiorcą: 9 cyfr (SIREN) lub 14 cyfr (SIRET), spacje dozwolone. Dla osoby prywatnej proszę zostawić puste.",
+      "why": "Numer identyfikacyjny klienta-przedsiębiorcy figuruje na fakturze. Prawo odstąpienia od umowy jest nadal proponowane: może przysługiwać przedsiębiorcom zatrudniającym najwyżej pięciu pracowników, poza ich główną działalnością."
+    },
+    "execution_terms": {
+      "title": "Data lub termin wykonania",
+      "how": "Proszę podać dokładną datę lub termin (np. „W ciągu 15 dni od Pana/Pani zgody” lub „12 listopada 2026”). Obowiązkowe do wysłania kosztorysu.",
+      "why": "Przedsiębiorca musi przed zawarciem umowy podać datę lub termin, w którym zobowiązuje się wykonać usługę."
+    },
+    "payment_terms": {
+      "title": "Warunki płatności",
+      "how": "Proszę określić moment płatności i akceptowane środki (przelew, czek, gotówka…). Wartość przejęta z ustawień. Obowiązkowe do wysłania kosztorysu.",
+      "why": "Obowiązkowa informacja przedumowna. W przypadku umowy podpisanej u klienta żadna płatność nie może być wymagana przed upływem siedmiu dni."
+    },
+    "time_counting": {
+      "title": "Sposób liczenia szacowanego czasu",
+      "how": "Proszę wyjaśnić, jak liczony jest czas robocizny (np. „Czas liczony za każdy rozpoczęty kwadrans”).",
+      "why": "Informacja, którą należy przekazać klientowi przed zawarciem umowy, wraz ze stawką godzinową brutto (TTC)."
+    },
+    "quote_price": {
+      "title": "Cena kosztorysu",
+      "how": "Proszę zostawić puste, jeśli kosztorys jest bezpłatny; w przeciwnym razie podać jego koszt brutto (TTC). Wartość przejęta z ustawień.",
+      "why": "Klient musi przed jakimkolwiek zobowiązaniem wiedzieć, czy kosztorys jest bezpłatny czy płatny i ile kosztuje."
+    },
+    "debours_budget": {
+      "title": "Maksymalny budżet pełnomocnictwa na débours",
+      "how": "Maksymalna kwota, którą klient upoważnia Pana/Panią do wydania w jego imieniu na części. Powyżej niej potrzebna jest nowa zgoda.",
+      "why": "Débours (części kupione w imieniu i na rachunek klienta, na podstawie jego pełnomocnictwa, refakturowane co do grosza) nie wchodzą do Pana/Pani obrotu i nie obejmuje ich Pana/Pani VAT, pod warunkiem spełnienia warunków ustalonych przez administrację."
+    },
+    "goods_received": {
+      "title": "Wydanie sprzedanych części",
+      "how": "Proszę wpisać dzień, w którym klient wszedł w posiadanie odsprzedanych części, zwykle dzień montażu. Koniec terminu odstąpienia jest wtedy obliczany.",
+      "why": "Kosztorys obejmujący odsprzedaż dostaw jest traktowany jak sprzedaż: termin odstąpienia biegnie od wejścia w posiadanie rzeczy, a nie od akceptacji."
+    },
+    "quote_vat_mode": {
+      "title": "Reżim VAT",
+      "how": "Zwolnienie podmiotowe (franchise en base): nie nalicza Pan/Pani VAT (najczęściej mikroprzedsiębiorstwo, micro-entreprise). Podatnik VAT: kosztorysy wykazują VAT pozycja po pozycji. Kosztorys już utworzony zachowuje swój reżim.",
+      "why": "Przy zwolnieniu na kosztorysach i fakturach nie może pojawić się VAT, a wzmianka o zwolnieniu jest obowiązkowa. Jako podatnik musi Pan/Pani przekazać klientowi swój numer VAT."
+    },
+    "quote_vat_exemption": {
+      "title": "Wzmianka o zwolnieniu",
+      "how": "« article 293 B » dla zwolnienia podmiotowego (franchise en base); « article 293 B bis » dla zwolnienia w odniesieniu do innego państwa członkowskiego. « Autre » (Inne) tylko po konsultacji z księgowym.",
+      "why": "Przepis nakłada wzmiankę odpowiadającą podstawie prawnej zwolnienia, słowo w słowo, na fakturach i dokumentach, które je zastępują."
+    },
+    "quote_labour_rate": {
+      "title": "Stawka godzinowa robocizny",
+      "how": "Proszę wpisać stawkę netto: wypełnia ona wstępnie pozycje robocizny w kosztorysach, a witryna publikuje ją brutto (TTC) (z doliczonym VAT, jeśli jest Pan/Pani podatnikiem).",
+      "why": "Klient musi znać stawkę godzinową robocizny brutto przed zawarciem umowy, a informacja ta musi być łatwo dostępna na Pana/Pani stronie."
+    },
+    "quote_default_price": {
+      "title": "Koszt sporządzenia kosztorysu",
+      "how": "Puste lub 0: kosztorys bezpłatny. W przeciwnym razie jego cena brutto (TTC), publikowana w cenniku witryny i wypełniana wstępnie w każdym nowym kosztorysie.",
+      "why": "Bezpłatny lub płatny charakter kosztorysu oraz jego koszt należą do informacji przekazywanych przed zawarciem umowy."
+    },
+    "pricing_exclusions": {
+      "title": "Czego ceny nie obejmują",
+      "how": "Proszę wskazać, czego nie obejmują wyświetlane ceny, a co będzie potrzebne (np. części, wyceniane w kosztorysie).",
+      "why": "Jeżeli podana cena nie obejmuje elementu niezbędnego do wykonania usługi, ta szczególna okoliczność musi być wyraźnie wskazana."
+    },
+    "quote_payment_terms": {
+      "title": "Domyślne warunki płatności",
+      "how": "Moment płatności i akceptowane środki; przejmowane do każdego nowego kosztorysu, modyfikowalne w każdym kosztorysie.",
+      "why": "Informacja obowiązkowa przed zawarciem umowy."
+    },
+    "quote_time_counting": {
+      "title": "Sposób liczenia szacowanego czasu",
+      "how": "Jak liczony jest czas robocizny (np. „za każdy rozpoczęty kwadrans”). Przejmowane do kosztorysów i cennika witryny.",
+      "why": "Informacja, którą należy przekazać klientowi przed zawarciem umowy, wraz ze stawką godzinową brutto (TTC)."
+    },
+    "quote_allow_supply": {
+      "title": "Odsprzedaż materiałów",
+      "how": "Proszę włączyć tylko wtedy, gdy odsprzedaż części należy do zgłoszonej działalności. W przeciwnym razie proszę korzystać z części kupionych w imieniu klienta (débours).",
+      "why": "Odsprzedaż części jest sprzedażą: kosztorys staje się umową traktowaną jak sprzedaż (termin odstąpienia od wydania rzeczy), a VAT od części podlega odrębnym zasadom, jeśli jest Pan/Pani podatnikiem."
+    },
+    "quote_builder_guarantees": {
+      "title": "Gwarancje wykonawców budowlanych",
+      "how": "Proszę zaznaczyć, jeśli niektóre prace stanowią obiekt budowlany lub dotyczą nierozłącznego elementu wyposażenia (do ustalenia z ubezpieczycielem). Każdy kosztorys proponuje wtedy odpowiednie pole.",
+      "why": "Te prace pociągają za sobą Pana/Pani odpowiedzialność dziesięcioletnią, która musi być ubezpieczona; zaświadczenie o ubezpieczeniu jest dołączane do kosztorysów i faktur."
+    },
+    "legal_form": {
+      "title": "Forma prawna",
+      "how": "Przedsiębiorstwo indywidualne (w tym micro-entreprise) lub forma Pana/Pani spółki.",
+      "why": "Status i forma prawna są przekazywane klientowi; decydują o oznaczeniu « EI » lub o formie i kapitale drukowanych na dokumentach."
+    },
+    "legal_ei_mention": {
+      "title": "Oznaczenie « EI »",
+      "how": "« EI » lub « Entrepreneur individuel » (przedsiębiorca indywidualny), umieszczone bezpośrednio przy nazwisku.",
+      "why": "Przedsiębiorca indywidualny używa nazwy zawierającej jego nazwisko, poprzedzone tymi słowami lub po nim następujące, na wszystkich dokumentach i w korespondencji zawodowej."
+    },
+    "legal_rm": {
+      "title": "Wpis do rejestru",
+      "how": "Rejestr, w którym jest Pan/Pani wpisany(-a): Registre national des entreprises (zawody rzemieślnicze) lub RCS wraz z miastem.",
+      "why": "Numer wpisu do RNE lub RCS jest przekazywany klientowi i figuruje na dokumentach handlowych."
+    },
+    "legal_vat_number": {
+      "title": "Wewnątrzwspólnotowy numer VAT",
+      "how": "Tylko jeśli jest Pan/Pani podatnikiem VAT. Przy zwolnieniu podmiotowym proszę zostawić puste.",
+      "why": "Przedsiębiorca będący podatnikiem przekazuje swój indywidualny numer identyfikacyjny VAT."
+    },
+    "legal_complaints": {
+      "title": "Rozpatrywanie reklamacji",
+      "how": "Jak klient składa reklamację (email, poczta) i w jakim terminie Pan/Pani odpowiada.",
+      "why": "Sposób rozpatrywania reklamacji należy do informacji przekazywanych klientowi; uprzednia reklamacja jest też warunkiem skorzystania z mediatora."
+    },
+    "legal_mediator": {
+      "title": "Mediator konsumencki",
+      "how": "Nazwa, dane kontaktowe i adres strony internetowej mediatora, któremu Pan/Pani podlega (często proponowanego przez organizację zawodową).",
+      "why": "Każdy przedsiębiorca przekazuje dane kontaktowe mediatora, któremu podlega, w widoczny sposób na swojej stronie, oraz adres strony mediatora."
+    },
+    "legal_assurance": {
+      "title": "Ubezpieczenie zawodowe",
+      "how": "Ubezpieczyciel, jego dane kontaktowe i zasięg terytorialny umowy.",
+      "why": "Informacja do przekazania klientowi, jeśli zawarł Pan/Pani ubezpieczenie odpowiedzialności zawodowej."
+    }
+  }
+}

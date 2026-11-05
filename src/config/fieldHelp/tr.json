@@ -1,0 +1,140 @@
+{
+  "labels": {
+    "how": "Nasıl doldurulur",
+    "why": "Neden",
+    "refs": "Metinler",
+    "doc": "Belgelerdeki fişi okuyun"
+  },
+  "entries": {
+    "title": {
+      "title": "İşlerin tam niteliği",
+      "how": "Yapılacak onarımı veya bakımı ayrıntılı olarak tanımlayın (ör. « Termosifonun emniyet grubunun değiştirilmesi »), yalnızca bir kategori (« Tesisat ») değil.",
+      "why": "Arıza giderme, onarım veya bakım fiyat teklifinin (devis) zorunlu ibaresidir: müşteri neyi kabul ettiğini tam olarak bilmelidir."
+    },
+    "urgent": {
+      "title": "Acil müdahale",
+      "how": "Yalnızca müşteri kendisi evine acil müdahale etmenizi istediyse işaretleyin. Fiyat teklifi bu durumda acil durumu gidermek için kesinlikle gerekli parça ve işlerle sınırlı kalır.",
+      "why": "Bu durumda müşterinin bu işler için cayma hakkı yoktur. Acil durumu aşan her şey on dört günlük süreye tabi olmaya devam eder."
+    },
+    "builder_works": {
+      "title": "Yapı yüklenicisi garantilerine giren işler",
+      "how": "İnşaat işleri için işaretleyin (yapı veya ayrılmaz donanım unsurları). Fiyat teklifi bu durumda yasal garantileri basar ve gönderim, otomatik olarak eklenen geçerli bir on yıllık sigorta (assurance décennale) belgesi gerektirir.",
+      "why": "Bu işler sigortalanması gereken on yıllık sorumluluğunuzu doğurur; belge fiyat tekliflerine ve faturalara eklenmelidir."
+    },
+    "client_siren": {
+      "title": "Müşterinin SIREN veya SIRET numarası",
+      "how": "Yalnızca profesyonel bir müşteri için: 9 hane (SIREN) veya 14 hane (SIRET), boşluk kabul edilir. Bireysel müşteri için boş bırakın.",
+      "why": "Profesyonel müşterinin kimlik numarası faturada yer alır. Cayma hakkı yine sunulur: ana faaliyetleri dışında, en fazla beş çalışanı olan profesyonellerden yararlanabilir."
+    },
+    "execution_terms": {
+      "title": "İfa tarihi veya süresi",
+      "how": "Kesin bir tarih veya süre belirtin (ör. « Onayınızdan sonra 15 gün içinde » veya « 12 Kasım 2026 »). Fiyat teklifini göndermek için zorunludur.",
+      "why": "Profesyonel, sözleşme kurulmadan önce hizmeti hangi tarihte veya hangi süre içinde sunmayı taahhüt ettiğini belirtmelidir."
+    },
+    "payment_terms": {
+      "title": "Ödeme koşulları",
+      "how": "Ödemenin zamanını ve kabul edilen araçları belirtin (havale, çek, nakit…). Değer ayarlardan alınır. Fiyat teklifini göndermek için zorunludur.",
+      "why": "Zorunlu sözleşme öncesi bilgi. Müşterinin evinde imzalanan bir sözleşmede yedi gün dolmadan hiçbir ödeme talep edilemez."
+    },
+    "time_counting": {
+      "title": "Tahmini sürenin hesaplanması",
+      "how": "İşçilik süresinin nasıl hesaplandığını açıklayın (ör. « Başlanan her çeyrek saat üzerinden hesaplanır »).",
+      "why": "Sözleşme kurulmadan önce, KDV dahil (TTC) saatlik ücretle birlikte müşteriye verilmesi gereken bilgi."
+    },
+    "quote_price": {
+      "title": "Fiyat teklifinin ücreti",
+      "how": "Fiyat teklifi ücretsizse boş bırakın; değilse KDV dahil (TTC) ücretini belirtin. Değer ayarlardan alınır.",
+      "why": "Müşteri, herhangi bir taahhütten önce fiyat teklifinin ücretsiz mi ücretli mi olduğunu ve ne kadar tuttuğunu bilmelidir."
+    },
+    "debours_budget": {
+      "title": "Débours vekâletinin azami bütçesi",
+      "how": "Müşterinin parçalar için kendi adına harcamanıza izin verdiği azami tutar. Bunun üzerinde yeni bir onay gerekir.",
+      "why": "Débours (müşterinin vekâletiyle onun adına ve hesabına satın alınan, kuruşu kuruşuna yeniden faturalanan parçalar), idarenin belirlediği koşullara uyulması kaydıyla cironuza dahil değildir ve sizin KDV'nize tabi değildir."
+    },
+    "goods_received": {
+      "title": "Satılan parçaların teslimi",
+      "how": "Müşterinin yeniden satılan parçaları teslim aldığı günü girin; genellikle montaj günüdür. Cayma süresinin sonu bu durumda hesaplanır.",
+      "why": "Yeniden satılan malzeme içeren bir fiyat teklifi satışa benzetilir: cayma süresi kabulden değil, malın teslim alınmasından itibaren işler."
+    },
+    "quote_vat_mode": {
+      "title": "KDV rejimi",
+      "how": "Temel KDV muafiyeti (franchise en base): KDV faturalamazsınız (çoğunlukla mikro işletme, micro-entreprise). KDV mükellefi: fiyat teklifleriniz KDV'yi satır satır gösterir. Önceden oluşturulmuş bir fiyat teklifi kendi rejimini korur.",
+      "why": "Muafiyette fiyat tekliflerinizde ve faturalarınızda hiçbir KDV görünmemeli ve bir muafiyet ibaresi zorunludur. Mükellef olarak KDV numaranızı müşteriye bildirmeniz gerekir."
+    },
+    "quote_vat_exemption": {
+      "title": "Muafiyet ibaresi",
+      "how": "Temel muafiyet (franchise en base) için « article 293 B »; başka bir üye devlete yönelik muafiyet için « article 293 B bis ». « Autre » (Diğer) yalnızca mali müşavirinizin görüşü üzerine.",
+      "why": "Metin, faturalarda ve onların yerini tutan belgelerde, muafiyetin yasal dayanağına karşılık gelen bir ibarenin kelimesi kelimesine yer almasını zorunlu kılar."
+    },
+    "quote_labour_rate": {
+      "title": "Saatlik işçilik ücreti",
+      "how": "KDV hariç ücretinizi girin: fiyat tekliflerinin işçilik satırlarını önceden doldurur ve vitrin sayfası onu KDV dahil (TTC) yayımlar (mükellefseniz KDV eklenir).",
+      "why": "Müşteri, sözleşme kurulmadan önce KDV dahil saatlik işçilik ücretini bilmelidir ve bu bilgiye sitenizde kolayca erişilebilmelidir."
+    },
+    "quote_default_price": {
+      "title": "Fiyat teklifi hazırlama ücreti",
+      "how": "Boş veya 0: ücretsiz fiyat teklifi. Değilse KDV dahil (TTC) fiyatı; vitrin sayfasının tarifelerinde yayımlanır ve her yeni fiyat teklifinde önceden doldurulur.",
+      "why": "Fiyat teklifinin ücretsiz veya ücretli olması ve ücreti, sözleşme kurulmadan önce verilmesi gereken bilgiler arasındadır."
+    },
+    "pricing_exclusions": {
+      "title": "Fiyatlara dahil olmayanlar",
+      "how": "Gösterilen fiyatlarınıza dahil olmayan ve gerekli olacak şeyleri belirtin (ör. fiyat teklifinde fiyatlandırılan parçalar).",
+      "why": "Duyurulan bir fiyat hizmet için vazgeçilmez bir unsuru içermiyorsa, bu özellik açıkça belirtilmelidir."
+    },
+    "quote_payment_terms": {
+      "title": "Varsayılan ödeme koşulları",
+      "how": "Ödemenin zamanı ve kabul edilen araçlar; her yeni fiyat teklifine aktarılır, her teklifte ayrı ayrı değiştirilebilir.",
+      "why": "Sözleşme kurulmadan önce zorunlu bilgi."
+    },
+    "quote_time_counting": {
+      "title": "Tahmini sürenin hesaplanması",
+      "how": "İşçilik süresinin nasıl hesaplandığı (ör. « başlanan her çeyrek saat üzerinden »). Fiyat tekliflerine ve vitrin sayfasının tarifelerine aktarılır.",
+      "why": "Sözleşme kurulmadan önce, KDV dahil (TTC) saatlik ücretle birlikte müşteriye verilmesi gereken bilgi."
+    },
+    "quote_allow_supply": {
+      "title": "Malzeme yeniden satışı",
+      "how": "Yalnızca parça yeniden satışı beyan ettiğiniz faaliyetin bir parçasıysa etkinleştirin. Değilse müşteri adına satın alınan parçaları (débours) kullanın.",
+      "why": "Bir parçayı yeniden satmak bir satıştır: fiyat teklifi satışa benzetilen bir sözleşme olur (cayma süresi malın tesliminden itibaren) ve mükellefseniz parçaların KDV'si kendine özgü kurallara tabidir."
+    },
+    "quote_builder_guarantees": {
+      "title": "Yapı yüklenicisi garantileri",
+      "how": "İşlerinizin bir kısmı bir yapı oluşturuyor veya ayrılmaz bir donanım unsurunu etkiliyorsa işaretleyin (sigortacınızla birlikte nitelendirin). Her fiyat teklifi bu durumda ilgili kutuyu sunar.",
+      "why": "Bu işler sigortalanması gereken on yıllık sorumluluğunuzu doğurur; sigorta belgesi fiyat tekliflerine ve faturalara eklenir."
+    },
+    "legal_form": {
+      "title": "Hukuki yapı",
+      "how": "Şahıs işletmesi (micro-entreprise dahil) veya şirketinizin türü.",
+      "why": "Statü ve hukuki yapı müşteriye bildirilir; belgelerinizde basılan « EI » ibaresini veya şirket türünü ve sermayeyi belirler."
+    },
+    "legal_ei_mention": {
+      "title": "« EI » ibaresi",
+      "how": "« EI » veya « Entrepreneur individuel » (şahıs işletmesi sahibi), adınızın hemen yanında.",
+      "why": "Şahıs işletmesi sahibi, tüm mesleki belge ve yazışmalarında, adının önünde veya arkasında bu kelimelerin yer aldığı bir unvan kullanır."
+    },
+    "legal_rm": {
+      "title": "Sicil kaydı",
+      "how": "Kayıtlı olduğunuz sicil: Registre national des entreprises (zanaat meslekleri) veya RCS ve şehri.",
+      "why": "RNE veya RCS kayıt numarası müşteriye bildirilir ve ticari belgelerinizde yer alır."
+    },
+    "legal_vat_number": {
+      "title": "Topluluk içi KDV numarası",
+      "how": "Yalnızca KDV mükellefiyseniz. Temel muafiyette boş bırakın.",
+      "why": "Mükellef profesyonel, bireysel KDV kimlik numarasını bildirir."
+    },
+    "legal_complaints": {
+      "title": "Şikâyetlerin ele alınması",
+      "how": "Müşterinin size nasıl şikâyette bulunacağı (e-posta, posta) ve hangi süre içinde yanıt verdiğiniz.",
+      "why": "Şikâyetlerin ele alınma usulü müşteriye verilmesi gereken bilgiler arasındadır; önceden yapılmış bir şikâyet ayrıca arabulucuya başvurunun koşuludur."
+    },
+    "legal_mediator": {
+      "title": "Tüketici arabulucusu",
+      "how": "Bağlı olduğunuz arabulucunun adı, iletişim bilgileri ve internet sitesi adresi (çoğunlukla meslek kuruluşunuz tarafından önerilir).",
+      "why": "Her profesyonel, bağlı olduğu arabulucunun iletişim bilgilerini sitesinde görünür biçimde ve arabulucunun sitesinin adresini bildirir."
+    },
+    "legal_assurance": {
+      "title": "Mesleki sigorta",
+      "how": "Sigortacı, iletişim bilgileri ve sözleşmenin coğrafi kapsamı.",
+      "why": "Mesleki sorumluluk sigortası yaptırdıysanız müşteriye bildirilmesi gereken bilgi."
+    }
+  }
+}

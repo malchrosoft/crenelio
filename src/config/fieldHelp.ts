@@ -206,3 +206,29 @@ export const FIELD_HELP = {
 export type FieldHelpKey = keyof typeof FIELD_HELP;
 
 export const hasFieldHelp = (key: string): key is FieldHelpKey => key in FIELD_HELP;
+
+/** Intitulés de la fenêtre d'aide (français, langue de référence). */
+export const FIELD_HELP_LABELS = {
+  how: 'Comment le remplir',
+  why: 'Pourquoi',
+  refs: 'Textes',
+  doc: 'Lire la fiche dans la Documentation',
+};
+
+/**
+ * Traduction de l'aide (`src/config/fieldHelp/<langue>.json`) : intitulés et, par champ, titre,
+ * « comment » et « pourquoi ». Les textes officiels (`refs`) restent en français ; un champ non traduit
+ * s'affiche en français. Le français (ci-dessus) fait foi : toute modification s'y fait d'abord.
+ */
+export interface FieldHelpTranslation {
+  labels: typeof FIELD_HELP_LABELS;
+  entries: Partial<Record<FieldHelpKey, { title: string; how: string; why: string }>>;
+}
+
+const TRANSLATIONS = import.meta.glob<FieldHelpTranslation>('./fieldHelp/*.json', { import: 'default' });
+
+/** Traduction d'une langue, chargée à la demande ; null pour le français ou une langue non traduite. */
+export async function loadFieldHelpTranslation(code: string): Promise<FieldHelpTranslation | null> {
+  const load = TRANSLATIONS[`./fieldHelp/${code}.json`];
+  return load ? load() : null;
+}

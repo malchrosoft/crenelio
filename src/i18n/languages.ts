@@ -41,18 +41,40 @@ export const languageOf = (code: string): Language => LANGUAGES.find((l) => l.co
 
 const UI_STATE_ID = 'language';
 
+/**
+ * Langue préférée, partagée par tous les composants (une seule lecture de `/admin/ui-state/language`) :
+ * un changement dans l'écran Compte se répercute aussitôt sur la documentation et l'aide « ? ».
+ */
+let current = DEFAULT_LANGUAGE;
+let loading: Promise<void> | null = null;
+const listeners = new Set<(code: string) => void>();
+
+function publish(code: string) {
+  current = code;
+  listeners.forEach((listener) => listener(code));
+}
+
 /** Langue préférée de l'Espace Artisan (français tant qu'elle n'est pas chargée ou choisie). */
 export function useLanguagePreference(): [string, (code: string) => Promise<void>] {
-  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
+  const [language, setLanguage] = useState(current);
   useEffect(() => {
-    api
+    listeners.add(setLanguage);
+    loading ??= api
       .getUiState<{ code?: string }>(UI_STATE_ID)
-      .then(({ state }) => state?.code && setLanguage(languageOf(state.code).code))
-      .catch(() => undefined);
+      .then(({ state }) => {
+        if (state?.code) publish(languageOf(state.code).code);
+      })
+      .catch(() => {
+        loading = null;
+      });
+    setLanguage(current);
+    return () => {
+      listeners.delete(setLanguage);
+    };
   }, []);
   const save = async (code: string) => {
     await api.saveUiState(UI_STATE_ID, { code });
-    setLanguage(code);
+    publish(code);
   };
   return [language, save];
 }

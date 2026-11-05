@@ -1,0 +1,140 @@
+{
+  "labels": {
+    "how": "Wie ausfüllen",
+    "why": "Warum",
+    "refs": "Texte",
+    "doc": "Merkblatt in der Dokumentation lesen"
+  },
+  "entries": {
+    "title": {
+      "title": "Genaue Art der Arbeiten",
+      "how": "Beschreiben Sie genau die auszuführende Reparatur oder Wartung (z. B. „Austausch der Sicherheitsgruppe des Warmwasserbereiters“), nicht nur eine Kategorie („Sanitär“).",
+      "why": "Pflichtangabe des Kostenvoranschlags (devis) für Pannenhilfe, Reparatur oder Wartung: Der Kunde muss genau wissen, was er annimmt."
+    },
+    "urgent": {
+      "title": "Dringender Einsatz",
+      "how": "Kreuzen Sie nur an, wenn der Kunde Sie selbst gebeten hat, dringend bei ihm einzugreifen. Der Kostenvoranschlag beschränkt sich dann auf die Teile und Arbeiten, die zur Behebung des Notfalls unbedingt erforderlich sind.",
+      "why": "In diesem Fall hat der Kunde für diese Arbeiten kein Widerrufsrecht. Alles, was über den Notfall hinausgeht, unterliegt weiterhin der Frist von vierzehn Tagen."
+    },
+    "builder_works": {
+      "title": "Arbeiten, die unter die Bauunternehmergarantien fallen",
+      "how": "Kreuzen Sie bei Bauarbeiten an (Bauwerk oder untrennbare Ausstattungselemente). Der Kostenvoranschlag druckt dann die gesetzlichen Garantien, und der Versand erfordert eine gültige Bescheinigung der zehnjährigen Haftpflichtversicherung (assurance décennale), die automatisch beigefügt wird.",
+      "why": "Diese Arbeiten begründen Ihre zehnjährige Haftung, die versichert sein muss; die Bescheinigung ist den Kostenvoranschlägen und Rechnungen beizufügen."
+    },
+    "client_siren": {
+      "title": "SIREN oder SIRET des Kunden",
+      "how": "Nur für einen gewerblichen Kunden: 9 Ziffern (SIREN) oder 14 Ziffern (SIRET), Leerzeichen erlaubt. Bei einer Privatperson leer lassen.",
+      "why": "Die Identifikationsnummer des gewerblichen Kunden steht auf der Rechnung. Das Widerrufsrecht wird weiterhin angeboten: Es kann Gewerbetreibenden mit höchstens fünf Beschäftigten außerhalb ihrer Haupttätigkeit zustehen."
+    },
+    "execution_terms": {
+      "title": "Ausführungsdatum oder -frist",
+      "how": "Geben Sie ein genaues Datum oder eine genaue Frist an (z. B. „Innerhalb von 15 Tagen nach Ihrer Zustimmung“ oder „Am 12. November 2026“). Pflichtangabe für den Versand des Kostenvoranschlags.",
+      "why": "Der Gewerbetreibende muss vor Vertragsschluss das Datum oder die Frist angeben, innerhalb der er sich zur Erbringung der Leistung verpflichtet."
+    },
+    "payment_terms": {
+      "title": "Zahlungsbedingungen",
+      "how": "Geben Sie den Zeitpunkt der Zahlung und die akzeptierten Zahlungsmittel an (Überweisung, Scheck, Bargeld…). Wert aus den Einstellungen übernommen. Pflichtangabe für den Versand des Kostenvoranschlags.",
+      "why": "Vorvertragliche Pflichtinformation. Bei einem beim Kunden geschlossenen Vertrag darf vor Ablauf von sieben Tagen keine Zahlung verlangt werden."
+    },
+    "time_counting": {
+      "title": "Abrechnung der geschätzten Zeit",
+      "how": "Erläutern Sie, wie die Arbeitszeit abgerechnet wird (z. B. „Abrechnung je angefangene Viertelstunde“).",
+      "why": "Information, die dem Kunden vor Vertragsschluss zusammen mit dem Stundensatz inkl. MwSt. (TTC) zu geben ist."
+    },
+    "quote_price": {
+      "title": "Preis des Kostenvoranschlags",
+      "how": "Leer lassen, wenn der Kostenvoranschlag kostenlos ist; andernfalls seine Kosten inkl. MwSt. (TTC) angeben. Wert aus den Einstellungen übernommen.",
+      "why": "Der Kunde muss vor jeder Verpflichtung wissen, ob der Kostenvoranschlag kostenlos oder kostenpflichtig ist und wie viel er kostet."
+    },
+    "debours_budget": {
+      "title": "Höchstbudget des Auftrags für durchlaufende Posten (débours)",
+      "how": "Höchstbetrag, den der Kunde Sie ermächtigt, in seinem Namen für die Teile auszugeben. Darüber hinaus ist eine neue Zustimmung erforderlich.",
+      "why": "Die durchlaufenden Posten (im Namen und für Rechnung des Kunden auf seinen Auftrag gekaufte, auf den Cent genau weiterberechnete Teile) gehören nicht zu Ihrem Umsatz und tragen keine MwSt. von Ihnen, sofern die von der Verwaltung festgelegten Voraussetzungen eingehalten werden."
+    },
+    "goods_received": {
+      "title": "Übergabe der verkauften Teile",
+      "how": "Geben Sie den Tag ein, an dem der Kunde die weiterverkauften Teile in Besitz genommen hat, in der Regel der Tag des Einbaus. Das Ende der Widerrufsfrist wird dann berechnet.",
+      "why": "Ein Kostenvoranschlag mit einer weiterverkauften Lieferung wird einem Kauf gleichgestellt: Die Widerrufsfrist läuft ab der Inbesitznahme der Ware, nicht ab der Annahme."
+    },
+    "quote_vat_mode": {
+      "title": "MwSt.-Regelung",
+      "how": "Kleinunternehmerregelung (franchise en base): Sie stellen keine MwSt. in Rechnung (meist Kleinstunternehmen, micro-entreprise). Steuerpflichtig: Ihre Kostenvoranschläge weisen die MwSt. Zeile für Zeile aus. Ein bereits erstellter Kostenvoranschlag behält seine Regelung.",
+      "why": "Bei der Kleinunternehmerregelung darf auf Ihren Kostenvoranschlägen und Rechnungen keine MwSt. erscheinen, und ein Hinweis auf die Befreiung ist Pflicht. Als Steuerpflichtiger müssen Sie dem Kunden Ihre USt-IdNr. mitteilen."
+    },
+    "quote_vat_exemption": {
+      "title": "Hinweis auf die Befreiung",
+      "how": "« article 293 B » für die Kleinunternehmerregelung (franchise en base); « article 293 B bis » für die Befreiung mit Bestimmung in einen anderen Mitgliedstaat. « Autre » (Sonstige) nur auf Rat Ihres Steuerberaters.",
+      "why": "Der Text schreibt einen der Rechtsgrundlage der Befreiung entsprechenden Hinweis vor, Wort für Wort, auf den Rechnungen und den sie ersetzenden Dokumenten."
+    },
+    "quote_labour_rate": {
+      "title": "Stundensatz für Arbeitsleistung",
+      "how": "Geben Sie Ihren Satz ohne MwSt. ein: Er füllt die Arbeitszeilen der Kostenvoranschläge vor, und die Schaufensterseite veröffentlicht ihn inkl. MwSt. (TTC) (MwSt. hinzugerechnet, wenn Sie steuerpflichtig sind).",
+      "why": "Der Kunde muss den Stundensatz für Arbeitsleistung inkl. MwSt. vor Vertragsschluss kennen, und diese Information muss auf Ihrer Website leicht zugänglich sein."
+    },
+    "quote_default_price": {
+      "title": "Kosten für die Erstellung eines Kostenvoranschlags",
+      "how": "Leer oder 0: kostenloser Kostenvoranschlag. Andernfalls sein Preis inkl. MwSt. (TTC), in den Tarifen der Schaufensterseite veröffentlicht und auf jedem neuen Kostenvoranschlag vorausgefüllt.",
+      "why": "Ob der Kostenvoranschlag kostenlos oder kostenpflichtig ist, und seine Kosten, gehören zu den Informationen, die vor Vertragsschluss zu geben sind."
+    },
+    "pricing_exclusions": {
+      "title": "Was die Preise nicht enthalten",
+      "how": "Geben Sie an, was in Ihren angezeigten Preisen nicht enthalten ist und benötigt wird (z. B. die Teile, im Kostenvoranschlag beziffert).",
+      "why": "Enthält ein angekündigter Preis ein für die Leistung unerlässliches Element nicht, muss diese Besonderheit ausdrücklich angegeben werden."
+    },
+    "quote_payment_terms": {
+      "title": "Standard-Zahlungsbedingungen",
+      "how": "Zeitpunkt der Zahlung und akzeptierte Zahlungsmittel; auf jeden neuen Kostenvoranschlag übernommen, je Kostenvoranschlag änderbar.",
+      "why": "Pflichtinformation vor Vertragsschluss."
+    },
+    "quote_time_counting": {
+      "title": "Abrechnung der geschätzten Zeit",
+      "how": "Wie die Arbeitszeit abgerechnet wird (z. B. „je angefangene Viertelstunde“). Auf die Kostenvoranschläge und in die Tarife der Schaufensterseite übernommen.",
+      "why": "Information, die dem Kunden vor Vertragsschluss zusammen mit dem Stundensatz inkl. MwSt. (TTC) zu geben ist."
+    },
+    "quote_allow_supply": {
+      "title": "Weiterverkauf von Material",
+      "how": "Nur aktivieren, wenn der Weiterverkauf von Teilen zu Ihrer angemeldeten Tätigkeit gehört. Andernfalls die im Namen des Kunden gekauften Teile (durchlaufende Posten, débours) verwenden.",
+      "why": "Ein Teil weiterzuverkaufen ist ein Verkauf: Der Kostenvoranschlag wird zu einem einem Kauf gleichgestellten Vertrag (Widerrufsfrist ab Übergabe der Ware), und die MwSt. der Teile folgt eigenen Regeln, wenn Sie steuerpflichtig sind."
+    },
+    "quote_builder_guarantees": {
+      "title": "Bauunternehmergarantien",
+      "how": "Kreuzen Sie an, wenn einige Ihrer Arbeiten ein Bauwerk darstellen oder ein untrennbares Ausstattungselement betreffen (mit Ihrem Versicherer zu klären). Jeder Kostenvoranschlag bietet dann das entsprechende Kästchen an.",
+      "why": "Diese Arbeiten begründen Ihre zehnjährige Haftung, die versichert sein muss; die Versicherungsbescheinigung wird den Kostenvoranschlägen und Rechnungen beigefügt."
+    },
+    "legal_form": {
+      "title": "Rechtsform",
+      "how": "Einzelunternehmen (einschließlich micro-entreprise) oder die Rechtsform Ihrer Gesellschaft.",
+      "why": "Status und Rechtsform werden dem Kunden mitgeteilt; sie bestimmen den Hinweis « EI » oder die auf Ihren Dokumenten gedruckte Rechtsform und das Kapital."
+    },
+    "legal_ei_mention": {
+      "title": "Bezeichnung « EI »",
+      "how": "« EI » oder « Entrepreneur individuel » (Einzelunternehmer), unmittelbar an Ihren Namen angefügt.",
+      "why": "Der Einzelunternehmer verwendet eine Bezeichnung, die seinen Namen enthält, gefolgt oder angeführt von diesen Wörtern, auf allen seinen Geschäftsdokumenten und -korrespondenzen."
+    },
+    "legal_rm": {
+      "title": "Eintragung",
+      "how": "Register, in dem Sie eingetragen sind: Registre national des entreprises (Handwerksberufe) oder RCS und dessen Stadt.",
+      "why": "Die Eintragungsnummer im RNE oder RCS wird dem Kunden mitgeteilt und steht auf Ihren Geschäftsdokumenten."
+    },
+    "legal_vat_number": {
+      "title": "USt-IdNr. (innergemeinschaftlich)",
+      "how": "Nur wenn Sie mehrwertsteuerpflichtig sind. Bei der Kleinunternehmerregelung leer lassen.",
+      "why": "Der steuerpflichtige Gewerbetreibende teilt seine individuelle Umsatzsteuer-Identifikationsnummer mit."
+    },
+    "legal_complaints": {
+      "title": "Bearbeitung von Beschwerden",
+      "how": "Wie der Kunde Ihnen eine Beschwerde zukommen lässt (E-Mail, Post) und innerhalb welcher Frist Sie antworten.",
+      "why": "Die Modalitäten der Beschwerdebearbeitung gehören zu den Informationen, die dem Kunden zu geben sind; eine vorherige Beschwerde ist zudem Voraussetzung für die Anrufung des Schlichters."
+    },
+    "legal_mediator": {
+      "title": "Verbraucherschlichter",
+      "how": "Name, Kontaktdaten und Website-Adresse des für Sie zuständigen Schlichters (oft von Ihrem Berufsverband vorgeschlagen).",
+      "why": "Jeder Gewerbetreibende teilt die Kontaktdaten des für ihn zuständigen Schlichters sichtbar auf seiner Website mit, sowie die Adresse der Website des Schlichters."
+    },
+    "legal_assurance": {
+      "title": "Berufshaftpflichtversicherung",
+      "how": "Versicherer, seine Kontaktdaten und der räumliche Geltungsbereich des Vertrags.",
+      "why": "Dem Kunden mitzuteilende Information, wenn Sie eine Berufshaftpflichtversicherung abgeschlossen haben."
+    }
+  }
+}
