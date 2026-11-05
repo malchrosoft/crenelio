@@ -28,7 +28,8 @@ const FieldHelp: React.FC<{ topic: FieldHelpKey }> = ({ topic }) => {
   const entry = translation?.entries[topic];
   const labels = entry ? translation.labels : FIELD_HELP_LABELS;
   const text = entry ?? help;
-  const { dir } = languageOf(entry ? language : 'fr');
+  const lang = entry ? language : 'fr';
+  const { dir } = languageOf(lang);
 
   useEffect(() => {
     if (!open) return;
@@ -50,7 +51,7 @@ const FieldHelp: React.FC<{ topic: FieldHelpKey }> = ({ topic }) => {
       {open &&
         createPortal(
           <div className="admin-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="field-help-title" onClick={() => setOpen(false)}>
-            <div className="admin-modal field-help__dialog" lang={entry ? language : 'fr'} dir={dir} onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal field-help__dialog" lang={lang} dir={dir} onClick={(e) => e.stopPropagation()}>
               <div className="admin-modal__header">
                 <h3 className="admin-modal__title" id="field-help-title">
                   {text.title}
