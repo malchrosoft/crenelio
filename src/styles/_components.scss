@@ -1257,6 +1257,7 @@ $admin-sidebar-collapsed: 68px;
 
   .admin-modal__actions {
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-end;
     gap: 12px;
     margin-top: $modal-padding;
@@ -4121,9 +4122,10 @@ $data-grid-status-width: 13em;
 
   .appointment-dialog__reschedule {
     display: flex;
+    flex-wrap: wrap;
     gap: $space-xs;
 
-    .form-input { flex: 1; }
+    .form-input { flex: 1 1 200px; min-width: 0; }
   }
 }
 
