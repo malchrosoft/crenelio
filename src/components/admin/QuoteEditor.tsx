@@ -371,6 +371,9 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                 value={form.client_phone}
                 onChange={(v) => set('client_phone', v)}
               />
+              <Field id="quote-address" label="Adresse" required value={form.address} onChange={(v) => set('address', v)} />
+              <Field id="quote-postal-code" label="Code postal" value={form.postal_code} onChange={(v) => set('postal_code', v)} />
+              <Field id="quote-city" label="Ville" value={form.city} onChange={(v) => set('city', v)} />
               <Field
                 id="quote-client-company"
                 label="Entreprise cliente (facultatif)"
@@ -385,9 +388,6 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                 onChange={(v) => set('client_siren', v || null)}
                 hint="Client professionnel : identification reprise sur la facture."
               />
-              <Field id="quote-address" label="Adresse" required value={form.address} onChange={(v) => set('address', v)} />
-              <Field id="quote-postal-code" label="Code postal" value={form.postal_code} onChange={(v) => set('postal_code', v)} />
-              <Field id="quote-city" label="Ville" value={form.city} onChange={(v) => set('city', v)} />
             </div>
           </fieldset>
 
