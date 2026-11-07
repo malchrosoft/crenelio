@@ -49,7 +49,13 @@ def start_docker():
         print("   brew install docker docker-compose   (puis `colima start` si colima est arrêté)")
         sys.exit(1)
     cmd = ["docker", "compose", "up", "-d"]
-    res = subprocess.run(cmd)
+    # Aligne l'UID/GID d'Apache dans le conteneur sur celui de l'hôte : les fichiers
+    # écrits dans ./api/storage restent accessibles des deux côtés du montage.
+    env = os.environ.copy()
+    if hasattr(os, "getuid"):
+        env.setdefault("PUID", str(os.getuid()))
+        env.setdefault("PGID", str(os.getgid()))
+    res = subprocess.run(cmd, env=env)
     if res.returncode != 0:
         print_err("Échec du démarrage de Docker Compose. Vérifiez que Docker Desktop est lancé.")
         sys.exit(1)

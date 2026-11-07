@@ -92,6 +92,12 @@ npm start aucun             # sans ouvrir de navigateur
 npm stop
 ```
 
+> `npm start` aligne l'UID/GID d'Apache (`www-data`) sur ceux de votre compte hôte
+> (`PUID`/`PGID`) : les fichiers écrits dans `api/storage/` (clé de session, logos, PDF…)
+> restent ainsi lisibles et modifiables des deux côtés du montage Docker. Pour un
+> `docker compose up` lancé directement, passez `PUID`/`PGID` (défaut `1000`) si votre
+> identifiant système diffère.
+
 | Adresse | Usage |
 |---|---|
 | `http://localhost:5173` | Vitrine et réservation |

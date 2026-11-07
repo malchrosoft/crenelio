@@ -62,6 +62,10 @@ Les scripts Python autonomes (`scripts/start.py` et `scripts/stop.py`) fonctionn
   Serveur déjà lancé : `npm run ouvrir [navigateur|tous] [chemin]` (`scripts/ouvrir.mts`).
   ⚠️ Un agent qui teste `npm start` doit utiliser `aucun` et ne jamais arrêter un Vite qu'il n'a
   pas lancé lui-même (l'humain peut avoir le sien sur 5173).
+- **UID/GID du conteneur API :** `start.py` transmet `PUID`/`PGID` de l'hôte à Docker Compose ;
+  `docker-compose.yml` aligne alors `www-data` sur ce compte au démarrage. Les fichiers écrits
+  dans `api/storage/` (clé de session, logos, PDF) restent accessibles côté hôte comme côté
+  conteneur. Un `docker compose up` direct utilise `1000` par défaut.
 - **Arrêt complet** (Conteneurs Docker + Processus Vite) :
   ```bash
   npm stop

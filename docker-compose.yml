@@ -41,11 +41,19 @@ services:
       MAIL_FROM: no-reply@crenelio.local
       MAIL_FROM_NAME: Crénelio (local)
       APP_URL: http://localhost:5173
+      # Apache écrit dans ./api/storage (clé de session, logos, PDF…). Aligner son
+      # UID/GID sur celui de l'hôte évite des fichiers inaccessibles d'un côté ou
+      # de l'autre du montage. `npm start` renseigne ces valeurs automatiquement.
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
     depends_on:
       - db
       - mailpit
     command: >
-      sh -c "docker-php-ext-install pdo pdo_mysql &&
+      sh -c "groupmod -o -g \"$$PGID\" www-data &&
+             usermod -o -u \"$$PUID\" -g \"$$PGID\" www-data &&
+             chown -R www-data:www-data /var/run/apache2 /var/log/apache2 &&
+             docker-php-ext-install pdo pdo_mysql &&
              a2enmod rewrite &&
              sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf &&
              apache2-foreground"
