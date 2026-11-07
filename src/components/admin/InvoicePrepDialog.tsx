@@ -5,7 +5,7 @@ import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../../api';
 import { AppConfig, Appointment, Quote, QuoteLine } from '../../types';
-import { euro, lineAmount } from './quoteRules';
+import { EXACT_TIME_COUNTING, billedHours, euro, lineAmount } from './quoteRules';
 import { legalIdentity } from '../../utils/legalIdentity';
 
 interface InvoicePrepDialogProps {
@@ -24,6 +24,8 @@ interface PrepLine {
   debours: boolean;
   estimate: number;
   reference: string;
+  /** Main-d'œuvre au temps : heures estimées au devis, à remplacer par le temps réellement passé. */
+  hours?: number;
 }
 
 const num = (value: number) => value.toFixed(2).replace('.', ',');
@@ -39,6 +41,7 @@ function fromQuote(lines: QuoteLine[]): PrepLine[] {
     debours: line.kind === 'debours',
     estimate: lineAmount(line),
     reference: '',
+    hours: line.kind === 'labour' && line.unit === 'h' ? Number(line.quantity) : undefined,
   }));
 }
 
@@ -196,13 +199,35 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
 
               <h4>Prestations</h4>
               <ul className="invoice-prep__lines">
-                {services.map((line) => (
-                  <li key={`s-${line.label}`}>
-                    <span>{lineText(line)}</span>
-                    <CopyButton id={`s-${line.label}`} text={lineText(line)} />
-                  </li>
-                ))}
+                {lines.map((line, index) =>
+                  line.debours ? null : (
+                    <li key={`s-${index}`} className={line.hours !== undefined ? 'invoice-prep__timed' : undefined}>
+                      <span>{lineText(line)}</span>
+                      {line.hours !== undefined && (
+                        // Temps réellement passé (« 1h20 », « 80 min » ou heures), arrondi selon le décompte réglé
+                        <input
+                          className="form-input"
+                          inputMode="decimal"
+                          aria-label={`Temps réellement passé : ${line.label}`}
+                          title="Temps réellement passé : 1h20, 80 min ou heures (1,5)"
+                          defaultValue={String(line.quantity).replace('.', ',')}
+                          onBlur={(e) => {
+                            const hours = billedHours(e.target.value, config, quote?.time_counting !== EXACT_TIME_COUNTING);
+                            if (hours !== null && hours > 0) setLine(index, { quantity: hours });
+                            e.target.value = String(hours ?? line.quantity).replace('.', ',');
+                          }}
+                        />
+                      )}
+                      <CopyButton id={`s-${index}`} text={lineText(line)} />
+                    </li>
+                  ),
+                )}
               </ul>
+              {lines.some((line) => line.hours !== undefined && line.quantity > line.hours) && (
+                <p className="form-hint">
+                  <WarningIcon size={14} weight="fill" aria-hidden="true" /> Temps passé supérieur au temps estimé sur le devis accepté.
+                </p>
+              )}
               <p className="invoice-prep__total">
                 {vat ? `Total HT ${euro(totals.ht)} · TVA ${euro(totals.tva)} · ` : ''}Total TTC {euro(totals.ttc)}
                 {!vat && <span className="form-hint"> — {config.quote_vat_exemption || 'TVA non applicable, article 293 B du CGI'}</span>}

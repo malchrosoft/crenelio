@@ -123,6 +123,12 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
       },
       { key: 'quote_vat_rates', label: 'Taux de TVA proposés', type: 'text', unit: '%', hint: 'Séparés par des virgules, taux normal en premier (ex. : 20,10,5.5).' },
       {
+        key: 'quote_labour_hourly',
+        label: 'Main-d’œuvre facturée au temps passé',
+        type: 'checkbox',
+        hint: 'Coché : temps × taux horaire (saisie « 1h20 » arrondie selon le décompte), taux publié dans les tarifs. Décoché : main-d’œuvre au forfait (arrêté du 24 janvier 2017, art. 3 : temps estimé ou montant forfaitaire).',
+      },
+      {
         key: 'quote_labour_rate',
         label: 'Taux horaire de main-d’œuvre',
         type: 'number',
@@ -150,10 +156,23 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
         hint: 'Reprises sur chaque nouveau devis (C. consom. R111-1, 2° et R221-2, 4°) : moment du paiement et moyens acceptés.',
       },
       {
+        key: 'quote_time_step',
+        label: 'Arrondi du temps passé',
+        type: 'select',
+        options: [
+          { value: '1', label: 'Aucun (temps exact, à la minute)' },
+          { value: '15', label: "Au quart d'heure entamé" },
+          { value: '30', label: 'À la demi-heure entamée' },
+          { value: '60', label: "À l'heure entamée" },
+        ],
+        hint: 'Appliqué à la durée saisie sur une ligne de main-d’œuvre et au temps réellement passé (Préparer la facture) ; désactivable devis par devis.',
+      },
+      { key: 'quote_time_minimum', label: 'Temps minimum facturé', type: 'number', unit: 'min', hint: 'Vide ou 0 : aucun minimum. Ex. : 30 pour un diagnostic.' },
+      {
         key: 'quote_time_counting',
         label: 'Décompte du temps estimé',
         type: 'text',
-        hint: "Imprimé sous la main-d'œuvre (arrêté du 24 janvier 2017, art. 2). Ex. : « Temps décompté par quart d'heure entamé ».",
+        hint: "Imprimé sous la main-d'œuvre et dans les tarifs (arrêté du 24 janvier 2017, art. 2). Vide : déduit de l'arrondi et du minimum (« Temps décompté par quart d'heure entamé, 30 min minimum »).",
       },
       { key: 'quote_number_prefix', label: 'Préfixe de numérotation', type: 'text', hint: 'Ex. : D → D-2026-0001.' },
       {

@@ -167,9 +167,10 @@ class Quote
         foreach ([
             'execution_terms' => [255, null],
             'payment_terms'   => [500, 'quote_payment_terms'],
-            'time_counting'   => [255, 'quote_time_counting'],
+            'time_counting'   => [255, null],
         ] as $field => [$max, $default]) {
-            $value = array_key_exists($field, $data) ? trim((string)$data[$field]) : (string)($default ? Config::get($default, '') : '');
+            $fallback = $field === 'time_counting' ? self::timeCountingText() : (string)($default ? Config::get($default, '') : '');
+            $value = array_key_exists($field, $data) ? trim((string)$data[$field]) : $fallback;
             $data[$field] = $value === '' ? null : mb_substr($value, 0, $max);
         }
 
@@ -457,5 +458,21 @@ class Quote
             );
         }
         return $quote;
+    }
+
+    /**
+     * Modalités de décompte du temps (arrêté du 24 janvier 2017, art. 2) : texte réglé, sinon déduit du pas
+     * d'arrondi et du minimum. Identique à `timeCountingText` (quoteRules.ts).
+     */
+    public static function timeCountingText(): string
+    {
+        $text = trim((string)Config::get('quote_time_counting', ''));
+        if ($text !== '' || Config::get('quote_labour_hourly', '1') === '0') {
+            return $text;
+        }
+        $steps = ['1' => 'à la minute', '15' => "par quart d'heure entamé", '30' => 'par demi-heure entamée', '60' => 'par heure entamée'];
+        $minimum = (int)Config::get('quote_time_minimum', '0');
+        return 'Temps décompté ' . ($steps[Config::get('quote_time_step', '15')] ?? $steps['15'])
+            . ($minimum > 0 ? ", {$minimum} min minimum" : '');
     }
 }

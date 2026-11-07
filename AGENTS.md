@@ -7,10 +7,9 @@ Ce document détaille l'architecture du projet **Crénelio**, les conventions à
 ## 1. Contexte & Identité Git
 
 - **Projet :** Crénelio (application mono-artisan de prise de rendez-vous en ligne à domicile).
-- **Emplacement :** `/Users/aymeric.malchrowicz/DEVELOPPEMENT/crenelio`
-- **Profil GitHub :** Compte personnel **`malchrosoft`** (`aymeric.malchrowicz@malchrosoft.com`).
-  - Remote SSH : `git@github-malchrosoft:malchrosoft/crenelio.git`.
-  - Vérifier l'identité CLI si interaction `gh` requise : `gh auth status` (basculer si besoin avec `gh auth switch --hostname github.com --user malchrosoft`).
+- **Dépôt :** `malchrosoft/crenelio` (public).
+  - Règles propres au poste de travail (identités, remotes, commits) : lire l'`AGENTS.md` du
+    répertoire parent s'il existe ; elles n'ont pas leur place dans ce dépôt public.
 
 ---
 
@@ -175,7 +174,7 @@ l'application y est capturé, rien ne sort de la machine.
 ---
 
 ## 4. Suivi de la Feuille de Route (`ROADMAP.md`)
-Le fichier [`ROADMAP.md`](file:///Users/aymeric.malchrowicz/DEVELOPPEMENT/crenelio/ROADMAP.md) sert de référence partagée pour le backlog et les évolutions prévues (frais de déplacement, theming, page vitrine, emails & iCal, RGPD, mentions légales...) :
+Le fichier [`ROADMAP.md`](ROADMAP.md) sert de référence partagée pour le backlog et les évolutions prévues (frais de déplacement, theming, page vitrine, emails & iCal, RGPD, mentions légales...) :
 - **En début de session :** Consulter systématiquement `ROADMAP.md` pour contextualiser la tâche ou choisir le prochain item prioritaire.
 - **En cours / fin de session :** Mettre à jour `ROADMAP.md` pour cocher/marquer les fonctionnalités réalisées, consigner de nouveaux besoins exprimés par l'utilisateur ou ajuster les spécifications techniques.
 

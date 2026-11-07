@@ -40,7 +40,7 @@ export function vatNote(config: AppConfig): string {
 /** Taux horaire de main-d'œuvre TTC (réglé HT pour les devis), null s'il n'est pas renseigné. */
 export function labourRateTtc(config: AppConfig): number | null {
   const ht = Number(config.quote_labour_rate || 0);
-  if (!(ht > 0)) return null;
+  if (!(ht > 0) || config.quote_labour_hourly === '0') return null;
   const rate = isVat(config) ? vatRates(config)[0] ?? 0 : 0;
   return Math.round(ht * (1 + rate / 100) * 100) / 100;
 }

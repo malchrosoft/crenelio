@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppConfig, Service } from '../../types';
 import { labourRateTtc, quoteCostLabel, servicePrice, travelTiers, vatNote } from '../../utils/pricing';
+import { timeCountingText } from '../admin/quoteRules';
 
 interface PricingSectionProps {
   config: AppConfig;
@@ -15,6 +16,7 @@ interface PricingSectionProps {
 const PricingSection: React.FC<PricingSectionProps> = ({ config, services }) => {
   const active = services.filter((s) => s.is_active);
   const labour = labourRateTtc(config);
+  const counting = timeCountingText(config);
   const tiers =
     config.travel_mode !== 'premises' && active.some((s) => s.travel_fee_mode === 'distance_tiers') ? travelTiers(config) : [];
   const fixedTravel = config.travel_mode !== 'premises' && active.some((s) => s.travel_fee_mode === 'fixed');
@@ -49,7 +51,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ config, services }) => 
               <dt>Main-d'œuvre</dt>
               <dd>
                 {labour.toFixed(2).replace('.', ',')} € TTC de l'heure
-                {config.quote_time_counting && <span className="vitrine-pricing__hint">{config.quote_time_counting}</span>}
+                {counting && <span className="vitrine-pricing__hint">{counting}</span>}
               </dd>
             </div>
           )}

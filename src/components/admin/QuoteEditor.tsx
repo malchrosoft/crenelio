@@ -8,7 +8,7 @@ import { AppConfig, Quote, QuoteLine, QuoteLineKind, QuoteNotification, QuotePay
 import ConfirmDialog from './ConfirmDialog';
 import FieldHelp from './FieldHelp';
 import { FieldHelpKey } from '../../config/fieldHelp';
-import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, euro, lineAmount, newLine, quoteTotals, supplyVatCheck, vatRates } from './quoteRules';
+import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, EXACT_TIME_COUNTING, billedHours, euro, isHourly, lineAmount, newLine, quoteTotals, supplyVatCheck, timeCountingText, vatRates } from './quoteRules';
 
 interface QuoteEditorProps {
   /** Devis existant ; `null` : nouveau brouillon (créé au premier enregistrement). */
@@ -82,7 +82,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
           ...EMPTY,
           validity_days: Number(config.quote_validity_days || 30),
           payment_terms: config.quote_payment_terms || null,
-          time_counting: config.quote_time_counting || null,
+          time_counting: timeCountingText(config) || null,
           quote_price: Number(config.quote_default_price || 0) > 0 ? Number(config.quote_default_price) : null,
         },
   );
@@ -97,6 +97,10 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
   const totals = useMemo(() => quoteTotals(form.lines, vatMode), [form.lines, vatMode]);
   const supplyVat = useMemo(() => supplyVatCheck(form.lines, vatMode), [form.lines, vatMode]);
   const hasDebours = form.lines.some((line) => line.kind === 'debours');
+  // Choix propres au devis : main-d'œuvre facturée ou non (ex. : déplacement et courte investigation),
+  // temps arrondi selon le décompte réglé ou exact (le décompte imprimé suit le choix)
+  const [labour, setLabour] = useState(() => (quote ? form.lines.some((line) => line.kind === 'labour') : true));
+  const [rounded, setRounded] = useState(form.time_counting !== EXACT_TIME_COUNTING);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !confirm && onClose();
@@ -111,6 +115,21 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
       form.lines.map((line, i) => (i === index ? { ...line, ...patch } : line)),
     );
   const addLine = (kind: QuoteLineKind) => set('lines', [...form.lines, newLine(kind, config, vatMode)]);
+  /** Diagnostic, recherche de panne : main-d'œuvre au temps passé, minimum facturé compris. */
+  const addDiagnostic = () =>
+    set('lines', [
+      ...form.lines,
+      { ...newLine('labour', config, vatMode), label: 'Diagnostic et recherche de panne', quantity: billedHours('0h1', config, rounded) ?? 1 },
+    ]);
+  const toggleLabour = (on: boolean) => {
+    setLabour(on);
+    if (!on) setForm((prev) => ({ ...prev, lines: prev.lines.filter((line) => line.kind !== 'labour'), time_counting: null }));
+    else set('time_counting', rounded ? timeCountingText(config) || null : EXACT_TIME_COUNTING);
+  };
+  const toggleRounded = (on: boolean) => {
+    setRounded(on);
+    set('time_counting', on ? timeCountingText(config) || null : EXACT_TIME_COUNTING);
+  };
 
   /** Enregistre le brouillon (création au premier passage) ; renvoie le devis à jour. */
   async function save(): Promise<Quote | null> {
@@ -203,16 +222,33 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                 value={line.label}
                 onChange={(e) => setLine(index, { label: e.target.value })}
               />
-              <input
-                className="form-input"
-                aria-label="Quantité"
-                type="number"
-                min="0.01"
-                step="0.01"
-                required
-                value={line.quantity}
-                onChange={(e) => setLine(index, { quantity: e.target.value })}
-              />
+              {line.kind === 'labour' && line.unit === 'h' ? (
+                // Temps passé : « 1h20 » ou « 80 min », converti en heures arrondies selon le décompte réglé
+                <input
+                  className="form-input"
+                  aria-label="Temps (heures, ou durée : 1h20, 80 min)"
+                  title="Heures (1,5) ou durée (1h20, 80 min), arrondie selon le décompte réglé"
+                  inputMode="decimal"
+                  required
+                  value={line.quantity}
+                  onChange={(e) => setLine(index, { quantity: e.target.value })}
+                  onBlur={(e) => {
+                    const hours = billedHours(e.target.value, config, rounded);
+                    if (hours !== null) setLine(index, { quantity: hours });
+                  }}
+                />
+              ) : (
+                <input
+                  className="form-input"
+                  aria-label="Quantité"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  required
+                  value={line.quantity}
+                  onChange={(e) => setLine(index, { quantity: e.target.value })}
+                />
+              )}
               <input
                 className="form-input"
                 aria-label="Unité"
@@ -432,15 +468,35 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
 
           <fieldset className="quote-editor__section" disabled={locked}>
             <legend>Prestations</legend>
+            {isHourly(config) && (
+              <div className="quote-editor__labour-options">
+                <label className="form-check">
+                  <input type="checkbox" checked={labour} onChange={(e) => toggleLabour(e.target.checked)} />
+                  <span>Main-d'œuvre facturée</span>
+                </label>
+                {labour && (
+                  <label className="form-check">
+                    <input type="checkbox" checked={rounded} onChange={(e) => toggleRounded(e.target.checked)} />
+                    <span>Arrondir le temps ({timeCountingText(config).replace(/^Temps décompté /, '') || 'décompte réglé'})</span>
+                  </label>
+                )}
+              </div>
+            )}
             {renderLines(false)}
             {!locked && (
               <div className="quote-editor__add">
-                {(['labour', 'service', 'travel', ...(allowSupply ? ['supply'] : [])] as QuoteLineKind[]).map((kind) => (
+                {([...(labour ? ['labour'] : []), 'service', 'travel', ...(allowSupply ? ['supply'] : [])] as QuoteLineKind[]).map((kind) => (
                   <button key={kind} type="button" className="btn btn-secondary admin-btn-sm" onClick={() => addLine(kind)}>
                     <PlusIcon size={14} weight="bold" aria-hidden="true" />
                     {LINE_KIND_LABELS[kind]}
                   </button>
                 ))}
+                {isHourly(config) && labour && (
+                  <button type="button" className="btn btn-secondary admin-btn-sm" onClick={addDiagnostic}>
+                    <PlusIcon size={14} weight="bold" aria-hidden="true" />
+                    Diagnostic
+                  </button>
+                )}
               </div>
             )}
 

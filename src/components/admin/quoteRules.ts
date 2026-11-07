@@ -30,9 +30,44 @@ export function vatRates(config: AppConfig): number[] {
     .filter((rate) => Number.isFinite(rate));
 }
 
+/** Main-d'œuvre facturée au temps passé × taux horaire (`quote_labour_hourly`, par défaut) ou au forfait. */
+export const isHourly = (config: AppConfig) => config.quote_labour_hourly !== '0';
+
+const STEP_LABELS: Record<string, string> = { '1': 'à la minute', '15': "par quart d'heure entamé", '30': 'par demi-heure entamée', '60': 'par heure entamée' };
+
+/**
+ * Modalités de décompte du temps (arrêté du 24 janvier 2017, art. 2) : texte saisi dans les réglages,
+ * sinon déduit du pas d'arrondi et du minimum (« Temps décompté par quart d'heure entamé, 30 min minimum »).
+ */
+export function timeCountingText(config: AppConfig): string {
+  if (config.quote_time_counting) return config.quote_time_counting;
+  if (!isHourly(config)) return '';
+  const minimum = Number(config.quote_time_minimum || 0);
+  return `Temps décompté ${STEP_LABELS[config.quote_time_step ?? '15'] ?? STEP_LABELS['15']}${minimum > 0 ? `, ${minimum} min minimum` : ''}`;
+}
+
+/** Décompte d'un devis sans arrondi (case « Arrondir le temps » décochée). */
+export const EXACT_TIME_COUNTING = 'Temps décompté à la minute, sans minimum';
+
+/**
+ * Durée saisie (« 1h20 », « 1:20 », « 80 min ») convertie en heures facturées : minimum puis arrondi au
+ * pas réglé (`quote_time_step`, en minutes) ; `rounded` faux : temps exact à la minute, sans minimum (choix du devis). Un nombre seul est déjà en heures : renvoyé tel quel ; null si illisible.
+ */
+export function billedHours(input: string, config: AppConfig, rounded = true): number | null {
+  const text = input.trim().toLowerCase().replace(',', '.');
+  const match = text.match(/^(?:(\d+(?:\.\d+)?)\s*(?:h|:))?\s*(?:(\d+)\s*(?:min|mn|m)?)?$/);
+  if (!match || !/[h:m]/.test(text)) return text !== '' && Number.isFinite(Number(text)) ? Number(text) : null;
+  const minutes = Number(match[1] ?? 0) * 60 + Number(match[2] ?? 0);
+  if (!(minutes > 0)) return null;
+  const step = rounded ? Number(config.quote_time_step || 15) || 1 : 1;
+  const counted = Math.ceil(Math.max(minutes, rounded ? Number(config.quote_time_minimum || 0) : 0) / step) * step;
+  return Math.round((counted / 60) * 100) / 100;
+}
+
 /** Nouvelle ligne d'un type : unité usuelle, taux horaire réglé pour la main-d'œuvre, taux normal. */
 export function newLine(kind: QuoteLineKind, config: AppConfig, vatMode: 'franchise' | 'vat'): QuoteLine {
-  const units: Record<QuoteLineKind, string> = { labour: 'h', service: 'forfait', travel: 'forfait', debours: 'u', supply: 'u' };
+  const hourly = isHourly(config);
+  const units: Record<QuoteLineKind, string> = { labour: hourly ? 'h' : 'forfait', service: 'forfait', travel: 'forfait', debours: 'u', supply: 'u' };
   const labels: Record<QuoteLineKind, string> = {
     labour: "Main-d'œuvre",
     service: '',
@@ -45,7 +80,7 @@ export function newLine(kind: QuoteLineKind, config: AppConfig, vatMode: 'franch
     label: labels[kind],
     quantity: 1,
     unit: units[kind],
-    unit_price: kind === 'labour' ? Number(config.quote_labour_rate || 0) : 0,
+    unit_price: kind === 'labour' && hourly ? Number(config.quote_labour_rate || 0) : 0,
     vat_rate: vatMode === 'vat' && kind !== 'debours' ? vatRates(config)[0] ?? 0 : 0,
   };
 }
