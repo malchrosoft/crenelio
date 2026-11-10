@@ -20,7 +20,117 @@ export const LINE_KIND_LABELS: Record<QuoteLineKind, string> = {
   travel: 'Déplacement',
   debours: 'Pièce au nom du client (débours)',
   supply: 'Fourniture revendue',
+  discount: 'Remise',
 };
+
+/**
+ * Désignation par défaut d'un type de ligne : main-d'œuvre, déplacement et remise n'attendent pas de
+ * désignation (le complément saisi s'y ajoute). Identique à `Quote::DEFAULT_LABELS`.
+ */
+export const DEFAULT_LINE_LABELS: Partial<Record<QuoteLineKind, string>> = {
+  labour: "Main-d'œuvre",
+  travel: 'Frais de déplacement',
+  discount: 'Remise exceptionnelle',
+};
+
+/** Unités proposées pour une pièce ou une fourniture ; les autres types ont une unité fixe. */
+export const PART_UNITS = ['u', 'lot', 'm', 'm²', 'm³', 'kg', 'l'];
+
+/** Unité fixe d'un type de ligne (null : choisie dans `PART_UNITS`). */
+export function fixedUnit(kind: QuoteLineKind, config: AppConfig): string | null {
+  if (kind === 'debours' || kind === 'supply') return null;
+  return kind === 'labour' && isHourly(config) ? 'h' : 'forfait';
+}
+
+/**
+ * Calcul saisi dans un champ numérique (« 120/3 », « 2*45,5 », « (80+40)/2 ») : nombres, + - * / et
+ * parenthèses seulement, virgule décimale admise. Résultat arrondi au centime ; null si illisible.
+ */
+export function evaluate(input: string | number): number | null {
+  const text = String(input).replace(/\s+/g, '').replace(/,/g, '.');
+  if (text === '' || !/^[\d.+\-*/()]+$/.test(text)) return null;
+  let pos = 0;
+  const peek = () => text[pos];
+  const expr = (): number => {
+    let value = term();
+    while (peek() === '+' || peek() === '-') value = text[pos++] === '+' ? value + term() : value - term();
+    return value;
+  };
+  const term = (): number => {
+    let value = factor();
+    while (peek() === '*' || peek() === '/') value = text[pos++] === '*' ? value * factor() : value / factor();
+    return value;
+  };
+  const factor = (): number => {
+    if (peek() === '-') return pos++, -factor();
+    if (peek() === '(') {
+      pos++;
+      const value = expr();
+      if (text[pos++] !== ')') throw new Error();
+      return value;
+    }
+    const match = /^\d*\.?\d+|^\d+\./.exec(text.slice(pos));
+    if (!match) throw new Error();
+    pos += match[0].length;
+    return Number(match[0]);
+  };
+  try {
+    const value = expr();
+    return pos === text.length && Number.isFinite(value) ? Math.round(value * 100) / 100 : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Modalités de paiement usuelles, proposées dans le devis avec le réglage `quote_payment_terms`. */
+export const PAYMENT_TERMS_OPTIONS = [
+  'Paiement à réception de la facture, par virement, chèque ou espèces.',
+  "Paiement sur place à la fin de l'intervention, par carte, chèque ou espèces.",
+  "Acompte de 30 % à l'acceptation du devis, solde à réception de la facture.",
+  'Paiement à 30 jours à compter de la date de la facture, par virement.',
+];
+
+/** Décomptes du temps proposés dans le devis : chaque pas d'arrondi (minimum réglé compris), et le temps exact. */
+export function timeCountingOptions(config: AppConfig): string[] {
+  const options = Object.keys(STEP_LABELS).map((step) => timeCountingText({ ...config, quote_time_counting: '', quote_labour_hourly: '1', quote_time_step: step }));
+  return [...new Set([timeCountingText(config), ...options, EXACT_TIME_COUNTING].filter(Boolean))];
+}
+
+/**
+ * Réglages d'arrondi propres à un devis : le pas dont le décompte choisi dans le devis est le texte,
+ * sinon les réglages (décompte saisi librement).
+ */
+export function countingConfig(config: AppConfig, counting: string | null): AppConfig {
+  const step = Object.keys(STEP_LABELS).find(
+    (s) => timeCountingText({ ...config, quote_time_counting: '', quote_labour_hourly: '1', quote_time_step: s }) === counting,
+  );
+  return step ? { ...config, quote_time_step: step } : config;
+}
+
+/** Doublons d'un devis : lignes de même type et de même désignation (casse et espaces ignorés). */
+export function duplicateGroups(lines: QuoteLine[]): number[][] {
+  const groups = new Map<string, number[]>();
+  lines.forEach((line, index) => {
+    const key = `${line.kind}|${line.label.trim().toLowerCase().replace(/\s+/g, ' ')}`;
+    groups.set(key, [...(groups.get(key) ?? []), index]);
+  });
+  return [...groups.values()].filter((group) => group.length > 1);
+}
+
+/**
+ * Date ou délai d'exécution (L221-5 3°). Hors urgence, 15 jours par défaut : le délai de rétractation de
+ * 14 jours (L221-18) est écoulé, l'exécution ne commence pas avant sauf demande expresse du client (L221-25).
+ */
+export const DEFAULT_EXECUTION_DAYS = 15;
+export const executionDateText = (date: Date) => `Le ${date.toLocaleDateString('fr-FR')}`;
+export const executionDelayText = (days: number) => `Sous ${days} jours à compter de l'acceptation du devis`;
+export function parseExecution(text: string | null): { mode: 'date' | 'delay' | 'free'; date?: string; days?: number } {
+  const date = /^Le (\d{2})\/(\d{2})\/(\d{4})$/.exec(text ?? '');
+  if (date) return { mode: 'date', date: `${date[3]}-${date[2]}-${date[1]}` };
+  const delay = /^Sous (\d+) jours à compter de l'acceptation du devis$/.exec(text ?? '');
+  if (delay) return { mode: 'delay', days: Number(delay[1]) };
+  return { mode: text ? 'free' : 'date' };
+}
 
 /** Taux de TVA proposés (`quote_vat_rates`), taux normal en premier. */
 export function vatRates(config: AppConfig): number[] {
@@ -67,19 +177,11 @@ export function billedHours(input: string, config: AppConfig, rounded = true): n
 /** Nouvelle ligne d'un type : unité usuelle, taux horaire réglé pour la main-d'œuvre, taux normal. */
 export function newLine(kind: QuoteLineKind, config: AppConfig, vatMode: 'franchise' | 'vat'): QuoteLine {
   const hourly = isHourly(config);
-  const units: Record<QuoteLineKind, string> = { labour: hourly ? 'h' : 'forfait', service: 'forfait', travel: 'forfait', debours: 'u', supply: 'u' };
-  const labels: Record<QuoteLineKind, string> = {
-    labour: "Main-d'œuvre",
-    service: '',
-    travel: 'Frais de déplacement',
-    debours: '',
-    supply: '',
-  };
   return {
     kind,
-    label: labels[kind],
+    label: '',
     quantity: 1,
-    unit: units[kind],
+    unit: fixedUnit(kind, config) ?? 'u',
     unit_price: kind === 'labour' && hourly ? Number(config.quote_labour_rate || 0) : 0,
     vat_rate: vatMode === 'vat' && kind !== 'debours' ? vatRates(config)[0] ?? 0 : 0,
   };

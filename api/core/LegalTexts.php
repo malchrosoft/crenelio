@@ -97,6 +97,23 @@ class LegalTexts
     }
 
     /** Formulaire type de rétractation (annexe à l'article R221-1, décret n° 2022-424), mot pour mot. */
+    /**
+     * Zone « Commandé le (*)/reçu le (*) » préremplie : date d'accord du devis et, pour une vente, date de
+     * remise des pièces (point de départ du délai, L221-18 2°). Vide avant l'accord. Identique à
+     * `withdrawalFormDates` (QuotePrintPage.tsx).
+     */
+    public static function withdrawalFormDates(array $quote): string
+    {
+        if (empty($quote['decided_at'])) {
+            return '';
+        }
+        $text = 'commandé le ' . date('d/m/Y', strtotime((string)$quote['decided_at']));
+        if ((int)($quote['sale'] ?? 0) && !empty($quote['goods_received_at'])) {
+            $text .= ', reçu le ' . date('d/m/Y', strtotime((string)$quote['goods_received_at']));
+        }
+        return $text;
+    }
+
     public static function withdrawalForm(array $config, array $quote): array
     {
         $to = implode(', ', array_filter([

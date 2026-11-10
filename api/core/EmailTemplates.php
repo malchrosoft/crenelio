@@ -687,6 +687,10 @@ class EmailTemplates
             ? 'Les pièces sont présentées dans un <strong>mandat de débours</strong> distinct : vous choisissez de les faire acheter en votre nom par le professionnel, ou de les fournir vous-même.'
             : 'Rien n\'est dû tant que vous n\'avez pas accepté le devis.';
         $outro .= ' Le devis' . ((float)$quote['total_debours'] > 0 ? ' et le mandat de débours sont joints' : ' est joint') . ' à ce message en PDF.';
+        // Information précontractuelle : formulaire type de rétractation (L221-5, 7°), hors urgence
+        if (!(int)$quote['urgent']) {
+            $outro .= ' Le formulaire type de rétractation (PDF remplissable) est également joint.';
+        }
         $outro .= $guarantees;
         $url = self::quoteUrl($quote);
 

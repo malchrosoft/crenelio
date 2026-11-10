@@ -223,7 +223,7 @@ export interface BookingPayload {
 // --- Devis (Item 22) ---
 
 /** Types de ligne : main-d'œuvre, forfait, déplacement, pièce au nom du client (débours), fourniture revendue. */
-export type QuoteLineKind = 'labour' | 'service' | 'travel' | 'debours' | 'supply';
+export type QuoteLineKind = 'labour' | 'service' | 'travel' | 'debours' | 'supply' | 'discount';
 export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'refused' | 'expired' | 'withdrawn';
 
 /** Montants en chaînes (DECIMAL MySQL) à la lecture, en nombres à l'envoi. */

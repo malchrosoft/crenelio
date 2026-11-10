@@ -2410,25 +2410,75 @@ $admin-sidebar-collapsed: 68px;
     line-height: $line-height-base;
   }
 
+  // Mise en page calquée sur le PDF (QuotePdf, qui fait référence) : couleur du thème, blocs teintés
   .quote-print__header {
     display: flex;
     justify-content: space-between;
     gap: $space-md;
-    padding-bottom: $space-block;
-    border-bottom: 2px solid $gray-800;
+    padding-bottom: $space-sm;
+    border-bottom: 2px solid $primary;
+  }
+
+  .quote-print__company {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75rem;
+    color: $gray-500;
+
+    strong { font-size: 0.9rem; color: $gray-800; }
+  }
+
+  .quote-print__parties {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-sm;
+    margin-top: $space-block;
+  }
+
+  .quote-print__party {
+    display: flex;
+    flex-direction: column;
+    padding: $space-xs $space-sm;
+    background: primary-tint(6%);
+  }
+
+  .quote-print__party-title {
+    margin: 0 0 $space-2xs;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: $primary;
+    text-transform: uppercase;
+  }
+
+  .quote-print__logo {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 180px;
+    max-height: 64px;
+    object-fit: contain;
+    align-self: flex-start;
+    margin-bottom: $space-xs;
   }
 
   .quote-print__title {
     text-align: right;
 
-    h1 { margin: 0; font-size: 1.4rem; text-transform: uppercase; }
-    p { margin: $space-2xs 0 0; }
+    h1 { margin: 0 0 $space-xs; font-size: 1.6rem; color: $primary; text-transform: uppercase; }
+    p { margin: 0; font-size: 0.75rem; color: $gray-500; }
   }
 
   .quote-print__block {
     margin-top: $space-block;
 
-    h2 { margin: 0 0 $space-xs; font-size: 1rem; text-transform: uppercase; }
+    h2 {
+      margin: 0 0 $space-xs;
+      padding-bottom: $space-2xs;
+      border-bottom: 1px solid primary-alpha(30%);
+      font-size: 0.8rem;
+      color: $primary;
+      text-transform: uppercase;
+    }
     p, ul { margin: 0 0 $space-xs; }
   }
 
@@ -2437,27 +2487,32 @@ $admin-sidebar-collapsed: 68px;
     margin-top: $space-block;
     border-collapse: collapse;
 
-    th, td { padding: $space-xs; border: 1px solid $gray-300; text-align: right; vertical-align: top; }
-    th { background: $gray-100; }
+    th, td { padding: $space-xs; border-bottom: 1px solid $gray-200; text-align: right; vertical-align: top; }
+    th { background: primary-tint(8%); color: $primary; font-size: 0.75rem; }
+    td:last-child { font-weight: 600; }
     th:first-child, td:first-child { text-align: left; }
+    small { display: block; color: $gray-500; }
   }
 
   .quote-print__totals {
     display: grid;
     grid-template-columns: max-content 130px;
     justify-content: end;
-    gap: $space-2xs $space-md;
+    gap: $space-2xs 0;
     margin: $space-xs 0;
 
-    dt { text-align: right; }
-    dd { margin: 0; text-align: right; }
+    dt { text-align: right; color: $gray-500; }
+    dd { margin: 0; text-align: right; font-weight: 600; }
+
+    // Total en bandeau teinté, comme le PDF
+    .quote-print__total { padding: $space-xs $space-sm; background: primary-tint(8%); color: $primary; font-size: 1rem; font-weight: 700; }
   }
+
+  .quote-print__mention--right { text-align: right; }
 
   .quote-print__mention { margin: $space-2xs 0; font-size: 0.8rem; }
 
   .quote-print__notice {
-    padding: $space-sm;
-    border: 1px solid $gray-300;
     font-size: 0.8rem;
 
     p { margin: 0 0 $space-xs; }
@@ -2482,6 +2537,8 @@ $admin-sidebar-collapsed: 68px;
     padding-bottom: $space-md;
     border-bottom: 1px dotted $gray-500;
   }
+
+  .quote-print__field--contract { font-weight: 700; }
 }
 
 @media print {
@@ -3585,6 +3642,20 @@ $data-grid-status-width: 13em;
 
   .quote-editor__urgent {
     margin-top: $space-xs;
+  }
+
+  .quote-editor__execution {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-xs;
+
+    .form-input:not(.form-input--compact) { flex: 1; min-width: 10rem; }
+  }
+
+  .quote-lines__unit {
+    align-self: center;
+    color: $gray-500;
   }
 
   .quote-editor__labour-options {

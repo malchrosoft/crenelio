@@ -150,7 +150,7 @@ class QuoteController
         $available = $quote !== null && match ($document) {
             'devis'       => true,
             'mandat'      => (float)$quote['total_debours'] > 0,
-            'formulaire'  => in_array($quote['status'], ['accepted', 'withdrawn'], true) && !(int)$quote['urgent'],
+            'formulaire'  => in_array($quote['status'], ['sent', 'accepted', 'withdrawn'], true) && !(int)$quote['urgent'],
             'declaration' => $quote['status'] === 'withdrawn',
             default       => false,
         };
@@ -161,7 +161,7 @@ class QuoteController
         [$pdf, $name] = match ($document) {
             'devis'       => [QuotePdf::quote($quote, $config), 'devis'],
             'mandat'      => [QuotePdf::mandate($quote, $config), 'mandat-debours'],
-            'formulaire'  => [QuotePdf::withdrawalForm($quote, $config, EmailTemplates::quoteWithdrawalUrl($quote)), 'formulaire-retractation'],
+            'formulaire'  => [QuotePdf::withdrawalForm($quote, $config, $quote['status'] === 'sent' ? null : EmailTemplates::quoteWithdrawalUrl($quote)), 'formulaire-retractation'],
             'declaration' => [QuotePdf::withdrawalDeclaration($quote, $config), 'declaration-retractation'],
         };
         header('Content-Type: application/pdf');

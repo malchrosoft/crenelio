@@ -223,7 +223,7 @@ CREATE TABLE `quote_lines` (
     `id`          INT AUTO_INCREMENT PRIMARY KEY,
     `quote_id`    INT             NOT NULL,
     `position`    SMALLINT        NOT NULL DEFAULT 0,
-    `kind`        ENUM('labour', 'service', 'travel', 'debours', 'supply') NOT NULL,
+    `kind`        ENUM('labour', 'service', 'travel', 'debours', 'supply', 'discount') NOT NULL,
     `label`       VARCHAR(255)    NOT NULL,
     `quantity`    DECIMAL(10,2)   NOT NULL DEFAULT 1.00,
     `unit`        VARCHAR(20)     NOT NULL DEFAULT 'u',

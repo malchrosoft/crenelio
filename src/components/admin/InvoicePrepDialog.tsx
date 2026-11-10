@@ -5,7 +5,7 @@ import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../../api';
 import { AppConfig, Appointment, Quote, QuoteLine } from '../../types';
-import { EXACT_TIME_COUNTING, billedHours, euro, lineAmount } from './quoteRules';
+import { EXACT_TIME_COUNTING, billedHours, countingConfig, euro, lineAmount } from './quoteRules';
 import { legalIdentity } from '../../utils/legalIdentity';
 
 interface InvoicePrepDialogProps {
@@ -212,7 +212,7 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
                           title="Temps réellement passé : 1h20, 80 min ou heures (1,5)"
                           defaultValue={String(line.quantity).replace('.', ',')}
                           onBlur={(e) => {
-                            const hours = billedHours(e.target.value, config, quote?.time_counting !== EXACT_TIME_COUNTING);
+                            const hours = billedHours(e.target.value, countingConfig(config, quote?.time_counting ?? null), quote?.time_counting !== EXACT_TIME_COUNTING);
                             if (hours !== null && hours > 0) setLine(index, { quantity: hours });
                             e.target.value = String(hours ?? line.quantity).replace('.', ',');
                           }}

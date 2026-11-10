@@ -31,7 +31,7 @@ class QuotePdf
         $pdf->paragraph($lines[2], 10, false, 8);
         $pdf->paragraph($lines[3], 10, false, 8);
         $pdf->paragraph($lines[4], 10, true, 10);
-        $pdf->field('commande_le', 'Commandé le (*)/reçu le (*) :', !empty($quote['decided_at']) ? date('d/m/Y', strtotime((string)$quote['decided_at'])) : '');
+        $pdf->field('commande_le', 'Commandé le (*)/reçu le (*) :', LegalTexts::withdrawalFormDates($quote));
         $pdf->field('nom', 'Nom du (des) consommateur(s) :', (string)$quote['client_name']);
         $address = trim(implode(', ', array_filter([(string)$quote['address'], trim($quote['postal_code'] . ' ' . $quote['city'])])));
         $pdf->field('adresse', 'Adresse du (des) consommateur(s) :', $address, 36, true);
@@ -82,15 +82,10 @@ class QuotePdf
     }
 
     /** En-tête : entreprise (identité légale) puis titre du document. */
+    /** En-tête des formulaires : le même que le devis (logo, couleur du thème), titre sur deux lignes au besoin. */
     private static function header(SimplePdf $pdf, array $config, string $title, string $reference): void
     {
-        foreach (LegalTexts::companyLines($config) as $i => $line) {
-            $pdf->paragraph($line, $i === 0 ? 11 : 9, $i === 0, 0);
-        }
-        $pdf->moveDown(8);
-        $pdf->rule(12);
-        $pdf->paragraph(mb_strtoupper($title, 'UTF-8'), 15, true, 2);
-        $pdf->paragraph($reference, 10, false, 14);
+        self::documentHeader($pdf, $config, SimplePdf::rgb((string)($config['theme_primary'] ?? ''), [0.15, 0.39, 0.92]), mb_strtoupper($title, 'UTF-8'), [$reference]);
     }
 
     // -----------------------------------------------------------------
@@ -157,12 +152,13 @@ class QuotePdf
             self::small($pdf, $text);
         }
 
-        // Pièces remplacées : annexe 2 de l'arrêté du 24 janvier 2017, mot pour mot
+        // Pièces remplacées : annexe 2 de l'arrêté du 24 janvier 2017, mot pour mot ; cases en « [ ] »,
+        // le caractère « □ » n'existant pas dans la police standard du PDF
         self::section($pdf, $primary, 'Pièces remplacées');
         self::small($pdf, 'Souhaitez-vous conserver les pièces, éléments ou appareils remplacés ?');
         self::small($pdf, $quote['keep_parts'] !== null
             ? sprintf('Réponse du client en ligne le %s : %s.', self::moment((string)$quote['decided_at']), (int)$quote['keep_parts'] ? 'OUI' : 'NON (décharge)')
-            : 'OUI □ NON □   Signature du consommateur précédée de la mention manuscrite " Lu et approuvé ".');
+            : 'OUI [   ]   NON [   ]   Signature du consommateur précédée de la mention manuscrite " Lu et approuvé ".');
 
         if ((int)$quote['builder_works']) {
             self::section($pdf, $primary, 'Garanties légales des constructeurs');
@@ -189,7 +185,7 @@ class QuotePdf
                     self::small($pdf, "Le client a expressément demandé que l'intervention commence avant la fin du délai de rétractation et reconnu qu'une fois la prestation entièrement exécutée, il ne disposera plus du droit de rétractation.");
                 }
             } else {
-                self::small($pdf, "□ Je demande expressément que l'intervention commence avant la fin du délai de rétractation. Si je me rétracte ensuite, je paierai un montant proportionnel au service déjà fourni. Je reconnais qu'une fois la prestation entièrement exécutée, je ne disposerai plus du droit de rétractation.");
+                self::small($pdf, "[   ] Je demande expressément que l'intervention commence avant la fin du délai de rétractation. Si je me rétracte ensuite, je paierai un montant proportionnel au service déjà fourni. Je reconnais qu'une fois la prestation entièrement exécutée, je ne disposerai plus du droit de rétractation.");
             }
             self::small($pdf, self::ONLINE_FORM_NOTICE);
         }
@@ -430,7 +426,7 @@ class QuotePdf
 
     private const KIND = [
         'labour' => "Main-d'œuvre", 'service' => 'Forfait', 'travel' => 'Déplacement',
-        'debours' => 'Pièce au nom du client (débours)', 'supply' => 'Fourniture revendue',
+        'debours' => 'Pièce au nom du client (débours)', 'supply' => 'Fourniture revendue', 'discount' => 'Remise',
     ];
 
     private static function money(float $amount): string

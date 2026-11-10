@@ -22,7 +22,8 @@ const DOC_LABELS: Record<DocId, string> = {
   retractation: 'Formulaire de rétractation',
 };
 
-const day = (value: string | null) => (value ? format(parseISO(value.replace(' ', 'T')), 'd MMMM yyyy', { locale: fr }) : '');
+// Dates au format du PDF (QuotePdf::day)
+const day = (value: string | null) => (value ? format(parseISO(value.replace(' ', 'T')), 'dd/MM/yyyy', { locale: fr }) : '');
 const moment = (value: string | null) => (value ? format(parseISO(value.replace(' ', 'T')), "d MMMM yyyy 'à' HH:mm", { locale: fr }) : '');
 
 /**
@@ -53,10 +54,13 @@ const QuotePrintPage: React.FC<QuotePrintPageProps> = ({ config }) => {
   return (
     <div className="quote-print">
       <div className="quote-print__toolbar">
-        <Link to={`/devis/${token}`} className="booking-page-header__back">
-          <ArrowLeftIcon size={18} weight="bold" />
-          Retour au devis
-        </Link>
+        {/* Ouverte dans un nouvel onglet (Espace Artisan) : rien à quoi revenir, il suffit de fermer l'onglet */}
+        {window.history.length > 1 && (
+          <Link to={`/devis/${token}`} className="booking-page-header__back">
+            <ArrowLeftIcon size={18} weight="bold" />
+            Retour au devis
+          </Link>
+        )}
         <div className="quote-print__docs" role="group" aria-label="Document à imprimer">
           {[...available, null].map((doc) => (
             <button
@@ -75,7 +79,7 @@ const QuotePrintPage: React.FC<QuotePrintPageProps> = ({ config }) => {
             Télécharger en PDF
           </a>
         )}
-        {quote && docs.length === 1 && docs[0] === 'retractation' && quote.status !== 'sent' && (
+        {quote && docs.length === 1 && docs[0] === 'retractation' && (
           <a className="btn btn-secondary" href={`/api/quotes/token/${token}/formulaire.pdf`}>
             Télécharger en PDF
           </a>
@@ -101,47 +105,56 @@ const QuotePrintPage: React.FC<QuotePrintPageProps> = ({ config }) => {
   );
 };
 
-/** En-tête commun : entreprise (identité légale complète) et titre du document. */
-const SheetHeader: React.FC<{ config: AppConfig; title: string; reference: string }> = ({ config, title, reference }) => (
+/**
+ * En-tête commun, calqué sur le PDF (`QuotePdf::documentHeader`, qui fait référence) : logo et entreprise
+ * (identité légale complète, `LegalTexts::companyLines`) à gauche, titre en couleur du thème à droite, filet.
+ */
+const SheetHeader: React.FC<{ config: AppConfig; title: string; meta: string[] }> = ({ config, title, meta }) => (
   <header className="quote-print__header">
-    <div>
+    <div className="quote-print__company">
+      {config.branding_logo_url && <img className="quote-print__logo" src={config.branding_logo_url} alt="" />}
       <strong>{config.company_name}</strong>
-      <br />
-      {legalIdentity(config)}
-      <br />
-      {companyAddress(config)}
-      {config.legal_siret && (
-        <>
-          <br />
-          SIRET {config.legal_siret}
-        </>
-      )}
-      {config.legal_vat_number && (
-        <>
-          <br />
-          N° TVA {config.legal_vat_number}
-        </>
-      )}
-      {config.legal_rm && (
-        <>
-          <br />
-          {config.legal_rm}
-        </>
-      )}
-      {config.legal_assurance && (
-        <>
-          <br />
-          Assurance : {config.legal_assurance}
-        </>
-      )}
-      <br />
-      {[config.pro_phone, config.pro_email].filter(Boolean).join(' · ')}
+      {[
+        legalIdentity(config),
+        companyAddress(config),
+        config.legal_siret && `SIRET ${config.legal_siret}`,
+        config.legal_vat_number && `N° TVA ${config.legal_vat_number}`,
+        config.legal_rm,
+        config.legal_assurance && `Assurance : ${config.legal_assurance}`,
+        [config.pro_phone, config.pro_email].filter(Boolean).join(' · '),
+      ]
+        .filter(Boolean)
+        .map((line) => (
+          <span key={line as string}>{line}</span>
+        ))}
     </div>
     <div className="quote-print__title">
       <h1>{title}</h1>
-      <p>{reference}</p>
+      {meta.filter(Boolean).map((line) => (
+        <p key={line}>{line}</p>
+      ))}
     </div>
   </header>
+);
+
+/** Deux blocs teintés côte à côte (client / intervention, mandant / mandataire), comme `QuotePdf::parties`. */
+const Parties: React.FC<{ blocks: [string, (string | null | false | undefined)[]][] }> = ({ blocks }) => (
+  <div className="quote-print__parties">
+    {blocks.map(([title, lines]) => (
+      <div className="quote-print__party" key={title}>
+        <p className="quote-print__party-title">{title}</p>
+        {lines.filter(Boolean).map((line, i) => (i === 0 ? <strong key={i}>{line}</strong> : <span key={i}>{line}</span>))}
+      </div>
+    ))}
+  </div>
+);
+
+/** Titre de section en capitales, couleur du thème et filet (`QuotePdf::section`). */
+const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
+  <section className="quote-print__block">
+    <h2>{title}</h2>
+    {children}
+  </section>
 );
 
 const Lines: React.FC<{ lines: QuoteLine[]; vat: boolean }> = ({ lines, vat }) => (
@@ -159,7 +172,8 @@ const Lines: React.FC<{ lines: QuoteLine[]; vat: boolean }> = ({ lines, vat }) =
       {lines.map((line, index) => (
         <tr key={index}>
           <td>
-            {line.label} <small>({LINE_KIND_LABELS[line.kind]})</small>
+            {line.label}
+            <small>{LINE_KIND_LABELS[line.kind]}</small>
           </td>
           <td>
             {Number(line.quantity).toLocaleString('fr-FR')} {line.unit}
@@ -200,49 +214,52 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
 
   return (
     <>
-      <SheetHeader config={config} title={`Devis n° ${quote.number}`} reference={`Établi le ${day(quote.sent_at)}`} />
+      <SheetHeader
+        config={config}
+        title="Devis"
+        meta={[`N° ${quote.number}`, quote.sent_at ? `Établi le ${day(quote.sent_at)}` : '', quote.valid_until ? `Valable jusqu'au ${day(quote.valid_until)}` : '']}
+      />
 
-      <section className="quote-print__block">
-        <p>
-          <strong>Client :</strong> {quote.client_name}
-          {quote.client_company && ` — ${quote.client_company}`}
-          {quote.client_siren && ` (SIREN/SIRET ${quote.client_siren})`}
-          <br />
-          <strong>Lieu d'intervention :</strong> {[quote.address, `${quote.postal_code} ${quote.city}`.trim()].filter(Boolean).join(', ')}
-        </p>
-        <p>
-          <strong>Nature des travaux :</strong> {quote.title || '—'}
-          {urgent && (
-            <>
-              <br />
-              <strong>Intervention urgente</strong> expressément demandée par le client.
-            </>
-          )}
-        </p>
-        {quote.notes && <p>{quote.notes}</p>}
-      </section>
+      <Parties
+        blocks={[
+          [
+            'Client',
+            [
+              quote.client_name,
+              quote.client_company,
+              quote.client_siren && `SIREN/SIRET ${quote.client_siren}`,
+              [quote.address, `${quote.postal_code} ${quote.city}`.trim()].filter(Boolean).join(', '),
+            ],
+          ],
+          [
+            'Intervention',
+            [
+              quote.title || 'Travaux',
+              quote.execution_terms && `Exécution : ${quote.execution_terms}`,
+              urgent && 'Intervention urgente expressément demandée',
+            ],
+          ],
+        ]}
+      />
+      {quote.notes && <p className="quote-print__mention">{quote.notes}</p>}
 
       <Lines lines={lines} vat={vat} />
       {quote.time_counting && lines.some((line) => line.kind === 'labour') && (
         <p className="quote-print__mention">{quote.time_counting}</p>
       )}
       <dl className="quote-print__totals">
-        <dt>{vat ? 'Total HT' : 'Total'}</dt>
-        <dd>{euro(quote.total_ht)}</dd>
         {vat && (
           <>
+            <dt>Total HT</dt>
+            <dd>{euro(quote.total_ht)}</dd>
             <dt>TVA</dt>
             <dd>{euro(quote.total_vat)}</dd>
           </>
         )}
-        <dt>
-          <strong>Total TTC</strong>
-        </dt>
-        <dd>
-          <strong>{euro(quote.total_ttc)}</strong>
-        </dd>
+        <dt className="quote-print__total">Total TTC</dt>
+        <dd className="quote-print__total">{euro(quote.total_ttc)}</dd>
       </dl>
-      {!vat && <p className="quote-print__mention">{config.quote_vat_exemption || 'TVA non applicable, article 293 B du CGI'}</p>}
+      {!vat && <p className="quote-print__mention quote-print__mention--right">{config.quote_vat_exemption || 'TVA non applicable, article 293 B du CGI'}</p>}
       {Number(quote.total_debours) > 0 && (
         <p className="quote-print__mention">
           Pièces achetées au nom et pour le compte du client : voir le mandat de débours (document distinct), estimées à{' '}
@@ -250,40 +267,44 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
           du devis.
         </p>
       )}
-      {quote.execution_terms && (
-        <p className="quote-print__mention">
-          <strong>Exécution :</strong> {quote.execution_terms}
-        </p>
-      )}
-      {quote.payment_terms && (
-        <p className="quote-print__mention">
-          <strong>Paiement :</strong> {quote.payment_terms}
-        </p>
-      )}
-      <p className="quote-print__mention">
-        Devis valable jusqu'au {day(quote.valid_until)} ({quote.validity_days} jours) ·{' '}
-        {quote.quote_price === null ? 'Devis gratuit' : `Devis payant : ${euro(quote.quote_price)}`}
-      </p>
 
-      <section className="quote-print__block">
-        <h2>Pièces remplacées</h2>
+      <Section title="Conditions">
+        {quote.payment_terms && <p className="quote-print__mention">Paiement : {quote.payment_terms}</p>}
+        <p className="quote-print__mention">
+          Devis valable jusqu'au {day(quote.valid_until)} ({quote.validity_days} jours) ·{' '}
+          {quote.quote_price === null ? 'Devis gratuit' : `Devis payant : ${euro(quote.quote_price)}`}
+        </p>
+        {config.legal_complaints && <p className="quote-print__mention">Réclamations : {config.legal_complaints}</p>}
+        {config.legal_mediator && <p className="quote-print__mention">Médiation de la consommation : {config.legal_mediator}</p>}
+      </Section>
+
+      <Section title="Pièces remplacées">
         {/* Annexe 2 de l'arrêté du 24 janvier 2017, mot pour mot */}
-        <p>Souhaitez-vous conserver les pièces, éléments ou appareils remplacés ?</p>
-        {quote.keep_parts !== null ? (
-          <p>
-            Réponse du client en ligne le {moment(quote.decided_at)} : {Number(quote.keep_parts) ? 'OUI' : 'NON (décharge)'}.
-          </p>
-        ) : (
-          <p>
-            OUI □ NON □
-            <br />
-            Signature du consommateur précédée de la mention manuscrite " Lu et approuvé ".
-          </p>
-        )}
-      </section>
+        <p className="quote-print__mention">Souhaitez-vous conserver les pièces, éléments ou appareils remplacés ?</p>
+        <p className="quote-print__mention">
+          {quote.keep_parts !== null
+            ? `Réponse du client en ligne le ${moment(quote.decided_at)} : ${Number(quote.keep_parts) ? 'OUI' : 'NON (décharge)'}.`
+            : 'OUI □ NON □   Signature du consommateur précédée de la mention manuscrite " Lu et approuvé ".'}
+        </p>
+      </Section>
 
-      <section className="quote-print__block">
-        <h2>Droit de rétractation</h2>
+      {Number(quote.builder_works) === 1 && (
+        <Section title="Garanties légales des constructeurs">
+          <ul>
+            {BUILDER_GUARANTEES.map((text) => (
+              <li key={text}>{text}</li>
+            ))}
+          </ul>
+          <p>
+            Attestation d'assurance de responsabilité décennale jointe (Code des assurances, art. L243-2) :{' '}
+            <a href={attestationUrl(token)} target="_blank" rel="noopener">
+              consulter l'attestation (PDF)
+            </a>
+          </p>
+        </Section>
+      )}
+
+      <Section title="Droit de rétractation">
         {urgent ? (
           <p>
             Intervention urgente expressément demandée par le client : pas de droit de rétractation (article L221-28 du Code de la
@@ -316,29 +337,9 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
             )}
           </div>
         )}
-      </section>
+        {!urgent && <p className="quote-print__mention">{ONLINE_FORM_NOTICE}</p>}
+      </Section>
 
-      {Number(quote.builder_works) === 1 && (
-        <section className="quote-print__block">
-          <h2>Garanties légales des constructeurs</h2>
-          <ul>
-            {BUILDER_GUARANTEES.map((text) => (
-              <li key={text}>{text}</li>
-            ))}
-          </ul>
-          <p>
-            Attestation d'assurance de responsabilité décennale jointe (Code des assurances, art. L243-2) :{' '}
-            <a href={attestationUrl(token)} target="_blank" rel="noopener">
-              consulter l'attestation (PDF)
-            </a>
-          </p>
-        </section>
-      )}
-
-      {config.legal_complaints && <p className="quote-print__mention">Réclamations : {config.legal_complaints}</p>}
-      {config.legal_mediator && (
-        <p className="quote-print__mention">Médiation de la consommation : {config.legal_mediator}</p>
-      )}
 
       <div className="quote-print__signatures">
         <Signature
@@ -362,13 +363,14 @@ const MandateSheet: React.FC<{ quote: Quote; config: AppConfig; lines: QuoteLine
   const given = quote.debours_mandate !== null ? Number(quote.debours_mandate) === 1 : null;
   return (
     <>
-      <SheetHeader config={config} title="Mandat de débours" reference={`Lié au devis n° ${quote.number}`} />
+      <SheetHeader config={config} title="Mandat de débours" meta={[`Lié au devis n° ${quote.number}`]} />
+      <Parties
+        blocks={[
+          ['Mandant (client)', [quote.client_name, [quote.address, `${quote.postal_code} ${quote.city}`.trim()].filter(Boolean).join(', ')]],
+          ['Mandataire', [config.company_name, legalIdentity(config)]],
+        ]}
+      />
       <section className="quote-print__block">
-        <p>
-          <strong>Mandant (client) :</strong> {quote.client_name}, {[quote.address, `${quote.postal_code} ${quote.city}`.trim()].filter(Boolean).join(', ')}
-          <br />
-          <strong>Mandataire :</strong> {config.company_name}, {legalIdentity(config)}
-        </p>
         <p>
           Je soussigné(e) <strong>{quote.client_name}</strong> donne mandat à <strong>{config.company_name}</strong> d'acheter,{' '}
           <strong>en mon nom et pour mon compte</strong>, les pièces désignées ci-dessous, nécessaires aux travaux du devis n°{' '}
@@ -379,22 +381,17 @@ const MandateSheet: React.FC<{ quote: Quote; config: AppConfig; lines: QuoteLine
       <dl className="quote-print__totals">
         <dt>Montant estimé</dt>
         <dd>{euro(quote.total_debours)}</dd>
-        <dt>
-          <strong>Budget maximum</strong>
-        </dt>
-        <dd>
-          <strong>{budget}</strong>
-        </dd>
+        <dt className="quote-print__total">Budget maximum</dt>
+        <dd className="quote-print__total">{budget}</dd>
       </dl>
-      <section className="quote-print__block">
-        <h2>Conditions</h2>
+      <Section title="Conditions">
         <ul>
           <li>Les pièces sont achetées au nom du mandant : la facture ou le ticket du fournisseur est établi à son nom.</li>
           <li>Le mandant rembourse le montant exact figurant sur le justificatif, sans marge ; une copie du justificatif lui est remise.</li>
           <li>Ces sommes sont des débours : elles ne constituent pas une vente par le mandataire et figurent sur une ligne distincte de la facture.</li>
           <li>Toute dépense au-delà du budget maximum nécessite un nouvel accord du mandant.</li>
         </ul>
-      </section>
+      </Section>
       <div className="quote-print__signatures">
         <Signature
           label="Bon pour mandat (mandant)"
@@ -406,14 +403,21 @@ const MandateSheet: React.FC<{ quote: Quote; config: AppConfig; lines: QuoteLine
   );
 };
 
+/** Zone « Commandé le / reçu le » : identique à `LegalTexts::withdrawalFormDates`. */
+const withdrawalFormDates = (quote: Quote) =>
+  quote.decided_at
+    ? `commandé le ${day(quote.decided_at)}${Number(quote.sale) && quote.goods_received_at ? `, reçu le ${day(quote.goods_received_at)}` : ''}`
+    : '';
+
 /**
  * Formulaire type de rétractation : annexe à l'article R221-1 du Code de la consommation (modifiée par le
  * décret n° 2022-424), reproduite mot pour mot (docs/legal/fr/textes/code-consommation.md). Seules les
- * zones prévues par le modèle sont complétées : coordonnées du professionnel et contrat visé.
+ * zones prévues par le modèle sont complétées : coordonnées du professionnel, contrat visé, dates, nom et
+ * adresse du client ; signature et date restent au client.
  */
 const WithdrawalFormSheet: React.FC<{ quote: Quote; config: AppConfig }> = ({ quote, config }) => (
   <>
-    <SheetHeader config={config} title="Formulaire de rétractation" reference={`Devis n° ${quote.number}`} />
+    <SheetHeader config={config} title="Formulaire de rétractation" meta={[`Devis n° ${quote.number}`]} />
     <section className="quote-print__block quote-print__form">
       <p>
         <strong>MODÈLE DE FORMULAIRE DE RÉTRACTATION</strong>
@@ -427,19 +431,23 @@ const WithdrawalFormSheet: React.FC<{ quote: Quote; config: AppConfig }> = ({ qu
         Je/nous (*) vous notifie/notifions (*) par la présente ma/notre (*) rétractation du contrat portant sur la vente du bien (*)/pour la
         prestation de services (*) ci-dessous :
       </p>
-      <p className="quote-print__field">
+      <p className="quote-print__field quote-print__field--contract">
         Devis n° {quote.number}
         {quote.title ? ` — ${quote.title}` : ''}
       </p>
-      <p className="quote-print__field">Commandé le (*)/reçu le (*) : {quote.decided_at ? day(quote.decided_at) : ''}</p>
-      <p className="quote-print__field">Nom du (des) consommateur(s) :</p>
-      <p className="quote-print__field">Adresse du (des) consommateur(s) :</p>
+      {/* Zones préremplies comme le PDF (QuotePdf::withdrawalForm) : le client vérifie, signe et date */}
+      <p className="quote-print__field">Commandé le (*)/reçu le (*) : {withdrawalFormDates(quote)}</p>
+      <p className="quote-print__field">Nom du (des) consommateur(s) : {quote.client_name}</p>
+      <p className="quote-print__field">
+        Adresse du (des) consommateur(s) : {[quote.address, `${quote.postal_code} ${quote.city}`.trim()].filter(Boolean).join(', ')}
+      </p>
       <p className="quote-print__field">Signature du (des) consommateur(s) (uniquement en cas de notification du présent formulaire sur papier) :</p>
       <p className="quote-print__field">Date :</p>
       <p>(*) Rayez la mention inutile.</p>
     </section>
-    {/* Information sur le formulaire prérempli en ligne (écart 13), hors du modèle réglementaire */}
-    <p className="quote-print__mention">{ONLINE_FORM_NOTICE}</p>
+    {/* Information sur le formulaire prérempli en ligne (écart 13), hors du modèle réglementaire ; comme le
+        PDF, seulement après l'accord (la fonction en ligne n'est utilisable qu'à partir de là) */}
+    {quote.decided_at && <p className="quote-print__mention">{ONLINE_FORM_NOTICE}</p>}
   </>
 );
 

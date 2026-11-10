@@ -21,6 +21,10 @@ class QuoteNotifier
     {
         // Devis et mandat de débours en PDF, attestation d'assurance décennale (C. assur. L243-2)
         $attachments = self::documents($quote, $config);
+        // Formulaire type avant le contrat (L221-5, 7°), hors urgence
+        if ($form = self::withdrawalFormAttachment($quote, $config)) {
+            $attachments[] = $form;
+        }
         if ((int)$quote['builder_works'] && ($attestation = InsuranceAttestation::attachment())) {
             $attachments[] = $attestation;
         }
@@ -83,16 +87,21 @@ class QuoteNotifier
             filter_var($client, FILTER_VALIDATE_EMAIL) ? $client : null, $attachment);
     }
 
-    /** Formulaire type remplissable joint à l'exemplaire du contrat (L221-9), sauf intervention urgente. */
+    /**
+     * Formulaire type remplissable, sauf intervention urgente : joint à l'envoi du devis (information
+     * précontractuelle, L221-5 7°) puis à l'exemplaire du contrat (L221-9), prérempli de la date d'accord
+     * et accompagné du lien vers le formulaire en ligne (utilisable seulement après l'accord).
+     */
     private static function withdrawalFormAttachment(array $quote, array $config): ?array
     {
-        if ($quote['status'] !== 'accepted' || (int)$quote['urgent']) {
+        if (!in_array($quote['status'], ['sent', 'accepted'], true) || (int)$quote['urgent']) {
             return null;
         }
+        $online = $quote['status'] === 'accepted' ? EmailTemplates::quoteWithdrawalUrl($quote) : null;
         return [
             'filename' => 'formulaire-retractation-' . $quote['number'] . '.pdf',
             'mime'     => 'application/pdf',
-            'content'  => QuotePdf::withdrawalForm($quote, $config, EmailTemplates::quoteWithdrawalUrl($quote)),
+            'content'  => QuotePdf::withdrawalForm($quote, $config, $online),
         ];
     }
 

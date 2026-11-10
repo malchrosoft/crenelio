@@ -20,7 +20,10 @@ require_once __DIR__ . '/Config.php';
 class Quote
 {
     /** Types de ligne ; `supply` (achat-revente) n'est accepté que si `quote_allow_supply` vaut 1. */
-    public const KINDS = ['labour', 'service', 'travel', 'debours', 'supply'];
+    public const KINDS = ['labour', 'service', 'travel', 'debours', 'supply', 'discount'];
+
+    /** Désignation par défaut des lignes qui n'en attendent pas (identique à `DEFAULT_LINE_LABELS`, quoteRules.ts). */
+    public const DEFAULT_LABELS = ['labour' => "Main-d'œuvre", 'travel' => 'Frais de déplacement', 'discount' => 'Remise exceptionnelle'];
 
     /** Devis avec le statut de son rendez-vous (prestation exécutée : L221-28 1°). */
     private const SELECT = 'SELECT q.*, a.status AS appointment_status
@@ -128,15 +131,20 @@ class Quote
             if ($kind === 'supply' && !$allowSupply) {
                 return "Ligne $n : la revente de fournitures est désactivée (achat-revente). Utilisez une pièce achetée au nom du client.";
             }
-            $line['label'] = trim((string)($line['label'] ?? ''));
+            $line['label'] = trim((string)($line['label'] ?? '')) ?: (self::DEFAULT_LABELS[$kind] ?? '');
             if ($line['label'] === '') {
                 return "Ligne $n : la désignation est obligatoire.";
             }
             if (!is_numeric($line['quantity'] ?? null) || (float)$line['quantity'] <= 0) {
                 return "Ligne $n : quantité invalide.";
             }
-            if (!is_numeric($line['unit_price'] ?? null) || (float)$line['unit_price'] < 0) {
+            if (!is_numeric($line['unit_price'] ?? null) || ($kind !== 'discount' && (float)$line['unit_price'] < 0)) {
                 return "Ligne $n : prix invalide.";
+            }
+            // Remise : montant déduit des prestations (prix unitaire négatif), HT et au taux de TVA choisi
+            if ($kind === 'discount') {
+                $line['unit_price'] = -abs((float)$line['unit_price']);
+                $line['quantity'] = 1;
             }
             $rate = (float)($line['vat_rate'] ?? 0);
             if ($vatMode === 'franchise' || $kind === 'debours') {
@@ -149,6 +157,9 @@ class Quote
         }
         unset($line);
         $data['lines'] = array_values($lines);
+        if (self::totals($data['lines'])['total_ht'] < 0) {
+            return 'Les remises dépassent le montant des prestations.';
+        }
         $data['urgent'] = !empty($data['urgent']);
 
         // Client professionnel : raison sociale et SIREN (9 chiffres) ou SIRET (14), facultatifs

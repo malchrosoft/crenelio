@@ -1,14 +1,39 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowSquareOutIcon, DownloadSimpleIcon, PaperPlaneTiltIcon, PlusIcon, PrinterIcon, TrashIcon, WarningIcon, XIcon } from '@phosphor-icons/react';
-import { format, parseISO } from 'date-fns';
+import { addDays, format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../../api';
-import { AppConfig, Quote, QuoteLine, QuoteLineKind, QuoteNotification, QuotePayload } from '../../types';
+import { AppConfig, Quote, QuoteLine, QuoteLineKind, QuoteNotification, QuotePayload, Service } from '../../types';
 import ConfirmDialog from './ConfirmDialog';
 import FieldHelp from './FieldHelp';
 import { FieldHelpKey } from '../../config/fieldHelp';
-import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, EXACT_TIME_COUNTING, billedHours, euro, isHourly, lineAmount, newLine, quoteTotals, supplyVatCheck, timeCountingText, vatRates } from './quoteRules';
+import {
+  DEFAULT_EXECUTION_DAYS,
+  DEFAULT_LINE_LABELS,
+  EXACT_TIME_COUNTING,
+  LINE_KIND_LABELS,
+  PART_UNITS,
+  PAYMENT_TERMS_OPTIONS,
+  QUOTE_STATUS_LABELS,
+  billedHours,
+  countingConfig,
+  duplicateGroups,
+  euro,
+  evaluate,
+  executionDateText,
+  executionDelayText,
+  fixedUnit,
+  isHourly,
+  lineAmount,
+  newLine,
+  parseExecution,
+  quoteTotals,
+  supplyVatCheck,
+  timeCountingOptions,
+  timeCountingText,
+  vatRates,
+} from './quoteRules';
 
 interface QuoteEditorProps {
   /** Devis existant ; `null` : nouveau brouillon (créé au premier enregistrement). */
@@ -82,6 +107,8 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
           ...EMPTY,
           validity_days: Number(config.quote_validity_days || 30),
           payment_terms: config.quote_payment_terms || null,
+          // Hors urgence : après le délai de rétractation (cf. DEFAULT_EXECUTION_DAYS)
+          execution_terms: executionDateText(addDays(new Date(), DEFAULT_EXECUTION_DAYS)),
           time_counting: timeCountingText(config) || null,
           quote_price: Number(config.quote_default_price || 0) > 0 ? Number(config.quote_default_price) : null,
         },
@@ -119,8 +146,56 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
   const addDiagnostic = () =>
     set('lines', [
       ...form.lines,
-      { ...newLine('labour', config, vatMode), label: 'Diagnostic et recherche de panne', quantity: billedHours('0h1', config, rounded) ?? 1 },
+      { ...newLine('labour', config, vatMode), label: 'Diagnostic et recherche de panne', quantity: billedHours('0h1', countingConfig(config, form.time_counting), rounded) ?? 1 },
     ]);
+  // Catalogue : désignation et prix d'un forfait ; prestation de référence pour le déplacement
+  const [services, setServices] = useState<Service[]>([]);
+  useEffect(() => {
+    api.listServices().then(setServices).catch(() => setServices([]));
+  }, []);
+  const serviceNamed = (label: string) => services.find((s) => s.name.trim().toLowerCase() === label.trim().toLowerCase());
+
+  /** Déplacement prérempli : frais de la prestation du devis (catalogue) pour l'adresse d'intervention. */
+  async function addTravel() {
+    const line = newLine('travel', config, vatMode);
+    const service = form.lines.map((l) => (l.kind === 'service' ? serviceNamed(l.label) : undefined)).find(Boolean) ?? services[0];
+    set('lines', [...form.lines, line]);
+    if (!service) return;
+    try {
+      const q = encodeURIComponent(`${form.address} ${form.postal_code} ${form.city}`.trim());
+      const geo = q ? await fetch(`https://api-adresse.data.gouv.fr/search/?q=${q}&limit=1`).then((r) => r.json()) : null;
+      const [lon, lat] = geo?.features?.[0]?.geometry?.coordinates ?? [];
+      const fee = await api.quoteTravelFee(service.id, lat !== undefined ? [lat, lon] : null);
+      const label = fee.distance_km !== null ? `Frais de déplacement (${String(fee.distance_km).replace('.', ',')} km)` : '';
+      setForm((prev) => ({
+        ...prev,
+        lines: prev.lines.map((l) => (l === line ? { ...l, label, unit_price: fee.travel_fee } : l)),
+      }));
+    } catch {
+      // Frais non calculables (adresse inconnue) : ligne laissée à saisir
+    }
+  }
+
+  /** Remise saisie en « 10 % » : pourcentage des prestations HT hors remises ; sinon montant. */
+  const discountAmount = (input: string) => {
+    const percent = /^\s*([\d.,]+)\s*%\s*$/.exec(input);
+    if (!percent) return evaluate(input);
+    const base = form.lines.filter((l) => l.kind !== 'debours' && l.kind !== 'discount').reduce((sum, l) => sum + lineAmount(l), 0);
+    const rate = evaluate(percent[1]);
+    return rate === null ? null : Math.round(base * rate) / 100;
+  };
+
+  const duplicates = useMemo(() => duplicateGroups(form.lines), [form.lines]);
+  /** Fusionne un groupe de doublons (même prix et même taux) : quantités additionnées sur la première ligne. */
+  const mergeGroup = (group: number[]) =>
+    set(
+      'lines',
+      form.lines
+        .map((line, i) => (i === group[0] ? { ...line, quantity: group.reduce((sum, j) => sum + Number(form.lines[j].quantity), 0) } : line))
+        .filter((_, i) => !group.slice(1).includes(i)),
+    );
+  const dropDuplicates = (group: number[]) => set('lines', form.lines.filter((_, i) => !group.slice(1).includes(i)));
+
   const toggleLabour = (on: boolean) => {
     setLabour(on);
     if (!on) setForm((prev) => ({ ...prev, lines: prev.lines.filter((line) => line.kind !== 'labour'), time_counting: null }));
@@ -217,10 +292,15 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
               <input
                 className="form-input"
                 aria-label="Désignation"
-                required
-                placeholder={line.kind === 'debours' ? 'Pièce, référence' : 'Désignation'}
+                // Main-d'œuvre, déplacement, remise : désignation facultative (libellé du type par défaut)
+                required={!DEFAULT_LINE_LABELS[line.kind]}
+                placeholder={DEFAULT_LINE_LABELS[line.kind] ?? (line.kind === 'debours' ? 'Pièce, référence' : line.kind === 'service' ? 'Prestation du catalogue ou désignation libre' : 'Désignation')}
+                list={line.kind === 'service' ? 'quote-catalogue' : undefined}
                 value={line.label}
-                onChange={(e) => setLine(index, { label: e.target.value })}
+                onChange={(e) => {
+                  const service = line.kind === 'service' ? serviceNamed(e.target.value) : undefined;
+                  setLine(index, service ? { label: service.name, unit_price: Number(service.price) } : { label: e.target.value });
+                }}
               />
               {line.kind === 'labour' && line.unit === 'h' ? (
                 // Temps passé : « 1h20 » ou « 80 min », converti en heures arrondies selon le décompte réglé
@@ -233,37 +313,61 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                   value={line.quantity}
                   onChange={(e) => setLine(index, { quantity: e.target.value })}
                   onBlur={(e) => {
-                    const hours = billedHours(e.target.value, config, rounded);
+                    const hours = billedHours(e.target.value, countingConfig(config, form.time_counting), rounded);
                     if (hours !== null) setLine(index, { quantity: hours });
                   }}
                 />
+              ) : line.kind === 'discount' ? (
+                <span className="quote-lines__na" role="cell">
+                  1
+                </span>
               ) : (
                 <input
                   className="form-input"
-                  aria-label="Quantité"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
+                  aria-label="Quantité (calcul possible : 120/3)"
+                  title="Nombre ou calcul (120/3, 2*1,5)"
+                  inputMode="decimal"
                   required
                   value={line.quantity}
                   onChange={(e) => setLine(index, { quantity: e.target.value })}
+                  onBlur={(e) => {
+                    const value = evaluate(e.target.value);
+                    if (value !== null) setLine(index, { quantity: value });
+                  }}
                 />
+              )}
+              {fixedUnit(line.kind, config) ? (
+                <span className="quote-lines__unit" role="cell" title={line.unit === 'h' ? "Prix unitaire à l'heure" : undefined}>
+                  {line.unit}
+                </span>
+              ) : (
+                <select className="form-input" aria-label="Unité" value={line.unit} onChange={(e) => setLine(index, { unit: e.target.value })}>
+                  {[...new Set([...PART_UNITS, line.unit])].map((unit) => (
+                    <option key={unit} value={unit}>
+                      {unit}
+                    </option>
+                  ))}
+                </select>
               )}
               <input
                 className="form-input"
-                aria-label="Unité"
-                value={line.unit}
-                onChange={(e) => setLine(index, { unit: e.target.value })}
-              />
-              <input
-                className="form-input"
-                aria-label="Prix unitaire"
-                type="number"
-                min="0"
-                step="0.01"
+                aria-label={line.kind === 'discount' ? 'Remise (montant ou pourcentage : 10 %)' : line.unit === 'h' ? 'Prix unitaire à l’heure' : 'Prix unitaire (calcul possible : 120/3)'}
+                title={
+                  line.kind === 'discount'
+                    ? 'Montant déduit (50) ou pourcentage des prestations (10 %)'
+                    : line.unit === 'h'
+                      ? 'Prix à l’heure ; nombre ou calcul (120/3)'
+                      : 'Nombre ou calcul (120/3, 2*45,5)'
+                }
+                placeholder={line.unit === 'h' ? '€/h' : undefined}
+                inputMode="decimal"
                 required
                 value={line.unit_price}
                 onChange={(e) => setLine(index, { unit_price: e.target.value })}
+                onBlur={(e) => {
+                  const value = line.kind === 'discount' ? discountAmount(e.target.value) : evaluate(e.target.value);
+                  if (value !== null) setLine(index, { unit_price: line.kind === 'discount' ? -Math.abs(value) : Math.max(value, 0) });
+                }}
               />
               {vatMode === 'vat' &&
                 (line.kind === 'debours' ? (
@@ -486,7 +590,7 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
             {!locked && (
               <div className="quote-editor__add">
                 {([...(labour ? ['labour'] : []), 'service', 'travel', ...(allowSupply ? ['supply'] : [])] as QuoteLineKind[]).map((kind) => (
-                  <button key={kind} type="button" className="btn btn-secondary admin-btn-sm" onClick={() => addLine(kind)}>
+                  <button key={kind} type="button" className="btn btn-secondary admin-btn-sm" onClick={() => (kind === 'travel' ? addTravel() : addLine(kind))}>
                     <PlusIcon size={14} weight="bold" aria-hidden="true" />
                     {LINE_KIND_LABELS[kind]}
                   </button>
@@ -497,8 +601,39 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
                     Diagnostic
                   </button>
                 )}
+                <button type="button" className="btn btn-secondary admin-btn-sm" onClick={() => addLine('discount')}>
+                  <PlusIcon size={14} weight="bold" aria-hidden="true" />
+                  {LINE_KIND_LABELS.discount}
+                </button>
               </div>
             )}
+            <datalist id="quote-catalogue">
+              {services.map((s) => (
+                <option key={s.id} value={s.name} />
+              ))}
+            </datalist>
+            {!locked &&
+              duplicates.map((group) => {
+                const [first, ...others] = group.map((i) => form.lines[i]);
+                const mergeable = others.every((l) => Number(l.unit_price) === Number(first.unit_price) && Number(l.vat_rate) === Number(first.vat_rate) && l.unit === first.unit);
+                return (
+                  <p className="quote-editor__vat-check" key={group.join('-')}>
+                    <WarningIcon size={16} weight="fill" aria-hidden="true" />
+                    <span>
+                      {group.length} lignes « {LINE_KIND_LABELS[first.kind]} — {first.label || DEFAULT_LINE_LABELS[first.kind]} » en double.{' '}
+                      {mergeable ? 'Fusionner additionne les quantités.' : 'Prix, unité ou TVA différents : fusion impossible, gardez une ligne ou modifiez les désignations.'}
+                    </span>
+                    {mergeable && (
+                      <button type="button" className="btn btn-secondary admin-btn-sm" onClick={() => mergeGroup(group)}>
+                        Fusionner
+                      </button>
+                    )}
+                    <button type="button" className="btn btn-secondary admin-btn-sm" onClick={() => dropDuplicates(group)}>
+                      Garder la première
+                    </button>
+                  </p>
+                );
+              })}
 
             {supplyVat && (
               <p className="quote-editor__vat-check">
@@ -574,30 +709,28 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
           <fieldset className="quote-editor__section" disabled={locked}>
             <legend>Conditions</legend>
             <div className="quote-editor__grid">
-              <Field
-                id="quote-execution"
-                help="execution_terms"
-                label="Date ou délai d'exécution"
-                value={form.execution_terms ?? ''}
-                onChange={(v) => set('execution_terms', v || null)}
-                hint="Obligatoire avant l'envoi (C. consom. L221-5, 3°). Ex. : « Le 12/11/2026 à 9h00 », « Sous 15 jours »."
-              />
-              <Field
+              <ExecutionField value={form.execution_terms} urgent={form.urgent} onChange={(v) => set('execution_terms', v)} />
+              <ChoiceField
                 id="quote-payment"
                 help="payment_terms"
                 label="Modalités de paiement"
+                options={[...new Set([config.quote_payment_terms, ...PAYMENT_TERMS_OPTIONS].filter((o): o is string => Boolean(o)))]}
                 value={form.payment_terms ?? ''}
                 onChange={(v) => set('payment_terms', v || null)}
                 hint="Obligatoire avant l'envoi (R221-2, 4°) : moment et moyens de paiement."
               />
               {form.lines.some((line) => line.kind === 'labour') && (
-                <Field
+                <ChoiceField
                   id="quote-time-counting"
-                help="time_counting"
+                  help="time_counting"
                   label="Décompte du temps estimé"
+                  options={timeCountingOptions(config)}
                   value={form.time_counting ?? ''}
-                  onChange={(v) => set('time_counting', v || null)}
-                  hint="Arrêté du 24 janvier 2017, art. 2. Ex. : « Temps décompté par quart d'heure entamé »."
+                  onChange={(v) => {
+                    set('time_counting', v || null);
+                    setRounded(v !== EXACT_TIME_COUNTING);
+                  }}
+                  hint="Arrêté du 24 janvier 2017, art. 2."
                 />
               )}
             </div>
@@ -712,6 +845,116 @@ const Field: React.FC<{
     {hint && <p className="form-hint">{hint}</p>}
   </div>
 );
+
+/** Liste de formules usuelles, ou « Autre » pour écrire librement (valeur existante hors liste comprise). */
+const ChoiceField: React.FC<{
+  id: string;
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
+  hint?: string;
+  help?: FieldHelpKey;
+}> = ({ id, label, options, value, onChange, hint, help }) => {
+  const [free, setFree] = useState(value !== '' && !options.includes(value));
+  return (
+    <div className="form-group">
+      <div className="form-label-row">
+        <label className="form-label" htmlFor={id}>
+          {label}
+        </label>
+        {help && <FieldHelp topic={help} />}
+      </div>
+      <select
+        id={id}
+        className="form-input"
+        value={free ? '__free' : value}
+        onChange={(e) => {
+          setFree(e.target.value === '__free');
+          if (e.target.value !== '__free') onChange(e.target.value);
+        }}
+      >
+        <option value="">—</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+        <option value="__free">Autre (saisie libre)…</option>
+      </select>
+      {free && <input className="form-input" aria-label={`${label} (saisie libre)`} value={value} onChange={(e) => onChange(e.target.value)} />}
+      {hint && <p className="form-hint">{hint}</p>}
+    </div>
+  );
+};
+
+/**
+ * Date ou délai d'exécution (L221-5 3°) : une date, ou « sous n jours » à compter de l'acceptation.
+ * Urgence : aujourd'hui ; sinon 15 jours, après le délai de rétractation (DEFAULT_EXECUTION_DAYS).
+ */
+const ExecutionField: React.FC<{ value: string | null; urgent: boolean; onChange: (value: string | null) => void }> = ({ value, urgent, onChange }) => {
+  const parsed = parseExecution(value);
+  const [mode, setMode] = useState(parsed.mode);
+  const defaultDays = urgent ? 0 : DEFAULT_EXECUTION_DAYS;
+  const switchTo = (next: typeof mode) => {
+    setMode(next);
+    if (next === 'date') onChange(executionDateText(addDays(new Date(), defaultDays)));
+    if (next === 'delay') onChange(executionDelayText(urgent ? 1 : DEFAULT_EXECUTION_DAYS));
+  };
+  // L'urgence change la date par défaut tant qu'elle n'a pas été modifiée
+  const [lastUrgent, setLastUrgent] = useState(urgent);
+  if (lastUrgent !== urgent) {
+    setLastUrgent(urgent);
+    if (mode === 'date' && value === executionDateText(addDays(new Date(), urgent ? DEFAULT_EXECUTION_DAYS : 0))) {
+      onChange(executionDateText(addDays(new Date(), defaultDays)));
+    }
+  }
+  return (
+    <div className="form-group">
+      <div className="form-label-row">
+        <span className="form-label">Date ou délai d'exécution</span>
+        <FieldHelp topic="execution_terms" />
+      </div>
+      <div className="quote-editor__execution" role="group" aria-label="Date ou délai d'exécution">
+        <select className="form-input form-input--compact" aria-label="Type" value={mode} onChange={(e) => switchTo(e.target.value as typeof mode)}>
+          <option value="date">Date</option>
+          <option value="delay">Délai</option>
+          <option value="free">Autre</option>
+        </select>
+        {mode === 'date' && (
+          <input
+            type="date"
+            className="form-input"
+            aria-label="Date d'exécution"
+            value={parsed.date ?? ''}
+            onChange={(e) => onChange(e.target.value ? executionDateText(parseISO(e.target.value)) : null)}
+          />
+        )}
+        {mode === 'delay' && (
+          <>
+            <span>Sous</span>
+            <input
+              type="number"
+              min="1"
+              className="form-input form-input--compact"
+              aria-label="Nombre de jours"
+              value={parsed.days ?? ''}
+              onChange={(e) => onChange(e.target.value ? executionDelayText(Number(e.target.value)) : null)}
+            />
+            <span>jours à compter de l'acceptation</span>
+          </>
+        )}
+        {mode === 'free' && (
+          <input className="form-input" aria-label="Date ou délai (texte libre)" value={value ?? ''} onChange={(e) => onChange(e.target.value || null)} />
+        )}
+      </div>
+      <p className="form-hint">
+        Obligatoire avant l'envoi (C. consom. L221-5, 3°).{' '}
+        {urgent ? 'Intervention urgente : exécution immédiate possible.' : "Hors urgence, 15 jours par défaut : l'exécution ne commence pas pendant le délai de rétractation de 14 jours, sauf demande expresse du client."}
+      </p>
+    </div>
+  );
+};
 
 /** Rappels à l'artisan pour les pièces achetées au nom du client (docs/legal/fr/rappels-artisan.md). */
 const DeboursReminder: React.FC<{ budget: number }> = ({ budget }) => (
