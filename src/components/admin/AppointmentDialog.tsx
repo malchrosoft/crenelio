@@ -4,7 +4,8 @@ import { CheckIcon, EnvelopeSimpleIcon, EraserIcon, FileTextIcon, ReceiptIcon, X
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../../api';
-import { Appointment } from '../../types';
+import { Appointment, Quote } from '../../types';
+import { QUOTE_STATUS_LABELS } from './quoteRules';
 import { formatEuro } from '../../utils/format';
 import { ANONYMIZED_NAME } from '../../utils/privacy';
 import ConfirmDialog from './ConfirmDialog';
@@ -23,8 +24,10 @@ interface AppointmentDialogProps {
   onChanged: (appointment: Appointment) => void;
   onEmails: (appointment: Appointment) => void;
   onAnonymize: (appointment: Appointment) => void;
-  /** Devis prérempli depuis ce rendez-vous (prestation, déplacement), ouvert dans l'écran « Devis ». */
+  /** Nouveau devis prérempli depuis ce rendez-vous (prestation, déplacement), ouvert dans l'écran « Devis ». */
   onQuote?: (appointment: Appointment) => void;
+  /** Ouvre un devis existant du rendez-vous dans l'écran « Devis ». */
+  onOpenQuote?: (id: number) => void;
   quoteError?: string | null;
   /** Fiche « Préparer la facture » (intervention terminée), si l'artisan facture avec son logiciel. */
   onInvoice?: (appointment: Appointment) => void;
@@ -50,13 +53,22 @@ const toInput = (sql: string) => format(parseISO(sql.replace(' ', 'T')), "yyyy-M
  * valident ensemble en bas de la fenêtre (récapitulatif, « Prévenir le client ») ; ne pas prévenir le
  * client d'une annulation ou d'un déplacement demande une confirmation.
  */
-const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onClose, onChanged, onEmails, onAnonymize, onQuote, quoteError, onInvoice, initialStatus }) => {
+const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onClose, onChanged, onEmails, onAnonymize, onQuote, onOpenQuote, quoteError, onInvoice, initialStatus }) => {
   const [datetime, setDatetime] = useState(toInput(appointment.start_datetime));
   const [status, setStatus] = useState<Appointment['status']>(initialStatus ?? appointment.status);
   const [reason, setReason] = useState('');
   const [otherReason, setOtherReason] = useState(false);
   const [notify, setNotify] = useState(true);
   const [confirmSilent, setConfirmSilent] = useState(false);
+  // Devis du rendez-vous (écart 16 de la recette) : listés pour être ouverts, plutôt qu'un nouveau brouillon à chaque fois
+  const [quotes, setQuotes] = useState<Quote[] | null>(null);
+  useEffect(() => {
+    if (!onQuote) return;
+    api
+      .listQuotes()
+      .then((all) => setQuotes(all.filter((q) => q.appointment_id === appointment.id)))
+      .catch(() => setQuotes([]));
+  }, [appointment.id, onQuote]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -280,15 +292,38 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onCl
               </p>
             )}
 
+            {quotes && quotes.length > 0 && (
+              <div className="appointment-dialog__quotes">
+                <p className="appointment-dialog__review-title">Devis de ce rendez-vous</p>
+                <ul>
+                  {quotes.map((q) => {
+                    const when = q.decided_at ?? q.sent_at ?? q.created_at;
+                    return (
+                      <li key={q.id}>
+                        <span>
+                          {q.number ?? 'Brouillon'} · <strong>{QUOTE_STATUS_LABELS[q.status]}</strong>
+                          {when && ` le ${format(parseISO(when.replace(' ', 'T')), 'dd/MM/yyyy')}`} · {formatEuro(Number(q.total_ttc))}
+                        </span>
+                        {onOpenQuote && (
+                          <button type="button" className="btn btn-secondary admin-btn-sm" onClick={() => onOpenQuote(q.id)}>
+                            Ouvrir
+                          </button>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
             {quoteError && <p className="form-alert-error">{quoteError}</p>}
 
             <div className="admin-modal__actions">
               {onQuote && !anonymized && (
-                <button type="button" className="btn btn-secondary" onClick={() => onQuote(a)}>
-                  <FileTextIcon size={16} weight="bold" aria-hidden="true" />
-                  Devis
-                </button>
-              )}
+              <button type="button" className="btn btn-secondary" onClick={() => onQuote(a)}>
+                <FileTextIcon size={16} weight="bold" aria-hidden="true" />
+                {quotes?.length ? 'Nouveau devis' : 'Devis'}
+              </button>
+            )}
               {onInvoice && a.status === 'completed' && (
                 <button type="button" className="btn btn-secondary" onClick={() => onInvoice(a)}>
                   <ReceiptIcon size={16} weight="bold" aria-hidden="true" />

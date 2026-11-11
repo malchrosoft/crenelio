@@ -755,6 +755,11 @@ export const AdminDashboard: React.FC = () => {
               setQuoteError(err instanceof Error ? err.message : 'Création du devis impossible');
             }
           }}
+          onOpenQuote={(id) => {
+            setOpenedId(null);
+            setOpenQuoteId(id);
+            setActiveTab('quotes');
+          }}
           quoteError={quoteError}
           onInvoice={invoicing ? (appointment) => {
             setOpenedId(null);

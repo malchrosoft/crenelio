@@ -4459,3 +4459,26 @@ $data-grid-status-width: 13em;
   padding-top: $space-sm;
   border-top: 1px solid $gray-200;
 }
+
+// Avertissement L221-10 en tête de « Préparer la facture »
+.invoice-prep__cooling-off {
+  display: flex;
+  gap: $space-xs;
+  align-items: flex-start;
+
+  svg { flex-shrink: 0; margin-top: 2px; }
+}
+
+// Devis d'un rendez-vous, listés dans sa fenêtre
+.appointment-dialog__quotes {
+  margin-top: $space-sm;
+
+  ul { display: grid; gap: $space-2xs; margin: $space-2xs 0 0; padding: 0; list-style: none; }
+  li { display: flex; align-items: center; justify-content: space-between; gap: $space-sm; }
+}
+
+// Valeur du devis accepté sous une ligne modifiée (Préparer la facture)
+.invoice-prep__quoted {
+  display: block;
+  color: $gray-500;
+}

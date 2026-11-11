@@ -309,7 +309,7 @@ class EmailTemplates
      *
      * @return array{subject: string, html: string, text: string}
      */
-    public static function cancellationPro(array $appointment, array $config, bool $byClient = true): array
+    public static function cancellationPro(array $appointment, array $config, bool $byClient = true, ?string $rescheduledAt = null): array
     {
         $company = $config['company_name'] ?? 'Crénelio';
         $when = sprintf('%s à %s', self::formatDate($appointment['start_datetime']), self::formatTime($appointment['start_datetime']));
@@ -320,15 +320,22 @@ class EmailTemplates
             self::escape($appointment['client_name']),
             self::escape($when)
         );
+        // Annulation qui suit un déplacement annoncé au client : le nouvel horaire ne lui convenait sans doute pas
+        if ($rescheduledAt !== null) {
+            $intro .= sprintf(
+                ' Cette annulation fait suite au déplacement du rendez-vous que vous lui avez annoncé le %s : le nouvel horaire ne lui convenait peut-être pas.',
+                self::escape(self::formatDate($rescheduledAt))
+            );
+        }
         $rows = self::summaryRows($appointment);
         if (!empty($appointment['cancellation_reason'])) {
             $rows['Motif'] = self::escape($appointment['cancellation_reason']);
         }
         $outro = self::AGENDA_SYNC_NOTE;
-        $title = $byClient ? 'Rendez-vous annulé par le client' : 'Annulation enregistrée';
+        $title = $byClient ? ($rescheduledAt !== null ? 'Annulation après déplacement' : 'Rendez-vous annulé par le client') : 'Annulation enregistrée';
 
         return [
-            'subject' => sprintf('Annulation : %s, %s', $appointment['client_name'], $when),
+            'subject' => sprintf($rescheduledAt !== null ? 'Annulation après déplacement : %s, %s' : 'Annulation : %s, %s', $appointment['client_name'], $when),
             'html'    => self::layout($company, $title, $intro, $rows, $outro, null, $config),
             'text'    => self::plainText($title, $intro, $rows, $outro, null, $config),
         ];

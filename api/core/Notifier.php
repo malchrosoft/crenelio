@@ -119,7 +119,7 @@ class Notifier
                 'cancellation_pro',
                 $proEmail,
                 (string)($config['pro_name'] ?? ''),
-                EmailTemplates::cancellationPro($appointment, $config, $byClient),
+                EmailTemplates::cancellationPro($appointment, $config, $byClient, $byClient ? self::lastRescheduleNotice((int)$appointment['id']) : null),
                 self::calendarFile($appointment, $config, 'pro')
             );
         }
@@ -296,5 +296,20 @@ class Notifier
 
             return ['type' => $type, 'status' => 'failed'];
         }
+    }
+
+    /**
+     * Date du dernier déplacement annoncé au client (email `reschedule_client` envoyé), null sinon : une
+     * annulation par le client qui suit un déplacement est signalée au professionnel comme un refus probable
+     * du nouvel horaire (recette, écart 5).
+     */
+    private static function lastRescheduleNotice(int $appointmentId): ?string
+    {
+        foreach (Notification::forAppointment($appointmentId) as $notification) {
+            if ($notification['type'] === 'reschedule_client' && $notification['status'] === 'sent') {
+                return (string)$notification['created_at'];
+            }
+        }
+        return null;
     }
 }

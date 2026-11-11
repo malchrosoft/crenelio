@@ -111,6 +111,64 @@ class SlotEngine
         return false;
     }
 
+    /**
+     * Raison pour laquelle `$startDatetime` n'est pas un créneau proposé (mêmes règles que `forDate` ; la
+     * plus significative d'abord), null s'il l'est. Affichée au professionnel qui déplace un rendez-vous.
+     */
+    public static function unavailableReason(array $service, string $startDatetime, array $config, ?int $excludeId = null): ?string
+    {
+        if (self::isAvailable($service, $startDatetime, $config, $excludeId)) {
+            return null;
+        }
+        $settings = self::settings($config);
+        $start = strtotime($startDatetime);
+        $date = date('Y-m-d', $start);
+        $today = strtotime(date('Y-m-d'));
+        if (strtotime($date) < $today) {
+            return 'date passée';
+        }
+        if (strtotime($date) > strtotime("+{$settings['max_advance']} days", $today)) {
+            return "au-delà de l'horizon de réservation ({$settings['max_advance']} jours)";
+        }
+        $schedule = Schedule::getByDay((int)date('N', $start));
+        $ranges = $schedule && $schedule['is_active'] ? self::ranges($schedule) : [];
+        if (!$ranges) {
+            return 'jour fermé';
+        }
+        $duration = (int)$service['duration_minutes'];
+        $minutes = (int)date('G', $start) * 60 + (int)date('i', $start);
+        $range = null;
+        foreach ($ranges as $candidate) {
+            if ($minutes >= $candidate[0] && $minutes + $duration <= $candidate[1]) {
+                $range = $candidate;
+            }
+        }
+        if ($range === null) {
+            return "hors des horaires d'ouverture (prestation de $duration min)";
+        }
+        if ($start < time() + $settings['notice'] * 3600) {
+            return "délai minimal de réservation non respecté ({$settings['notice']} h)";
+        }
+        $end = $start + $duration * 60;
+        foreach (Unavailability::getForRange("$date 00:00:00", "$date 23:59:59") as $period) {
+            if (self::overlaps($start, $end, [$period], 0)) {
+                return 'indisponibilité « ' . $period['title'] . ' »';
+            }
+        }
+        $buffer = $settings['buffer'];
+        foreach (Appointment::getOverlapping(date('Y-m-d H:i:s', $start - $buffer * 60), date('Y-m-d H:i:s', $end + $buffer * 60), $excludeId) as $other) {
+            return sprintf(
+                'chevauche le rendez-vous de %s à %s (temps de trajet de %d min compris)',
+                $other['client_name'], date('H:i', strtotime($other['start_datetime'])), $buffer
+            );
+        }
+        // En dernier : une heure libre hors de la grille n'est qu'une question de présentation en ligne
+        if (($minutes - $range[0]) % $settings['step'] !== 0) {
+            return "heure hors de la grille des créneaux proposés en ligne (toutes les {$settings['step']} min)";
+        }
+        return 'créneau non proposé';
+    }
+
     /** Plages de travail [début, fin] en minutes depuis minuit (matin puis après-midi). */
     private static function ranges(array $schedule): array
     {

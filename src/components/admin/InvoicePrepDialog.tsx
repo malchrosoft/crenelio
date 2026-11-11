@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CheckIcon, CopyIcon, WarningIcon, XIcon } from '@phosphor-icons/react';
-import { format, parseISO } from 'date-fns';
+import { addDays, format, isAfter, parseISO, startOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../../api';
 import { AppConfig, Appointment, Quote, QuoteLine } from '../../types';
@@ -101,6 +101,13 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
     return { ht, tva, ttc: ht + tva, debours: deb, total: ht + tva + deb };
   }, [services, debours, vat]);
   const budget = quote?.debours_budget ? Number(quote.debours_budget) : null;
+  // Premier jour où un paiement est possible pour un contrat hors établissement (L221-10) : le lendemain du
+  // septième jour suivant l'accord, par prudence ; null hors délai, sans accord, ou pour une urgence (4°)
+  const coolingOff = useMemo(() => {
+    if (!quote?.decided_at || quote.status !== 'accepted' || Number(quote.urgent)) return null;
+    const firstDay = addDays(startOfDay(parseISO(quote.decided_at.replace(' ', 'T'))), 8);
+    return isAfter(firstDay, new Date()) ? firstDay : null;
+  }, [quote]);
 
   const a = appointment;
   const clientAddress = [a.address, `${a.postal_code} ${a.city}`.trim()].filter(Boolean).join(', ');
@@ -171,6 +178,18 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
             <p>Chargement…</p>
           ) : (
             <>
+              {coolingOff && (
+                // Contrat hors établissement (C. consom. L221-1 2° a et b, L221-10) : Crénelio ne sait pas où le
+                // devis a été conclu ; avertissement daté tant que les sept jours ne sont pas écoulés
+                <p className="form-alert-error invoice-prep__cooling-off" role="alert">
+                  <WarningIcon size={16} weight="fill" aria-hidden="true" />
+                  <span>
+                    <strong>Aucun paiement ni acompte avant le {format(coolingOff, 'dd/MM/yyyy')}</strong> si ce devis a été conclu au
+                    domicile du client, ou accepté en ligne juste après votre visite : contrat hors établissement, sept jours à
+                    compter de l'accord du {day(quote!.decided_at!)} (C. consom. L221-1 et L221-10).
+                  </span>
+                </p>
+              )}
               <p className="form-hint">
                 Établissez la facture dans votre logiciel : copiez chaque valeur ou l'ensemble. Source :{' '}
                 {quote
@@ -202,7 +221,15 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
                 {lines.map((line, index) =>
                   line.debours ? null : (
                     <li key={`s-${index}`} className={line.hours !== undefined ? 'invoice-prep__timed' : undefined}>
-                      <span>{lineText(line)}</span>
+                      <span>
+                        {lineText(line)}
+                        {/* Valeur du devis accepté, quand le temps réellement passé la modifie */}
+                        {line.hours !== undefined && line.quantity !== line.hours && (
+                          <small className="invoice-prep__quoted">
+                            Devis : {String(line.hours).replace('.', ',')} h, soit {euro(Math.round(line.hours * line.unitPrice * 100) / 100)}
+                          </small>
+                        )}
+                      </span>
                       {line.hours !== undefined && (
                         // Temps réellement passé (« 1h20 », « 80 min » ou heures), arrondi selon le décompte réglé
                         <input
@@ -225,7 +252,8 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
               </ul>
               {lines.some((line) => line.hours !== undefined && line.quantity > line.hours) && (
                 <p className="form-hint">
-                  <WarningIcon size={14} weight="fill" aria-hidden="true" /> Temps passé supérieur au temps estimé sur le devis accepté.
+                  <WarningIcon size={14} weight="fill" aria-hidden="true" /> Temps passé supérieur au temps estimé sur le devis accepté
+                  (valeurs du devis indiquées sous chaque ligne modifiée ; total du devis : {euro(Number(quote?.total_ttc ?? 0))}).
                 </p>
               )}
               <p className="invoice-prep__total">
