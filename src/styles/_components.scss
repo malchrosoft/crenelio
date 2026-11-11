@@ -2450,6 +2450,13 @@ $admin-sidebar-collapsed: 68px;
     text-transform: uppercase;
   }
 
+  // Mode « Tous » : PDF de chaque document en tête de sa feuille (masqué à l'impression)
+  .quote-print__sheet-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: $space-sm;
+  }
+
   .quote-print__logo {
     display: block;
     width: auto;
@@ -2548,7 +2555,8 @@ $admin-sidebar-collapsed: 68px;
     max-width: none;
     padding: 0;
 
-    .quote-print__toolbar { display: none; }
+    .quote-print__toolbar,
+    .quote-print__sheet-actions { display: none; }
 
     .quote-print__sheet {
       margin: 0;

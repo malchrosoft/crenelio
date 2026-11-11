@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ArrowLeftIcon, PrinterIcon } from '@phosphor-icons/react';
+import { ArrowLeftIcon, DownloadSimpleIcon, PrinterIcon } from '@phosphor-icons/react';
 import { api } from '../api';
 import { AppConfig, Quote, QuoteLine } from '../types';
 import { LINE_KIND_LABELS, euro, lineAmount } from '../components/admin/quoteRules';
@@ -37,6 +37,9 @@ const QuotePrintPage: React.FC<QuotePrintPageProps> = ({ config }) => {
   const [params, setParams] = useSearchParams();
   const [quote, setQuote] = useState<Quote | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Ouverte dans un nouvel onglet (Espace Artisan) : rien à quoi revenir, il suffit de fermer l'onglet.
+  // Évalué à l'ouverture : changer de document ne crée pas d'historique (`replace`)
+  const [standalone] = useState(() => window.history.length <= 1);
 
   useEffect(() => {
     api
@@ -50,12 +53,25 @@ const QuotePrintPage: React.FC<QuotePrintPageProps> = ({ config }) => {
   const available: DocId[] = ['devis', ...(debours.length ? (['mandat'] as DocId[]) : []), ...(urgent ? [] : (['retractation'] as DocId[]))];
   const requested = params.get('doc');
   const docs: DocId[] = requested && available.includes(requested as DocId) ? [requested as DocId] : available;
+  /** PDF généré par le serveur (logo, couleurs du thème) ; formulaire seulement pour un devis envoyé ou accepté. */
+  const pdfUrl = (doc: DocId) =>
+    doc === 'retractation' && !['sent', 'accepted', 'withdrawn'].includes(quote?.status ?? '')
+      ? null
+      : `/api/quotes/token/${token}/${doc === 'devis' ? 'devis' : doc === 'mandat' ? 'mandat' : 'formulaire'}.pdf`;
+  const pdfLink = (doc: DocId) => {
+    const url = pdfUrl(doc);
+    return url ? (
+      <a className="btn btn-secondary" href={url}>
+        <DownloadSimpleIcon size={16} weight="bold" aria-hidden="true" />
+        Télécharger en PDF
+      </a>
+    ) : null;
+  };
 
   return (
     <div className="quote-print">
       <div className="quote-print__toolbar">
-        {/* Ouverte dans un nouvel onglet (Espace Artisan) : rien à quoi revenir, il suffit de fermer l'onglet */}
-        {window.history.length > 1 && (
+        {!standalone && (
           <Link to={`/devis/${token}`} className="booking-page-header__back">
             <ArrowLeftIcon size={18} weight="bold" />
             Retour au devis
@@ -67,26 +83,17 @@ const QuotePrintPage: React.FC<QuotePrintPageProps> = ({ config }) => {
               key={doc ?? 'all'}
               type="button"
               className={`btn admin-btn-sm ${(doc === null ? !requested : requested === doc) ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setParams(doc ? { doc } : {})}
+              onClick={() => setParams(doc ? { doc } : {}, { replace: true })}
             >
               {doc ? DOC_LABELS[doc] : 'Tous'}
             </button>
           ))}
         </div>
-        {/* PDF générés par le serveur (logo, couleurs du thème) pour le document affiché */}
-        {quote && docs.length === 1 && docs[0] !== 'retractation' && (
-          <a className="btn btn-secondary" href={`/api/quotes/token/${token}/${docs[0] === 'devis' ? 'devis' : 'mandat'}.pdf`}>
-            Télécharger en PDF
-          </a>
-        )}
-        {quote && docs.length === 1 && docs[0] === 'retractation' && (
-          <a className="btn btn-secondary" href={`/api/quotes/token/${token}/formulaire.pdf`}>
-            Télécharger en PDF
-          </a>
-        )}
+        {/* Un seul document : son PDF ici ; tous : un bouton en tête de chacun */}
+        {quote && docs.length === 1 && pdfLink(docs[0])}
         <button type="button" className="btn btn-primary" onClick={() => window.print()} disabled={!quote}>
           <PrinterIcon size={18} weight="fill" aria-hidden="true" />
-          Imprimer / PDF
+          Imprimer
         </button>
       </div>
 
@@ -96,6 +103,7 @@ const QuotePrintPage: React.FC<QuotePrintPageProps> = ({ config }) => {
       {quote &&
         docs.map((doc) => (
           <article className="quote-print__sheet" key={doc}>
+            {docs.length > 1 && pdfUrl(doc) && <div className="quote-print__sheet-actions">{pdfLink(doc)}</div>}
             {doc === 'devis' && <QuoteSheet quote={quote} config={config} token={token} />}
             {doc === 'mandat' && <MandateSheet quote={quote} config={config} lines={debours} />}
             {doc === 'retractation' && <WithdrawalFormSheet quote={quote} config={config} />}

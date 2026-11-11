@@ -17,14 +17,14 @@ noté) · ❌ échec · 🔁 corrigé depuis, à rejouer · ⏭️ volontairemen
 
 | Partie | ✅ Validé | ⚠️ Réserve | ❌ Échec | 🔁 À rejouer | ⏭️ Écarté | ⬜ À jouer |
 |---|---|---|---|---|---|---|
-| 1. Prise de rendez-vous | 5 | — | — | — | 1 | 3 |
+| 1. Prise de rendez-vous | 7 | — | — | — | 1 | 1 |
 | 2. Annulation et déplacement d'un rendez-vous | 10 | — | — | — | — | 1 |
-| 3. Devis : préparation et envoi | 5 | 2 | — | — | — | 3 |
-| 4. Devis : réponse du client | 6 | — | — | — | — | 3 |
+| 3. Devis : préparation et envoi | 7 | 2 | — | — | — | 1 |
+| 4. Devis : réponse du client | 7 | — | — | — | — | 2 |
 | 5. Rétractation | 3 | — | — | — | — | 3 |
 | 6. Croisements rendez-vous / devis | — | 1 | — | — | — | 4 |
 | 7. Après l'intervention | — | 1 | — | — | — | 3 |
-| **Total** | **29** | **4** | **0** | **0** | **1** | **20** |
+| **Total** | **34** | **4** | **0** | **0** | **1** | **15** |
 
 **Écarts à traiter** (tous notés dans `ROADMAP.md`, Item 22) :
 
@@ -43,6 +43,8 @@ noté) · ❌ échec · 🔁 corrigé depuis, à rejouer · ⏭️ volontairemen
 | 11 | Tous | Rendez-vous, calendrier, indisponibilités et devis ne se rafraîchissent pas : une réservation en ligne n'apparaît qu'après rechargement de la page (12/11) | Bouton « Actualiser » dans la barre de chaque grille et du calendrier, et rechargement automatique au retour sur l'onglet et à intervalle raisonnable ; tableau de bord : bouton en bout de ligne de l'en-tête |
 | 12 | Tableau de bord | Cartes des jours : au plus 2 par ligne (12/11) | Grille à 2 colonnes maximum |
 | 13 | 2.3 | Motif d'annulation du pro en saisie libre seulement (12/11) | Liste de motifs prédéfinis (empêchement, pièce indisponible, accès impossible, demande du client…) et « Autre » |
+| 14 | 3.7 | Écran Entreprise : la case « garanties des constructeurs » est séparée de ce qui en dépend (attestation, n° d'assurance) (12/11) | Regrouper la case et ses éléments dépendants dans un même bloc, affichés quand la case est cochée |
+| 15 | 3.9 | ✅ corrigé le 12/11. Version imprimable : « Retour au devis » réapparaissait en changeant de document ; « Imprimer / PDF » trompeur ; aucun PDF proposé en mode « Tous » | Changement de document sans historique, « Imprimer », bouton PDF en tête de chaque document en mode « Tous » |
 
 **Reste à jouer :** avec le pro : 1.6, 1.7, 2.9 (après l'écart 1), 2.11, 3.7, 3.9, 4.4, 7.2 à 7.4 ; avec
 accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5. Outils de la recette
@@ -69,8 +71,8 @@ accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5
 | 1.3 | Hors zone | Adresse au-delà du rayon / commune non desservie | Proposition de demande exceptionnelle ; envoi → RDV `pending` ; email pro avec liens accepter / refuser ; email client « demande reçue » || ✅ 11/11 : Puteaux (9,5 km, commune non desservie) ; Cergy (29,6 km) sans demande possible |
 | 1.4 | Hors zone accepté (lien) | Lien « accepter » de l'email pro | RDV `confirmed` ; emails de confirmation client et pro (comme 1.1) ; lien réutilisé → « déjà traitée » || ✅ 11/11 : `confirmed`, emails de confirmation ; lien rejoué → 404 |
 | 1.5 | Hors zone refusé (lien) | Lien « refuser » | RDV `cancelled`, motif « Demande hors zone refusée » ; email de refus au client || ✅ 11/11 : `cancelled` avec motif, email « non retenue » |
-| 1.6 | Hors zone décidé depuis le planning | Statut changé dans la fenêtre du RDV, case « Prévenir le client » cochée puis décochée | Même résultat que 1.4 / 1.5 ; décochée : aucun email au client | |
-| 1.7 | RDV saisi par le pro | Espace Artisan → nouveau rendez-vous (heure libre, hors zone admis) | RDV créé avec position ; emails selon le choix | |
+| 1.6 | Hors zone décidé depuis le planning | Statut changé dans la fenêtre du RDV, case « Prévenir le client » cochée puis décochée | Même résultat que 1.4 / 1.5 ; décochée : aucun email au client | ✅ 12/11 : demande confirmée depuis la fenêtre → confirmations client et pro (`.ics`) ; demande annulée depuis la liste (option « Actions sur chaque ligne ») sans prévenir → aucun email au client |
+| 1.7 | RDV saisi par le pro | Espace Artisan → nouveau rendez-vous (heure libre, hors zone admis) | RDV créé avec position ; emails selon le choix | ✅ 12/11 : téléphone obligatoire (voulu) ; RDV confirmé avec position et frais, emails client et pro |
 | 1.8 | Anti-abus | Plus de réservations que la limite depuis une même IP | 429 « Trop de tentatives » ; rien d'enregistré || ⏭️ non joué (bloquerait le poste) |
 | 1.9 | Sans envoi d'emails | `MAIL_FROM` vide (ou Mailpit arrêté) | Réservation enregistrée malgré tout ; tentatives `failed` avec motif dans le journal | |
 
@@ -100,9 +102,9 @@ accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5
 | 3.4 | Doublons | Deux lignes même type et même désignation | Avertissement ; « Fusionner » (même prix) / « Garder la première » || ⚠️ 11/11 : doublon main-d'œuvre signalé ; deux déplacements de désignations différentes non signalés (écart 6) |
 | 3.5 | Remise excessive | Remise supérieure aux prestations | Enregistrement refusé || ⚠️ 11/11 : refusé, message trop discret (écart 7) |
 | 3.6 | Envoi incomplet | Envoyer sans exécution ni paiement | Envoi refusé avec le motif || ✅ 11/11 : envoi refusé (écart 8 : choix « — » dans la liste) |
-| 3.7 | Garanties des constructeurs | Case cochée sans attestation valide, puis avec | Refusé, puis envoyé avec l'attestation jointe | |
+| 3.7 | Garanties des constructeurs | Case cochée sans attestation valide, puis avec | Refusé, puis envoyé avec l'attestation jointe | ✅ 12/11 : envoi refusé sans attestation (« Déposez une attestation d'assurance décennale en cours de validité… (C. assur. L243-2) ») ; après dépôt, attestation jointe à l'email, garanties rappelées, attestation consultable en ligne (écart 14 : écran Entreprise) |
 | 3.8 | Envoi | Envoyer | Numéro attribué ; devis non modifiable ; email client avec devis PDF, mandat PDF (si débours), **formulaire type de rétractation** (hors urgence), lien `/devis/:token` || ✅ 11/11 : devis, mandat et formulaire joints, mention dans l'email |
-| 3.9 | Versions imprimables | Depuis l'Espace Artisan (nouvel onglet) | Mise en page identique au PDF ; logo ; pas de « Retour au devis » ; formulaire prérempli (nom, adresse, contrat) | |
+| 3.9 | Versions imprimables | Depuis l'Espace Artisan (nouvel onglet) | Mise en page identique au PDF ; logo ; pas de « Retour au devis » ; formulaire prérempli (nom, adresse, contrat) | ✅ 12/11 après correction : « Retour au devis » réapparaissait en changeant de document, « Imprimer / PDF » trompeur, pas de PDF en mode « Tous » → corrigés (écart 15) |
 | 3.10 | Devis urgent | Case urgence cochée | Ni formulaire ni information de rétractation : mention de l'absence de droit (L221-28) ; exécution « aujourd'hui » par défaut || ✅ 11/11 : aucun formulaire joint, PDF du formulaire en 404 |
 
 ## 4. Devis : réponse du client
@@ -112,7 +114,7 @@ accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5
 | 4.1 | Acceptation simple | Page du devis : pièces OUI/NON, reconnaissance du droit de rétractation, accepter | `accepted` ; email client = exemplaire du contrat (PDF, formulaire prérempli « commandé le », lien en ligne) ; email pro || ✅ 11/11 : exemplaire au client (devis, mandat, formulaire), avis au pro ; délai jusqu'au 25/11 |
 | 4.2 | Acceptation incomplète | Accepter sans répondre sur les pièces / sans reconnaître le droit | Refus avec le motif || ✅ 11/11 : refus sans réponse sur les pièces, puis sans reconnaissance du droit |
 | 4.3 | Mandat de débours donné | Devis avec débours : « je donne ce mandat » | Mandat enregistré ; PDF du mandat avec la trace ; « Préparer la facture » reprend les débours || ✅ 11/11 |
-| 4.4 | Mandat refusé | « Je fournis moi-même les pièces » | Devis accepté sans débours ; la fiche facture n'en reprend aucun | |
+| 4.4 | Mandat refusé | « Je fournis moi-même les pièces » | Devis accepté sans débours ; la fiche facture n'en reprend aucun | ✅ 12/11 : accepté avec mandat refusé ; exemplaire « Refusé : vous fournissez les pièces », avis au pro ; PDF du mandat portant le refus |
 | 4.5 | Exécution anticipée | Case « je demande expressément… » cochée | Mention dans l'exemplaire et le PDF || ✅ 11/11 |
 | 4.6 | Refus | Refuser (motif facultatif) | `refused` ; accusé au client « aucune somme due » ; avis au pro || ✅ 11/11 : accusé au client, avis au pro (RDV resté confirmé : écart 9) |
 | 4.7 | Seconde réponse | Rejouer accepter/refuser | « Déjà reçu une réponse » || ✅ 11/11 : 409 |
