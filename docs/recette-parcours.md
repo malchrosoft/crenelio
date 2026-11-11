@@ -4,9 +4,9 @@ Liste des cas à dérouler de bout en bout avant une mise en ligne ou après une
 ou 33. Établie le 11/11/2026 d'après le code (statuts, routes, emails). Cocher chaque cas, noter l'écart
 constaté dans la colonne « Résultat ».
 
-## Bilan de la recette du 11/11/2026 (en cours)
+## Bilan de la recette du 11/11/2026 (terminée)
 
-Au 11/11 : 31 cas joués, 26 validés, 4 avec réserves, 1 en échec (2.4, corrigé le 11/11 avec 2.3 : à rejouer) ; aucune erreur de calcul ni email manquant. Recette mixte : actions du client jouées par
+Recette terminée le 11/11 : 54 cas, 44 validés, 9 avec réserve (écarts notés), 1 écarté (1.8), aucun échec restant ; aucune erreur de calcul ni email manquant. Recette mixte : actions du client jouées par
 l'API publique et Mailpit, actions du professionnel dans l'Espace Artisan. Données « Recette … » (clients
 `recette-…@example.test`, RDV 22 à 28, devis D-2026-0003 à 0006) laissées en base locale.
 
@@ -19,12 +19,12 @@ noté) · ❌ échec · 🔁 corrigé depuis, à rejouer · ⏭️ volontairemen
 |---|---|---|---|---|---|---|
 | 1. Prise de rendez-vous | 8 | — | — | — | 1 | — |
 | 2. Annulation et déplacement d'un rendez-vous | 11 | — | — | — | — | — |
-| 3. Devis : préparation et envoi | 7 | 2 | — | — | — | 1 |
+| 3. Devis : préparation et envoi | 8 | 2 | — | — | — | — |
 | 4. Devis : réponse du client | 9 | — | — | — | — | — |
 | 5. Rétractation | 6 | — | — | — | — | — |
 | 6. Croisements rendez-vous / devis | — | 5 | — | — | — | — |
-| 7. Après l'intervention | 1 | 2 | — | — | — | 1 |
-| **Total** | **42** | **9** | **0** | **0** | **1** | **2** |
+| 7. Après l'intervention | 2 | 2 | — | — | — | — |
+| **Total** | **44** | **9** | **0** | **0** | **1** | **0** |
 
 **Écarts à traiter** (tous notés dans `ROADMAP.md`, Item 22) :
 
@@ -48,12 +48,10 @@ noté) · ❌ échec · 🔁 corrigé depuis, à rejouer · ⏭️ volontairemen
 | 16 | 7.2 | Le bouton « Devis » d'un rendez-vous crée toujours un nouveau brouillon, même s'il a déjà un devis (11/11) | Afficher dans la fenêtre du rendez-vous ses devis (numéro, statut, date), chacun ouvrable, et un bouton « Nouveau devis » distinct |
 | 17 | 7.2 | Rappel des sept jours sans paiement (L221-10) noyé en fin d'encadré, sans date (11/11) | Avertissement en tête de « Préparer la facture » tant que sept jours ne sont pas écoulés depuis l'accord (hors urgence), avec la date : « si le devis a été conclu au domicile du client, ou accepté en ligne juste après votre visite, aucun paiement avant le jj/mm » (L221-1 2° a et b) |
 | 18 | 7.3 | Noms des exports non datés (`clients.csv`, `clients-indy.csv`) (11/11) | Date inversée et application en préfixe pour tous les exports : `aaaa-mm-jj_crenelio_export_clients.csv`, `…_export_interventions_<début>_<fin>.csv`, exports des grilles |
-| 19 | 7.4 | « Effacer le client » possible sur un RDV à venir non annulé, sans avertissement ; devis accepté anonymisé avec lui (11/11) | Avertir (ou proposer d'annuler d'abord) si le RDV est à venir et non annulé ; vérifier dans les textes officiels ce qu'il faut conserver d'un contrat (RGPD art. 17, 3 ; conservation des contrats et des factures) avant d'anonymiser un devis accepté |
+| 19 | 7.4 | « Effacer le client » possible sur un RDV à venir non annulé, sans avertissement ; devis accepté anonymisé avec lui, preuves d'accord (IP) comprises, sans que le message de confirmation le dise (11/11) | Avertir (ou proposer d'annuler d'abord) si le RDV est à venir et non annulé ; vérifier dans les textes officiels ce qu'il faut conserver d'un contrat (RGPD art. 17, 3 ; conservation des contrats et des factures) avant d'anonymiser un devis accepté |
 | 20 | 6.3 | Déplacer un RDV ne touche pas la date d'exécution de son devis (11/11) | À l'enregistrement du déplacement, signaler le devis lié ; devis envoyé : proposer un nouveau devis à la nouvelle date qui remplace le précédent ; devis accepté : accord du client nécessaire (à confirmer dans les textes) |
 
-**Reste à jouer :** avec le pro : 1.6, 1.7, 2.9 (après l'écart 1), 2.11, 3.7, 3.9, 4.4, 7.2 à 7.4 ; avec
-accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5. Outils de la recette
-(appels API, lecture Mailpit) : scripts `/tmp/recette/*.mts`, non versionnés, à recréer si besoin.
+Outils de la recette (appels API, lecture Mailpit) : scripts `/tmp/recette/*.mts`, non versionnés, à recréer si besoin.
 
 ## Préparation
 
@@ -102,7 +100,7 @@ accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5
 | N° | Cas | Étapes | Attendu | Résultat |
 |---|---|---|---|---|
 | 3.1 | Devis depuis un RDV | Fenêtre du RDV → créer un devis | Client, adresse, prestation, déplacement et date d'exécution repris | ✅ 11/11 (prestation, déplacement, exécution « Le 19/11/2026 à 08h30 ») |
-| 3.2 | Devis libre | Devis → nouveau | Validité, prix du devis, paiement, décompte et exécution (date à J+15) préremplis depuis les réglages | |
+| 3.2 | Devis libre | Devis → nouveau | Validité, prix du devis, paiement, décompte et exécution (date à J+15) préremplis depuis les réglages | ✅ 11/11 : exécution à J+15 (26/11), validité 15 jours, paiement présélectionné, décompte affiché avec une ligne de main-d'œuvre ; enregistrement impossible sans client (Item 43 : fichier clients) |
 | 3.3 | Lignes | Main-d'œuvre « 1h20 », forfait du catalogue, déplacement (prérempli selon prestation et distance), remise « 10 % », pièce en débours, calcul « 120/3 » | Arrondi selon le décompte ; prix du catalogue ; frais calculés ; remise négative ; totaux justes (débours hors total) | ✅ 11/11 : 1h20 → 1,5 h ; remise 10 % = −36,80 € ; 120/3 → 40 € ; total 331,20 € |
 | 3.4 | Doublons | Deux lignes même type et même désignation | Avertissement ; « Fusionner » (même prix) / « Garder la première » | ⚠️ 11/11 : doublon main-d'œuvre signalé ; deux déplacements de désignations différentes non signalés (écart 6) |
 | 3.5 | Remise excessive | Remise supérieure aux prestations | Enregistrement refusé | ⚠️ 11/11 : refusé, message trop discret (écart 7) |
@@ -154,4 +152,4 @@ accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5
 | 7.1 | Préparer la facture | RDV terminé, devis accepté | Valeurs à copier ; temps réellement passé (« 2h05 ») recalculé ; avertissement si au-delà de l'estimation ; débours au montant exact | ⚠️ 11/11 : recalcul et avertissement OK ; valeurs du devis non visibles (écart 10) |
 | 7.2 | Sept jours (hors établissement) | Devis signé au domicile | Rappel : aucun paiement avant sept jours (L221-10) | ⚠️ 11/11 : rappel L221-10 présent mais noyé en fin d'encadré, sans date (écart 17) |
 | 7.3 | Exports | Exports CSV clients et interventions | Fichiers complets, sans donnée inattendue | ✅ 11/11 : exports complets (écart 18 : nom des fichiers) |
-| 7.4 | RGPD | Effacer un client ; purge des RDV expirés | Données anonymisées partout (RDV, devis, journaux) | ⏸️ 11/11 : suspendu avant l'effacement (RDV à venir non annulé) ; conditions de l'effacement à revoir (écart 19) |
+| 7.4 | RGPD | Effacer un client ; purge des RDV expirés | Données anonymisées partout (RDV, devis, journaux) | ✅ 11/11 (RDV passé et terminé) : RDV, devis D-2026-0003 et journaux anonymisés, montants et commune conservés ; le message ne dit pas que le devis accepté et ses preuves d'accord (IP) sont effacés aussi (écart 19) |

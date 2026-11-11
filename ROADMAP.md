@@ -602,6 +602,14 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Source :** `sql/schema.sql` fait foi ; le rapport en est tiré, à régénérer à chaque évolution notable du schéma.
 - **Prérequis :** Item 22 terminé.
 
+### 43. Fichier Clients (Fiche, Historique, Accès du Client)
+- **Demandé le 11/11/2026** (recette, cas 3.2) : aujourd'hui, le client n'existe qu'à travers ses rendez-vous et ses devis (coordonnées recopiées sur chacun) ; aucun moyen de retrouver un client existant ni de voir son historique.
+- **Création :** un client est créé à la première réservation ou au premier devis s'il n'existe pas ; reconnu ensuite (email, téléphone) pour lui rattacher rendez-vous et devis, sans doublon.
+- **Recherche :** retrouver un client existant à la création d'un rendez-vous ou d'un devis (nom, email, téléphone, adresse), coordonnées préremplies.
+- **Historique :** pour le professionnel, fiche du client (rendez-vous, devis, réponses, emails) ; pour le client, consultation de son propre historique (lien sécurisé, sans compte à créer de préférence).
+- **RGPD (Item 5) :** données limitées au nécessaire, conservation et purge appliquées à la fiche, effacement de la fiche et de tout ce qui s'y rattache (cf. écart 19 de la recette : ce qu'un contrat conclu doit conserver), information dans la politique de confidentialité ; aucune donnée sans finalité.
+- **Préalable :** modèle à concevoir (table `clients`, migration des rendez-vous et devis existants), avant l'Item 42.
+
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
 Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légale, blocage de la mise en ligne) puis **le gain** (usage quotidien de l'artisan, effort).
@@ -621,6 +629,7 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 | — | **Item 39** | **Veille & ajustements réglementaires (publicité des prix, assurance, seuils de TVA, conservation)** | Conformité | ⏳ *À faire* | Item 22 | 🟡 Obligations du devis en ligne à compléter |
 | — | **Item 41** | **Largeur de la vitrine et du pied de page (centrée ou pleine largeur)** | Design / Personnalisation | ⏳ *À faire* | Item 2 ✅ | ⚪ Confort sur grand écran ; réglage du professionnel |
 | — | **Item 42** | **Dossier du modèle de données (rapport PDF : schéma, relations, sens métier, exemples)** | Documentation | ⏳ *À faire* (fin de chantier) | Item 22 | ⚪ Transmission et reprise du projet |
+| — | **Item 43** | **Fichier clients (fiche, recherche, historique pour le pro et le client)** | Espace Artisan / Données | ⏳ *À faire* | Items 5 et 22 | 🟡 Retrouver un client et son historique ; à concevoir avec le RGPD |
 | — | **Item 38** | Menu de l'espace Artisan par catégories, configuration répartie en écrans (Entreprise, Vitrine, Thème, Compte ; créneaux sous Horaires) | Espace Artisan / Navigation | ✅ **Terminé** | — | — |
 | — | **Item 35** | Tableau de bord (jours en cartes, carte du jour numérotée, positions des rendez-vous enregistrées) | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 21** | Liste des interventions AG Grid Community (tri, filtres, sélection, export CSV, disposition enregistrée) ; composant `DataGrid` commun, pleine hauteur desktop/tablette, fenêtre de rendez-vous partagée avec le calendrier, avertissements regroupés dans le header, indisponibilités en grille (sous-onglet de « Horaires ») | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |

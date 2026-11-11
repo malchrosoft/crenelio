@@ -10,26 +10,17 @@
 
 ## 1. Ce qui est réellement achevé
 
-### 🎯 Reprise immédiate (11/11/2026, recette des parcours interrompue)
-- **Où on en est :** recette mixte de `docs/recette-parcours.md` (section « Bilan ») : 31 cas joués,
-  26 validés, 4 avec réserves, 1 en échec (2.4). Les actions client sont jouées par l'API publique et
-  Mailpit (scripts `/tmp/recette/*.mts`, non versionnés : `lib.mts` = appels API + lecture Mailpit,
-  à recréer) ; l'humain fait les actions du professionnel dans l'Espace Artisan (jamais son mot de
-  passe dans la conversation).
-- **Étape 1, à faire en premier — écart 1 (défaut) :** `src/components/admin/AppointmentDialog.tsx:130`
-  enregistre le statut dès le choix dans la liste, et `api.updateAppointmentStatus` n'envoie pas
-  `notify` (l'API l'accepte : `PUT /appointments/:id/status`, `notify: false`). Demande de l'humain :
-  **parcours descendant**, modifications (statut, déplacement) puis « Prévenir le client » et bouton
-  **« Valider »** en fin de formulaire ; écart 2 : confirmation explicite (ou motif) avant d'annuler
-  sans prévenir.
-- **Étape 2 — finir la recette :** 2.9 (déplacement silencieux, après l'écart 1), 1.6, 1.7, 2.11, 3.7,
-  3.9, 4.4, 7.2 à 7.4 avec l'humain ; 4.8, 4.9, 5.2, 5.6 demandent de vieillir des dates en base
-  (**accord de l'humain requis**) ; 1.9 et 5.5 à part.
-- **Ensuite :** écarts 3 à 10 (`ROADMAP.md`, Item 22, point 17) ; écart 9 (RDV resté confirmé après
-  refus du devis ou rétractation) à décider avec l'humain.
-- **Données de recette en base locale :** clients « Recette … » (`recette-…@example.test`), RDV 22 à
-  28, devis D-2026-0003 à D-2026-0006 ; état : 25 terminé (devis accepté, exécution anticipée),
-  26 et 27 annulés (devis refusé / rétracté), 28 confirmé (devis urgent accepté).
+### 🎯 Reprise immédiate (recette terminée le 11/11/2026)
+- **Recette :** `docs/recette-parcours.md`, 54 cas : 44 validés, 9 avec réserve, 1 écarté. Écarts 1, 2 et 15
+  corrigés ; **à traiter : écarts 3 à 14 et 16 à 20** (tableau du Bilan, `ROADMAP.md` Item 22 point 17).
+- **À décider avec l'humain avant de coder :** écart 9 et 20 (RDV et devis liés : retirer un devis envoyé,
+  nouveau devis qui remplace l'ancien, accord du client pour un devis accepté) et écart 19 (effacement d'un
+  client : ce qu'un contrat conclu doit conserver) : **lire d'abord les textes officiels** (C. civ. 1113 à
+  1117, 1193 ; RGPD art. 17, 3 ; conservation des contrats) et les ajouter à `docs/legal/`.
+- **Nouvel Item 43 :** fichier clients (fiche, recherche, historique pour le pro et le client, RGPD).
+- **Données de recette** en base locale : clients « Recette … » (`recette-…@example.test`), RDV 22 à 41,
+  devis D-2026-0003 à 0012 environ ; réglage « Revente de fournitures » activé et attestation déposée
+  pour la recette (à remettre selon l'usage réel).
 
 ### Session du 05 au 11/11/2026
 - **Item 40 :** documentation en 15 langues, aide « ? » traduite (`src/config/fieldHelp/<langue>.json`),
