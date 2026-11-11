@@ -23,8 +23,8 @@ noté) · ❌ échec · 🔁 corrigé depuis, à rejouer · ⏭️ volontairemen
 | 4. Devis : réponse du client | 7 | — | — | — | — | 2 |
 | 5. Rétractation | 3 | — | — | — | — | 3 |
 | 6. Croisements rendez-vous / devis | — | 1 | — | — | — | 4 |
-| 7. Après l'intervention | — | 1 | — | — | — | 3 |
-| **Total** | **34** | **4** | **0** | **0** | **1** | **15** |
+| 7. Après l'intervention | 1 | 2 | — | — | — | 1 |
+| **Total** | **35** | **5** | **0** | **0** | **1** | **13** |
 
 **Écarts à traiter** (tous notés dans `ROADMAP.md`, Item 22) :
 
@@ -45,6 +45,10 @@ noté) · ❌ échec · 🔁 corrigé depuis, à rejouer · ⏭️ volontairemen
 | 13 | 2.3 | Motif d'annulation du pro en saisie libre seulement (12/11) | Liste de motifs prédéfinis (empêchement, pièce indisponible, accès impossible, demande du client…) et « Autre » |
 | 14 | 3.7 | Écran Entreprise : la case « garanties des constructeurs » est séparée de ce qui en dépend (attestation, n° d'assurance) (12/11) | Regrouper la case et ses éléments dépendants dans un même bloc, affichés quand la case est cochée |
 | 15 | 3.9 | ✅ corrigé le 12/11. Version imprimable : « Retour au devis » réapparaissait en changeant de document ; « Imprimer / PDF » trompeur ; aucun PDF proposé en mode « Tous » | Changement de document sans historique, « Imprimer », bouton PDF en tête de chaque document en mode « Tous » |
+| 16 | 7.2 | Le bouton « Devis » d'un rendez-vous crée toujours un nouveau brouillon, même s'il a déjà un devis (12/11) | Afficher dans la fenêtre du rendez-vous ses devis (numéro, statut, date), chacun ouvrable, et un bouton « Nouveau devis » distinct |
+| 17 | 7.2 | Rappel des sept jours sans paiement (L221-10) noyé en fin d'encadré, sans date (12/11) | Avertissement en tête de « Préparer la facture » tant que sept jours ne sont pas écoulés depuis l'accord (hors urgence), avec la date : « si le devis a été conclu au domicile du client, ou accepté en ligne juste après votre visite, aucun paiement avant le jj/mm » (L221-1 2° a et b) |
+| 18 | 7.3 | Noms des exports non datés (`clients.csv`, `clients-indy.csv`) (12/11) | Date inversée et application en préfixe pour tous les exports : `aaaa-mm-jj_crenelio_export_clients.csv`, `…_export_interventions_<début>_<fin>.csv`, exports des grilles |
+| 19 | 7.4 | « Effacer le client » possible sur un RDV à venir non annulé, sans avertissement ; devis accepté anonymisé avec lui (12/11) | Avertir (ou proposer d'annuler d'abord) si le RDV est à venir et non annulé ; vérifier dans les textes officiels ce qu'il faut conserver d'un contrat (RGPD art. 17, 3 ; conservation des contrats et des factures) avant d'anonymiser un devis accepté |
 
 **Reste à jouer :** avec le pro : 1.6, 1.7, 2.9 (après l'écart 1), 2.11, 3.7, 3.9, 4.4, 7.2 à 7.4 ; avec
 accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5. Outils de la recette
@@ -147,6 +151,6 @@ accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5
 | N° | Cas | Étapes | Attendu | Résultat |
 |---|---|---|---|---|
 | 7.1 | Préparer la facture | RDV terminé, devis accepté | Valeurs à copier ; temps réellement passé (« 2h05 ») recalculé ; avertissement si au-delà de l'estimation ; débours au montant exact || ⚠️ 11/11 : recalcul et avertissement OK ; valeurs du devis non visibles (écart 10) |
-| 7.2 | Sept jours (hors établissement) | Devis signé au domicile | Rappel : aucun paiement avant sept jours (L221-10) | |
-| 7.3 | Exports | Exports CSV clients et interventions | Fichiers complets, sans donnée inattendue | |
-| 7.4 | RGPD | Effacer un client ; purge des RDV expirés | Données anonymisées partout (RDV, devis, journaux) | |
+| 7.2 | Sept jours (hors établissement) | Devis signé au domicile | Rappel : aucun paiement avant sept jours (L221-10) | ⚠️ 12/11 : rappel L221-10 présent mais noyé en fin d'encadré, sans date (écart 17) |
+| 7.3 | Exports | Exports CSV clients et interventions | Fichiers complets, sans donnée inattendue | ✅ 12/11 : exports complets (écart 18 : nom des fichiers) |
+| 7.4 | RGPD | Effacer un client ; purge des RDV expirés | Données anonymisées partout (RDV, devis, journaux) | ⏸️ 12/11 : suspendu avant l'effacement (RDV à venir non annulé) ; conditions de l'effacement à revoir (écart 19) |
