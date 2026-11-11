@@ -1,14 +1,46 @@
 # 📋 Fiche de Passation & Point d'Avancement — Crénelio
 
-**Date :** 29 Octobre 2026
-**Dépôt :** `/Users/aymeric.malchrowicz/DEVELOPPEMENT/crenelio`
-**Dernier commit :** `6ea2d98` (`main`, **non poussé**, avec `8949682`, `52834fe` et `751caed`) — *liste des interventions AG Grid (Item 21, 1/2)*
+**Date :** 11 Novembre 2026
+**Dépôt :** `malchrosoft/crenelio` (public ; règles du poste dans l'`AGENTS.md` du répertoire parent)
+**Dernier commit :** voir `git log` (`main`) — session du 05 au 11/11/2026, Item 22 et Item 40
 **Statut Git :** commits directs sur `main` (projet solo), sans ligne d'attribution, **uniquement après accord explicite** (cf. `AGENTS.md`, section 6) ; le push reste à l'humain.
-**Non commité :** rien (hors cette fiche).
+**Non commité :** rien.
 
 ---
 
 ## 1. Ce qui est réellement achevé
+
+### 🎯 Reprise immédiate (11/11/2026, recette des parcours interrompue)
+- **Où on en est :** recette mixte de `docs/recette-parcours.md` (section « Bilan ») : 31 cas joués,
+  26 validés, 4 avec réserves, 1 en échec (2.4). Les actions client sont jouées par l'API publique et
+  Mailpit (scripts `/tmp/recette/*.mts`, non versionnés : `lib.mts` = appels API + lecture Mailpit,
+  à recréer) ; l'humain fait les actions du professionnel dans l'Espace Artisan (jamais son mot de
+  passe dans la conversation).
+- **Étape 1, à faire en premier — écart 1 (défaut) :** `src/components/admin/AppointmentDialog.tsx:130`
+  enregistre le statut dès le choix dans la liste, et `api.updateAppointmentStatus` n'envoie pas
+  `notify` (l'API l'accepte : `PUT /appointments/:id/status`, `notify: false`). Demande de l'humain :
+  **parcours descendant**, modifications (statut, déplacement) puis « Prévenir le client » et bouton
+  **« Valider »** en fin de formulaire ; écart 2 : confirmation explicite (ou motif) avant d'annuler
+  sans prévenir.
+- **Étape 2 — finir la recette :** 2.9 (déplacement silencieux, après l'écart 1), 1.6, 1.7, 2.11, 3.7,
+  3.9, 4.4, 7.2 à 7.4 avec l'humain ; 4.8, 4.9, 5.2, 5.6 demandent de vieillir des dates en base
+  (**accord de l'humain requis**) ; 1.9 et 5.5 à part.
+- **Ensuite :** écarts 3 à 10 (`ROADMAP.md`, Item 22, point 17) ; écart 9 (RDV resté confirmé après
+  refus du devis ou rétractation) à décider avec l'humain.
+- **Données de recette en base locale :** clients « Recette … » (`recette-…@example.test`), RDV 22 à
+  28, devis D-2026-0003 à D-2026-0006 ; état : 25 terminé (devis accepté, exécution anticipée),
+  26 et 27 annulés (devis refusé / rétracté), 28 confirmé (devis urgent accepté).
+
+### Session du 05 au 11/11/2026
+- **Item 40 :** documentation en 15 langues, aide « ? » traduite (`src/config/fieldHelp/<langue>.json`),
+  langue préférée partagée, arabe de droite à gauche ; priorité abaissée (rang 10).
+- **Item 22 :** main-d'œuvre au temps passé (arrondi, minimum, « 1h20 », diagnostic, temps réel dans
+  « Préparer la facture ») ; saisie des lignes (unités fixes, calculs « 120/3 », **remise** `discount`,
+  catalogue, déplacement prérempli, doublons) ; conditions en listes (date ou délai, 15 jours hors
+  urgence) ; version imprimable calquée sur le PDF ; **formulaire type joint à l'envoi du devis**
+  (L221-5 7°) et prérempli ; « Powered by Crénelio » sur les pages en ligne du devis ; aide « ? »
+  consultable sur un devis envoyé. Migrations `2026-11-07_item22_temps_passe`, `2026-11-10_item22_remise`.
+- **Recette :** `docs/recette-parcours.md` (53 cas, résultats et écarts du 11/11).
 
 ### Session du 29/10/2026 (`52834fe` → `6ea2d98`)
 - **Item 27 — Déploiement interactif (`52834fe`) :** `npm run deploy:init` (`scripts/deploy-init.mjs`,
