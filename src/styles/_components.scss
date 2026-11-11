@@ -4203,12 +4203,26 @@ $data-grid-status-width: 13em;
     @include mobile { grid-template-columns: 1fr; }
   }
 
-  .appointment-dialog__reschedule {
+  // Récapitulatif des modifications, validées ensemble (statut, date, prévenir le client)
+  .appointment-dialog__review {
+    display: grid;
+    gap: $space-xs;
+    margin-top: $space-sm;
+    padding: $space-sm;
+    border: 1px solid primary-alpha(30%);
+    border-radius: $radius-sm;
+    background: primary-tint(6%);
+
+    ul { margin: 0; padding-inline-start: $space-md; }
+  }
+
+  .appointment-dialog__review-title { margin: 0; font-weight: 600; }
+
+  .appointment-dialog__review-actions {
     display: flex;
     flex-wrap: wrap;
+    justify-content: flex-end;
     gap: $space-xs;
-
-    .form-input { flex: 1 1 200px; min-width: 0; }
   }
 }
 

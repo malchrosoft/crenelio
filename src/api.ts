@@ -207,8 +207,9 @@ export const api = {
     return request<Appointment[]>('GET', `/appointments${q ? `?${q}` : ''}`);
   },
   getAppointment: (id: number) => request<Appointment>('GET', `/appointments/${id}`),
-  updateAppointmentStatus: (id: number, status: string, reason: string | null = null) =>
-    request<Appointment>('PUT', `/appointments/${id}/status`, { status, reason }),
+  /** `notify: false` : changement silencieux pour le client (annulation, décision d'une demande). */
+  updateAppointmentStatus: (id: number, status: string, reason: string | null = null, notify = true) =>
+    request<Appointment>('PUT', `/appointments/${id}/status`, { status, reason, notify }),
   /** Demande d'effacement (RGPD) : données du client effacées, rendez-vous conservé. */
   /** Position d'un rendez-vous localisé après coup (tableau de bord). */
   locateAppointment: (id: number, latitude: number, longitude: number) =>

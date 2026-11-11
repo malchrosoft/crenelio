@@ -174,6 +174,8 @@ export const AdminDashboard: React.FC = () => {
   const [dateEndFilter, setDateEndFilter] = useState('');
   // Rendez-vous ouvert dans la fenêtre de consultation / modification (calendrier ou liste)
   const [openedId, setOpenedId] = useState<number | null>(null);
+  // Statut proposé à l'ouverture de la fenêtre (choisi dans la liste), à valider
+  const [openedStatus, setOpenedStatus] = useState<Appointment['status'] | undefined>(undefined);
   // Devis à ouvrir dans l'écran « Devis » (créé depuis la fenêtre d'un rendez-vous)
   const [openQuoteId, setOpenQuoteId] = useState<number | null>(null);
   const [quoteError, setQuoteError] = useState<string | null>(null);
@@ -347,7 +349,23 @@ export const AdminDashboard: React.FC = () => {
     applyFavicon(urls.branding_favicon_url);
   }
 
+  /**
+   * Statut choisi dans la liste : une annulation ou la décision d'une demande en attente (le client en est
+   * prévenu) passe par la fenêtre du rendez-vous, à valider ; les autres changements sont enregistrés.
+   */
+  /** Fenêtre d'un rendez-vous ouverte sur son statut actuel. */
+  const openAppointment = (id: number) => {
+    setOpenedStatus(undefined);
+    setOpenedId(id);
+  };
+
   async function handleStatusChange(id: number, newStatus: string) {
+    const current = appointments.find((a) => a.id === id);
+    if (newStatus === 'cancelled' || current?.status === 'pending') {
+      setOpenedStatus(newStatus as Appointment['status']);
+      setOpenedId(id);
+      return;
+    }
     try {
       replaceAppointment(await api.updateAppointmentStatus(id, newStatus));
     } catch (err: unknown) {
@@ -680,9 +698,12 @@ export const AdminDashboard: React.FC = () => {
     >
       {openedId !== null && appointments.some((a) => a.id === openedId) && (
         <AppointmentDialog
+          key={openedId}
           appointment={appointments.find((a) => a.id === openedId)!}
+          initialStatus={openedStatus}
           onClose={() => {
             setOpenedId(null);
+            setOpenedStatus(undefined);
             setQuoteError(null);
           }}
           onChanged={replaceAppointment}
@@ -727,7 +748,7 @@ export const AdminDashboard: React.FC = () => {
           onBack={
             emailsFor.fromDialog
               ? () => {
-                  setOpenedId(emailsFor.appointment.id);
+                  openAppointment(emailsFor.appointment.id);
                   setEmailsFor(null);
                 }
               : undefined
@@ -768,7 +789,7 @@ export const AdminDashboard: React.FC = () => {
           <DashboardOverview
             appointments={appointments}
             config={config}
-            onOpen={(appointment) => setOpenedId(appointment.id)}
+            onOpen={(appointment) => openAppointment(appointment.id)}
             onCreate={(date) => {
               setNewAppointmentDate(date);
               setCreatingAppointment(true);
@@ -783,7 +804,7 @@ export const AdminDashboard: React.FC = () => {
             appointments={appointments}
             onChanged={replaceAppointment}
             // Même fenêtre que depuis la liste : on reste sur le calendrier
-            onOpen={(appointment) => setOpenedId(appointment.id)}
+            onOpen={(appointment) => openAppointment(appointment.id)}
             onCreate={(date) => {
               setNewAppointmentDate(date);
               setCreatingAppointment(true);
@@ -906,7 +927,7 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </>
                 }
-                onOpen={(appointment) => setOpenedId(appointment.id)}
+                onOpen={(appointment) => openAppointment(appointment.id)}
                 onStatusChange={handleStatusChange}
                 onEmails={openNotifications}
                 onAnonymize={setAnonymizing}

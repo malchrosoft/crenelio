@@ -6,16 +6,32 @@ constaté dans la colonne « Résultat ».
 
 ## Bilan de la recette du 11/11/2026 (en cours)
 
-31 cas joués : 26 validés, 4 avec réserves, 1 en échec (2.4) ; aucune erreur de calcul ni email manquant. Recette mixte : actions du client jouées par
+Au 11/11 : 31 cas joués, 26 validés, 4 avec réserves, 1 en échec (2.4, corrigé le 12/11 avec 2.3 : à rejouer) ; aucune erreur de calcul ni email manquant. Recette mixte : actions du client jouées par
 l'API publique et Mailpit, actions du professionnel dans l'Espace Artisan. Données « Recette … » (clients
 `recette-…@example.test`, RDV 22 à 28, devis D-2026-0003 à 0006) laissées en base locale.
+
+### Avancement
+
+Légende de la colonne « Résultat » : ✅ validé par la recette · ⚠️ fonctionne, avec une réserve (écart
+noté) · ❌ échec · 🔁 corrigé depuis, à rejouer · ⏭️ volontairement écarté · vide : à jouer.
+
+| Partie | ✅ Validé | ⚠️ Réserve | ❌ Échec | 🔁 À rejouer | ⏭️ Écarté | ⬜ À jouer |
+|---|---|---|---|---|---|---|
+| 1. Prise de rendez-vous | 5 | — | — | — | 1 | 3 |
+| 2. Annulation et déplacement d'un rendez-vous | 10 | — | — | — | — | 1 |
+| 3. Devis : préparation et envoi | 5 | 2 | — | — | — | 3 |
+| 4. Devis : réponse du client | 6 | — | — | — | — | 3 |
+| 5. Rétractation | 3 | — | — | — | — | 3 |
+| 6. Croisements rendez-vous / devis | — | 1 | — | — | — | 4 |
+| 7. Après l'intervention | — | 1 | — | — | — | 3 |
+| **Total** | **29** | **4** | **0** | **0** | **1** | **20** |
 
 **Écarts à traiter** (tous notés dans `ROADMAP.md`, Item 22) :
 
 | # | Cas | Écart | Piste |
 |---|---|---|---|
-| 1 | 2.3 / 2.4 | **Défaut** : le statut s'enregistre dès le choix dans la liste (`AppointmentDialog.tsx`), sans validation ; « Prévenir le client » n'est pas transmis au changement de statut (client toujours prévenu) | Parcours descendant : modifications, résumé, « Prévenir le client » pour statut et déplacement, bouton « Valider » |
-| 2 | 2.4 | Annuler sans prévenir le client est risqué | Confirmation explicite ou motif obligatoire |
+| 1 | 2.3 / 2.4 | ✅ corrigé et rejoué le 12/11 (2.3, 2.4, 2.9 validés). **Défaut** : le statut s'enregistre dès le choix dans la liste (`AppointmentDialog.tsx`), sans validation ; « Prévenir le client » n'est pas transmis au changement de statut (client toujours prévenu) | Parcours descendant : modifications, résumé, « Prévenir le client » pour statut et déplacement, bouton « Valider » |
+| 2 | 2.4 | ✅ corrigé et rejoué le 12/11 (confirmation). Annuler sans prévenir le client est risqué | Confirmation explicite ou motif obligatoire |
 | 3 | 2.6 | Fond du calendrier sans distinction libre / indisponible | Griser heures fermées, indisponibilités, trajets |
 | 4 | 2.7 | Avertissement générique sur un créneau non proposable | Donner la raison précise (fermé, indisponibilité, délai minimal, chevauchement avec tel RDV, trajet) |
 | 5 | 2.8 | Refus d'un déplacement = simple annulation pour le pro | Le signaler dans l'email au pro quand l'annulation suit un déplacement |
@@ -24,6 +40,9 @@ l'API publique et Mailpit, actions du professionnel dans l'Espace Artisan. Donn�
 | 8 | 3.6 | Choix vide « — » dans les modalités de paiement | Le retirer |
 | 9 | 6.x | RDV resté confirmé après refus du devis ou rétractation | Proposer l'annulation au pro (à décider) |
 | 10 | 7.1 | « Préparer la facture » ne montre pas les valeurs du devis | Afficher l'estimation à côté de chaque valeur modifiée |
+| 11 | Tous | Rendez-vous, calendrier, indisponibilités et devis ne se rafraîchissent pas : une réservation en ligne n'apparaît qu'après rechargement de la page (12/11) | Bouton « Actualiser » dans la barre de chaque grille et du calendrier, et rechargement automatique au retour sur l'onglet et à intervalle raisonnable ; tableau de bord : bouton en bout de ligne de l'en-tête |
+| 12 | Tableau de bord | Cartes des jours : au plus 2 par ligne (12/11) | Grille à 2 colonnes maximum |
+| 13 | 2.3 | Motif d'annulation du pro en saisie libre seulement (12/11) | Liste de motifs prédéfinis (empêchement, pièce indisponible, accès impossible, demande du client…) et « Autre » |
 
 **Reste à jouer :** avec le pro : 1.6, 1.7, 2.9 (après l'écart 1), 2.11, 3.7, 3.9, 4.4, 7.2 à 7.4 ; avec
 accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5. Outils de la recette
@@ -61,13 +80,13 @@ accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5
 |---|---|---|---|---|
 | 2.1 | Annulation par le client | Lien `/rdv/:token` → annuler | RDV `cancelled` ; email au pro (`.ics` `METHOD:CANCEL`, même UID : l'agenda retire l'événement) ; confirmation au client || ✅ 11/11 : `.ics` CANCEL même UID, client et pro |
 | 2.2 | Double annulation | Rejouer le lien | « Déjà annulé », aucun nouvel email || ✅ 11/11 : « déjà annulé », aucun email |
-| 2.3 | Annulation par le pro | Fenêtre du RDV → Annuler, « Prévenir le client » cochée | Email d'annulation au client (`.ics` CANCEL) ; agenda du pro mis à jour (`cancellation_pro`) || ⚠️ 11/11 : emails OK ; statut enregistré dès le choix, sans validation (écart 1) |
-| 2.4 | Annulation silencieuse | Idem, case décochée | Aucun email client ; agenda pro mis à jour || ❌ 11/11 : client prévenu malgré la case décochée (écarts 1 et 2) |
+| 2.3 | Annulation par le pro | Fenêtre du RDV → Annuler, « Prévenir le client » cochée | Email d'annulation au client (`.ics` CANCEL) ; agenda du pro mis à jour (`cancellation_pro`) || ✅ 12/11 (rejeu) : validation par le récapitulatif ; emails d'annulation client et pro (`.ics` CANCEL) ; motif enregistré seulement s'il est saisi (écart 13 : motifs prédéfinis) |
+| 2.4 | Annulation silencieuse | Idem, case décochée | Aucun email client ; agenda pro mis à jour || ✅ 12/11 (rejeu) : ouverture de la fenêtre depuis la liste, confirmation, **aucun email au client**, agenda du pro mis à jour |
 | 2.5 | Déplacement par le pro (liste) | Fenêtre du RDV → nouvelle date sur un créneau libre | Email au client (`.ics` mis à jour, même UID, `SEQUENCE` +1) ; agenda pro mis à jour ; l'événement est déplacé, pas dupliqué || ✅ 11/11 : « déplacé au… », même UID, SEQUENCE + |
 | 2.6 | Déplacement par glisser-déposer | Calendrier → déposer sur un créneau libre | Comme 2.5 || ✅ 11/11 : emails et `.ics` à jour (écart 3 : fond du calendrier) |
 | 2.7 | Déplacement sur un créneau indisponible | Déposer sur un créneau occupé / hors horaires | Avertissement (409 `slot_unavailable`) ; forcer → déplacé quand même, emails comme 2.5 || ✅ 11/11 : avertissement puis forçage (écart 4 : raison générique) |
 | 2.8 | Déplacement refusé par le client, puis annulation | Après 2.5, le client ouvre `/rdv/:token` et annule | Le client n'a pas de bouton « refuser le déplacement » : il annule (cas 2.1). Vérifier que l'email d'annulation au pro porte la **nouvelle** date et que l'agenda retire le bon événement || ✅ 11/11 : annulation à la nouvelle date, bon événement retiré (écart 5) |
-| 2.9 | Déplacement silencieux | Case « Prévenir le client » décochée | Aucun email client ; agenda pro mis à jour | |
+| 2.9 | Déplacement silencieux | Case « Prévenir le client » décochée | Aucun email client ; agenda pro mis à jour | ✅ 12/11 : confirmation, **aucun email au client**, agenda du pro mis à jour (`.ics` REQUEST à la nouvelle date) |
 | 2.10 | Terminé | Statut « terminé » après l'intervention | RDV `completed` ; fiche « Préparer la facture » disponible || ✅ 11/11 |
 | 2.11 | Abonnement d'agenda (Item 33) | Flux `/calendar/:token` activé, puis 2.1 / 2.5 | Le flux reflète annulation et déplacement ; annulés exclus | |
 
@@ -118,7 +137,7 @@ accord pour vieillir des dates en base : 4.8, 4.9, 5.2, 5.6 ; à part : 1.9, 5.5
 | 6.1 | RDV annulé par le pro alors que le devis est accepté | Le devis reste-t-il `accepted` ? Le client est-il informé de la suite (nouveau RDV, contrat) ? | |
 | 6.2 | RDV annulé par le client avec un devis accepté | L'annulation vaut-elle rétractation ? (non aujourd'hui : deux actions distinctes) | |
 | 6.3 | RDV déplacé alors que le devis porte « Le jj/mm/aaaa » | La date d'exécution du devis n'est pas mise à jour : à signaler au client ? | |
-| 6.4 | Rétractation alors que le RDV est confirmé | Le RDV reste-t-il planifié ? Le pro est-il invité à l'annuler ? | |
+| 6.4 | Rétractation alors que le RDV est confirmé | Le RDV reste-t-il planifié ? Le pro est-il invité à l'annuler ? | ⚠️ 11/11 : RDV resté confirmé, rien ne le signale (écart 9) |
 | 6.5 | Devis envoyé, RDV annulé avant la réponse | Le client peut-il encore accepter un devis dont l'intervention n'existe plus ? | |
 
 ## 7. Après l'intervention

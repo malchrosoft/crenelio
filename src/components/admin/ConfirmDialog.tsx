@@ -6,12 +6,14 @@ interface ConfirmDialogProps {
   title: string;
   children: React.ReactNode;
   confirmLabel: string;
+  /** Libellé du retour (« Annuler » par défaut) : à changer quand « annuler » désigne l'action confirmée. */
+  cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
 /** Fenêtre de confirmation d'une action qui écrase des données (Échap pour annuler). */
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ title, children, confirmLabel, onConfirm, onCancel }) => {
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ title, children, confirmLabel, cancelLabel = 'Annuler', onConfirm, onCancel }) => {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onCancel();
     document.addEventListener('keydown', onKey);
@@ -34,7 +36,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ title, children, confirmL
           <div className="confirm-dialog__text">{children}</div>
           <div className="admin-settings-actions confirm-dialog__actions">
             <button type="button" className="btn btn-secondary" onClick={onCancel}>
-              Annuler
+              {cancelLabel}
             </button>
             {/* Focus par défaut sur l'action pour un enchaînement au clavier */}
             <button type="button" className="btn btn-primary" onClick={onConfirm} autoFocus>
