@@ -14,6 +14,8 @@ import { useMediaQuery } from '../../utils/useMediaQuery';
 
 interface AppointmentCalendarProps {
   appointments: Appointment[];
+  /** Change à chaque actualisation (bouton de l'en-tête, retour sur l'onglet) : données rechargées. */
+  refreshKey?: number;
   /** Rendez-vous déplacé (glisser-déposer) : la liste du planning est mise à jour. */
   onChanged: (appointment: Appointment) => void;
   /** Clic sur un rendez-vous : ouverture de ses actions (statut, emails…). */
@@ -53,7 +55,7 @@ function businessHours(schedules: Schedule[]): BusinessHoursInput {
  * Calendrier des interventions (Item 23) : vues mois / semaine / jour / liste, horaires de travail,
  * indisponibilités, glisser-déposer validé par le moteur de créneaux (forçable sur confirmation).
  */
-const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ appointments, onChanged, onOpen, onCreate }) => {
+const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ appointments, onChanged, onOpen, onCreate, refreshKey }) => {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [unavailabilities, setUnavailabilities] = useState<Unavailability[]>([]);
   const [showCancelled, setShowCancelled] = useState(false);
@@ -71,7 +73,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ appointments,
         setUnavailabilities(u);
       })
       .catch(() => setError('Horaires ou indisponibilités indisponibles : affichage partiel.'));
-  }, []);
+  }, [refreshKey]);
 
   const events = useMemo<EventInput[]>(
     () => [

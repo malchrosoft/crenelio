@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useState, useEffect, useMemo } from 'react';
+import React, { lazy, Suspense, useCallback, useState, useEffect, useMemo, useRef } from 'react';
 import clsx from 'clsx';
 import {
   ClockIcon,
@@ -276,6 +276,35 @@ export const AdminDashboard: React.FC = () => {
     await api.adminLogout().catch(() => undefined);
     setIsAuthenticated(false);
   }
+
+  // Actualisation (écart 11 de la recette) : bouton de l'en-tête, retour sur l'onglet du navigateur après
+  // une minute, et toutes les 5 minutes tant que l'onglet est affiché. Rendez-vous rechargés ici ; les
+  // autres écrans (calendrier, indisponibilités, devis) rechargent leurs données quand `refreshKey` change.
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const lastRefresh = useRef(Date.now());
+  const refresh = useCallback(async () => {
+    setRefreshing(true);
+    lastRefresh.current = Date.now();
+    try {
+      setAppointments(await api.listAppointments());
+      setRefreshKey((key) => key + 1);
+    } catch (err: unknown) {
+      console.error(err);
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+  useEffect(() => {
+    const visible = () => document.visibilityState === 'visible';
+    const onVisible = () => visible() && Date.now() - lastRefresh.current > 60_000 && refresh();
+    document.addEventListener('visibilitychange', onVisible);
+    const timer = window.setInterval(() => visible() && refresh(), 5 * 60_000);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.clearInterval(timer);
+    };
+  }, [refresh]);
 
   async function loadData() {
     setLoading(true);
@@ -665,7 +694,12 @@ export const AdminDashboard: React.FC = () => {
         (group) =>
           group && (
             <React.Fragment key={group.id}>
-              <ConfigGroupForm group={group} config={config} onSaved={setConfig}>
+              <ConfigGroupForm
+                group={group}
+                config={config}
+                onSaved={setConfig}
+                dependents={group.id === 'legal' ? { quote_builder_guarantees: <InsuranceAttestationField onChange={setInsurance} /> } : undefined}
+              >
                 {group.id === 'identity' && (
                   <div className="admin-settings-form">
                     <BrandingField kind="logo" url={config.branding_logo_url} onChange={applyBranding} />
@@ -675,11 +709,6 @@ export const AdminDashboard: React.FC = () => {
                       logoUrl={config.branding_logo_url}
                       onChange={applyBranding}
                     />
-                  </div>
-                )}
-                {group.id === 'legal' && config.quote_builder_guarantees === '1' && (
-                  <div className="admin-settings-form">
-                    <InsuranceAttestationField onChange={setInsurance} />
                   </div>
                 )}
               </ConfigGroupForm>
@@ -694,6 +723,8 @@ export const AdminDashboard: React.FC = () => {
       onLogout={handleLogout}
       nav={{ items: navItems, active: activeTab, onSelect: setActiveTab }}
       notices={notices}
+      onRefresh={refresh}
+      refreshing={refreshing}
       fill={!loading && ((activeTab === 'appointments' && !creatingAppointment) || activeTab === 'calendar' || activeTab === 'unavailabilities' || activeTab === 'quotes')}
     >
       {openedId !== null && appointments.some((a) => a.id === openedId) && (
@@ -802,6 +833,7 @@ export const AdminDashboard: React.FC = () => {
         <Suspense fallback={<p>Chargement du calendrier…</p>}>
           <AppointmentCalendar
             appointments={appointments}
+            refreshKey={refreshKey}
             onChanged={replaceAppointment}
             // Même fenêtre que depuis la liste : on reste sur le calendrier
             onOpen={(appointment) => openAppointment(appointment.id)}
@@ -1189,13 +1221,13 @@ export const AdminDashboard: React.FC = () => {
       ) : activeTab === 'quotes' ? (
         <div className="admin-page">
           <Suspense fallback={<p>Chargement…</p>}>
-            <QuotesGrid config={config} openId={openQuoteId} onOpened={() => setOpenQuoteId(null)} />
+            <QuotesGrid config={config} openId={openQuoteId} onOpened={() => setOpenQuoteId(null)} refreshKey={refreshKey} />
           </Suspense>
         </div>
       ) : activeTab === 'unavailabilities' ? (
         <div className="admin-page">
           <Suspense fallback={<p>Chargement…</p>}>
-            <UnavailabilitiesGrid />
+            <UnavailabilitiesGrid refreshKey={refreshKey} />
           </Suspense>
         </div>
       ) : activeTab === 'hours' ? (

@@ -122,6 +122,8 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
   const allowSupply = config.quote_allow_supply === '1';
   const rates = vatRates(config);
   const totals = useMemo(() => quoteTotals(form.lines, vatMode), [form.lines, vatMode]);
+  // Remises supérieures aux prestations : refusé par le serveur, signalé ici sur les lignes concernées
+  const overDiscount = totals.ht < 0;
   const supplyVat = useMemo(() => supplyVatCheck(form.lines, vatMode), [form.lines, vatMode]);
   const hasDebours = form.lines.some((line) => line.kind === 'debours');
   // Choix propres au devis : main-d'œuvre facturée ou non (ex. : déplacement et courte investigation),
@@ -285,7 +287,11 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
         </div>
         {form.lines.map((line, index) =>
           (line.kind === 'debours') !== debours ? null : (
-            <div className={`quote-lines__row quote-lines__row--${line.kind}`} role="row" key={index}>
+            <div
+              className={`quote-lines__row quote-lines__row--${line.kind}${overDiscount && line.kind === 'discount' ? ' quote-lines__row--invalid' : ''}`}
+              role="row"
+              key={index}
+            >
               <span className="quote-lines__kind" role="cell">
                 {LINE_KIND_LABELS[line.kind]}
               </span>
@@ -615,13 +621,22 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
             {!locked &&
               duplicates.map((group) => {
                 const [first, ...others] = group.map((i) => form.lines[i]);
-                const mergeable = others.every((l) => Number(l.unit_price) === Number(first.unit_price) && Number(l.vat_rate) === Number(first.vat_rate) && l.unit === first.unit);
+                // Déplacement : unique par intervention, jamais additionné
+                const travel = first.kind === 'travel';
+                const mergeable =
+                  !travel && others.every((l) => Number(l.unit_price) === Number(first.unit_price) && Number(l.vat_rate) === Number(first.vat_rate) && l.unit === first.unit);
                 return (
                   <p className="quote-editor__vat-check" key={group.join('-')}>
                     <WarningIcon size={16} weight="fill" aria-hidden="true" />
                     <span>
-                      {group.length} lignes « {LINE_KIND_LABELS[first.kind]} — {first.label || DEFAULT_LINE_LABELS[first.kind]} » en double.{' '}
-                      {mergeable ? 'Fusionner additionne les quantités.' : 'Prix, unité ou TVA différents : fusion impossible, gardez une ligne ou modifiez les désignations.'}
+                      {travel ? (
+                        <>{group.length} lignes de déplacement : un seul déplacement par intervention, gardez une ligne.</>
+                      ) : (
+                        <>
+                          {group.length} lignes « {LINE_KIND_LABELS[first.kind]} — {first.label || DEFAULT_LINE_LABELS[first.kind]} » en double.{' '}
+                          {mergeable ? 'Fusionner additionne les quantités.' : 'Prix, unité ou TVA différents : fusion impossible, gardez une ligne ou modifiez les désignations.'}
+                        </>
+                      )}
                     </span>
                     {mergeable && (
                       <button type="button" className="btn btn-secondary admin-btn-sm" onClick={() => mergeGroup(group)}>
@@ -650,6 +665,12 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
               </p>
             )}
 
+            {overDiscount && (
+              <p className="form-alert-error" role="alert">
+                <WarningIcon size={16} weight="fill" aria-hidden="true" /> Les remises ({euro(-form.lines.filter((l) => l.kind === 'discount').reduce((sum, l) => sum + lineAmount(l), 0))})
+                dépassent le montant des prestations : réduisez la remise signalée en rouge.
+              </p>
+            )}
             <dl className="quote-totals">
               <dt>{vatMode === 'vat' ? 'Total HT' : 'Total prestations'}</dt>
               <dd>{euro(totals.ht)}</dd>
@@ -874,7 +895,12 @@ const ChoiceField: React.FC<{
           if (e.target.value !== '__free') onChange(e.target.value);
         }}
       >
-        <option value="">—</option>
+        {/* Pas de choix vide une fois une valeur choisie : ces mentions sont attendues sur le devis */}
+        {value === '' && !free && (
+          <option value="" disabled>
+            Choisir…
+          </option>
+        )}
         {options.map((option) => (
           <option key={option} value={option}>
             {option}

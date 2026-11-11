@@ -769,10 +769,18 @@ $admin-sidebar-collapsed: 68px;
     }
   }
 
-  .admin-topbar__logout {
+  .admin-topbar__logout,
+  .admin-topbar__refresh {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+  }
+
+  // Rechargement en cours : l'icône tourne (sauf mouvement réduit)
+  .admin-topbar__refresh--busy svg {
+    animation: admin-refresh-spin $duration-spin linear infinite;
+
+    @media (prefers-reduced-motion: reduce) { animation: none; }
   }
 
   @include tablet {
@@ -781,7 +789,8 @@ $admin-sidebar-collapsed: 68px;
     }
 
     .admin-topbar__link span,
-    .admin-topbar__logout span {
+    .admin-topbar__logout span,
+    .admin-topbar__refresh span {
       display: none;
     }
   }
@@ -3730,6 +3739,14 @@ $data-grid-status-width: 13em;
   // Débours : distingués (hors chiffre d'affaires)
   .quote-lines__row--debours .quote-lines__kind { color: $warning; font-weight: 600; }
 
+  // Remise supérieure aux prestations : ligne et prix mis en évidence
+  .quote-lines__row--invalid {
+    background: $danger-light;
+
+    .quote-lines__kind { color: $danger; font-weight: 600; }
+    .form-input { border-color: $danger; }
+  }
+
   .quote-lines__amount {
     text-align: right;
     font-variant-numeric: tabular-nums;
@@ -4257,8 +4274,11 @@ $data-grid-status-width: 13em;
 
 .dashboard__days {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  // Deux cartes de jour par ligne au plus, une seule sur un écran étroit
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: $space-block;
+
+  @include mobile { grid-template-columns: 1fr; }
 }
 
 .dashboard-day {
@@ -4421,4 +4441,21 @@ $data-grid-status-width: 13em;
   padding: $space-xs $space-sm;
   color: $gray-600;
   font-size: 0.85rem;
+}
+
+@keyframes admin-refresh-spin {
+  to { transform: rotate(360deg); }
+}
+
+// Case à cocher et éléments qui en dépendent (ConfigGroupForm `dependents`) : un même bloc encadré
+.config-dependent {
+  padding: $space-sm;
+  border: 1px solid $gray-200;
+  border-radius: $radius-sm;
+}
+
+.config-dependent__content {
+  margin-top: $space-sm;
+  padding-top: $space-sm;
+  border-top: 1px solid $gray-200;
 }

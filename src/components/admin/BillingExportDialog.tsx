@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { DownloadSimpleIcon, XIcon } from '@phosphor-icons/react';
 import { endOfMonth, format, parseISO, startOfMonth, subMonths } from 'date-fns';
 import { api } from '../../api';
+import { exportFileName } from '../../utils/format';
 import { Appointment, Quote } from '../../types';
 import { ANONYMIZED_NAME } from '../../utils/privacy';
 
@@ -78,7 +79,7 @@ const BillingExportDialog: React.FC<BillingExportDialogProps> = ({ appointments,
       // Modèle d'import des clients d'Indy (wikicompta.indy.fr, « Comment importer mes clients sur Indy ? ») :
       // 17 colonnes dans cet ordre, particuliers, pays en code Alpha-2, séparateur « , »
       downloadCsv(
-        'clients-indy.csv',
+        exportFileName('clients_indy'),
         ['Type', 'Nom de famille', 'Prénom', "Nom d'entreprise", 'N° SIRET', 'N° de TVA', 'Adresse facturation', 'Ville facturation', 'Code postal', 'Pays (Alpha-2)', 'Adresse livraison', 'Ville livraison', 'Code postal', 'Pays', 'Téléphone', 'Email(s)', 'Informations supplémentaires'],
         clients.map((a) => {
           const [last, first] = splitName(a.client_name);
@@ -89,7 +90,7 @@ const BillingExportDialog: React.FC<BillingExportDialogProps> = ({ appointments,
       return;
     }
     downloadCsv(
-      'clients.csv',
+      exportFileName('clients'),
       ['Nom', 'Email', 'Téléphone', 'Adresse', 'Code postal', 'Ville'],
       clients.map((a) => [a.client_name, a.client_email, a.client_phone, a.address, a.postal_code, a.city])
     );
@@ -97,7 +98,7 @@ const BillingExportDialog: React.FC<BillingExportDialogProps> = ({ appointments,
 
   function exportInterventions() {
     downloadCsv(
-      `interventions-${start}-${end}.csv`,
+      exportFileName(`interventions_${start}_${end}`),
       ['Date', 'Client', 'Email', 'Adresse', 'Code postal', 'Ville', 'Prestation', 'Devis', 'Montant HT', 'TVA', 'Montant TTC', 'Débours (hors CA)'],
       done.map((a) => {
         const quote = quotes.find((q) => q.appointment_id === a.id && q.status === 'accepted');

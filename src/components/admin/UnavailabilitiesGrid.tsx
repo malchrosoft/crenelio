@@ -38,7 +38,10 @@ const PeriodCell: React.FC<CustomCellRendererProps<Unavailability>> = ({ data })
  * ajout dans une fenêtre, suppression de la ligne sélectionnée. Aucun créneau n'est proposé pendant
  * ces périodes.
  */
-const UnavailabilitiesGrid: React.FC = () => {
+const UnavailabilitiesGrid: React.FC<{
+  /** Change à chaque actualisation (bouton de l'en-tête, retour sur l'onglet) : données rechargées. */
+  refreshKey?: number;
+}> = ({ refreshKey }) => {
   const [items, setItems] = useState<Unavailability[]>([]);
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState<Unavailability | null>(null);
@@ -46,7 +49,7 @@ const UnavailabilitiesGrid: React.FC = () => {
 
   useEffect(() => {
     api.listUnavailabilities().then(setItems).catch(() => setError('Chargement impossible'));
-  }, []);
+  }, [refreshKey]);
 
   const columnDefs = useMemo<ColDef<Unavailability>[]>(
     () => [

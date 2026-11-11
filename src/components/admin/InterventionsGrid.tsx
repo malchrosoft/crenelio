@@ -13,7 +13,7 @@ import {
 import { format, isPast, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Appointment } from '../../types';
-import { formatEuro } from '../../utils/format';
+import { formatEuro, exportFileName } from '../../utils/format';
 import { ANONYMIZED_NAME } from '../../utils/privacy';
 import DataGrid, { ActiveFilter, GridSettingToggle } from './DataGrid';
 import { STATUS_LABELS } from './AppointmentDialog';
@@ -137,7 +137,6 @@ const ActionsCell: React.FC<CustomCellRendererProps<Appointment, unknown, Interv
 
 /** Colonnes de l'export CSV : une information par colonne (colonnes masquées comprises). */
 const CSV_EXPORT: CsvExportParams = {
-  fileName: `interventions-${format(new Date(), 'yyyy-MM-dd')}.csv`,
   columnSeparator: ';', // séparateur lu nativement par Excel en français
   columnKeys: ['date', 'service_name', 'client_name', 'client_phone', 'client_email', 'address', 'commune', 'travel_fee', 'status'],
   processCellCallback: (p) => {
@@ -313,7 +312,7 @@ const InterventionsGrid: React.FC<InterventionsGridProps> = ({
       quickFilters={quickFilters}
       activeFilters={activeFilters}
       settings={<GridSettingToggle label="Actions sur chaque ligne" checked={rowActions} onChange={(v) => toggleActions?.(v)} />}
-      csvExport={CSV_EXPORT}
+      csvExport={{ ...CSV_EXPORT, fileName: exportFileName('rendez-vous') }}
       context={actions}
       rowHeight={72}
       emptyMessage="Aucun rendez-vous enregistré pour le moment."

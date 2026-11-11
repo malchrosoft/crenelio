@@ -13,6 +13,11 @@ interface ConfigGroupFormProps {
   onSaved: (config: AppConfig) => void;
   /** Contenu propre au groupe, enregistré indépendamment du formulaire (ex. logo). */
   children?: React.ReactNode;
+  /**
+   * Éléments qui dépendent d'une case à cocher (clé), affichés avec elle dans un même bloc dès qu'elle est
+   * cochée (ex. attestation décennale sous « garanties des constructeurs »), enregistrés à part.
+   */
+  dependents?: Record<string, React.ReactNode>;
 }
 
 const pickValues = (fields: ConfigField[], config: AppConfig): Record<string, string> =>
@@ -21,7 +26,7 @@ const pickValues = (fields: ConfigField[], config: AppConfig): Record<string, st
 /**
  * Formulaire générique d'un groupe de paramètres : n'envoie que les clés du groupe.
  */
-const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSaved, children }) => {
+const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSaved, children, dependents = {} }) => {
   const [values, setValues] = useState(() => pickValues(group.fields, config));
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -71,8 +76,9 @@ const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSave
               (enableIf.in !== undefined && !enableIf.in.includes(values[enableIf.key])));
           const id = `config-field-${key}`;
           if (type === 'checkbox') {
+            const dependent = values[key] === '1' ? dependents[key] : undefined;
             return (
-              <div className="form-group" key={key}>
+              <div className={dependents[key] ? 'form-group config-dependent' : 'form-group'} key={key}>
                 <div className="form-label-row">
                   <label className="form-check" htmlFor={id}>
                     <input
@@ -88,6 +94,7 @@ const ConfigGroupForm: React.FC<ConfigGroupFormProps> = ({ group, config, onSave
                   {hasFieldHelp(key) && <FieldHelp topic={key} />}
                 </div>
                 {hint && <p className="form-hint">{hint}</p>}
+                {dependent && <div className="config-dependent__content">{dependent}</div>}
               </div>
             );
           }

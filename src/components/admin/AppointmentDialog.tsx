@@ -32,6 +32,16 @@ interface AppointmentDialogProps {
   initialStatus?: Appointment['status'];
 }
 
+/** Motifs d'annulation usuels du professionnel (repris dans l'email au client), « Autre » en saisie libre. */
+const CANCELLATION_REASONS = [
+  'Empêchement du professionnel',
+  'Pièce ou matériel indisponible',
+  'Intempéries ou accès impossible',
+  'Annulation demandée par le client (téléphone, message)',
+  'Remplacé par un autre rendez-vous',
+];
+const OTHER_REASON = '__other';
+
 const toInput = (sql: string) => format(parseISO(sql.replace(' ', 'T')), "yyyy-MM-dd'T'HH:mm");
 
 /**
@@ -44,6 +54,7 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onCl
   const [datetime, setDatetime] = useState(toInput(appointment.start_datetime));
   const [status, setStatus] = useState<Appointment['status']>(initialStatus ?? appointment.status);
   const [reason, setReason] = useState('');
+  const [otherReason, setOtherReason] = useState(false);
   const [notify, setNotify] = useState(true);
   const [confirmSilent, setConfirmSilent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -95,6 +106,7 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onCl
     setStatus(a.status);
     setDatetime(toInput(a.start_datetime));
     setReason('');
+    setOtherReason(false);
     setNotify(true);
   };
 
@@ -196,13 +208,32 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onCl
               {cancelling && (
                 <div className="form-group">
                   <label className="form-label" htmlFor="appointment-reason">Motif d'annulation (facultatif)</label>
-                  <input
+                  <select
                     id="appointment-reason"
                     className="form-input"
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    placeholder="Ex. : empêchement, pièce indisponible"
-                  />
+                    value={otherReason ? OTHER_REASON : reason}
+                    onChange={(e) => {
+                      setOtherReason(e.target.value === OTHER_REASON);
+                      setReason(e.target.value === OTHER_REASON ? '' : e.target.value);
+                    }}
+                  >
+                    <option value="">Sans motif</option>
+                    {CANCELLATION_REASONS.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                    <option value={OTHER_REASON}>Autre (saisie libre)…</option>
+                  </select>
+                  {otherReason && (
+                    <input
+                      className="form-input"
+                      aria-label="Motif d'annulation (saisie libre)"
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                      autoFocus
+                    />
+                  )}
                 </div>
               )}
             </div>

@@ -5,6 +5,7 @@ import { CopyIcon, FolderOpenIcon, PlusIcon } from '@phosphor-icons/react';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { api } from '../../api';
+import { exportFileName } from '../../utils/format';
 import { AppConfig, Quote } from '../../types';
 import DataGrid from './DataGrid';
 import QuoteEditor from './QuoteEditor';
@@ -17,6 +18,8 @@ const StatusCell: React.FC<CustomCellRendererProps<Quote>> = ({ data }) =>
 
 interface QuotesGridProps {
   config: AppConfig;
+  /** Change à chaque actualisation (bouton de l'en-tête, retour sur l'onglet) : données rechargées. */
+  refreshKey?: number;
   /** Devis à ouvrir à l'arrivée (ex. créé depuis la fenêtre d'un rendez-vous). */
   openId?: number | null;
   onOpened?: () => void;
@@ -26,7 +29,7 @@ interface QuotesGridProps {
  * Devis (Item 22) en grille (écran « Devis » du menu Interventions) : création, ouverture dans
  * l'éditeur (lecture seule une fois envoyé), copie en nouveau brouillon après un refus ou une expiration.
  */
-const QuotesGrid: React.FC<QuotesGridProps> = ({ config, openId, onOpened }) => {
+const QuotesGrid: React.FC<QuotesGridProps> = ({ config, openId, onOpened, refreshKey }) => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   // `null` : fermé ; 'new' : nouveau brouillon ; sinon devis complet (avec ses lignes)
   const [editing, setEditing] = useState<Quote | 'new' | null>(null);
@@ -34,7 +37,7 @@ const QuotesGrid: React.FC<QuotesGridProps> = ({ config, openId, onOpened }) => 
 
   useEffect(() => {
     api.listQuotes().then(setQuotes).catch(() => setError('Chargement impossible'));
-  }, []);
+  }, [refreshKey]);
 
   async function open(id: number) {
     setError(null);
@@ -156,7 +159,7 @@ const QuotesGrid: React.FC<QuotesGridProps> = ({ config, openId, onOpened }) => 
         entityLabel={['devis', 'devis']}
         emptyMessage="Aucun devis : créez-en un ici ou depuis la fenêtre d'un rendez-vous."
         onRowDoubleClicked={(q) => open(q.id)}
-        csvExport={{ fileName: 'devis.csv' }}
+        csvExport={{ fileName: exportFileName('devis') }}
         actions={(selected) => (
           <>
             <button type="button" className="btn btn-primary admin-btn-sm" onClick={() => setEditing('new')} title="Nouveau devis">

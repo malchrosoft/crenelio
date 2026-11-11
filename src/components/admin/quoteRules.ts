@@ -107,11 +107,15 @@ export function countingConfig(config: AppConfig, counting: string | null): AppC
   return step ? { ...config, quote_time_step: step } : config;
 }
 
-/** Doublons d'un devis : lignes de même type et de même désignation (casse et espaces ignorés). */
+/**
+ * Doublons d'un devis : lignes de même type et de même désignation (casse et espaces ignorés). Le
+ * déplacement est unique par intervention : deux lignes de déplacement sont des doublons quelle que soit
+ * leur désignation (« Frais de déplacement » et « Frais de déplacement (0,62 km) »).
+ */
 export function duplicateGroups(lines: QuoteLine[]): number[][] {
   const groups = new Map<string, number[]>();
   lines.forEach((line, index) => {
-    const key = `${line.kind}|${line.label.trim().toLowerCase().replace(/\s+/g, ' ')}`;
+    const key = line.kind === 'travel' ? 'travel' : `${line.kind}|${line.label.trim().toLowerCase().replace(/\s+/g, ' ')}`;
     groups.set(key, [...(groups.get(key) ?? []), index]);
   });
   return [...groups.values()].filter((group) => group.length > 1);
