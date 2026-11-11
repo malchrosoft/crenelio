@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale';
 import { ArrowLeftIcon, CheckCircleIcon, DownloadSimpleIcon, XCircleIcon } from '@phosphor-icons/react';
 import { api } from '../api';
 import { AppConfig, Quote } from '../types';
+import PoweredBy from '../components/PoweredBy';
 import BrandMark from '../components/BrandMark';
 import { companyAddress, legalIdentity } from '../utils/legalIdentity';
 import { attestationUrl, BUILDER_GUARANTEES } from '../utils/builderGuarantees';
@@ -482,6 +483,9 @@ const QuoteLayout: React.FC<{ config: AppConfig; children: React.ReactNode }> = 
     </div>
     <div className="container">
       <div className="card decision-card quote-page">{children}</div>
+      <p className="quote-page__powered">
+        <PoweredBy />
+      </p>
     </div>
   </div>
 );

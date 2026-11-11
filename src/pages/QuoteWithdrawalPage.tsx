@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale';
 import { ArrowLeftIcon, CheckCircleIcon } from '@phosphor-icons/react';
 import { api } from '../api';
 import { AppConfig, Quote } from '../types';
+import PoweredBy from '../components/PoweredBy';
 import BrandMark from '../components/BrandMark';
 import { companyAddress } from '../utils/legalIdentity';
 
@@ -156,6 +157,9 @@ const QuoteWithdrawalPage: React.FC<{ config: AppConfig }> = ({ config }) => {
             </form>
           )}
         </div>
+        <p className="quote-page__powered">
+          <PoweredBy />
+        </p>
       </div>
     </div>
   );

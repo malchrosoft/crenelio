@@ -6,9 +6,9 @@ import {
   PhoneIcon,
   EnvelopeSimpleIcon,
   LockKeyIcon,
-  GithubLogoIcon,
 } from '@phosphor-icons/react';
 import BrandMark from '../BrandMark';
+import PoweredBy from '../PoweredBy';
 import { AppConfig } from '../../types';
 import LegalModal from '../LegalModal';
 
@@ -90,21 +90,7 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
             <span className="footer-bottom__copy">
               © {currentYear} {companyName}. Tous droits réservés.
             </span>
-            <span className="footer-bottom__powered">
-              Powered by{' '}
-              <a
-                href="https://github.com/malchrosoft/crenelio"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="footer-bottom__project-link"
-              >
-                <GithubLogoIcon size={14} weight="fill" aria-hidden="true" />
-                Crénelio
-              </a>
-              <span className="footer-bottom__slogan">
-                — Book appointments directly with your local pro
-              </span>
-            </span>
+            <PoweredBy />
           </div>
           <div className="footer-bottom__actions">
             <button

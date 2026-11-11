@@ -45,9 +45,24 @@ const FieldHelp: React.FC<{ topic: FieldHelpKey }> = ({ topic }) => {
 
   return (
     <>
-      <button type="button" className="field-help" title={`Aide : ${help.title}`} aria-label={`Aide : ${help.title}`} onClick={() => setOpen(true)}>
+      {/* Pas un <button> : un <fieldset disabled> (devis envoyé, en lecture) le désactiverait, alors que l'aide
+          doit rester consultable */}
+      <span
+        role="button"
+        tabIndex={0}
+        className="field-help"
+        title={`Aide : ${help.title}`}
+        aria-label={`Aide : ${help.title}`}
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+      >
         <QuestionIcon size={14} weight="bold" aria-hidden="true" />
-      </button>
+      </span>
       {open &&
         createPortal(
           <div className="admin-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="field-help-title" onClick={() => setOpen(false)}>

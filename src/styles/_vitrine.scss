@@ -704,46 +704,6 @@ $engagement-gap: 24px;
       color: $gray-500;
     }
 
-    .footer-bottom__powered {
-      font-size: 0.8rem;
-      color: $gray-500;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-
-    .footer-bottom__project-link {
-      color: $primary-light;
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      vertical-align: middle;
-      transition: color $duration-fast;
-
-      svg {
-        display: inline-block;
-        vertical-align: middle;
-        flex-shrink: 0;
-      }
-
-      &:hover {
-        color: white;
-        text-decoration: underline;
-      }
-    }
-
-    .footer-bottom__slogan {
-      color: $gray-500;
-      font-style: italic;
-
-      @include mobile {
-        display: block;
-        width: 100%;
-      }
-    }
 
     .footer-bottom__actions {
       display: flex;
@@ -1085,4 +1045,55 @@ $engagement-gap: 24px;
   .panel__body {
     padding: 16px;
   }
+}
+
+// « Powered by Crénelio » : pied de page de la vitrine et pages en ligne du devis (composant PoweredBy)
+.footer-bottom__powered {
+  font-size: 0.8rem;
+  color: $gray-500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.footer-bottom__project-link {
+  color: $primary-light;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: middle;
+  transition: color $duration-fast;
+
+  svg {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    color: white;
+    text-decoration: underline;
+  }
+}
+
+.footer-bottom__slogan {
+  color: $gray-500;
+  font-style: italic;
+
+  @include mobile {
+    display: block;
+    width: 100%;
+  }
+}
+
+// Pages en ligne du devis (fond clair) : centré, lien en couleur du thème
+.quote-page__powered {
+  margin: $space-md 0;
+  text-align: center;
+
+  .footer-bottom__project-link { color: $primary; }
+  .footer-bottom__project-link:hover { color: $primary-hover; }
 }
