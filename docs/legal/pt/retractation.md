@@ -145,6 +145,7 @@ O modelo de informação (anexo ao artigo R221-3) foi alterado em conformidade (
   palavra, transmitido pela função de livre resolução; **PDF preenchível** anexado ao email de acordo;
   declaração validada descarregável em PDF e anexada aos avisos de receção. O cliente é informado desta
   facilidade (texto `ONLINE_FORM_NOTICE`, fora do modelo regulamentar).
+- **Antes do contrato** (L221-5, 7°, 10/11/2026): o formulário tipo (PDF preenchível, sem data de aceitação nem ligação em linha, pois a função em linha só pode ser usada após a aceitação) é anexado ao e-mail de envio do orçamento, salvo urgência; continua também na versão imprimível.
 - **Exemplar do contrato** (L221-9): o email enviado ao cliente após o seu acordo retoma todas as
   informações do contrato, o modelo de informação e o formulário-tipo (`LegalTexts.php`).
 - Versões imprimíveis (`/devis/:token/imprimer`): modelo de informação no orçamento; formulário-tipo

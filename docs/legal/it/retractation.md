@@ -147,6 +147,7 @@ Il modello di informazione (allegato all'articolo R221-3) è stato modificato di
   parola, trasmesso tramite la funzione di recesso; **PDF compilabile** allegato all'email di accettazione;
   dichiarazione convalidata scaricabile in PDF e allegata alle ricevute. Il cliente è informato di questa
   possibilità (testo `ONLINE_FORM_NOTICE`, al di fuori del modello regolamentare).
+- **Prima del contratto** (L221-5, 7°, 10/11/2026): il modulo tipo (PDF compilabile, senza data di accettazione né link online, poiché la funzione online è utilizzabile solo dopo l'accettazione) è allegato all'email di invio del preventivo, salvo urgenza; resta anche nella versione stampabile.
 - **Copia del contratto** (L221-9): l'email inviata al cliente dopo la sua accettazione riprende tutte le
   informazioni del contratto, il modello di informazione e il modulo tipo (`LegalTexts.php`).
 - Versioni stampabili (`/devis/:token/imprimer`): modello di informazione nel preventivo; modulo tipo

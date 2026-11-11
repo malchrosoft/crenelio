@@ -154,6 +154,7 @@ sürüm): resmî metin ve uygulama tercihleri [retractation-modele.md](retractat
   kelimesine, cayma işleviyle iletilir; **doldurulabilir PDF** onay e-postasına eklenir; doğrulanan beyan
   PDF olarak indirilebilir ve alındı belgelerine eklenir. Müşteri bu kolaylıktan haberdar edilir
   (`ONLINE_FORM_NOTICE` metni, yasal modelin dışında).
+- **Sözleşmeden önce** (L221-5, 7°, 10/11/2026): standart form (doldurulabilir PDF, onay tarihi ve çevrimiçi bağlantı olmadan, çünkü çevrimiçi işlev ancak onaydan sonra kullanılabilir) acil durumlar dışında teklifin gönderildiği e-postaya eklenir; yazdırılabilir sürümde de yer almaya devam eder.
 - **Sözleşme nüshası** (L221-9): müşteriye onayından sonra gönderilen e-posta sözleşmenin tüm
   bilgilerini, bilgilendirme modelini ve örnek formu içerir (`LegalTexts.php`).
 - Yazdırılabilir sürümler (`/devis/:token/imprimer`): teklifte bilgilendirme modeli; R221-1 maddesinin

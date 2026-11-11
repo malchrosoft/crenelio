@@ -145,6 +145,7 @@ Modelul de informare (anexa la articolul R221-3) a fost modificat în consecinț
   cuvânt, transmis prin funcția de retragere; **PDF completabil** anexat la emailul de acord;
   declarația validată poate fi descărcată în PDF și este anexată la confirmări. Clientul este informat despre această
   facilitate (textul `ONLINE_FORM_NOTICE`, în afara modelului reglementar).
+- **Înainte de contract** (L221-5, 7°, 10/11/2026): formularul tip (PDF completabil, fără data acceptării și fără link online, funcția online putând fi folosită doar după acceptare) este atașat la e-mailul de trimitere a devizului, cu excepția urgențelor; rămâne și în versiunea imprimabilă.
 - **Exemplarul contractului** (L221-9): emailul trimis clientului după acordul său reia toate
   informațiile contractului, modelul de informare și formularul-tip (`LegalTexts.php`).
 - Versiuni imprimabile (`/devis/:token/imprimer`): modelul de informare în deviz; formularul-tip

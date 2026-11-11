@@ -145,6 +145,7 @@ Wzór informacji (załącznik do artykułu R221-3) został odpowiednio zmieniony
   słowo, przekazywany przez funkcję odstąpienia; **wypełnialny PDF** dołączony do emaila z akceptacją;
   zatwierdzone oświadczenie do pobrania w PDF i dołączane do potwierdzeń. Klient jest informowany o tym
   udogodnieniu (tekst `ONLINE_FORM_NOTICE`, poza urzędowym wzorem).
+- **Przed zawarciem umowy** (L221-5, 7°, 10/11/2026): wzór formularza (PDF do wypełnienia, bez daty akceptacji i bez linku online, ponieważ funkcja online działa dopiero po akceptacji) jest załączany do e-maila z kosztorysem, z wyjątkiem sytuacji pilnych; pozostaje też w wersji do druku.
 - **Egzemplarz umowy** (L221-9): email wysłany do klienta po jego akceptacji zawiera wszystkie
   informacje umowy, wzór informacji i wzór formularza (`LegalTexts.php`).
 - Wersje do druku (`/devis/:token/imprimer`): wzór informacji w kosztorysie; wzór formularza

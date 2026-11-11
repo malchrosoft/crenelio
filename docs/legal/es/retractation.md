@@ -145,6 +145,7 @@ El modelo de información (anexo al artículo R221-3) se modificó en consecuenc
   palabra, transmitido por la función de desistimiento; **PDF rellenable** adjunto al email de aceptación;
   declaración validada descargable en PDF y adjunta a los acuses. Se informa al cliente de esta
   facilidad (texto `ONLINE_FORM_NOTICE`, fuera del modelo reglamentario).
+- **Antes del contrato** (L221-5, 7°, 10/11/2026): el formulario tipo (PDF rellenable, sin fecha de aceptación ni enlace en línea, ya que la función en línea solo puede usarse tras la aceptación) se adjunta al correo de envío del presupuesto, salvo urgencia; también sigue en la versión imprimible.
 - **Ejemplar del contrato** (L221-9): el email enviado al cliente tras su aceptación recoge todas las
   informaciones del contrato, el modelo de información y el formulario tipo (`LegalTexts.php`).
 - Versiones imprimibles (`/devis/:token/imprimer`): modelo de información en el presupuesto; formulario tipo

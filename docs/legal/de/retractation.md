@@ -145,6 +145,7 @@ Das Informationsmuster (Anhang zu Artikel R221-3) wurde entsprechend geändert (
   übermittelt über die Widerrufsfunktion; **ausfüllbares PDF** im Anhang der Annahme-E-Mail;
   bestätigte Erklärung als PDF herunterladbar und den Bestätigungen beigefügt. Der Kunde wird über diese
   Möglichkeit informiert (Text `ONLINE_FORM_NOTICE`, außerhalb des amtlichen Musters).
+- **Vor dem Vertrag** (L221-5, 7°, 10/11/2026): Das Muster-Widerrufsformular (ausfüllbares PDF, ohne Annahmedatum und ohne Online-Link, da die Online-Funktion erst nach der Annahme nutzbar ist) wird der E-Mail mit dem Kostenvoranschlag beigefügt, außer in Notfällen; es bleibt auch in der Druckversion.
 - **Vertragsausfertigung** (L221-9): Die nach seiner Annahme an den Kunden gesendete E-Mail enthält alle
   Vertragsinformationen, das Informationsmuster und das Musterformular (`LegalTexts.php`).
 - Druckversionen (`/devis/:token/imprimer`): Informationsmuster im Kostenvoranschlag; Musterformular

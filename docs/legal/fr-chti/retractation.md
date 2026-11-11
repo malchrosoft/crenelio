@@ -141,6 +141,7 @@ L'modèle d'information (annexe à l'article R221-3) a été modifié in conséq
   mot, transmis par l'fonction d'rétractation ; **PDF remplissable** joint à l'email d'accord ;
   déclaration validée téléchargeable in PDF et jointe aux accusés. L'client est informé d'cheulle
   facilité (texte `ONLINE_FORM_NOTICE`, hors du modèle réglementaire).
+- **Avant l'contrat** (L221-5, 7°, 10/11/2026) : l'formulaire type (PDF à r'mplir, sans date d'accord ni lien in ligne, vu qu'la fonction in ligne all' marche qu'après l'accord) i est joint à l'mail d'envoi du devis, sauf urgence ; i reste aussi dins l'version imprimable.
 - **Exemplaire du contrat** (L221-9) : l'email invoyé au client après sin accord i r'prind toutes les
   informations du contrat, l'modèle d'information et l'formulaire type (`LegalTexts.php`).
 - Versions imprimables (`/devis/:token/imprimer`) : modèle d'information dins l'devis ; formulaire type

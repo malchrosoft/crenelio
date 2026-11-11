@@ -151,6 +151,7 @@ Modèl enfòmasyon-an (annexe à l'article R221-3) chanjé pou sa (vèsyon an vi
   mo, voyé pa fonksyon rétractation-an ; **PDF pou ranpli** jwenn épi imèl akò-a ;
   déklarasyon validé-a pé téléchajé an PDF épi i jwenn épi akizé-a. Yo ka di kliyan-an i ni
   fasilité-tala (tèks `ONLINE_FORM_NOTICE`, déwò modèl réglemantè-a).
+- **Avan kontra-a** (L221-5, 7°, 10/11/2026) : fòmilè tip-la (PDF pou ranpli, san dat dakò ni lyen an liy, pas fonksyon an liy-la ka maché sèlman apré dakò-a) ka jwenn épi imèl ki ka voyé dévi-a, si sé pa an ijans ; i ka rété osi adan vèsyon pou enprimé-a.
 - **Légzanplè kontra-a** (L221-9) : imèl ki pati ba kliyan-an apré akò'y ka rété tout
   enfòmasyon kontra-a, modèl enfòmasyon-an épi fòmilè-tip-la (`LegalTexts.php`).
 - Vèsyon pou enprimé (`/devis/:token/imprimer`) : modèl enfòmasyon-an adan devis-la ; fòmilè-tip

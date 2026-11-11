@@ -152,6 +152,7 @@ chwa aplikasyon adan [retractation-modele.md](retractation-modele.md).
   fonksyon *rétractation*-la ; **PDF ou pé rempli** jwenn a imèl dakò-la ; déklarasyon validé ou pé
   téléchajé an PDF é jwenn a *accusé* yo. Yo ka di kliyan-la fasilité-lasa ègzisté (tèks `ONLINE_FORM_NOTICE`,
   an déwò a modèl règlémantè-la).
+- **Avan kontra-la** (L221-5, 7°, 10/11/2026) : fòmilè tip-la (PDF pou ranpli, san dat a dakò ni lyen an liy, paskè fonksyon an liy-la ka maché sèlman apré dakò-la) ka vin jwenn épi imèl a voyé dévi-la, si sé pa on ijans ; i ka rété osi adan vèsyon pou enprimé-la.
 - **Ègzanplè a kontra-la** (L221-9) : imèl yo ka voyé ba kliyan-la apré dakò a-y ka répran tout enfòmasyon a
   kontra-la, modèl enfòmasyon-la é fòmilè-tip-la (`LegalTexts.php`).
 - Vèsyon enprimab (`/devis/:token/imprimer`) : modèl enfòmasyon-la adan *devis*-la ; fòmilè-tip a annexe à

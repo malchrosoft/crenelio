@@ -156,6 +156,7 @@ The information model (annex to article R221-3) has been amended accordingly (ve
   the withdrawal function; **fillable PDF** attached to the acceptance email; validated declaration
   downloadable as PDF and attached to the acknowledgements. The customer is informed of this facility
   (`ONLINE_FORM_NOTICE` text, outside the regulatory model).
+- **Before the contract** (L221-5, 7°, 10/11/2026): the standard form (fillable PDF, without acceptance date or online link, since the online function can only be used after acceptance) is attached to the email sending the quote, except in emergencies; it also remains in the printable version.
 - **Copy of the contract** (L221-9): the email sent to the customer after acceptance repeats all the contract
   information, the information model and the standard form (`LegalTexts.php`).
 - Printable versions (`/devis/:token/imprimer`): information model in the quote; standard form of the annex
