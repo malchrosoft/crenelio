@@ -12,6 +12,8 @@ export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
   refused: 'Refusé',
   expired: 'Expiré',
   withdrawn: 'Rétracté',
+  // Annulé par le professionnel avant toute réponse : rétractation de l'offre (C. civ. 1115 et 1116)
+  cancelled: 'Annulé',
 };
 
 export const LINE_KIND_LABELS: Record<QuoteLineKind, string> = {

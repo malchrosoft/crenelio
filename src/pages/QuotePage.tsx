@@ -89,6 +89,13 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
         Devis {quote.number}
         <span className={`status-badge quote-status--${quote.status}`}>{QUOTE_STATUS_LABELS[quote.status]}</span>
       </h2>
+      {/* Rendez-vous annulé alors que le devis attend une réponse : l'accepter conclurait le contrat (C. civ. 1121) */}
+      {quote.status === 'sent' && quote.appointment_status === 'cancelled' && (
+        <p className="form-alert-error" role="alert">
+          L'intervention prévue avec ce devis a été annulée. Contactez {company} avant de l'accepter : votre acceptation
+          conclurait le contrat.
+        </p>
+      )}
 
       <div className="quote-page__parties">
         <section>
@@ -391,6 +398,13 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
         <p className="decision-card__result">
           <XCircleIcon size={22} weight="fill" aria-hidden="true" />
           Devis refusé le {dateTime(quote.decided_at)}.
+        </p>
+      )}
+      {quote.status === 'cancelled' && (
+        <p className="decision-card__result">
+          <XCircleIcon size={22} weight="fill" aria-hidden="true" />
+          Ce devis a été annulé par {company} le {dateTime(quote.cancelled_at)} : il ne peut plus être accepté, et aucune somme n'est due.
+          {quote.cancel_reason ? ` Motif : ${quote.cancel_reason}.` : ''}
         </p>
       )}
       {quote.status === 'expired' && <p className="decision-card__result">Ce devis a expiré : contactez {company} pour un nouveau devis.</p>}

@@ -113,6 +113,22 @@ class QuoteController
     }
 
     /**
+     * POST /quotes/:id/cancel — Annulation d'un devis envoyé, avant toute réponse (rétractation de l'offre,
+     * C. civ. 1115 et 1116). `notify` (par défaut vrai) : le client en est informé par email.
+     */
+    public function cancel(array $params): void
+    {
+        $quote = self::findOr404((int)($params['id'] ?? 0));
+        $body = Response::body();
+        if (!Quote::cancel((int)$quote['id'], isset($body['reason']) ? (string)$body['reason'] : null)) {
+            Response::json(['error' => "Seul un devis envoyé et sans réponse du client peut être annulé. Un devis accepté ne peut être révoqué qu'avec l'accord du client (C. civ. 1193)."], 409);
+        }
+        $quote = Quote::find((int)$quote['id']);
+        $quote['notifications'] = ($body['notify'] ?? true) !== false ? QuoteNotifier::sendCancellation($quote, Config::getAll()) : [];
+        Response::json($quote);
+    }
+
+    /**
      * PUT /quotes/:id/goods-received — Vente (fourniture revendue) : date de remise du bien au client,
      * point de départ du délai de rétractation (C. consom. L221-18, 2°).
      */
@@ -208,7 +224,11 @@ class QuoteController
             Response::json(['error' => 'Devis introuvable.'], 404);
         }
         if ($quote['status'] !== 'sent') {
-            Response::json(['error' => $quote['status'] === 'expired' ? 'Ce devis a expiré.' : 'Ce devis a déjà reçu une réponse.'], 409);
+            Response::json(['error' => match ($quote['status']) {
+                'expired'   => 'Ce devis a expiré.',
+                'cancelled' => 'Ce devis a été annulé par le professionnel : il ne peut plus être accepté.',
+                default     => 'Ce devis a déjà reçu une réponse.',
+            }], 409);
         }
 
         $body = Response::body();

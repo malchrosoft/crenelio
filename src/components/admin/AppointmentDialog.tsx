@@ -60,6 +60,8 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onCl
   const [otherReason, setOtherReason] = useState(false);
   const [notify, setNotify] = useState(true);
   const [confirmSilent, setConfirmSilent] = useState(false);
+  // Devis envoyés (sans réponse) à annuler avec le rendez-vous : rétractation de l'offre (C. civ. 1115 et 1116)
+  const [cancelQuoteIds, setCancelQuoteIds] = useState<number[]>([]);
   // Devis du rendez-vous (écart 16 de la recette) : listés pour être ouverts, plutôt qu'un nouveau brouillon à chaque fois
   const [quotes, setQuotes] = useState<Quote[] | null>(null);
   useEffect(() => {
@@ -112,6 +114,10 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onCl
   // Changements dont le client est prévenu (sinon aucun email ne lui part de toute façon)
   const cancelling = statusChanged && status === 'cancelled';
   const clientConcerned = Boolean(a.client_email) && (dateChanged || cancelling || (statusChanged && a.status === 'pending'));
+  // Devis liés touchés par une annulation ou un déplacement (écarts 9 et 20 de la recette)
+  const linkedChange = cancelling || dateChanged;
+  const sentQuotes = (quotes ?? []).filter((q) => q.status === 'sent');
+  const acceptedQuotes = (quotes ?? []).filter((q) => q.status === 'accepted');
   const when = (value: string) => format(parseISO(value), "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
 
   const reset = () => {
@@ -130,12 +136,23 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onCl
     }
     setConfirmSilent(false);
     const notifyClient = !(clientConcerned && !notify);
+    const quotesToCancel = sentQuotes.filter((q) => cancelQuoteIds.includes(q.id));
     run(
-      () =>
-        cancelling || !dateChanged
-          ? api.updateAppointmentStatus(a.id, status, cancelling ? reason.trim() || null : null, notifyClient)
-          : api.rescheduleAppointment(a.id, `${datetime.replace('T', ' ')}:00`, status, { notify: notifyClient }),
-      cancelling ? 'Rendez-vous annulé.' : dateChanged ? 'Nouvelle date enregistrée.' : 'Statut enregistré.',
+      async () => {
+        const updated =
+          cancelling || !dateChanged
+            ? await api.updateAppointmentStatus(a.id, status, cancelling ? reason.trim() || null : null, notifyClient)
+            : await api.rescheduleAppointment(a.id, `${datetime.replace('T', ' ')}:00`, status, { notify: notifyClient });
+        // Devis envoyés annulés avec le rendez-vous, le client prévenu comme pour le rendez-vous
+        for (const q of quotesToCancel) {
+          await api.cancelQuote(q.id, cancelling ? reason.trim() || "Rendez-vous annulé" : 'Date de l\'intervention modifiée : nouveau devis à suivre', notifyClient);
+        }
+        if (quotesToCancel.length) setQuotes((prev) => prev?.map((q) => (cancelQuoteIds.includes(q.id) ? { ...q, status: 'cancelled' } : q)) ?? prev);
+        setCancelQuoteIds([]);
+        return updated;
+      },
+      (cancelling ? 'Rendez-vous annulé.' : dateChanged ? 'Nouvelle date enregistrée.' : 'Statut enregistré.') +
+        (quotesToCancel.length ? ` Devis annulé : ${quotesToCancel.map((q) => q.number).join(', ')}.` : ''),
     );
   }
 
@@ -265,6 +282,35 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({ appointment, onCl
                     </li>
                   )}
                 </ul>
+                {linkedChange && sentQuotes.length > 0 && (
+                  <div className="appointment-dialog__linked">
+                    {sentQuotes.map((q) => (
+                      <label className="form-check" key={q.id}>
+                        <input
+                          type="checkbox"
+                          checked={cancelQuoteIds.includes(q.id)}
+                          onChange={(e) => setCancelQuoteIds((ids) => (e.target.checked ? [...ids, q.id] : ids.filter((id) => id !== q.id)))}
+                        />
+                        <span>
+                          Annuler aussi le devis {q.number}, envoyé et sans réponse
+                          {q.valid_until && ` (valable jusqu'au ${format(parseISO(q.valid_until), 'dd/MM/yyyy')})`}
+                          {dateChanged && !cancelling && ' : sa date d’exécution ne correspond plus, créez ensuite un nouveau devis'}
+                        </span>
+                      </label>
+                    ))}
+                    <p className="form-hint">
+                      Sinon le client peut encore l'accepter, et le contrat serait conclu (C. civ. 1121). Annuler un devis avant la fin de sa
+                      validité reste possible mais engage votre responsabilité (C. civ. 1116).
+                    </p>
+                  </div>
+                )}
+                {linkedChange && acceptedQuotes.length > 0 && (
+                  <p className="form-alert-error appointment-dialog__linked">
+                    Devis {acceptedQuotes.map((q) => q.number).join(', ')} accepté : le contrat ne peut être modifié ou révoqué qu'avec
+                    l'accord du client (C. civ. 1193), sauf force majeure (C. civ. 1218).{' '}
+                    {cancelling ? 'Convenez avec lui de la suite avant d’annuler.' : 'Convenez avec lui de la nouvelle date, et faites-lui accepter un nouveau devis si les conditions changent.'}
+                  </p>
+                )}
                 {clientConcerned && (
                   <label className="theme-effect">
                     <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} />

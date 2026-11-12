@@ -480,6 +480,19 @@ la vitrine n'affiche que le repère de l'entreprise tant que la zone n'a pas ét
 enregistrée une fois. Les réservations sont ensuite limitées aux communes cochées. Le calcul
 interroge l'API publique `geo.api.gouv.fr` depuis le navigateur.
 
+### Jours fériés (calcul des délais)
+
+Les jours fériés de métropole servent au calcul des délais (sept jours sans paiement d'un contrat hors
+établissement, C. consom. L221-10 ; prorogation au jour ouvrable suivant, C. proc. civ. 642). Ils sont lus
+sur l'API Jours fériés (`calendrier.api.gouv.fr`) et gardés dans `api/storage/holidays/metropole.json`,
+rechargé de lui-même quand une année manque ou que la réserve a plus d'un an : **aucune tâche planifiée
+n'est nécessaire**, l'offre Starter suffit. Le dossier doit être accessible en écriture par PHP.
+
+Facultatif, si votre hébergement propose les tâches planifiées (« Tâches planifiées - Cron » dans
+l'espace client OVHcloud ; à vérifier pour votre offre) : commande `api/cron/refresh-holidays.php`
+(chemin depuis la racine de votre hébergement, selon l'emplacement du dossier `api/`), langage PHP, une
+fois par mois ou par an. Le script ne s'exécute qu'en ligne de commande.
+
 ---
 
 ## Étape 7 : vérifier le déploiement

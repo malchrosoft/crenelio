@@ -30,7 +30,7 @@ class Quote
         FROM `quotes` q LEFT JOIN `appointments` a ON a.id = q.appointment_id';
 
     /** Statuts dans lesquels le devis n'est plus modifiable (envoyé au client ou décidé). */
-    private const LOCKED = ['sent', 'accepted', 'refused', 'expired', 'withdrawn'];
+    private const LOCKED = ['sent', 'accepted', 'refused', 'expired', 'withdrawn', 'cancelled'];
 
     /** Liste, avec passage en « expiré » des devis envoyés dont la validité est dépassée. */
     public static function all(): array
@@ -281,6 +281,20 @@ class Quote
      * Envoi : numéro chronologique propre aux devis (préfixe-année-rang), lien client, échéance.
      * Le numéro n'est attribué qu'ici : un brouillon supprimé ne laisse pas de trou.
      */
+    /**
+     * Annulation par le professionnel d'un devis envoyé, avant toute réponse du client : rétractation de
+     * l'offre (C. civ. 1115 et 1116 ; avant la fin de sa validité, elle engage sa responsabilité). Le client
+     * ne peut plus l'accepter. False si le devis n'est pas (ou plus) en attente de réponse.
+     */
+    public static function cancel(int $id, ?string $reason): bool
+    {
+        self::expireOutdated();
+        return Database::execute(
+            "UPDATE `quotes` SET status = 'cancelled', cancelled_at = NOW(), cancel_reason = ? WHERE id = ? AND status = 'sent'",
+            [$reason === null || trim($reason) === '' ? null : mb_substr(trim($reason), 0, 255), $id]
+        ) > 0;
+    }
+
     public static function markSent(int $id): bool
     {
         $pdo = Database::getConnection();

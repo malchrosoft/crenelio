@@ -156,7 +156,7 @@ CREATE TABLE `quotes` (
     `title`           VARCHAR(255)    NOT NULL DEFAULT '',
     `notes`           TEXT            NULL,
     -- withdrawn : rétractation du client (fonction de rétractation en ligne, C. consom. L221-18 et suivants)
-    `status`          ENUM('draft', 'sent', 'accepted', 'refused', 'expired', 'withdrawn') NOT NULL DEFAULT 'draft',
+    `status`          ENUM('draft', 'sent', 'accepted', 'refused', 'expired', 'withdrawn', 'cancelled') NOT NULL DEFAULT 'draft',
     -- Régime de TVA figé à la création : 'franchise' (art. 293 B du CGI) ou 'vat'
     `vat_mode`        ENUM('franchise', 'vat') NOT NULL DEFAULT 'franchise',
     `validity_days`   SMALLINT        NOT NULL DEFAULT 30,
@@ -210,6 +210,9 @@ CREATE TABLE `quotes` (
     `withdrawal_address` VARCHAR(500) NULL,
     `withdrawal_ip`    VARCHAR(45)    NULL,
     `refusal_reason`  TEXT            NULL,
+    -- Devis envoyé annulé par le professionnel avant toute réponse (rétractation de l'offre, C. civ. 1115 et 1116)
+    `cancelled_at`    DATETIME        NULL,
+    `cancel_reason`   VARCHAR(255)    NULL,
     `created_at`      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `fk_quote_appointment` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`id`) ON DELETE SET NULL
@@ -239,7 +242,7 @@ CREATE INDEX `idx_quote_lines_quote` ON `quote_lines` (`quote_id`, `position`);
 CREATE TABLE `quote_notifications` (
     `id`            INT AUTO_INCREMENT PRIMARY KEY,
     `quote_id`      INT             NOT NULL,
-    `type`          ENUM('quote_client', 'decision_client', 'decision_pro', 'withdrawal_client', 'withdrawal_pro') NOT NULL,
+    `type`          ENUM('quote_client', 'decision_client', 'decision_pro', 'withdrawal_client', 'withdrawal_pro', 'cancellation_client') NOT NULL,
     `recipient`     VARCHAR(255)    NOT NULL,
     `subject`       VARCHAR(255)    NOT NULL,
     `status`        ENUM('pending', 'sent', 'failed') NOT NULL DEFAULT 'pending',

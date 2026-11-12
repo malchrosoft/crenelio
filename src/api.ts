@@ -149,6 +149,11 @@ export const api = {
   updateQuote: (id: number, payload: QuotePayload) => request<Quote>('PUT', `/quotes/${id}`, payload),
   deleteQuote: (id: number) => request<{ deleted: boolean }>('DELETE', `/quotes/${id}`),
   /** Numéro, lien et email au client (`notifications` : résultat de l'envoi). */
+  /** Jours fériés de métropole (année en cours et deux suivantes), pour le calcul des délais. */
+  holidays: () => request<{ dates: Record<string, string> }>('GET', '/admin/holidays'),
+  /** Devis envoyé annulé avant toute réponse (rétractation de l'offre) ; `notify` : email au client. */
+  cancelQuote: (id: number, reason: string | null, notify: boolean) =>
+    request<Quote>('POST', `/quotes/${id}/cancel`, { reason, notify }),
   sendQuote: (id: number) =>
     request<Quote & { notifications: { type: string; status: string }[] }>('POST', `/quotes/${id}/send`),
   /** Vente : remise du bien au client, départ du délai de rétractation (L221-18, 2°). */

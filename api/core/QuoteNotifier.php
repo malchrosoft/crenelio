@@ -31,6 +31,12 @@ class QuoteNotifier
         return [self::toClient($quote, 'quote_client', EmailTemplates::quoteClient($quote, $config), $attachments)];
     }
 
+    /** Devis annulé par le professionnel avant toute réponse : le client en est informé. */
+    public static function sendCancellation(array $quote, array $config): array
+    {
+        return array_values(array_filter([self::toClient($quote, 'cancellation_client', EmailTemplates::quoteCancelled($quote, $config))]));
+    }
+
     /** Réponse du client : exemplaire au client (accepté) ou accusé (refusé), et avis à l'artisan. */
     public static function sendDecision(array $quote, array $config): array
     {

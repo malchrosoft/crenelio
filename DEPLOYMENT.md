@@ -475,6 +475,19 @@ to `api/storage/zone/service-area.geojson`. After a first deployment, the vitrin
 the company marker until the zone is computed and saved once. Bookings are then restricted to
 the selected communes. The computation calls the public API `geo.api.gouv.fr` from the browser.
 
+### Public holidays (time-limit computation)
+
+Metropolitan French public holidays are used to compute legal time limits (seven days without payment for
+an off-premises contract, French Consumer Code L221-10; extension to the next working day, Code of Civil
+Procedure art. 642). They are read from the public holidays API (`calendrier.api.gouv.fr`) and kept in
+`api/storage/holidays/metropole.json`, which refreshes itself when a year is missing or the store is more
+than a year old: **no scheduled task is needed**, the Starter plan is enough. PHP must be able to write to
+that folder.
+
+Optional, if your hosting offers scheduled tasks ("Tâches planifiées - Cron" in the OVHcloud control panel;
+check availability for your plan): command `api/cron/refresh-holidays.php` (path from your hosting root,
+depending on where `api/` lives), language PHP, monthly or yearly. The script only runs from the command line.
+
 ---
 
 ## Step 7: Verify the Deployment

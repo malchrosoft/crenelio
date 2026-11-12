@@ -88,6 +88,14 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ config }) => {
         Les données d'un rendez-vous sont conservées {retention} après la date de l'intervention, puis effacées
         automatiquement (seuls restent la prestation, la date, le montant et la commune, sans lien avec vous).
       </p>
+      <p>
+        Un devis que vous avez accepté est un contrat : il est conservé, avec vos coordonnées et la trace de votre
+        accord, dix ans après l'intervention, et vous pouvez y accéder à tout moment (Code de la consommation,
+        articles L213-1 et D213-2, obligation pour un contrat de 120 euros ou plus conclu en ligne ; même durée
+        pour les autres devis acceptés, comme pièces justificatives, Code de commerce, article L123-22). Pendant ce
+        délai, il n'est pas effacé à votre demande, cette conservation répondant à une obligation légale (règlement
+        général sur la protection des données, article 17, paragraphe 3, b). Il est ensuite effacé automatiquement.
+      </p>
 
       <h4>Vos droits</h4>
       <p>

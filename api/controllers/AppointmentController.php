@@ -625,9 +625,10 @@ class AppointmentController
         }
         $months = (int)(Config::get('rgpd_retention_months') ?: Appointment::DEFAULT_RETENTION_MONTHS);
         $count = Appointment::purgeOlderThan(max(1, $months));
+        $quotes = Appointment::purgeQuotes(max(1, $months));
         Config::set('rgpd_last_purge', $today);
-        if ($count > 0) {
-            error_log("[Crenelio] RGPD : $count rendez-vous anonymisés (conservation $months mois)");
+        if ($count + $quotes > 0) {
+            error_log("[Crenelio] RGPD : $count rendez-vous et $quotes devis anonymisés (conservation $months mois, contrats dix ans)");
         }
     }
 }

@@ -11,6 +11,7 @@ export const SITE_FILES = [
   'api/controllers',
   'api/models',
   'api/routes',
+  'api/cron',
   'api/public/assets',
 ];
 
@@ -21,4 +22,5 @@ export const STORAGE_SKELETON = [
   'api/storage/insurance/.gitkeep',
   'api/storage/zone/.gitkeep',
   'api/storage/auth/.gitkeep',
+  'api/storage/holidays/.gitkeep',
 ];

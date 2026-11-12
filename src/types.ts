@@ -224,7 +224,7 @@ export interface BookingPayload {
 
 /** Types de ligne : main-d'œuvre, forfait, déplacement, pièce au nom du client (débours), fourniture revendue. */
 export type QuoteLineKind = 'labour' | 'service' | 'travel' | 'debours' | 'supply' | 'discount';
-export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'refused' | 'expired' | 'withdrawn';
+export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'refused' | 'expired' | 'withdrawn' | 'cancelled';
 
 /** Montants en chaînes (DECIMAL MySQL) à la lecture, en nombres à l'envoi. */
 export interface QuoteLine {
@@ -287,10 +287,15 @@ export interface Quote {
   withdrawal_email: string | null;
   withdrawal_address?: string | null;
   refusal_reason: string | null;
+  /** Devis envoyé annulé par le professionnel (rétractation de l'offre, C. civ. 1115 et 1116). */
+  cancelled_at: string | null;
+  cancel_reason: string | null;
   /** Jeton du lien client (Espace Artisan seulement, après l'envoi). */
   token?: string | null;
   /** Page publique : rétractation en ligne encore possible. */
   can_withdraw?: boolean;
+  /** Statut du rendez-vous lié (lecture seule, jointure du serveur). */
+  appointment_status?: string | null;
   created_at: string;
   lines?: QuoteLine[];
 }

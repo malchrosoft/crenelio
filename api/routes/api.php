@@ -22,6 +22,7 @@ require_once __DIR__ . '/../controllers/UiStateController.php';
 require_once __DIR__ . '/../controllers/CalendarFeedController.php';
 require_once __DIR__ . '/../controllers/QuoteController.php';
 require_once __DIR__ . '/../controllers/InsuranceController.php';
+require_once __DIR__ . '/../controllers/HolidayController.php';
 
 $router = new Router();
 
@@ -149,10 +150,12 @@ $router->get('/quotes/:id',                 $admin([$quoteController, 'show']));
 $router->put('/quotes/:id',                 $admin([$quoteController, 'update']));
 $router->delete('/quotes/:id',              $admin([$quoteController, 'destroy']));
 $router->post('/quotes/:id/send',           $admin([$quoteController, 'send']));
+$router->post('/quotes/:id/cancel',         $admin([$quoteController, 'cancel']));
 $router->put('/quotes/:id/goods-received',  $admin([$quoteController, 'goodsReceived']));
 $router->get('/quotes/:id/notifications',   $admin([$quoteController, 'notifications']));
 
 // Attestation d'assurance décennale jointe aux devis (C. assur. L243-2)
+$router->get('/admin/holidays',                      $admin([new HolidayController(), 'index']));
 $router->get('/admin/insurance-attestation',       $admin([$insuranceController, 'status']));
 $router->get('/admin/insurance-attestation/file',  $admin([$insuranceController, 'file']));
 $router->post('/admin/insurance-attestation',      $admin([$insuranceController, 'upload']));

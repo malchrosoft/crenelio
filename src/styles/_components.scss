@@ -3642,6 +3642,7 @@ $data-grid-status-width: 13em;
   &.quote-status--refused  { background: $danger-light; color: $danger; }
   &.quote-status--expired  { background: $warning-light; color: $warning; }
   &.quote-status--withdrawn { background: $danger-light; color: $danger; }
+  &.quote-status--cancelled { background: $gray-100; color: $gray-600; }
 }
 
 .admin-modal__title .status-badge {
@@ -4498,4 +4499,11 @@ $data-grid-status-width: 13em;
 .invoice-prep__quoted {
   display: block;
   color: $gray-500;
+}
+
+// Fenêtre du rendez-vous : devis liés à une annulation ou un déplacement
+.appointment-dialog__linked {
+  display: grid;
+  gap: $space-2xs;
+  margin: 0;
 }

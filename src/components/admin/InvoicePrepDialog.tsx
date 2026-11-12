@@ -101,17 +101,22 @@ const InvoicePrepDialog: React.FC<InvoicePrepDialogProps> = ({ appointment, conf
     return { ht, tva, ttc: ht + tva, debours: deb, total: ht + tva + deb };
   }, [services, debours, vat]);
   const budget = quote?.debours_budget ? Number(quote.debours_budget) : null;
+  // Jours fériés (API Jours fériés, réserve du serveur) : un délai qui finit un jour férié est prorogé
+  const [holidays, setHolidays] = useState<Record<string, string>>({});
+  useEffect(() => {
+    api.holidays().then((r) => setHolidays(r.dates)).catch(() => setHolidays({}));
+  }, []);
   // Premier jour où un paiement est possible pour un contrat hors établissement (L221-10). Calcul des délais en
   // jours (C. proc. civ. 641 et 642, règlement 1182/71 art. 3, concordants ; docs/legal/fr/textes/) : le jour de
   // l'accord ne compte pas, le délai finit au septième jour à 24 h, prorogé au jour ouvrable suivant s'il tombe un
-  // samedi ou un dimanche (jours fériés non connus ici : avertissement à vérifier ces jours-là). null hors délai, sans accord, ou pour une urgence (L221-10, 4°)
+  // samedi, un dimanche ou un jour férié de métropole (Holidays ; sans réponse de l'API, week-ends seulement). null hors délai, sans accord, ou pour une urgence (L221-10, 4°)
   const coolingOff = useMemo(() => {
     if (!quote?.decided_at || quote.status !== 'accepted' || Number(quote.urgent)) return null;
     let lastDay = addDays(startOfDay(parseISO(quote.decided_at.replace(' ', 'T'))), 7);
-    while (lastDay.getDay() === 0 || lastDay.getDay() === 6) lastDay = addDays(lastDay, 1);
+    while (lastDay.getDay() === 0 || lastDay.getDay() === 6 || holidays[format(lastDay, 'yyyy-MM-dd')]) lastDay = addDays(lastDay, 1);
     const firstDay = addDays(lastDay, 1);
     return isAfter(firstDay, new Date()) ? firstDay : null;
-  }, [quote]);
+  }, [quote, holidays]);
 
   const a = appointment;
   const clientAddress = [a.address, `${a.postal_code} ${a.city}`.trim()].filter(Boolean).join(', ');

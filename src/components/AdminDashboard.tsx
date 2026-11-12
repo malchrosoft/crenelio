@@ -65,7 +65,7 @@ import ProEmailField from './admin/ProEmailField';
 import InsuranceAttestationField from './admin/InsuranceAttestationField';
 import { applyFavicon } from '../utils/favicon';
 import { applyDocumentTitle } from '../utils/documentTitle';
-import { addDays, format, isPast, isToday, parseISO } from 'date-fns';
+import { addDays, format, isAfter, isPast, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const NAV_ICON = { size: 20, weight: 'fill' as const, 'aria-hidden': true };
@@ -174,6 +174,8 @@ export const AdminDashboard: React.FC = () => {
   const [dateEndFilter, setDateEndFilter] = useState('');
   // Rendez-vous ouvert dans la fenêtre de consultation / modification (calendrier ou liste)
   const [openedId, setOpenedId] = useState<number | null>(null);
+  // Devis acceptés du rendez-vous à effacer : conservés comme contrats (dix ans), signalés dans la confirmation
+  const [keptContracts, setKeptContracts] = useState<string[]>([]);
   // Statut proposé à l'ouverture de la fenêtre (choisi dans la liste), à valider
   const [openedStatus, setOpenedStatus] = useState<Appointment['status'] | undefined>(undefined);
   // Devis à ouvrir dans l'écran « Devis » (créé depuis la fenêtre d'un rendez-vous)
@@ -212,6 +214,18 @@ export const AdminDashboard: React.FC = () => {
 
   // Demande d'effacement RGPD en cours de confirmation
   const [anonymizing, setAnonymizing] = useState<Appointment | null>(null);
+  useEffect(() => {
+    setKeptContracts([]);
+    if (!anonymizing) return;
+    api
+      .listQuotes()
+      .then((all) =>
+        setKeptContracts(
+          all.filter((q) => q.appointment_id === anonymizing.id && (q.status === 'accepted' || q.status === 'withdrawn')).map((q) => q.number ?? ''),
+        ),
+      )
+      .catch(() => setKeptContracts([]));
+  }, [anonymizing]);
 
   // Journal des emails ouvert (depuis la liste, le calendrier ou la fenêtre du rendez-vous)
   const [emailsFor, setEmailsFor] = useState<{ appointment: Appointment; fromDialog: boolean } | null>(null);
@@ -798,9 +812,27 @@ export const AdminDashboard: React.FC = () => {
           onConfirm={confirmAnonymize}
           onCancel={() => setAnonymizing(null)}
         >
-          Le nom, l'email, le téléphone, l'adresse et les notes de <strong>{anonymizing.client_name}</strong> seront
-          effacés, ainsi que les adresses du journal des emails. Le rendez-vous reste dans le planning (prestation,
-          date, montant, commune). Cette action est irréversible : à utiliser pour une demande d'effacement.
+          {isAfter(parseISO(anonymizing.start_datetime.replace(' ', 'T')), new Date()) && anonymizing.status !== 'cancelled' && (
+            <p className="form-alert-error">
+              Ce rendez-vous est à venir et n'est pas annulé : sans ses coordonnées, vous ne pourrez plus joindre le client.
+              Annulez-le d'abord si l'intervention n'a plus lieu.
+            </p>
+          )}
+          <p>
+            Le nom, l'email, le téléphone, l'adresse et les notes de <strong>{anonymizing.client_name}</strong> seront effacés,
+            ainsi que les adresses du journal des emails. Le rendez-vous reste dans le planning (prestation, date, montant,
+            commune). Cette action est irréversible : à utiliser pour une demande d'effacement.
+          </p>
+          {keptContracts.length > 0 && (
+            <p>
+              <strong>Conservé :</strong> le devis accepté {keptContracts.join(', ')}, contrat conclu, reste intact dix ans après
+              l'intervention (C. consom. L213-1 et D213-2 ; RGPD, art. 17, 3, b), puis il est effacé automatiquement. Indiquez-le
+              au client qui demande l'effacement.{' '}
+              <a href="/admin?doc=fr%2Fconservation-effacement.md" target="_blank" rel="noopener">
+                Conservation et effacement
+              </a>
+            </p>
+          )}
         </ConfirmDialog>
       )}
       {loading ? (

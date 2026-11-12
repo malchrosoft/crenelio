@@ -116,7 +116,9 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
-  const [confirm, setConfirm] = useState<'send' | 'delete' | null>(null);
+  const [confirm, setConfirm] = useState<'send' | 'delete' | 'cancel' | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
+  const [cancelNotify, setCancelNotify] = useState(true);
 
   const locked = quote !== null && quote.status !== 'draft';
   const allowSupply = config.quote_allow_supply === '1';
@@ -255,6 +257,21 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
       );
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur lors de l'envoi");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function cancelQuote() {
+    setConfirm(null);
+    if (!quote) return;
+    setBusy(true);
+    setError(null);
+    try {
+      onSaved(await api.cancelQuote(quote.id, cancelReason.trim() || null, cancelNotify));
+      setInfo(cancelNotify ? 'Devis annulé : le client en est informé par email.' : 'Devis annulé, sans email au client.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'annulation");
     } finally {
       setBusy(false);
     }
@@ -794,6 +811,12 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
           )}
 
           <div className="admin-modal__actions">
+            {quote && quote.status === 'sent' && (
+              <button type="button" className="btn btn-danger" onClick={() => setConfirm('cancel')} disabled={busy}>
+                <XIcon size={16} weight="bold" aria-hidden="true" />
+                Annuler le devis
+              </button>
+            )}
             {quote && quote.status === 'draft' && (
               <button type="button" className="btn btn-danger" onClick={() => setConfirm('delete')} disabled={busy}>
                 <TrashIcon size={16} weight="bold" aria-hidden="true" />
@@ -824,6 +847,25 @@ const QuoteEditor: React.FC<QuoteEditorProps> = ({ quote, config, onClose, onSav
           <p>
             Il est envoyé par email au client avec un lien pour l'accepter ou le refuser, et reste valable {form.validity_days} jours.
           </p>
+        </ConfirmDialog>
+      )}
+      {confirm === 'cancel' && quote && (
+        <ConfirmDialog title="Annuler ce devis ?" confirmLabel="Annuler le devis" cancelLabel="Revenir" onConfirm={cancelQuote} onCancel={() => setConfirm(null)}>
+          <p>
+            Le client ne pourra plus l'accepter. C'est une rétractation de votre offre (C. civ. 1115 et 1116) : avant la fin de sa
+            validité, le {sqlDate(quote.valid_until)}, elle reste possible mais engage votre responsabilité si le client subit un
+            préjudice. En cas de doute, prévenez-le d'abord. Voir <DocLink path="fr/annulation-devis.md">annuler un devis ou un rendez-vous</DocLink>.
+          </p>
+          <div className="form-group">
+            <label className="form-label" htmlFor="quote-cancel-reason">
+              Motif (facultatif, repris dans l'email)
+            </label>
+            <input id="quote-cancel-reason" className="form-input" value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} />
+          </div>
+          <label className="form-check">
+            <input type="checkbox" checked={cancelNotify} onChange={(e) => setCancelNotify(e.target.checked)} />
+            <span>Prévenir le client par email</span>
+          </label>
         </ConfirmDialog>
       )}
       {confirm === 'delete' && (
@@ -1077,6 +1119,15 @@ const QuoteDecision: React.FC<{ quote: Quote }> = ({ quote }) => (
         <dt>Rétracté le</dt>
         <dd>
           {sqlDate(quote.withdrawn_at)} par {quote.withdrawal_name} (accusé de réception : {quote.withdrawal_email})
+        </dd>
+      </>
+    )}
+    {quote.status === 'cancelled' && (
+      <>
+        <dt>Annulé le</dt>
+        <dd>
+          {sqlDate(quote.cancelled_at)}
+          {quote.cancel_reason ? ` (${quote.cancel_reason})` : ''}
         </dd>
       </>
     )}

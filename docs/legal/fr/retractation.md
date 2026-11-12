@@ -64,7 +64,12 @@ Texte intégral : [textes/code-consommation.md](textes/code-consommation.md).
   bénéficie pas.
 - **Hors établissement** (L221-9) : exemplaire daté du contrat, papier signé ou support durable, avec
   toutes les informations de L221-5 et **accompagné du formulaire type**. (L221-10) : **aucun paiement ni
-  contrepartie avant sept jours** à compter de la conclusion, sauf travaux urgents (4°).
+  contrepartie avant sept jours** à compter de la conclusion, sauf travaux urgents (4°). Calcul (vérifié le
+  12/11/2026, C. proc. civ. 641 et 642, règlement 1182/71 art. 3, concordants) : le jour de l'accord ne compte
+  pas, le délai finit le septième jour à 24 h, prorogé au premier jour ouvrable s'il tombe un samedi, un
+  dimanche ou un jour férié ; Crénelio affiche le premier jour de paiement possible en tête de « Préparer la
+  facture » (jours fériés de métropole lus sur l'API Jours fériés). Un devis accepté **en ligne juste après
+  votre visite** au domicile est aussi un contrat hors établissement (L221-1, 2°, b).
 - **Fonction en ligne** (D221-5, créé par le décret n° 2026-3) : libellés « renoncer au contrat ici » et
   « confirmer la rétractation », déclaration (nom et prénom, contrat, moyen électronique de l'accusé),
   accusé de réception reprenant le contenu, la date et l'heure. Conforme à l'implémentation.

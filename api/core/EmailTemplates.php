@@ -857,6 +857,33 @@ class EmailTemplates
      * @param bool $forPro Copie destinée à l'artisan.
      * @return array{subject: string, html: string, text: string}
      */
+    /**
+     * Devis annulé par le professionnel avant toute réponse (rétractation de l'offre) : le client ne peut
+     * plus l'accepter ; aucune somme n'est due.
+     *
+     * @return array{subject: string, html: string, text: string}
+     */
+    public static function quoteCancelled(array $quote, array $config): array
+    {
+        $company = $config['company_name'] ?? 'Crénelio';
+        $title = 'Devis annulé';
+        $intro = sprintf(
+            'Bonjour %s, le devis %s que nous vous avons adressé est annulé : il ne peut plus être accepté et aucune somme n\'est due.',
+            self::escape((string)$quote['client_name']),
+            self::escape((string)$quote['number'])
+        );
+        $rows = ['Devis' => self::escape('Devis ' . $quote['number'] . ($quote['title'] ? ' — ' . $quote['title'] : ''))];
+        if (!empty($quote['cancel_reason'])) {
+            $rows['Motif'] = self::escape((string)$quote['cancel_reason']);
+        }
+        $outro = 'Pour toute question, répondez simplement à ce message.';
+        return [
+            'subject' => sprintf('Devis %s annulé — %s', $quote['number'], $company),
+            'html'    => self::layout($company, $title, $intro, $rows, $outro, null, $config),
+            'text'    => self::plainText($title, $intro, $rows, $outro, null, $config),
+        ];
+    }
+
     public static function quoteWithdrawal(array $quote, array $config, bool $forPro): array
     {
         $company = $config['company_name'] ?? 'Crénelio';
