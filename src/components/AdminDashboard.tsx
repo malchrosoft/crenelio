@@ -838,6 +838,7 @@ export const AdminDashboard: React.FC = () => {
         <Suspense fallback={<p>Chargement du calendrier…</p>}>
           <AppointmentCalendar
             appointments={appointments}
+            travelMinutes={Number(config.buffer_minutes ?? 30)}
             refreshKey={refreshKey}
             onChanged={replaceAppointment}
             // Même fenêtre que depuis la liste : on reste sur le calendrier

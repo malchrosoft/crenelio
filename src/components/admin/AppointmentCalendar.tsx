@@ -6,6 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import frLocale from '@fullcalendar/core/locales/fr';
 import type { BusinessHoursInput, EventDropArg, EventInput } from '@fullcalendar/core';
+import { addMinutes, parseISO } from 'date-fns';
 import { api } from '../../api';
 import { Appointment, Schedule, Unavailability } from '../../types';
 import ConfirmDialog from './ConfirmDialog';
@@ -14,6 +15,8 @@ import { useMediaQuery } from '../../utils/useMediaQuery';
 
 interface AppointmentCalendarProps {
   appointments: Appointment[];
+  /** Temps de trajet entre deux interventions (`buffer_minutes`), affiché autour des rendez-vous. */
+  travelMinutes?: number;
   /** Change à chaque actualisation (bouton de l'en-tête, retour sur l'onglet) : données rechargées. */
   refreshKey?: number;
   /** Rendez-vous déplacé (glisser-déposer) : la liste du planning est mise à jour. */
@@ -55,7 +58,7 @@ function businessHours(schedules: Schedule[]): BusinessHoursInput {
  * Calendrier des interventions (Item 23) : vues mois / semaine / jour / liste, horaires de travail,
  * indisponibilités, glisser-déposer validé par le moteur de créneaux (forçable sur confirmation).
  */
-const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ appointments, onChanged, onOpen, onCreate, refreshKey }) => {
+const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ appointments, onChanged, onOpen, onCreate, refreshKey, travelMinutes = 0 }) => {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [unavailabilities, setUnavailabilities] = useState<Unavailability[]>([]);
   const [showCancelled, setShowCancelled] = useState(false);
@@ -89,6 +92,19 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ appointments,
           editable: a.status === 'pending' || a.status === 'confirmed',
           extendedProps: { appointment: a },
         })),
+      // Trajet avant et après chaque rendez-vous actif : réservé, donc non proposé en ligne
+      ...(travelMinutes > 0
+        ? appointments
+            .filter((a) => a.status === 'pending' || a.status === 'confirmed')
+            .flatMap((a) => {
+              const start = parseISO(a.start_datetime.replace(' ', 'T'));
+              const end = parseISO(a.end_datetime.replace(' ', 'T'));
+              return [
+                { id: `t${a.id}b`, start: addMinutes(start, -travelMinutes), end: start },
+                { id: `t${a.id}a`, start: end, end: addMinutes(end, travelMinutes) },
+              ].map((slot) => ({ ...slot, display: 'background', classNames: ['calendar-travel'] }));
+            })
+        : []),
       ...unavailabilities.map((u) => ({
         id: `u${u.id}`,
         title: u.title,
@@ -98,7 +114,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ appointments,
         classNames: ['calendar-unavailability'],
       })),
     ],
-    [appointments, unavailabilities, showCancelled]
+    [appointments, unavailabilities, showCancelled, travelMinutes]
   );
 
   async function move(drop: EventDropArg, force: boolean) {
@@ -135,6 +151,8 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ appointments,
             </li>
           ))}
           <li className="appointment-calendar__legend-item appointment-calendar__legend-item--unavailable">Indisponible</li>
+          <li className="appointment-calendar__legend-item appointment-calendar__legend-item--closed">Fermé</li>
+          {travelMinutes > 0 && <li className="appointment-calendar__legend-item appointment-calendar__legend-item--travel">Trajet</li>}
         </ul>
       </div>
 

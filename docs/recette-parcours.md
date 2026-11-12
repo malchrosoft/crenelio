@@ -32,7 +32,7 @@ noté) · ❌ échec · 🔁 corrigé depuis, à rejouer · ⏭️ volontairemen
 |---|---|---|---|
 | 1 | 2.3 / 2.4 | ✅ corrigé et rejoué le 11/11 (2.3, 2.4, 2.9 validés). **Défaut** : le statut s'enregistre dès le choix dans la liste (`AppointmentDialog.tsx`), sans validation ; « Prévenir le client » n'est pas transmis au changement de statut (client toujours prévenu) | Parcours descendant : modifications, résumé, « Prévenir le client » pour statut et déplacement, bouton « Valider » |
 | 2 | 2.4 | ✅ corrigé et rejoué le 11/11 (confirmation). Annuler sans prévenir le client est risqué | Confirmation explicite ou motif obligatoire |
-| 3 | 2.6 | Fond du calendrier sans distinction libre / indisponible | Griser heures fermées, indisponibilités, trajets |
+| 3 | 2.6 | ✅ corrigé le 11/11 (à vérifier à l'usage). Fond du calendrier sans distinction libre / indisponible | Griser heures fermées, indisponibilités, trajets |
 | 4 | 2.7 | ✅ corrigé le 11/11 (à vérifier à l'usage). Avertissement générique sur un créneau non proposable | Donner la raison précise (fermé, indisponibilité, délai minimal, chevauchement avec tel RDV, trajet) |
 | 5 | 2.8 | ✅ corrigé le 11/11 (à vérifier à l'usage). Refus d'un déplacement = simple annulation pour le pro | Le signaler dans l'email au pro quand l'annulation suit un déplacement |
 | 6 | 3.4 | ✅ corrigé le 11/11 (à vérifier à l'usage). Deux lignes de déplacement non signalées (désignations différentes) | Comparer les déplacements entre eux, ou ne pas en préremplir un second |

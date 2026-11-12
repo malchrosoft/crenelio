@@ -2930,7 +2930,8 @@ $calendar-statuses: (
   --fc-neutral-bg-color: #{$gray-50};
   --fc-today-bg-color: #{$primary-light};
   --fc-now-indicator-color: #{$danger};
-  --fc-non-business-color: color-mix(in srgb, #{$gray-400} 12%, transparent);
+  // Heures fermées nettement grisées : le fond distingue libre et indisponible (recette, écart 3)
+  --fc-non-business-color: color-mix(in srgb, #{$gray-400} 32%, transparent);
   --fc-button-bg-color: white;
   --fc-button-text-color: #{$gray-700};
   --fc-button-border-color: #{$gray-300};
@@ -3018,12 +3019,18 @@ $calendar-statuses: (
     text-decoration: line-through;
   }
 
+  // Temps de trajet réservé avant et après chaque rendez-vous actif (non réservable en ligne)
+  .calendar-travel {
+    background: primary-tint(14%);
+    opacity: 1;
+  }
+
   // Indisponibilités : bandes grises en arrière-plan
   .calendar-unavailability {
     background: repeating-linear-gradient(
       -45deg,
-      color-mix(in srgb, $gray-500 14%, transparent) 0 6px,
-      color-mix(in srgb, $gray-500 5%, transparent) 6px 12px
+      color-mix(in srgb, $gray-500 30%, transparent) 0 6px,
+      color-mix(in srgb, $gray-500 12%, transparent) 6px 12px
     );
     opacity: 1;
 
@@ -3080,6 +3087,16 @@ $calendar-statuses: (
     &--#{$status}::before {
       background: $color;
     }
+  }
+
+  &--closed::before {
+    background: color-mix(in srgb, $gray-400 32%, transparent);
+    border: 1px solid $gray-300;
+  }
+
+  &--travel::before {
+    background: primary-tint(14%);
+    border: 1px solid primary-alpha(30%);
   }
 
   &--unavailable::before {
