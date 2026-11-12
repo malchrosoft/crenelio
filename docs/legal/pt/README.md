@@ -48,6 +48,8 @@ transposta para as suas traduções (ou estas são assinaladas como desatualizad
 | Nota (fatura) obrigatória acima de 25 € com IVA | [note-facture.md](note-facture.md) |
 | Menção « EI », SIRET, RM, seguro, mediador, publicidade dos preços | [mentions-entreprise.md](mentions-entreprise.md) |
 | Lembrete do profissional: compras, comprovativos, conservação | [rappels-artisan.md](rappels-artisan.md) |
+| Anular ou mudar a data de uma marcação que tem orçamento: oferta anulada, revogação, força maior | [annulation-devis.md](annulation-devis.md) |
+| Conservação e apagamento dos dados dos clientes: dez anos para um orçamento aceite, RGPD | [conservation-effacement.md](conservation-effacement.md) |
 | Textos oficiais, palavra por palavra: Code de la consommation (Código do Consumo) | [fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Textos oficiais: Code de commerce (Código Comercial; EI, sociedades) | [fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Textos oficiais: Code général des impôts (Código Geral dos Impostos; *débours*, isenção) | [fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -56,6 +58,8 @@ transposta para as suas traduções (ou estas são assinaladas como desatualizad
 | Textos oficiais: CGI, anexo II (menções obrigatórias das faturas) | [fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Textos oficiais: Code de la sécurité sociale (Código da Segurança Social; contribuições do microempresário) | [fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Textos oficiais: Code des assurances (Código dos Seguros; seguro decenal, certificado anexado aos orçamentos) | [fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Textos oficiais: Code civil (Código Civil; construtor, garantias decenal, bienal, de perfeito acabamento) | [fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Textos oficiais: Code civil (Código Civil; oferta e aceitação, modificação do contrato, força maior, resolução; construtor, garantias decenal, bienal, de perfeito acabamento) | [fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Textos oficiais: direito da União (contagem dos prazos: regulamento 1182/71, diretiva 2011/83/UE; RGPD: conservação, fundamentos jurídicos, apagamento) | [fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Textos oficiais: Code de procédure civile (Código de Processo Civil; contagem dos prazos) | [fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Doutrina fiscal (BOFiP): *débours*, peças soltas | [fr/textes/bofip.md](../fr/textes/bofip.md) |
 | Lista das fontes, natureza e data de verificação | [sources.md](../sources.md) |

@@ -66,7 +66,12 @@ Texte intégral : [../fr/textes/code-consommation.md](../fr/textes/code-consomma
   bénéficie point.
 - **Hors établissemint** (L221-9) : exemplaire daté du contrat, papier signé ou support durable, avec
   toutes les informations d'L221-5 et **accompagné du formulaire type**. (L221-10) : **aucun paiemint ni
-  contrepartie avant sept jours** à compter d'el conclusion, sauf travaux urgents (4°).
+  contrepartie avant sept jours** à compter d'el conclusion, sauf travaux urgents (4°). Calcul (vérifié l'
+  12/11/2026, C. proc. civ. 641 et 642, règlemint 1182/71 art. 3, d'accord intre eux) : l'jour d'l'accord i compte
+  point, l'délai i finit l'septième jour à 24 h, poussé au premier jour ouvrabe s'i tombe un sam'di, un
+  dimanche ou un jour férié ; Crénelio i affiche l'premier jour d'paiemint possibe in haut d'« Préparer la
+  facture » (jours fériés d'métropole lus su l'API Jours fériés). Un devis accepté **in ligne jusse après
+  vo visite** au domicile, ch'est eun contrat hors établissemint itou (L221-1, 2°, b).
 - **Fonction in ligne** (D221-5, créé par l'décret n° 2026-3) : libellés « renoncer au contrat ici » et
   « confirmer la rétractation », déclaration (nom et prénom, contrat, moyen électronique d'l'accusé),
   accusé d'réception qui r'prind l'contenu, l'date et l'heure. Conforme à ch'qui est fait dins l'code.

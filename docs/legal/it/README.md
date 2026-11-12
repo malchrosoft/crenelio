@@ -48,6 +48,8 @@ riporta nelle sue traduzioni (oppure queste vengono segnalate come non aggiornat
 | Nota (fattura) obbligatoria oltre 25 € IVA inclusa | [note-facture.md](note-facture.md) |
 | Menzione « EI », SIRET, RM, assicurazione, mediatore, pubblicità dei prezzi | [mentions-entreprise.md](mentions-entreprise.md) |
 | Promemoria del professionista: acquisti, giustificativi, conservazione | [rappels-artisan.md](rappels-artisan.md) |
+| Annullare o spostare un appuntamento che ha un preventivo: offerta annullata, revoca, forza maggiore | [annulation-devis.md](annulation-devis.md) |
+| Conservazione e cancellazione dei dati dei clienti: dieci anni per un preventivo accettato, RGPD | [conservation-effacement.md](conservation-effacement.md) |
 | Testi ufficiali, parola per parola: Code de la consommation (Codice del consumo francese) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Testi ufficiali: Code de commerce (Codice di commercio francese; EI, società) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Testi ufficiali: Code général des impôts (Codice generale delle imposte francese; spese anticipate, franchigia) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -56,6 +58,8 @@ riporta nelle sue traduzioni (oppure queste vengono segnalate come non aggiornat
 | Testi ufficiali: CGI, allegato II (menzioni obbligatorie delle fatture) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Testi ufficiali: Code de la sécurité sociale (Codice della previdenza sociale francese; contributi del micro-imprenditore) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Testi ufficiali: Code des assurances (Codice delle assicurazioni francese; assicurazione decennale, attestato allegato ai preventivi) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Testi ufficiali: Code civil (Codice civile francese; costruttore, garanzie decennale, biennale, di perfetto completamento) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Testi ufficiali: Code civil (Codice civile francese; offerta e accettazione, modifica del contratto, forza maggiore, risoluzione; costruttore, garanzie decennale, biennale, di perfetto completamento) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Testi ufficiali: diritto dell'Unione (calcolo dei termini: regolamento 1182/71, direttiva 2011/83/UE; RGPD: conservazione, basi giuridiche, cancellazione) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Testi ufficiali: Code de procédure civile (Codice di procedura civile francese; calcolo dei termini) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Dottrina fiscale (BOFiP): spese anticipate, pezzi di ricambio | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | Elenco delle fonti, natura e data di verifica | [../sources.md](../sources.md) |

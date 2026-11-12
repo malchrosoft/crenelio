@@ -48,6 +48,8 @@ przenosi się do jej tłumaczeń (albo oznacza je jako nieaktualne). Arabski (`a
 | Rachunek (*note*, faktura) obowiązkowy powyżej 25 € TTC (brutto) | [note-facture.md](note-facture.md) |
 | Oznaczenie « EI », SIRET, RM, ubezpieczenie, mediator, jawność cen | [mentions-entreprise.md](mentions-entreprise.md) |
 | Ściągawka profesjonalisty: zakupy, dowody, przechowywanie | [rappels-artisan.md](rappels-artisan.md) |
+| Odwołanie lub przesunięcie wizyty, do której jest kosztorys: anulowana oferta, rozwiązanie za porozumieniem, siła wyższa | [annulation-devis.md](annulation-devis.md) |
+| Przechowywanie i usuwanie danych klientów: dziesięć lat dla zaakceptowanego kosztorysu, RODO | [conservation-effacement.md](conservation-effacement.md) |
 | Teksty urzędowe, słowo w słowo: Code de la consommation | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Teksty urzędowe: Code de commerce (EI, spółki) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Teksty urzędowe: Code général des impôts (*débours*, zwolnienie podmiotowe) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -56,6 +58,8 @@ przenosi się do jej tłumaczeń (albo oznacza je jako nieaktualne). Arabski (`a
 | Teksty urzędowe: CGI, załącznik II (obowiązkowe elementy faktur) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Teksty urzędowe: Code de la sécurité sociale (składki mikroprzedsiębiorcy) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Teksty urzędowe: Code des assurances (ubezpieczenie dziesięcioletnie, zaświadczenie dołączane do kosztorysów) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Teksty urzędowe: Code civil (wykonawca robót budowlanych, gwarancje dziesięcioletnia, dwuletnia, *parfait achèvement*) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Teksty urzędowe: Code civil (oferta i przyjęcie, zmiana umowy, siła wyższa, rozwiązanie; wykonawca robót budowlanych, gwarancje dziesięcioletnia, dwuletnia, *parfait achèvement*) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Teksty urzędowe: prawo europejskie (terminy, RODO) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Teksty urzędowe: Code de procédure civile (obliczanie terminów) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Doktryna podatkowa (BOFiP): *débours*, części zamienne | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | Lista źródeł, ich charakter i data weryfikacji | [../sources.md](../sources.md) |

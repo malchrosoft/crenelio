@@ -48,6 +48,8 @@
 | Обов'язковий рахунок (*note*) понад 25 € з ПДВ | [note-facture.md](note-facture.md) |
 | Позначка «EI», SIRET, RM, страхування, медіатор, оприлюднення цін | [mentions-entreprise.md](mentions-entreprise.md) |
 | Пам'ятка фахівця: закупівлі, підтвердні документи, зберігання | [rappels-artisan.md](rappels-artisan.md) |
+| Скасування чи перенесення візиту, до якого є кошторис: скасована оферта, розірвання за згодою, непереборна сила | [annulation-devis.md](annulation-devis.md) |
+| Зберігання та видалення даних клієнтів: десять років для прийнятого кошторису, GDPR | [conservation-effacement.md](conservation-effacement.md) |
 | Офіційні тексти дослівно: Code de la consommation | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Офіційні тексти: Code de commerce (EI, товариства) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Офіційні тексти: Code général des impôts (*débours*, звільнення від ПДВ) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -56,6 +58,8 @@
 | Офіційні тексти: CGI, додаток II (обов'язкові відомості в рахунках-фактурах) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Офіційні тексти: Code de la sécurité sociale (внески мікропідприємця) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Офіційні тексти: Code des assurances (десятирічне страхування, сертифікат, що додається до кошторисів) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Офіційні тексти: Code civil (будівельник, десятирічна, дворічна гарантії, гарантія належного завершення) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Офіційні тексти: Code civil (оферта й акцепт, зміна договору, непереборна сила, розірвання; будівельник, десятирічна, дворічна гарантії, гарантія належного завершення) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Офіційні тексти: право ЄС (строки, GDPR) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Офіційні тексти: Code de procédure civile (обчислення строків) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Податкова доктрина (BOFiP): *débours*, запасні частини | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | Перелік джерел, їх характер і дата перевірки | [../sources.md](../sources.md) |

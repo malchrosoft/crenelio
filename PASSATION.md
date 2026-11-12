@@ -10,17 +10,25 @@
 
 ## 1. Ce qui est réellement achevé
 
-### 🎯 Reprise immédiate (recette terminée le 11/11/2026)
-- **Recette :** `docs/recette-parcours.md`, 54 cas : 44 validés, 9 avec réserve, 1 écarté. Écarts 1, 2 et 15
-  corrigés ; **à traiter : écarts 3 à 14 et 16 à 20** (tableau du Bilan, `ROADMAP.md` Item 22 point 17).
-- **À décider avec l'humain avant de coder :** écart 9 et 20 (RDV et devis liés : retirer un devis envoyé,
-  nouveau devis qui remplace l'ancien, accord du client pour un devis accepté) et écart 19 (effacement d'un
-  client : ce qu'un contrat conclu doit conserver) : **lire d'abord les textes officiels** (C. civ. 1113 à
-  1117, 1193 ; RGPD art. 17, 3 ; conservation des contrats) et les ajouter à `docs/legal/`.
-- **Nouvel Item 43 :** fichier clients (fiche, recherche, historique pour le pro et le client, RGPD).
-- **Données de recette** en base locale : clients « Recette … » (`recette-…@example.test`), RDV 22 à 41,
-  devis D-2026-0003 à 0012 environ ; réglage « Revente de fournitures » activé et attestation déposée
-  pour la recette (à remettre selon l'usage réel).
+### 🎯 Reprise immédiate (12/11/2026)
+- **Recette :** `docs/recette-parcours.md` terminée (44/54 validés) ; **tous les écarts traités** (1 à 21),
+  à vérifier à l'usage. Non vus dans le navigateur : page client d'un devis annulé, case « Annuler aussi
+  le devis » de la fenêtre du rendez-vous, confirmation d'effacement détaillée.
+- **12/11 :** devis « Annulé » (`cancelled`, rétractation de l'offre, C. civ. 1115-1116, migration
+  `2026-11-12_item22_devis_annule`) ; avertissements rendez-vous / devis liés (1116, 1121, 1193, 1218) ;
+  devis acceptés conservés dix ans (`Appointment::CONTRACT_RETENTION_YEARS`, L213-1, D213-2, L123-22 par
+  prudence) et purge des devis sans rendez-vous ; jours fériés (`api/core/Holidays.php`, API Jours fériés,
+  réserve `api/storage/holidays/`, `api/cron/refresh-holidays.php` facultatif) ; fiches
+  `docs/legal/fr/annulation-devis.md`, `conservation-effacement.md` ; textes officiels ajoutés
+  (`docs/legal/fr/textes/` : C. civ. contrat, L213-1, L123-22, C. proc. civ. 640-642, RGPD 5-6-17,
+  règlement 1182/71).
+- **Traductions** des nouvelles fiches faites le 12/11 (15 langues), liens vérifiés dans l'écran Documentation.
+- **Prochain lot demandé :** textes officiels traduits pour l'aide à la compréhension (`ROADMAP.md`, Item 40), le français seul faisant foi.
+- **Non vérifié :** l'offre OVHcloud Starter a-t-elle les tâches cron (doc officielle muette) ; éditeur,
+  licence et zones de l'API Jours fériés (page non lisible sans navigateur).
+- **Ensuite :** Item 41 (largeur de la vitrine), Item 43 (fichier clients), relectures natives (Item 40).
+- **Données de recette** en base locale : clients « Recette … », RDV 22 à 41, devis D-2026-0003 à 0012 ;
+  réglage « Revente de fournitures » activé et attestation déposée pour la recette.
 
 ### Session du 05 au 11/11/2026
 - **Item 40 :** documentation en 15 langues, aide « ? » traduite (`src/config/fieldHelp/<langue>.json`),

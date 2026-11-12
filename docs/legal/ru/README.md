@@ -48,6 +48,8 @@ Item 40: файлы Markdown, по одной папке на язык (`fr/` и
 | Обязательная записка (счёт, *note*) свыше 25 € с НДС | [note-facture.md](note-facture.md) |
 | Пометка «EI», SIRET, RM, страхование, медиатор, информирование о ценах | [mentions-entreprise.md](mentions-entreprise.md) |
 | Памятка профессионала: закупки, подтверждающие документы, хранение | [rappels-artisan.md](rappels-artisan.md) |
+| Отмена или перенос визита, к которому есть смета: отозванная оферта, расторжение по соглашению, непреодолимая сила | [annulation-devis.md](annulation-devis.md) |
+| Хранение и удаление данных клиентов: десять лет для принятой сметы, GDPR | [conservation-effacement.md](conservation-effacement.md) |
 | Официальные тексты дословно: Code de la consommation (Кодекс о защите прав потребителей) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Официальные тексты: Code de commerce (Торговый кодекс; EI, общества) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Официальные тексты: Code général des impôts (Общий налоговый кодекс; *débours*, освобождение от НДС) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -56,6 +58,8 @@ Item 40: файлы Markdown, по одной папке на язык (`fr/` и
 | Официальные тексты: CGI, приложение II (обязательные реквизиты счетов) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Официальные тексты: Code de la sécurité sociale (Кодекс социального обеспечения; взносы микропредпринимателя) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Официальные тексты: Code des assurances (Страховой кодекс; десятилетнее страхование, свидетельство, прилагаемое к сметам) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Официальные тексты: Code civil (Гражданский кодекс; строитель, десятилетняя, двухлетняя гарантии, гарантия полного завершения) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Официальные тексты: Code civil (Гражданский кодекс; оферта и акцепт, изменение договора, непреодолимая сила, расторжение; строитель, десятилетняя, двухлетняя гарантии, гарантия полного завершения) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Официальные тексты: право ЕС (сроки, GDPR) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Официальные тексты: Code de procédure civile (Гражданский процессуальный кодекс; исчисление сроков) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Налоговая доктрина (BOFiP): *débours*, запасные части | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | Список источников, их характер и дата проверки | [../sources.md](../sources.md) |

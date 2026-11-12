@@ -72,7 +72,7 @@ Full text: [textes/code-consommation.md](../fr/textes/code-consommation.md).
   benefit from it.
 - **Off-premises** (L221-9): dated copy of the contract, signed paper or durable medium, with all the
   information of L221-5 and **accompanied by the standard form**. (L221-10): **no payment or consideration
-  before seven days** from conclusion, except urgent work (4°).
+  before seven days** from conclusion, except urgent work (4°). Computation (checked on 12/11/2026, C. proc. civ. 641 and 642, regulation 1182/71 art. 3, consistent): the day of the agreement does not count, the period ends on the seventh day at midnight, extended to the first working day if it falls on a Saturday, a Sunday or a public holiday; Crénelio shows the first possible payment day at the top of « Préparer la facture » (*prepare the invoice*) (public holidays of metropolitan France read from the Jours fériés API). A quote accepted **online just after your visit** to the customer's home is also an off-premises contract (L221-1, 2°, b).
 - **Online function** (D221-5, created by decree no. 2026-3): labels « renoncer au contrat ici » (*withdraw
   from the contract here*) and « confirmer la rétractation » (*confirm withdrawal*), declaration (first name
   and surname, contract, electronic means for the acknowledgement), acknowledgement of receipt repeating the

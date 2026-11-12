@@ -68,7 +68,7 @@ Texto íntegro: [textes/code-consommation.md](../fr/textes/code-consommation.md)
   goza de él.
 - **Fuera del establecimiento** (L221-9): ejemplar fechado del contrato, en papel firmado o soporte duradero, con
   todas las informaciones de L221-5 y **acompañado del formulario tipo**. (L221-10): **ningún pago ni
-  contrapartida antes de siete días** a contar desde la celebración, salvo trabajos urgentes (4°).
+  contrapartida antes de siete días** a contar desde la celebración, salvo trabajos urgentes (4°). Cálculo (verificado el 12/11/2026, C. proc. civ. 641 y 642, reglamento 1182/71 art. 3, concordantes): el día del acuerdo no cuenta, el plazo termina el séptimo día a las 24 h, prorrogado al primer día hábil si cae en sábado, domingo o día festivo; Crénelio muestra el primer día de pago posible en la cabecera de « Préparer la facture » (preparar la factura) (festivos de la Francia metropolitana leídos de la API Jours fériés). Un presupuesto aceptado **en línea justo después de su visita** al domicilio es también un contrato fuera del establecimiento (L221-1, 2°, b).
 - **Función en línea** (D221-5, creado por el décret n° 2026-3): textos « renoncer au contrat ici » (renunciar al contrato aquí) y
   « confirmer la rétractation » (confirmar el desistimiento), declaración (nombre y apellidos, contrato, medio electrónico del acuse),
   acuse de recibo que recoge el contenido, la fecha y la hora. Conforme a la implementación.

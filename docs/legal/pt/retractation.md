@@ -68,7 +68,7 @@ Texto integral: [textes/code-consommation.md](../fr/textes/code-consommation.md)
   beneficia dele.
 - **Fora do estabelecimento** (L221-9): exemplar datado do contrato, em papel assinado ou suporte duradouro, com
   todas as informações de L221-5 e **acompanhado do formulário-tipo**. (L221-10): **nenhum pagamento nem
-  contrapartida antes de sete dias** a contar da celebração, salvo trabalhos urgentes (4°).
+  contrapartida antes de sete dias** a contar da celebração, salvo trabalhos urgentes (4°). Cálculo (verificado em 12/11/2026, C. proc. civ. 641 e 642, regulamento 1182/71 art. 3, concordantes): o dia do acordo não conta, o prazo termina no sétimo dia às 24 h, prorrogado para o primeiro dia útil se calhar a um sábado, domingo ou feriado; o Crénelio mostra o primeiro dia de pagamento possível no topo de « Préparer la facture » (*preparar a fatura*) (feriados da França metropolitana lidos na API Jours fériés). Um orçamento aceite **online logo após a sua visita** ao domicílio é também um contrato fora do estabelecimento (L221-1, 2°, b).
 - **Função online** (D221-5, criado pelo décret n.º 2026-3): textos « renoncer au contrat ici » (*renunciar ao contrato aqui*) e
   « confirmer la rétractation » (*confirmar a livre resolução*), declaração (nome e apelido, contrato, meio eletrónico do aviso de receção),
   aviso de receção que retoma o conteúdo, a data e a hora. Conforme à implementação.

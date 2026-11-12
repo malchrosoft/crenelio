@@ -47,6 +47,8 @@ ou ajouté isi ka parèt la, lyen ant fich yo ka rété rélatif.
 | *Note* (fakti) obligatwa lè pri-la pasé 25 € TTC | [note-facture.md](note-facture.md) |
 | Mansyon « EI », SIRET, RM, asirans, médyatè, piblisité a pri | [mentions-entreprise.md](mentions-entreprise.md) |
 | Aid-mémwa a pwofésyonèl-la : acha, jistifikatif, konsèvasyon | [rappels-artisan.md](rappels-artisan.md) |
+| Anilé oben déplasé on randévou ki ni on *devis* : òf anilé, *révocation*, *force majeure* | [annulation-devis.md](annulation-devis.md) |
+| Konsèvasyon é éfasman a done a kliyan yo : dis lanné pou on *devis* asèpté, RGPD | [conservation-effacement.md](conservation-effacement.md) |
 | Tèks ofisyèl, mo pou mo : Code de la consommation | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Tèks ofisyèl : Code de commerce (EI, sosyété) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Tèks ofisyèl : Code général des impôts (débours, franchise) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -55,6 +57,8 @@ ou ajouté isi ka parèt la, lyen ant fich yo ka rété rélatif.
 | Tèks ofisyèl : CGI, annexe II (mansyon obligatwa a fakti) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Tèks ofisyèl : Code de la sécurité sociale (kotizasyon a *micro-entrepreneur*) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Tèks ofisyèl : Code des assurances (asirans désènal, atèstasyon ki ka akonpangné *devis*) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Tèks ofisyèl : Code civil (konstriktè, garanti désènal, biyènal, *parfait achèvement*) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Tèks ofisyèl : Code civil (òf é asèptasyon, chanjman a kontra, *force majeure*, *résolution* ; konstriktè, garanti désènal, biyènal, *parfait achèvement*) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Tèks ofisyèl : dwa a Linyon éwopéyèn (kalkil a délè : règleman 1182/71, direktiv 2011/83/UE ; RGPD : konsèvasyon, baz légal, éfasman) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Tèks ofisyèl : Code de procédure civile (kalkil a délè) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Doktrin fiskal (BOFiP) : débours, pyès détaché | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | Lis a sous yo, ki kalité é dat a vérifikasyon | [../sources.md](../sources.md) |

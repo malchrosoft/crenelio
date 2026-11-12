@@ -48,6 +48,8 @@ traslada a sus traducciones (o se señalan como desactualizadas). El árabe (`ar
 | Nota (factura) obligatoria por encima de 25 € IVA incluido (*TTC*) | [note-facture.md](note-facture.md) |
 | Mención « EI », SIRET, RM, seguro, mediador, publicidad de los precios | [mentions-entreprise.md](mentions-entreprise.md) |
 | Recordatorio del profesional: compras, justificantes, conservación | [rappels-artisan.md](rappels-artisan.md) |
+| Anular o cambiar de fecha una cita que tiene presupuesto: oferta anulada, revocación, fuerza mayor | [annulation-devis.md](annulation-devis.md) |
+| Conservación y supresión de los datos de los clientes: diez años para un presupuesto aceptado, RGPD | [conservation-effacement.md](conservation-effacement.md) |
 | Textos oficiales, palabra por palabra: Code de la consommation (Código de Consumo francés) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Textos oficiales: Code de commerce (Código de Comercio francés) (EI, sociedades) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Textos oficiales: Code général des impôts (Código General Tributario francés) (gastos suplidos, franquicia) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -56,6 +58,8 @@ traslada a sus traducciones (o se señalan como desactualizadas). El árabe (`ar
 | Textos oficiales: CGI, anexo II (menciones obligatorias de las facturas) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Textos oficiales: Code de la sécurité sociale (Código de la Seguridad Social francés) (cotizaciones del microempresario) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Textos oficiales: Code des assurances (Código de Seguros francés) (seguro decenal, certificado adjunto a los presupuestos) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Textos oficiales: Code civil (Código Civil francés) (constructor, garantías decenal, bienal y de perfecta terminación) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Textos oficiales: Code civil (Código Civil francés) (oferta y aceptación, modificación del contrato, fuerza mayor, resolución; constructor, garantías decenal, bienal y de perfecta terminación) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Textos oficiales: Derecho de la Unión (cómputo de plazos: reglamento 1182/71, directiva 2011/83/UE; RGPD: conservación, bases jurídicas, supresión) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Textos oficiales: Code de procédure civile (Código de Procedimiento Civil francés) (cómputo de plazos) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Doctrina fiscal (BOFiP): gastos suplidos, piezas de recambio | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | Lista de las fuentes, naturaleza y fecha de verificación | [../sources.md](../sources.md) |

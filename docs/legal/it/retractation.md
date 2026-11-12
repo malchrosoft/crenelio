@@ -70,7 +70,7 @@ Testo integrale: [../fr/textes/code-consommation.md](../fr/textes/code-consommat
   beneficia.
 - **Fuori dei locali commerciali** (L221-9): copia datata del contratto, su carta firmata o supporto durevole, con
   tutte le informazioni di L221-5 e **accompagnata dal modulo tipo**. (L221-10): **nessun pagamento né
-  corrispettivo prima di sette giorni** dalla conclusione, salvo lavori urgenti (4°).
+  corrispettivo prima di sette giorni** dalla conclusione, salvo lavori urgenti (4°). Calcolo (verificato il 12/11/2026, C. proc. civ. 641 e 642, regolamento 1182/71 art. 3, concordanti): il giorno dell'accordo non conta, il termine scade il settimo giorno alle 24, prorogato al primo giorno lavorativo se cade di sabato, di domenica o in un giorno festivo; Crénelio mostra il primo giorno di pagamento possibile in cima a « Préparer la facture » (*preparare la fattura*) (festività della Francia metropolitana lette dall'API Jours fériés). Un preventivo accettato **online subito dopo la vostra visita** a domicilio è anch'esso un contratto fuori dei locali commerciali (L221-1, 2°, b).
 - **Funzione online** (D221-5, creato dal decreto n. 2026-3): diciture « renoncer au contrat ici » e
   « confirmer la rétractation », dichiarazione (nome e cognome, contratto, mezzo elettronico per la ricevuta),
   ricevuta che riprende il contenuto, la data e l'ora. Conforme all'implementazione.

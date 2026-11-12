@@ -70,7 +70,11 @@ Tam metin: [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md
   işlevinin yeri; hak yoksa (acil durum) tüketicinin bu haktan yararlanmadığı bilgisi.
 - **İş yeri dışında** (L221-9): sözleşmenin tarihli nüshası, imzalı kâğıt ya da kalıcı veri saklayıcısı,
   L221-5'in tüm bilgileriyle ve **örnek form eklenmiş olarak**. (L221-10): sözleşmenin kurulmasından
-  itibaren **yedi gün dolmadan hiçbir ödeme ya da karşılık alınamaz**, acil işler hariç (4°).
+  itibaren **yedi gün dolmadan hiçbir ödeme ya da karşılık alınamaz**, acil işler hariç (4°). Hesaplama (12/11/2026'da doğrulandı, C. proc. civ. 641 ve 642, 1182/71 sayılı tüzük md. 3, birbiriyle uyumlu): onay günü
+  sayılmaz, süre yedinci günün saat 24'ünde dolar; cumartesi, pazar veya resmî tatile denk gelirse ilk iş gününe uzar;
+  Crénelio ilk olası ödeme gününü « Préparer la facture » (Faturayı hazırla) ekranının başında gösterir (anakara
+  resmî tatilleri Jours fériés API'sinden okunur). **Müşteri evindeki ziyaretinizin hemen ardından çevrimiçi** kabul edilen
+  bir teklif de iş yeri dışında kurulan sözleşmedir (L221-1, 2°, b).
 - **Çevrimiçi işlev** (D221-5, n° 2026-3 sayılı kararname ile oluşturuldu): « renoncer au contrat ici »
   (sözleşmeden burada vazgeç) ve « confirmer la rétractation » (caymayı onayla) ifadeleri; beyan (ad ve
   soyad, sözleşme, alındı belgesi için elektronik iletişim aracı); içeriği, tarihi ve saati yineleyen

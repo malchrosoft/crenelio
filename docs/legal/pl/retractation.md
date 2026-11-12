@@ -68,7 +68,11 @@ Pełny tekst: [../fr/textes/code-consommation.md](../fr/textes/code-consommation
   przysługuje.
 - **Poza lokalem przedsiębiorstwa** (L221-9): datowany egzemplarz umowy, na papierze podpisany lub na trwałym nośniku, ze
   wszystkimi informacjami z L221-5 i **wraz ze wzorem formularza**. (L221-10): **żadnej płatności ani
-  świadczenia wzajemnego przed upływem siedmiu dni** od zawarcia, z wyjątkiem prac pilnych (4°).
+  świadczenia wzajemnego przed upływem siedmiu dni** od zawarcia, z wyjątkiem prac pilnych (4°). Obliczenie (sprawdzone 12/11/2026, C. proc. civ. 641 i 642, rozporządzenie 1182/71 art. 3, zgodne): dnia zgody
+  nie wlicza się, termin kończy się siódmego dnia o 24:00 i przedłuża się do pierwszego dnia roboczego, jeśli przypada w sobotę,
+  niedzielę lub dzień ustawowo wolny; Crénelio wyświetla pierwszy możliwy dzień płatności na początku « Préparer la
+  facture » (Przygotuj fakturę) (dni wolne metropolii pobierane z API Jours fériés). Kosztorys zaakceptowany **online tuż po
+  Twojej wizycie** w domu klienta to także umowa zawarta poza lokalem przedsiębiorstwa (L221-1, 2°, b).
 - **Funkcja online** (D221-5, wprowadzony décret n° 2026-3): napisy « renoncer au contrat ici » (zrezygnuj z umowy tutaj) i
   « confirmer la rétractation » (potwierdź odstąpienie), oświadczenie (imię i nazwisko, umowa, elektroniczny środek otrzymania potwierdzenia),
   potwierdzenie odbioru zawierające treść, datę i godzinę. Zgodne z implementacją.

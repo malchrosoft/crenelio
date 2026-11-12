@@ -69,7 +69,11 @@ Tèks konplè : [textes/code-consommation.md](../fr/textes/code-consommation.md)
   fonksyon rétractation-an yé ; si dwa-a pa ka ègzisté (ijans), fok di kliyan-an i pa ni'y.
 - **Hors établissement** (L221-9) : an légzanplè daté kontra-a, papié siyé ou sipò ki ka rété, épi
   tout enfòmasyon L221-5 **épi fòmilè-tip-la**. (L221-10) : **pyès péman ni
-  kontrapati avan sèt jou** dépi kontra-a fèt, sòf travay ijan (4°).
+  kontrapati avan sèt jou** dépi kontra-a fèt, sòf travay ijan (4°). Kalkil (vérifyé 12/11/2026, C. proc. civ. 641 épi 642, règleman 1182/71 art. 3, ki dakò) : jou akò-a pa ka
+  kontè, délè-a ka fini sétyèm jou-a a 24 è, é i ka alonjé jis prèmié jou travay si i tonbé an sanmdi, an
+  dimanch ou an jou féryé ; Crénelio ka afiché prèmié jou ou pé fè péyé anlè « Préparer la facture »
+  (paré faktiw-la) (jou féryé Lafrans métwopolitèn li asou API Jours fériés). An devis aksèpté **an liy jis
+  apré vizit ou** lakay kliyan-an sé osi an kontra hors établissement (L221-1, 2°, b).
 - **Fonksyon an liy** (D221-5, kréyé pa décret n° 2026-3) : libèlé « renoncer au contrat ici » (kité kontra-a isi) épi
   « confirmer la rétractation » (konfirmé rétractation-an), déklarasyon (non épi tinon, kontra, mwayen élèktwonik pou akizé risépsyon-an),
   *accusé de réception* (prèv ki ou risivwè) ki ka rété kontni-a, dat-la épi lè-a. Konfòm a sa ki fèt adan Crénelio.

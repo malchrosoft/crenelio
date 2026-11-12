@@ -68,7 +68,11 @@ Text integral: [../fr/textes/code-consommation.md](../fr/textes/code-consommatio
   beneficiază de el.
 - **În afara spațiului comercial** (L221-9): exemplar datat al contractului, pe hârtie semnat sau pe suport durabil, cu
   toate informațiile din L221-5 și **însoțit de formularul-tip**. (L221-10): **nicio plată și nicio
-  contraprestație înainte de șapte zile** de la încheiere, cu excepția lucrărilor urgente (4°).
+  contraprestație înainte de șapte zile** de la încheiere, cu excepția lucrărilor urgente (4°). Calcul (verificat la 12/11/2026, C. proc. civ. 641 și 642, regulamentul 1182/71 art. 3, concordante): ziua acordului
+  nu se numără, termenul se încheie în a șaptea zi la ora 24 și se prelungește până în prima zi lucrătoare dacă se împlinește
+  sâmbăta, duminica sau într-o zi de sărbătoare legală; Crénelio afișează prima zi posibilă de plată în capul « Préparer la
+  facture » (Pregătește factura) (sărbătorile legale din Franța metropolitană sunt citite din API-ul Jours fériés). Un deviz
+  acceptat **online imediat după vizita** dumneavoastră la domiciliu este tot un contract în afara spațiilor comerciale (L221-1, 2°, b).
 - **Funcția online** (D221-5, creat prin decretul nr. 2026-3): textele « renoncer au contrat ici » și
   « confirmer la rétractation », declarația (nume și prenume, contract, mijlocul electronic pentru confirmare),
   confirmarea de primire care reia conținutul, data și ora. Conform cu implementarea.

@@ -46,6 +46,8 @@ aktarılır (ya da çeviriler geride kaldı diye işaretlenir). Arapça (`ar/`) 
 | 25 € KDV dahil tutarın üzerinde zorunlu hizmet notu (fatura) | [note-facture.md](note-facture.md) |
 | « EI » ibaresi, SIRET, RM, sigorta, arabulucu, fiyatların ilanı | [mentions-entreprise.md](mentions-entreprise.md) |
 | Profesyonelin hatırlatma notu: satın almalar, belgeler, saklama | [rappels-artisan.md](rappels-artisan.md) |
+| Teklifi olan bir randevuyu iptal etmek veya ertelemek: iptal edilen icap, karşılıklı anlaşmayla sona erdirme, mücbir sebep | [annulation-devis.md](annulation-devis.md) |
+| Müşteri verilerinin saklanması ve silinmesi: kabul edilen teklif için on yıl, GDPR | [conservation-effacement.md](conservation-effacement.md) |
 | Resmî metinler, kelimesi kelimesine: Code de la consommation (Tüketici Kanunu) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Resmî metinler: Code de commerce (Ticaret Kanunu) (EI, şirketler) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Resmî metinler: Code général des impôts (Genel Vergi Kanunu) (*débours*, muafiyet) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -54,6 +56,8 @@ aktarılır (ya da çeviriler geride kaldı diye işaretlenir). Arapça (`ar/`) 
 | Resmî metinler: CGI, ek II (faturalardaki zorunlu bilgiler) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Resmî metinler: Code de la sécurité sociale (Sosyal Güvenlik Kanunu) (mikro girişimcinin primleri) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Resmî metinler: Code des assurances (Sigorta Kanunu) (on yıllık sigorta, tekliflere eklenen sigorta belgesi) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Resmî metinler: Code civil (Medeni Kanun) (yapımcı, on yıllık, iki yıllık ve tam tamamlama garantileri) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Resmî metinler: Code civil (Medeni Kanun) (icap ve kabul, sözleşmenin değiştirilmesi, mücbir sebep, sona erdirme; yapımcı, on yıllık, iki yıllık ve tam tamamlama garantileri) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Resmî metinler: AB hukuku (süreler, GDPR) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Resmî metinler: Code de procédure civile (Hukuk Usulü Kanunu) (sürelerin hesaplanması) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Vergi idaresi yorumu (BOFiP): *débours*, yedek parçalar | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | Kaynak listesi, niteliği ve kontrol tarihi | [../sources.md](../sources.md) |

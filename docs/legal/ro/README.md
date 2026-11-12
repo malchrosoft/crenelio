@@ -48,6 +48,8 @@ transpune în traducerile sale (sau acestea sunt semnalate ca rămase în urmă)
 | Notă (factură) obligatorie peste 25 € cu TVA | [note-facture.md](note-facture.md) |
 | Mențiunea „EI”, SIRET, RM, asigurare, mediator, publicitatea prețurilor | [mentions-entreprise.md](mentions-entreprise.md) |
 | Memento al profesionistului: achiziții, documente justificative, păstrare | [rappels-artisan.md](rappels-artisan.md) |
+| Anularea sau mutarea unei programări care are un deviz: ofertă anulată, revocare prin acord, forță majoră | [annulation-devis.md](annulation-devis.md) |
+| Păstrarea și ștergerea datelor clienților: zece ani pentru un deviz acceptat, RGPD | [conservation-effacement.md](conservation-effacement.md) |
 | Texte oficiale, cuvânt cu cuvânt: Code de la consommation (Codul francez al consumului) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Texte oficiale: Code de commerce (Codul comercial francez; EI, societăți) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Texte oficiale: Code général des impôts (Codul general fiscal; *débours*, scutire) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -56,6 +58,8 @@ transpune în traducerile sale (sau acestea sunt semnalate ca rămase în urmă)
 | Texte oficiale: CGI, anexa II (mențiunile obligatorii ale facturilor) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Texte oficiale: Code de la sécurité sociale (Codul securității sociale; contribuțiile microîntreprinzătorului) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Texte oficiale: Code des assurances (Codul asigurărilor; asigurarea decenală, atestat anexat devizelor) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Texte oficiale: Code civil (Codul civil; constructor, garanțiile decenală, bienală, de bună execuție) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Texte oficiale: Code civil (Codul civil; oferta și acceptarea, modificarea contractului, forța majoră, rezoluțiunea; constructor, garanțiile decenală, bienală, de bună execuție) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Texte oficiale: dreptul european (termene, RGPD) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Texte oficiale: Code de procédure civile (Codul francez de procedură civilă; calculul termenelor) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Doctrina fiscală (BOFiP): *débours*, piese de schimb | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | Lista surselor, natura și data verificării | [../sources.md](../sources.md) |

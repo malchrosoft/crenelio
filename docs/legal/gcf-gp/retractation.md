@@ -69,7 +69,11 @@ Tèks konplè : [../fr/textes/code-consommation.md](../fr/textes/code-consommati
   *rétractation*-la yé ; si dwa-la pa ka ègzisté (ijans), enfòmasyon kè konsonmatè-la pa ni-y.
 - ***Hors établissement*** (L221-9) : ègzanplè daté a kontra-la, papyé siyé oben *support durable*, épi tout
   enfòmasyon a L221-5 é **épi fòmilè-tip-la**. (L221-10) : **pon péman ni pon kontrapati avan sèt jou** apati
-  jou kontra-la siyé, sòf travay ijan (4°).
+  jou kontra-la siyé, sòf travay ijan (4°). Kalkil (vérifyé 12/11/2026, C. proc. civ. 641 é 642, règleman 1182/71 art. 3, ki dakò) : jou akò-la pa ka
+  kontè, délè-la ka fini sétyèm jou-la a 24 è, é i ka alonjé jis prèmyé jou ouvrab-la si i tonbé on sanmdi, on
+  dimanch oben on jou féryé ; Crénelio ka afiché prèmyé jou ou pé fè-y péyé an tèt a « Préparer la facture »
+  (paré fakti-la) (jou féryé a Lafrans métwopolitèn li asi API Jours fériés). On *devis* asèpté **an liy jis
+  apré vizit a-w** a kaz a kliyan-la sé osi on kontra *hors établissement* (L221-1, 2°, b).
 - **Fonksyon an liy** (D221-5, *décret* n° 2026-3 kréyé-y) : libèl « renoncer au contrat ici » (rinonsé a
   kontra-la isi) é « confirmer la rétractation » (konfimé *rétractation*-la), déklarasyon (non é prinon,
   kontra, mwayen élèktwonik pou *accusé de réception*-la), *accusé de réception* (papyé ki ka di yo risivwè)

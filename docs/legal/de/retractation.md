@@ -68,7 +68,7 @@ Volltext: [textes/code-consommation.md](../fr/textes/code-consommation.md).
   hat.
 - **Außerhalb von Geschäftsräumen** (L221-9): datierte Ausfertigung des Vertrags, unterschriebenes Papier oder dauerhafter Datenträger, mit
   allen Informationen nach L221-5 und **mit beigefügtem Musterformular**. (L221-10): **keine Zahlung und keine
-  Gegenleistung vor Ablauf von sieben Tagen** ab Vertragsschluss, außer bei dringenden Arbeiten (4°).
+  Gegenleistung vor Ablauf von sieben Tagen** ab Vertragsschluss, außer bei dringenden Arbeiten (4°). Berechnung (überprüft am 12/11/2026, C. proc. civ. 641 und 642, Verordnung 1182/71 Art. 3, übereinstimmend): Der Tag der Zustimmung zählt nicht, die Frist endet am siebten Tag um 24 Uhr und verlängert sich auf den nächsten Werktag, wenn sie auf einen Samstag, Sonntag oder Feiertag fällt; Crénelio zeigt den ersten möglichen Zahlungstag oben in « Préparer la facture » (*Rechnung vorbereiten*) an (Feiertage des französischen Mutterlands aus der API Jours fériés). Ein **unmittelbar nach Ihrem Besuch** beim Kunden **online** angenommener Kostenvoranschlag ist ebenfalls ein außerhalb von Geschäftsräumen geschlossener Vertrag (L221-1, 2°, b).
 - **Online-Funktion** (D221-5, geschaffen durch Dekret (*décret*) Nr. 2026-3): Beschriftungen « renoncer au contrat ici » und
   « confirmer la rétractation », Erklärung (Name und Vorname, Vertrag, elektronisches Mittel für die Bestätigung),
   Empfangsbestätigung mit Inhalt, Datum und Uhrzeit. Entspricht der Umsetzung.

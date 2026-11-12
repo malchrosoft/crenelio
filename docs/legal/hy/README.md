@@ -50,6 +50,8 @@
 | Պարտադիր *note* (հաշիվ) 25 € ԱԱՀ-ով գումարից բարձր | [note-facture.md](note-facture.md) |
 | «EI» նշում, SIRET, RM, ապահովագրություն, միջնորդ, գների հրապարակում | [mentions-entreprise.md](mentions-entreprise.md) |
 | Արհեստավորի հուշաթերթ՝ գնումներ, հիմնավորող փաստաթղթեր, պահպանում | [rappels-artisan.md](rappels-artisan.md) |
+| Նախահաշիվ ունեցող այցի չեղարկում կամ տեղափոխում՝ չեղարկված առաջարկ, համաձայնությամբ լուծում, անհաղթահարելի ուժ | [annulation-devis.md](annulation-devis.md) |
+| Հաճախորդների տվյալների պահպանում և ջնջում՝ ընդունված նախահաշվի համար տասը տարի, GDPR | [conservation-effacement.md](conservation-effacement.md) |
 | Պաշտոնական տեքստեր, բառացի՝ Code de la consommation (Սպառողների իրավունքների օրենսգիրք) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Պաշտոնական տեքստեր՝ Code de commerce (Առևտրային օրենսգիրք) (EI, ընկերություններ) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Պաշտոնական տեքստեր՝ Code général des impôts (Հարկերի ընդհանուր օրենսգիրք) (*débours*, ԱԱՀ-ից ազատում) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -58,6 +60,8 @@
 | Պաշտոնական տեքստեր՝ CGI, հավելված II (հաշիվ-ապրանքագրերի պարտադիր նշումներ) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Պաշտոնական տեքստեր՝ Code de la sécurité sociale (Սոցիալական ապահովության օրենսգիրք) (միկրոձեռնարկատիրոջ սոցիալական վճարներ) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Պաշտոնական տեքստեր՝ Code des assurances (Ապահովագրության օրենսգիրք) (տասնամյա ապահովագրություն, նախահաշվին կցված հավաստագիր) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Պաշտոնական տեքստեր՝ Code civil (Քաղաքացիական օրենսգիրք) (կառուցապատող, տասնամյա, երկամյա և կատարյալ ավարտի երաշխիքներ) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Պաշտոնական տեքստեր՝ Code civil (Քաղաքացիական օրենսգիրք) (առաջարկ և ընդունում, պայմանագրի փոփոխում, անհաղթահարելի ուժ, լուծում. կառուցապատող, տասնամյա, երկամյա և կատարյալ ավարտի երաշխիքներ) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Պաշտոնական տեքստեր՝ Եվրոպական միության իրավունք (ժամկետների հաշվարկ՝ 1182/71 կանոնակարգ, 2011/83/ԵՄ հրահանգ. GDPR՝ պահպանում, իրավական հիմքեր, ջնջում) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Պաշտոնական տեքստեր՝ Code de procédure civile (Քաղաքացիական դատավարության օրենսգիրք) (ժամկետների հաշվարկ) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Հարկային դոկտրին (BOFiP)՝ *débours*, պահեստամասեր | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | Աղբյուրների ցանկ, բնույթ և ստուգման ամսաթիվ | [../sources.md](../sources.md) |

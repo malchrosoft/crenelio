@@ -48,6 +48,8 @@ to its translations (or they are flagged as out of date). Arabic (`ar/`) is writ
 | Note (invoice) mandatory above €25 incl. VAT | [note-facture.md](note-facture.md) |
 | « EI » mention, SIRET, RM, insurance, mediator, price display | [mentions-entreprise.md](mentions-entreprise.md) |
 | Tradesperson's checklist: purchases, supporting documents, retention | [rappels-artisan.md](rappels-artisan.md) |
+| Cancelling or moving an appointment that has a quote: cancelled offer, revocation, force majeure | [annulation-devis.md](annulation-devis.md) |
+| Retention and erasure of customer data: ten years for an accepted quote, GDPR | [conservation-effacement.md](conservation-effacement.md) |
 | Official texts, word for word: Code de la consommation (French Consumer Code) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Official texts: Code de commerce (French Commercial Code) (EI, companies) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Official texts: Code général des impôts (French General Tax Code) (disbursements, VAT exemption threshold) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -56,6 +58,8 @@ to its translations (or they are flagged as out of date). Arabic (`ar/`) is writ
 | Official texts: CGI, annex II (mandatory invoice information) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Official texts: Code de la sécurité sociale (French Social Security Code) (micro-entrepreneur contributions) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Official texts: Code des assurances (French Insurance Code) (ten-year liability insurance, certificate attached to quotes) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Official texts: Code civil (French Civil Code) (builder, ten-year, two-year and completion guarantees) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Official texts: Code civil (French Civil Code) (offer and acceptance, contract modification, force majeure, termination; builder, ten-year, two-year and completion guarantees) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Official texts: EU law (computation of time limits: regulation 1182/71, directive 2011/83/EU; GDPR: retention, legal bases, erasure) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Official texts: Code de procédure civile (French Code of Civil Procedure) (computation of time limits) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Tax doctrine (BOFiP): disbursements, spare parts | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | List of sources, type and date of check | [../sources.md](../sources.md) |

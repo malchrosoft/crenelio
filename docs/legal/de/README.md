@@ -49,6 +49,8 @@ Arabisch (`ar/`) wird von rechts nach links geschrieben; seine amtlichen Zitate,
 | Rechnung (*note*) Pflicht ab 25 € inkl. MwSt. | [note-facture.md](note-facture.md) |
 | Angabe „EI“, SIRET, RM, Versicherung, Schlichter, Preisauszeichnung | [mentions-entreprise.md](mentions-entreprise.md) |
 | Merkhilfe für den Fachbetrieb: Einkäufe, Belege, Aufbewahrung | [rappels-artisan.md](rappels-artisan.md) |
+| Termin mit Kostenvoranschlag absagen oder verschieben: zurückgezogenes Angebot, Aufhebung, höhere Gewalt | [annulation-devis.md](annulation-devis.md) |
+| Aufbewahrung und Löschung von Kundendaten: zehn Jahre für einen angenommenen Kostenvoranschlag, DSGVO | [conservation-effacement.md](conservation-effacement.md) |
 | Amtliche Texte, wörtlich: Code de la consommation | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Amtliche Texte: Code de commerce (EI, Gesellschaften) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Amtliche Texte: Code général des impôts (durchlaufende Posten, Kleinunternehmerregelung) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -57,6 +59,8 @@ Arabisch (`ar/`) wird von rechts nach links geschrieben; seine amtlichen Zitate,
 | Amtliche Texte: CGI, Anhang II (Pflichtangaben auf Rechnungen) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | Amtliche Texte: Code de la sécurité sociale (Beiträge des Kleinstunternehmers) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | Amtliche Texte: Code des assurances (zehnjährige Bauhaftpflichtversicherung, dem Kostenvoranschlag beigefügte Bescheinigung) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| Amtliche Texte: Code civil (Bauunternehmer, zehnjährige, zweijährige Gewährleistung und Fertigstellungsgewährleistung) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Amtliche Texte: Code civil (Angebot und Annahme, Vertragsänderung, höhere Gewalt, Vertragsauflösung; Bauunternehmer, zehnjährige, zweijährige Gewährleistung und Fertigstellungsgewährleistung) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| Amtliche Texte: Unionsrecht (Fristberechnung: Verordnung 1182/71, Richtlinie 2011/83/EU; DSGVO: Aufbewahrung, Rechtsgrundlagen, Löschung) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| Amtliche Texte: Code de procédure civile (französische Zivilprozessordnung; Fristberechnung) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | Steuerverwaltungsdoktrin (BOFiP): durchlaufende Posten, Ersatzteile | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | Quellenliste, Art und Datum der Überprüfung | [../sources.md](../sources.md) |

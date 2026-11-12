@@ -48,6 +48,8 @@
 | المذكرة (الفاتورة) الإلزامية ابتداء من 25 € TTC | [note-facture.md](note-facture.md) |
 | بيان « EI »، SIRET، RM، التأمين، الوسيط، الإعلان عن الأسعار | [mentions-entreprise.md](mentions-entreprise.md) |
 | مذكرة المهني: المشتريات، المستندات المثبتة، الحفظ | [rappels-artisan.md](rappels-artisan.md) |
+| إلغاء موعد له عرض أسعار أو تغيير موعده: العرض الملغى، الفسخ بالتراضي، القوة القاهرة | [annulation-devis.md](annulation-devis.md) |
+| حفظ بيانات الزبائن ومحوها: عشر سنوات لعرض الأسعار المقبول، اللائحة العامة لحماية البيانات (RGPD) | [conservation-effacement.md](conservation-effacement.md) |
 | النصوص الرسمية حرفيا: Code de la consommation (قانون الاستهلاك) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | النصوص الرسمية: Code de commerce (مدونة التجارة) (EI، الشركات) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | النصوص الرسمية: Code général des impôts (المدونة العامة للضرائب) (*débours*، الإعفاء) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
@@ -56,6 +58,8 @@
 | النصوص الرسمية: CGI، الملحق II (البيانات الإلزامية للفواتير) | [../fr/textes/code-general-impots-annexe-2.md](../fr/textes/code-general-impots-annexe-2.md) |
 | النصوص الرسمية: Code de la sécurité sociale (مدونة الضمان الاجتماعي) (اشتراكات المقاول الذاتي) | [../fr/textes/code-securite-sociale.md](../fr/textes/code-securite-sociale.md) |
 | النصوص الرسمية: Code des assurances (مدونة التأمينات) (التأمين العشري، الشهادة المرفقة بعروض الأسعار) | [../fr/textes/code-assurances.md](../fr/textes/code-assurances.md) |
-| النصوص الرسمية: Code civil (القانون المدني) (المُشيِّد، الضمان العشري، ضمان السنتين، ضمان الإنجاز التام) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| النصوص الرسمية: Code civil (القانون المدني) (الإيجاب والقبول، تعديل العقد، القوة القاهرة، الفسخ؛ المُشيِّد، الضمان العشري، ضمان السنتين، ضمان الإنجاز التام) | [../fr/textes/code-civil.md](../fr/textes/code-civil.md) |
+| النصوص الرسمية: قانون الاتحاد الأوروبي (حساب الآجال: النظام 1182/71، التوجيه 2011/83/UE؛ RGPD: الحفظ، الأسس القانونية، المحو) | [../fr/textes/droit-europeen.md](../fr/textes/droit-europeen.md) |
+| النصوص الرسمية: Code de procédure civile (قانون المسطرة المدنية) (حساب الآجال) | [../fr/textes/code-procedure-civile.md](../fr/textes/code-procedure-civile.md) |
 | الاجتهاد الإداري الجبائي (BOFiP): *débours*، قطع الغيار | [../fr/textes/bofip.md](../fr/textes/bofip.md) |
 | قائمة المصادر وطبيعتها وتاريخ التحقق منها | [../sources.md](../sources.md) |
