@@ -29,6 +29,10 @@ Fichiers Légifrance déposés par le mainteneur, reproduits mot pour mot dans [
 | Annexe à l'article R221-3 | [retractation-modele.md](fr/retractation-modele.md) |
 | C. com. R526-27, R123-237, R123-238, L123-28 (livre des recettes) | [code-commerce.md](fr/textes/code-commerce.md) |
 | CGI 50-0 (régime micro, seuils, livre des recettes), 267, 293 B, 293 E | [code-general-impots.md](fr/textes/code-general-impots.md) |
+| C. civ. 1113 à 1122, 1193, 1217, 1218, 1224 à 1230 (offre, acceptation, modification, inexécution, force majeure, résolution), lus le 12/11/2026 | [code-civil.md](fr/textes/code-civil.md) |
+| C. consom. L213-1, D213-1, D213-2 (conservation des contrats électroniques) ; C. com. L123-22 (conservation des pièces), lus le 12/11/2026 | [code-consommation.md](fr/textes/code-consommation.md), [code-commerce.md](fr/textes/code-commerce.md) |
+| Règlement (CEE, Euratom) n° 1182/71, art. 3 ; directive 2011/83/UE, considérant 41 (calcul des délais) ; RGPD art. 5, 6 (1) et 17, lus le 12/11/2026 | [droit-europeen.md](fr/textes/droit-europeen.md) |
+| C. proc. civ. 640 à 642 (calcul des délais), lus le 12/11/2026 | [code-procedure-civile.md](fr/textes/code-procedure-civile.md) |
 | Code des assurances, L241-1, L243-1-1, L243-2, L243-3, A243-2 à A243-5 (assurance décennale, champ, attestation jointe aux devis et son modèle, arrêté du 5 janvier 2016) | [code-assurances.md](fr/textes/code-assurances.md) |
 | Code civil, articles 1792 à 1792-7 (constructeur, garanties décennale, de bon fonctionnement et de parfait achèvement, réception) | [code-civil.md](fr/textes/code-civil.md) |
 | CGI, annexe II, art. 242 nonies et 242 nonies A (mentions des factures) | [code-general-impots-annexe-2.md](fr/textes/code-general-impots-annexe-2.md) |

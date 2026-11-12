@@ -55,6 +55,8 @@ gauche ; ses citations officielles, en français, restent affichées de gauche �
 | Textes officiels : CGI, annexe II (mentions obligatoires des factures) | [fr/textes/code-general-impots-annexe-2.md](fr/textes/code-general-impots-annexe-2.md) |
 | Textes officiels : Code de la sécurité sociale (cotisations du micro-entrepreneur) | [fr/textes/code-securite-sociale.md](fr/textes/code-securite-sociale.md) |
 | Textes officiels : Code des assurances (assurance décennale, attestation jointe aux devis) | [fr/textes/code-assurances.md](fr/textes/code-assurances.md) |
-| Textes officiels : Code civil (constructeur, garanties décennale, biennale, de parfait achèvement) | [fr/textes/code-civil.md](fr/textes/code-civil.md) |
+| Textes officiels : Code civil (offre et acceptation, modification du contrat, force majeure, résolution ; constructeur, garanties décennale, biennale, de parfait achèvement) | [fr/textes/code-civil.md](fr/textes/code-civil.md) |
+| Textes officiels : droit de l'Union (calcul des délais : règlement 1182/71, directive 2011/83/UE ; RGPD : conservation, bases légales, effacement) | [fr/textes/droit-europeen.md](fr/textes/droit-europeen.md) |
+| Textes officiels : Code de procédure civile (calcul des délais) | [fr/textes/code-procedure-civile.md](fr/textes/code-procedure-civile.md) |
 | Doctrine fiscale (BOFiP) : débours, pièces détachées | [fr/textes/bofip.md](fr/textes/bofip.md) |
 | Liste des sources, nature et date de vérification | [sources.md](sources.md) |

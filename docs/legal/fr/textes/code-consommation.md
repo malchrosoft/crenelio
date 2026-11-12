@@ -411,3 +411,22 @@ Source : Légifrance, Code de la consommation (LEGITEXT000006069565), document g
 > NOTA :
 >
 > Conformément à l’article 2 du décret n° 2022-424 du 25 mars 2022, ces dispositions entrent en vigueur le 28 mai 2022.
+---
+
+*Ajout du 12/11/2026, reproduit mot pour mot depuis le fichier Légifrance déposé (Code de la consommation, dernière modification le 10 octobre 2026, document généré le 30 octobre 2026). Le PDF ne porte pas la mention de version article par article : version en vigueur à la date du document.*
+
+Source : Légifrance, Code de la consommation (LEGITEXT000006069565), conservation des contrats conclus par voie électronique (L213-1, D213-1, D213-2). Utilisés pour : conservation des devis acceptés en ligne, limites de l'effacement des données du client.
+
+### Article L213-1
+
+> Lorsque le contrat est conclu par voie électronique et qu'il porte sur une somme égale ou supérieure à un montant fixé par décret, le contractant professionnel assure la conservation de l'écrit qui le constate pendant un délai déterminé par ce même décret et en garantit à tout moment l'accès à son cocontractant si celui-ci en fait la demande.
+
+### Article D213-1
+
+> Le montant mentionné à l'article L. 213-1 est fixé à 120 euros.
+
+### Article D213-2
+
+> Le délai mentionné à l'article L. 213-1 est fixé à dix ans à compter de la conclusion du contrat lorsque la livraison du bien ou l'exécution de la prestation est immédiate.
+>
+> Dans le cas contraire, le délai court à compter de la conclusion du contrat jusqu'à la date de livraison du bien ou de l'exécution de la prestation et pendant une durée de dix ans à compter de celle-ci.
