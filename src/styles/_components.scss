@@ -769,19 +769,12 @@ $admin-sidebar-collapsed: 68px;
     }
   }
 
-  .admin-topbar__logout,
-  .admin-topbar__refresh {
+  .admin-topbar__logout {
     display: inline-flex;
     align-items: center;
     gap: 6px;
   }
 
-  // Rechargement en cours : l'icône tourne (sauf mouvement réduit)
-  .admin-topbar__refresh--busy svg {
-    animation: admin-refresh-spin $duration-spin linear infinite;
-
-    @media (prefers-reduced-motion: reduce) { animation: none; }
-  }
 
   @include tablet {
     .admin-topbar__company {
@@ -789,8 +782,7 @@ $admin-sidebar-collapsed: 68px;
     }
 
     .admin-topbar__link span,
-    .admin-topbar__logout span,
-    .admin-topbar__refresh span {
+    .admin-topbar__logout span {
       display: none;
     }
   }
@@ -4459,6 +4451,13 @@ $data-grid-status-width: 13em;
   padding: $space-xs $space-sm;
   color: $gray-600;
   font-size: 0.85rem;
+}
+
+// Actualisation en cours (bouton de la barre d'une grille) : l'icône tourne (sauf mouvement réduit)
+.data-grid__refresh--busy svg {
+  animation: admin-refresh-spin $duration-spin linear infinite;
+
+  @media (prefers-reduced-motion: reduce) { animation: none; }
 }
 
 @keyframes admin-refresh-spin {

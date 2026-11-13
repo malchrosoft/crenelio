@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import {
-  ArrowClockwiseIcon,
   HouseIcon,
   SidebarSimpleIcon,
   SignOutIcon,
@@ -40,9 +39,6 @@ interface AdminShellProps {
   onLogout?: () => void;
   /** Avertissements regroupés dans le header (cf. AdminNotices). */
   notices?: AdminNotice[];
-  /** Bouton « Actualiser » en bout d'en-tête : recharge les données de l'écran (absent avant connexion). */
-  onRefresh?: () => void;
-  refreshing?: boolean;
   /** Écran de travail en pleine hauteur (liste, grille) : la page ne défile plus. */
   fill?: boolean;
   children: React.ReactNode;
@@ -54,7 +50,7 @@ const COLLAPSED_KEY = 'crenelio.admin.sidebarCollapsed';
  * Mise en page pleine page de l'espace Artisan : header fixe, menu latéral rétractable.
  * Le site public s'ouvre dans un nouvel onglet pour ne pas quitter la gestion.
  */
-const AdminShell: React.FC<AdminShellProps> = ({ companyName, nav, onLogout, notices = [], onRefresh, refreshing = false, children, fill = false }) => {
+const AdminShell: React.FC<AdminShellProps> = ({ companyName, nav, onLogout, notices = [], children, fill = false }) => {
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem(COLLAPSED_KEY) === '1');
 
   useEffect(() => {
@@ -87,18 +83,6 @@ const AdminShell: React.FC<AdminShellProps> = ({ companyName, nav, onLogout, not
             <HouseIcon size={18} weight="fill" aria-hidden="true" />
             <span>Accueil</span>
           </a>
-          {onRefresh && (
-            <button
-              type="button"
-              className={clsx('btn btn-secondary admin-topbar__refresh', { 'admin-topbar__refresh--busy': refreshing })}
-              onClick={onRefresh}
-              disabled={refreshing}
-              title="Recharger rendez-vous, calendrier, indisponibilités et devis"
-            >
-              <ArrowClockwiseIcon size={18} weight="bold" aria-hidden="true" />
-              <span>Actualiser</span>
-            </button>
-          )}
           {onLogout && (
             <button type="button" className="btn btn-secondary admin-topbar__logout" onClick={onLogout}>
               <SignOutIcon size={18} weight="fill" aria-hidden="true" />

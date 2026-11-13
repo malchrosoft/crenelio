@@ -737,8 +737,6 @@ export const AdminDashboard: React.FC = () => {
       onLogout={handleLogout}
       nav={{ items: navItems, active: activeTab, onSelect: setActiveTab }}
       notices={notices}
-      onRefresh={refresh}
-      refreshing={refreshing}
       fill={!loading && ((activeTab === 'appointments' && !creatingAppointment) || activeTab === 'calendar' || activeTab === 'unavailabilities' || activeTab === 'quotes')}
     >
       {openedId !== null && appointments.some((a) => a.id === openedId) && (
@@ -886,6 +884,8 @@ export const AdminDashboard: React.FC = () => {
         <div className="admin-page">
             <Suspense fallback={<p>Chargement de la liste…</p>}>
               <InterventionsGrid
+                onRefresh={refresh}
+                refreshing={refreshing}
                 appointments={filteredAppointments}
                 totalCount={appointments.length}
                 onCreate={() => setCreatingAppointment(true)}
@@ -1259,13 +1259,13 @@ export const AdminDashboard: React.FC = () => {
       ) : activeTab === 'quotes' ? (
         <div className="admin-page">
           <Suspense fallback={<p>Chargement…</p>}>
-            <QuotesGrid config={config} openId={openQuoteId} onOpened={() => setOpenQuoteId(null)} refreshKey={refreshKey} />
+            <QuotesGrid config={config} openId={openQuoteId} onOpened={() => setOpenQuoteId(null)} refreshKey={refreshKey} onRefresh={refresh} refreshing={refreshing} />
           </Suspense>
         </div>
       ) : activeTab === 'unavailabilities' ? (
         <div className="admin-page">
           <Suspense fallback={<p>Chargement…</p>}>
-            <UnavailabilitiesGrid refreshKey={refreshKey} />
+            <UnavailabilitiesGrid refreshKey={refreshKey} onRefresh={refresh} refreshing={refreshing} />
           </Suspense>
         </div>
       ) : activeTab === 'hours' ? (

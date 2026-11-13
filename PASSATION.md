@@ -12,8 +12,9 @@
 
 ### 🎯 Reprise immédiate (12/11/2026)
 - **Recette :** `docs/recette-parcours.md` terminée (44/54 validés) ; **tous les écarts traités** (1 à 21),
-  à vérifier à l'usage. Non vus dans le navigateur : page client d'un devis annulé, case « Annuler aussi
-  le devis » de la fenêtre du rendez-vous, confirmation d'effacement détaillée.
+  à vérifier à l'usage. Vérifiés à l'écran le 13/11 : page client d'un devis annulé (avertissement remonté
+  sous le titre), case « Annuler aussi le devis » (annulation du rendez-vous et du devis, deux emails au
+  client), confirmation d'effacement détaillée.
 - **12/11 :** devis « Annulé » (`cancelled`, rétractation de l'offre, C. civ. 1115-1116, migration
   `2026-11-12_item22_devis_annule`) ; avertissements rendez-vous / devis liés (1116, 1121, 1193, 1218) ;
   devis acceptés conservés dix ans (`Appointment::CONTRACT_RETENTION_YEARS`, L213-1, D213-2, L123-22 par

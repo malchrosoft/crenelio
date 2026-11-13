@@ -18,6 +18,9 @@ const StatusCell: React.FC<CustomCellRendererProps<Quote>> = ({ data }) =>
 
 interface QuotesGridProps {
   config: AppConfig;
+  /** Bouton « Actualiser » de la barre de la grille (`DataGrid`). */
+  onRefresh?: () => void;
+  refreshing?: boolean;
   /** Change à chaque actualisation (bouton de l'en-tête, retour sur l'onglet) : données rechargées. */
   refreshKey?: number;
   /** Devis à ouvrir à l'arrivée (ex. créé depuis la fenêtre d'un rendez-vous). */
@@ -29,7 +32,7 @@ interface QuotesGridProps {
  * Devis (Item 22) en grille (écran « Devis » du menu Interventions) : création, ouverture dans
  * l'éditeur (lecture seule une fois envoyé), copie en nouveau brouillon après un refus ou une expiration.
  */
-const QuotesGrid: React.FC<QuotesGridProps> = ({ config, openId, onOpened, refreshKey }) => {
+const QuotesGrid: React.FC<QuotesGridProps> = ({ config, openId, onOpened, refreshKey, onRefresh, refreshing }) => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   // `null` : fermé ; 'new' : nouveau brouillon ; sinon devis complet (avec ses lignes)
   const [editing, setEditing] = useState<Quote | 'new' | null>(null);
@@ -152,6 +155,8 @@ const QuotesGrid: React.FC<QuotesGridProps> = ({ config, openId, onOpened, refre
     <>
       {error && <p className="form-alert-error">{error}</p>}
       <DataGrid<Quote>
+        onRefresh={onRefresh}
+        refreshing={refreshing}
         gridId="quotes"
         rows={quotes}
         columnDefs={columnDefs}

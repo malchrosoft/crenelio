@@ -25,7 +25,7 @@ import {
   themeQuartz,
 } from 'ag-grid-community';
 import { AG_GRID_LOCALE_FR } from '@ag-grid-community/locale';
-import { ArrowCounterClockwiseIcon, DownloadSimpleIcon, FunnelIcon, GearSixIcon, XIcon } from '@phosphor-icons/react';
+import { ArrowClockwiseIcon, ArrowCounterClockwiseIcon, DownloadSimpleIcon, FunnelIcon, GearSixIcon, XIcon } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { api as appApi } from '../../api';
 import { useMediaQuery } from '../../utils/useMediaQuery';
@@ -124,6 +124,12 @@ export interface DataGridProps<T> {
   activeFilters?: ActiveFilter[];
   /** Réglages propres à la grille, ajoutés au menu « roue dentée » (`GridSettingToggle`). */
   settings?: React.ReactNode;
+  /**
+   * Actualisation des données (bouton à côté des filtres) : recharge rendez-vous, calendrier, indisponibilités
+   * et devis ; `refreshing` pendant le rechargement.
+   */
+  onRefresh?: () => void;
+  refreshing?: boolean;
   /** Export CSV (bouton affiché si fourni). */
   csvExport?: CsvExportParams;
   /** Ligne sélectionnée de l'extérieur (ex. après une création). */
@@ -157,6 +163,8 @@ function DataGrid<T>({
   quickFilters,
   activeFilters = [],
   settings,
+  onRefresh,
+  refreshing = false,
   csvExport,
   selectedRowId = null,
   onRowDoubleClicked,
@@ -350,6 +358,18 @@ function DataGrid<T>({
           </div>
         )}
         <div className="data-grid__tools">
+          {onRefresh && (
+            <button
+              type="button"
+              className={`btn btn-secondary admin-btn-sm data-grid__icon-btn${refreshing ? ' data-grid__refresh--busy' : ''}`}
+              onClick={onRefresh}
+              disabled={refreshing}
+              title="Actualiser : recharger les données (aussi automatique au retour sur l'onglet et toutes les 5 minutes)"
+              aria-label="Actualiser"
+            >
+              <ArrowClockwiseIcon size={16} weight="bold" aria-hidden="true" />
+            </button>
+          )}
           {csvExport && (
             <button
               type="button"

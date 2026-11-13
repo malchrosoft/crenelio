@@ -41,7 +41,10 @@ const PeriodCell: React.FC<CustomCellRendererProps<Unavailability>> = ({ data })
 const UnavailabilitiesGrid: React.FC<{
   /** Change à chaque actualisation (bouton de l'en-tête, retour sur l'onglet) : données rechargées. */
   refreshKey?: number;
-}> = ({ refreshKey }) => {
+  /** Bouton « Actualiser » de la barre de la grille (`DataGrid`). */
+  onRefresh?: () => void;
+  refreshing?: boolean;
+}> = ({ refreshKey, onRefresh, refreshing }) => {
   const [items, setItems] = useState<Unavailability[]>([]);
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState<Unavailability | null>(null);
@@ -111,6 +114,8 @@ const UnavailabilitiesGrid: React.FC<{
     <>
       {error && <p className="form-alert-error">{error}</p>}
       <DataGrid<Unavailability>
+        onRefresh={onRefresh}
+        refreshing={refreshing}
         gridId="unavailabilities"
         rows={items}
         columnDefs={columnDefs}

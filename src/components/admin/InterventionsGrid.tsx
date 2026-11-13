@@ -27,6 +27,9 @@ export interface InterventionActions {
 }
 
 interface InterventionsGridProps extends InterventionActions {
+  /** Bouton « Actualiser » de la barre de la grille (`DataGrid`). */
+  onRefresh?: () => void;
+  refreshing?: boolean;
   /** Rendez-vous déjà filtrés par la barre du planning (recherche, statut, période, jour). */
   appointments: Appointment[];
   /** Nombre total de rendez-vous, avant tout filtre (pied de grille). */
@@ -161,6 +164,8 @@ const InterventionsGrid: React.FC<InterventionsGridProps> = ({
   onCreate,
   onInvoice,
   onBillingExport,
+  onRefresh,
+  refreshing,
   ...actions
 }) => {
   // Colonne d'actions visible : reflet de la disposition (enregistrée avec les autres colonnes)
@@ -238,6 +243,8 @@ const InterventionsGrid: React.FC<InterventionsGridProps> = ({
 
   return (
     <DataGrid<Appointment>
+        onRefresh={onRefresh}
+        refreshing={refreshing}
       gridId="interventions"
       rows={appointments}
       columnDefs={columnDefs}
