@@ -1,8 +1,8 @@
 # Conservazione e cancellazione dei dati dei clienti
 
-*Traduzione della versione francese del 12/11/2026; fa fede la versione francese. I testi ufficiali sono citati in francese.*
+*Traduzione della versione francese del 14/11/2026; fa fede la versione francese. I testi ufficiali sono citati in francese.*
 
-*Ultima verifica: 12/11/2026. Base giuridica: Code de la consommation (Codice del consumo francese), L213-1,
+*Ultima verifica: 14/11/2026. Base giuridica: Code de la consommation (Codice del consumo francese), L213-1,
 D213-1 e D213-2 (conservazione dei contratti conclusi per via elettronica); Code de commerce (Codice di commercio
 francese), L123-22 (documenti giustificativi); regolamento (UE) 2016/679 (RGPD), articoli 5, 6 e 17. Testi parola
 per parola: [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md),
@@ -13,11 +13,29 @@ per parola: [../fr/textes/code-consommation.md](../fr/textes/code-consommation.m
 
 | Dato | Conservato | Poi |
 |---|---|---|
-| Appuntamento (nome, email, telefono, indirizzo, note) | La durata impostata (schermata Account, 36 mesi per impostazione predefinita) dopo l'intervento | Anonimizzato automaticamente |
-| Preventivo **non accettato** (bozza, inviato, rifiutato, scaduto, annullato) | La stessa durata | Anonimizzato automaticamente |
-| Preventivo **accettato** (contratto), anche se poi oggetto di recesso | **Dieci anni** dopo l'intervento (o, in mancanza, dopo l'accordo), con la traccia dell'accordo | Anonimizzato automaticamente |
+| Appuntamento (nome, email, telefono, indirizzo, note) | La durata impostata (schermata Account, 36 mesi per impostazione predefinita) dopo l'intervento | **Eliminato** automaticamente |
+| Preventivo **non accettato** (bozza, inviato, rifiutato, scaduto, annullato) | La stessa durata | **Eliminato** automaticamente |
+| Preventivo **accettato** (contratto), anche se poi oggetto di recesso | **Dieci anni** dopo l'intervento (o, in mancanza, dopo l'accordo), con la traccia dell'accordo; concluso l'intervento, è **archiviato** (filtro « Archivés » (*Archiviati*) della schermata « Devis » (*Preventivi*)) | **Eliminato** automaticamente, insieme al suo appuntamento |
 
-Restano sempre, senza legame con il cliente: la prestazione, la data, gli importi e il comune.
+Perché eliminare anziché « anonimizzare »: una riga conservata con la sua data, la prestazione, l'importo e il
+comune può ancora identificare il cliente, ad esempio confrontandola con una fattura. Togliere il nome non basta a
+rendere anonimo un dato: non deve più essere possibile isolare una persona, collegarne i dati né dedurne
+informazioni (Gruppo di lavoro articolo 29, parere 05/2014 sulle tecniche di anonimizzazione, p. 9 e 10). Crénelio
+quindi elimina, invece di conservare righe « anonimizzate ».
+
+*Portata di questa fonte (verificata il 14/11/2026)*: il parere 05/2014 è **anteriore al RGPD** (adottato nel 2016,
+applicabile dal 25 maggio 2018) e non figura nell'elenco dei documenti del Gruppo di lavoro articolo 29 fatti
+propri dal Comitato europeo per la protezione dei dati nella sua prima riunione; resta tuttavia il riferimento
+citato dalla CNIL (autorità francese per la protezione dei dati) nella sua guida sulle durate di conservazione
+(luglio 2020) e nel suo quadro di riferimento sulla gestione commerciale (pubblicato nel gennaio 2022). Il Comitato
+ha sottoposto a consultazione linee guida sulla pseudonimizzazione (01/2025, versione definitiva non confermata a
+tale data). L'eliminazione scelta da Crénelio non dipende da questi dibattiti: un dato eliminato non deve più
+essere qualificato.
+
+Durante la conservazione, un preventivo accettato è in **archiviazione intermedia** ai sensi della CNIL: si
+conservano solo i dati che attestano il contratto (il telefono del cliente viene tolto), esce dall'elenco corrente
+dei preventivi e si consulta solo se necessario, ad esempio per una controversia o una richiesta del cliente (CNIL,
+guida sulle durate di conservazione, luglio 2020, e quadro di riferimento « gestion des activités commerciales »).
 
 ## Perché dieci anni per un preventivo accettato
 
@@ -42,10 +60,10 @@ Il RGPD gli riconosce questo diritto (articolo 17), salvo quando la conservazion
 respecter une obligation légale » (articolo 17, paragrafo 3, b). In concreto, con « Effacer le client »
 (*cancella il cliente*):
 
-- **vengono cancellati**: i suoi recapiti sull'appuntamento, i suoi preventivi non accettati, gli indirizzi del
-  registro delle email;
-- **resta intatto**: ogni preventivo **accettato**, fino alla fine dei suoi dieci anni. La finestra di conferma
-  vi indica quali; ditelo al cliente, citando questi testi;
+- **vengono eliminati**: l'appuntamento, i suoi preventivi non accettati e il relativo registro delle email;
+- **resta intatto**: ogni preventivo **accettato**, fino alla fine dei suoi dieci anni; il suo appuntamento è
+  conservato, ridotto alla sola data. La finestra di conferma vi indica quali; ditelo al cliente, citando questi
+  testi;
 - **appuntamento futuro** non annullato: la conferma vi avverte che non potrete più contattare il cliente.
   Annullate prima l'appuntamento se l'intervento non ha più luogo.
 

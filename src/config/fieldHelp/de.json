@@ -91,6 +91,11 @@
       "how": "Wie die Arbeitszeit abgerechnet wird (z. B. „je angefangene Viertelstunde“). Auf die Kostenvoranschläge und in die Tarife der Schaufensterseite übernommen.",
       "why": "Information, die dem Kunden vor Vertragsschluss zusammen mit dem Stundensatz inkl. MwSt. (TTC) zu geben ist."
     },
+    "rgpd_retention_months": {
+      "title": "Aufbewahrung der Kundendaten",
+      "how": "Dauer in Monaten nach dem Einsatz, nach deren Ablauf der Termin und seine nicht angenommenen Kostenvoranschläge gelöscht werden (36 Monate, wenn leer). Ein angenommener Kostenvoranschlag wird zehn Jahre aufbewahrt, archiviert und dann gelöscht.",
+      "why": "Daten werden nicht länger als nötig aufbewahrt; ein online geschlossener Vertrag wird zehn Jahre aufbewahrt. Löschen statt eine „anonymisierte“ Zeile aufzubewahren, die den Kunden noch bestimmbar machen könnte."
+    },
     "quote_allow_supply": {
       "title": "Weiterverkauf von Material",
       "how": "Nur aktivieren, wenn der Weiterverkauf von Teilen zu Ihrer angemeldeten Tätigkeit gehört. Andernfalls die im Namen des Kunden gekauften Teile (durchlaufende Posten, débours) verwenden.",

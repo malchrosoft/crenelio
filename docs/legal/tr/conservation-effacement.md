@@ -1,8 +1,8 @@
 # Müşteri verilerinin saklanması ve silinmesi
 
-*12/11/2026 tarihli Fransızca sürümün çevirisidir; Fransızca sürüm esastır. Resmî metinler Fransızca olarak alıntılanmıştır.*
+*14/11/2026 tarihli Fransızca sürümün çevirisidir; Fransızca sürüm esastır. Resmî metinler Fransızca olarak alıntılanmıştır.*
 
-*Son doğrulama: 12/11/2026. Hukuki dayanak: Code de la consommation, L213-1, D213-1 ve D213-2
+*Son doğrulama: 14/11/2026. Hukuki dayanak: Code de la consommation, L213-1, D213-1 ve D213-2
 (elektronik yolla kurulan sözleşmelerin saklanması); Code de commerce, L123-22 (destekleyici
 belgeler); (AB) 2016/679 sayılı tüzük (GDPR), madde 5, 6 ve 17. Kelimesi kelimesine metinler:
 [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md), [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md),
@@ -12,11 +12,29 @@ belgeler); (AB) 2016/679 sayılı tüzük (GDPR), madde 5, 6 ve 17. Kelimesi kel
 
 | Veri | Saklama | Sonra |
 |---|---|---|
-| Randevu (ad, e-posta, telefon, adres, notlar) | Müdahaleden sonra ayarlanan süre (Compte ekranı, varsayılan 36 ay) | Otomatik olarak anonimleştirilir |
-| **Kabul edilmemiş** teklif (taslak, gönderilmiş, reddedilmiş, süresi dolmuş, iptal edilmiş) | Aynı süre | Otomatik olarak anonimleştirilir |
-| **Kabul edilmiş** teklif (sözleşme), sonradan cayılmış olsa bile | Müdahaleden (yoksa kabulden) sonra **on yıl**, kabulün iziyle birlikte | Otomatik olarak anonimleştirilir |
+| Randevu (ad, e-posta, telefon, adres, notlar) | Müdahaleden sonra ayarlanan süre (Compte ekranı, varsayılan 36 ay) | Otomatik olarak **silinir** |
+| **Kabul edilmemiş** teklif (taslak, gönderilmiş, reddedilmiş, süresi dolmuş, iptal edilmiş) | Aynı süre | Otomatik olarak **silinir** |
+| **Kabul edilmiş** teklif (sözleşme), sonradan cayılmış olsa bile | Müdahaleden (yoksa kabulden) sonra **on yıl**, kabulün iziyle birlikte; müdahale tamamlandığında **arşivlenir** (Devis ekranının « Archivés » filtresi) | Randevusuyla birlikte otomatik olarak **silinir** |
 
-Müşteriyle bağlantısı olmadan her zaman kalır: hizmet, tarih, tutarlar ve belediye (*commune*).
+Neden “anonimleştirmek” yerine silmek: tarihi, hizmeti, tutarı ve belediyesiyle (*commune*) saklanan bir satır,
+örneğin bir faturayla karşılaştırıldığında müşteriyi hâlâ işaret edebilir. Adı kaldırmak, bir veriyi anonim hâle
+getirmeye yetmez: artık bir kişiyi ayırt etmek, verilerini ilişkilendirmek veya onun hakkında bir bilgi çıkarmak
+mümkün olmamalıdır (Madde 29 Çalışma Grubu, anonimleştirme teknikleri hakkında 05/2014 sayılı görüş, s. 9 ve 10).
+Bu nedenle Crénelio, “anonimleştirilmiş” satırlar saklamak yerine siler.
+
+*Bu kaynağın kapsamı (14/11/2026 tarihinde doğrulandı)*: 05/2014 sayılı görüş **GDPR'den öncedir** (2016'da kabul
+edilmiş, 25 Mayıs 2018'den beri uygulanmaktadır) ve Avrupa Veri Koruma Kurulu'nun ilk oturumunda benimsediği Madde 29
+Çalışma Grubu belgeleri listesinde yer almaz; yine de CNIL'in saklama süreleri rehberinde (Temmuz 2020) ve ticari
+yönetim referans belgesinde (Ocak 2022'de yayımlanmış) atıfta bulunduğu kaynak olmaya devam etmektedir. Kurul, takma
+adlandırma (pseudonymisation) hakkındaki yönergeleri kamuoyu görüşüne sunmuştur (01/2025, nihai sürümü bu tarih
+itibarıyla doğrulanmamıştır). Crénelio'nun benimsediği silme bu tartışmalara bağlı değildir: silinmiş bir verinin
+artık nitelendirilmesi gerekmez.
+
+Saklandığı süre boyunca kabul edilmiş bir teklif, CNIL'in tanımladığı anlamda **ara arşivlemededir** (*archivage
+intermédiaire*): yalnızca sözleşmeyi belgeleyen veriler saklanır (müşterinin telefonu kaldırılır), teklif güncel
+teklif listesinden çıkar ve yalnızca gerektiğinde, örneğin bir uyuşmazlıkta veya müşterinin talebi üzerine
+görüntülenir (CNIL, saklama süreleri rehberi, Temmuz 2020, ve « gestion des activités commerciales » referans
+belgesi).
 
 ## Kabul edilmiş teklif için neden on yıl
 
@@ -38,9 +56,9 @@ cayma beyanı.
 GDPR ona bu hakkı tanır (madde 17); ancak saklama « nécessaire […] pour respecter une
 obligation légale » ise bu hak uygulanmaz (madde 17, paragraf 3, b). Somut olarak, « Effacer le client » (Müşteriyi sil) ile:
 
-- **silinir**: randevudaki iletişim bilgileri, kabul edilmemiş teklifleri, e-posta günlüğündeki
-  adresler;
-- **olduğu gibi kalır**: **kabul edilmiş** her teklif, on yılının sonuna kadar. Onay penceresi
+- **silinir**: randevu, kabul edilmemiş teklifleri ve bunların e-posta günlüğü;
+- **olduğu gibi kalır**: **kabul edilmiş** her teklif, on yılının sonuna kadar; randevusu yalnızca tarihine
+  indirgenerek saklanır. Onay penceresi
   hangileri olduğunu gösterir; bunu müşteriye bu metinlere atıfta bulunarak söyleyin;
 - iptal edilmemiş **gelecek randevu**: onay, müşteriye artık ulaşamayacağınız konusunda sizi uyarır.
   Müdahale artık yapılmayacaksa önce randevuyu iptal edin.

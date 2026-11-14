@@ -182,7 +182,11 @@ class Appointment
     // -----------------------------------------------------------------
 
     /** Nom affiché à la place du client une fois ses données effacées. */
-    public const ANONYMIZED_NAME = 'Client anonymisé';
+    /**
+     * Nom porté par un rendez-vous réduit (contrat conservé) : ses données de contact sont effacées. Pas
+     * « anonymisé » : la ligne garde sa date (docs/legal/fr/conservation-effacement.md). Identique à privacy.ts.
+     */
+    public const ANONYMIZED_NAME = 'Client (données effacées)';
 
     /** Durée de conservation par défaut après l'intervention (mois). */
     public const DEFAULT_RETENTION_MONTHS = 36;
@@ -202,55 +206,65 @@ class Appointment
             . self::CONTRACT_RETENTION_YEARS . ' YEAR) > NOW())';
     }
 
-    /**
-     * Efface les données personnelles du client (nom, email, téléphone, adresse, notes, motif
-     * d'annulation) et celles du journal des emails. Restent : prestation, date, statut, montants,
-     * code postal et commune (statistiques de la zone d'intervention). Un devis accepté (contrat) reste
-     * intact pendant sa durée de conservation (`CONTRACT_RETENTION_YEARS`).
-     */
-    public static function anonymize(int $id): bool
+    /** Le rendez-vous `a` a-t-il un devis encore à conserver comme contrat ? (condition SQL corrélée) */
+    private static function hasKeptContractSql(): string
     {
-        return self::anonymizeWhere('a.id = ?', [$id]) > 0;
+        return 'EXISTS (SELECT 1 FROM `quotes` q WHERE q.appointment_id = a.id AND ' . self::keptContractSql() . ')';
     }
 
     /**
-     * Anonymise les rendez-vous terminés depuis plus de $months mois.
-     * Les demandes « En attente » à venir ne sont jamais concernées.
+     * Effacement à la demande du client (RGPD, art. 17). Une ligne gardée avec sa date, sa prestation, son
+     * montant et sa commune n'est pas anonyme (groupe de l'article 29, avis 05/2014, p. 9-10) : le rendez-vous
+     * et ses devis non conclus sont **supprimés**. Un rendez-vous dont un devis est conservé comme contrat
+     * (`CONTRACT_RETENTION_YEARS`) est seulement réduit au strict nécessaire, le contrat restant intact.
      *
-     * @return int Nombre de rendez-vous anonymisés.
+     * @return string `deleted` ou `minimised`
+     */
+    public static function erase(int $id): string
+    {
+        $kept = self::keptContractSql();
+        Database::execute("DELETE q FROM `quotes` q JOIN `appointments` a ON a.id = q.appointment_id WHERE a.id = ? AND NOT $kept", [$id]);
+        if (Database::fetchOne('SELECT a.id FROM `appointments` a WHERE a.id = ? AND ' . self::hasKeptContractSql(), [$id])) {
+            self::minimiseWhere('a.id = ?', [$id]);
+            return 'minimised';
+        }
+        Database::execute('DELETE FROM `appointments` WHERE id = ?', [$id]);
+        return 'deleted';
+    }
+
+    /**
+     * Fin de la durée de conservation (`rgpd_retention_months` après l'intervention) : rendez-vous et devis
+     * non conclus **supprimés** ; un rendez-vous lié à un contrat conservé est réduit (archivage intermédiaire,
+     * CNIL) et supprimé avec lui à son terme (`purgeQuotes`). Les demandes à venir ne sont jamais concernées.
+     *
+     * @return int Nombre de rendez-vous supprimés.
      */
     public static function purgeOlderThan(int $months): int
     {
-        return self::anonymizeWhere('a.end_datetime < DATE_SUB(NOW(), INTERVAL ? MONTH)', [$months]);
+        $old = 'a.end_datetime < DATE_SUB(NOW(), INTERVAL ? MONTH)';
+        $kept = self::keptContractSql();
+        Database::execute("DELETE q FROM `quotes` q JOIN `appointments` a ON a.id = q.appointment_id WHERE $old AND NOT $kept", [$months]);
+        $deleted = Database::execute("DELETE a FROM `appointments` a WHERE $old AND NOT " . self::hasKeptContractSql(), [$months]);
+        self::minimiseWhere($old, [$months]);
+        return $deleted;
     }
 
-    /** Champs personnels d'un devis effacés à l'anonymisation (`q`). */
-    private const QUOTE_ERASE = "q.client_name = ?, q.client_email = '', q.client_phone = '', q.address = '', q.client_company = NULL, q.client_siren = NULL,
-                 q.decision_ip = NULL, q.mandate_ip = NULL, q.notes = NULL, q.refusal_reason = NULL, q.cancel_reason = NULL,
-                 q.withdrawal_name = NULL, q.withdrawal_email = NULL, q.withdrawal_address = NULL, q.withdrawal_ip = NULL";
-
     /**
-     * Purge des devis hors rendez-vous, et des contrats dont la durée de conservation est écoulée : devis
-     * non conclus sans rendez-vous inactifs depuis `$months` mois (comme les rendez-vous), contrats dix ans
-     * après leur exécution (rendez-vous déjà anonymisé ou absent).
+     * Devis hors rendez-vous et contrats échus : devis non conclus sans rendez-vous inactifs depuis `$months`
+     * mois, et contrats dont les dix ans sont écoulés, **supprimés** (leur rendez-vous l'est ensuite par
+     * `purgeOlderThan`).
      *
-     * @return int Nombre de devis anonymisés.
+     * @return int Nombre de devis supprimés.
      */
     public static function purgeQuotes(int $months): int
     {
         $kept = self::keptContractSql();
-        $notifications = "UPDATE `quote_notifications` n JOIN `quotes` q ON q.id = n.quote_id LEFT JOIN `appointments` a ON a.id = q.appointment_id
-             SET n.recipient = IF(n.type IN ('decision_pro', 'withdrawal_pro'), n.recipient, ''), n.subject = '(données anonymisées)'
-             WHERE q.client_name <> ? AND NOT $kept AND ";
-        $quotes = "UPDATE `quotes` q LEFT JOIN `appointments` a ON a.id = q.appointment_id SET " . self::QUOTE_ERASE . "
-             WHERE q.client_name <> ? AND NOT $kept AND ";
-        // Sans rendez-vous : dernière activité ; avec un rendez-vous déjà anonymisé : contrats échus
         $standalone = 'q.appointment_id IS NULL AND COALESCE(q.withdrawn_at, q.cancelled_at, q.decided_at, q.sent_at, q.created_at) < DATE_SUB(NOW(), INTERVAL ? MONTH)';
-        $expired = "q.status IN ('accepted', 'withdrawn') AND a.client_name = ?";
-        Database::execute($notifications . "($standalone)", [self::ANONYMIZED_NAME, $months]);
-        Database::execute($notifications . "($expired)", [self::ANONYMIZED_NAME, self::ANONYMIZED_NAME]);
-        return Database::execute($quotes . "($standalone)", [self::ANONYMIZED_NAME, self::ANONYMIZED_NAME, $months])
-            + Database::execute($quotes . "($expired)", [self::ANONYMIZED_NAME, self::ANONYMIZED_NAME, self::ANONYMIZED_NAME]);
+        return Database::execute(
+            "DELETE q FROM `quotes` q LEFT JOIN `appointments` a ON a.id = q.appointment_id
+             WHERE NOT $kept AND (($standalone) OR q.status IN ('accepted', 'withdrawn'))",
+            [$months]
+        );
     }
 
     /** Devis acceptés d'un rendez-vous, conservés comme contrats (numéros), pour l'avertir avant un effacement. */
@@ -262,39 +276,27 @@ class Appointment
         ), 'number');
     }
 
-    private static function anonymizeWhere(string $condition, array $params): int
+    /**
+     * Réduit au strict nécessaire un rendez-vous lié à un contrat conservé (archivage intermédiaire) : plus
+     * de coordonnées ni de notes, journal des emails sans destinataire ; le rendez-vous ne garde que ce qui
+     * date l'exécution du contrat. Côté devis conservé, seul le téléphone est retiré (tri des données : il ne
+     * constate pas le contrat).
+     */
+    private static function minimiseWhere(string $condition, array $params): void
     {
-        // Journal des emails : adresses des clients et sujets (ceux de l'artisan citent le client)
         Database::execute(
             "UPDATE `appointment_notifications` n
              JOIN `appointments` a ON a.id = n.appointment_id
              SET n.recipient = IF(n.type IN ('pro_confirmation', 'exception_pro_request'), n.recipient, ''),
-                 n.subject = '(données anonymisées)'
+                 n.subject = '(données effacées)'
              WHERE a.client_name <> ? AND $condition",
             [self::ANONYMIZED_NAME, ...$params]
         );
-
-        // Devis du rendez-vous (Item 22) : client, preuves de réponse et de rétractation, journal des
-        // emails ; montants et lignes conservés. Sauf les contrats à conserver (devis acceptés, dix ans)
-        $kept = self::keptContractSql();
         Database::execute(
-            "UPDATE `quote_notifications` n
-             JOIN `quotes` q ON q.id = n.quote_id
-             JOIN `appointments` a ON a.id = q.appointment_id
-             SET n.recipient = IF(n.type IN ('decision_pro', 'withdrawal_pro'), n.recipient, ''),
-                 n.subject = '(données anonymisées)'
-             WHERE a.client_name <> ? AND $condition AND NOT $kept",
-            [self::ANONYMIZED_NAME, ...$params]
+            "UPDATE `quotes` q JOIN `appointments` a ON a.id = q.appointment_id SET q.client_phone = '' WHERE $condition AND " . self::keptContractSql(),
+            $params
         );
         Database::execute(
-            "UPDATE `quotes` q
-             JOIN `appointments` a ON a.id = q.appointment_id
-             SET " . self::QUOTE_ERASE . "
-             WHERE a.client_name <> ? AND $condition AND NOT $kept",
-            [self::ANONYMIZED_NAME, self::ANONYMIZED_NAME, ...$params]
-        );
-
-        return Database::execute(
             "UPDATE `appointments` a
              SET a.client_name = ?, a.client_email = '', a.client_phone = '', a.address = '',
                  a.latitude = NULL, a.longitude = NULL,

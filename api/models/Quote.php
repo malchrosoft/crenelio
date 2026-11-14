@@ -25,8 +25,14 @@ class Quote
     /** Désignation par défaut des lignes qui n'en attendent pas (identique à `DEFAULT_LINE_LABELS`, quoteRules.ts). */
     public const DEFAULT_LABELS = ['labour' => "Main-d'œuvre", 'travel' => 'Frais de déplacement', 'discount' => 'Remise exceptionnelle'];
 
-    /** Devis avec le statut de son rendez-vous (prestation exécutée : L221-28 1°). */
-    private const SELECT = 'SELECT q.*, a.status AS appointment_status
+    /**
+     * Devis avec le statut de son rendez-vous (prestation exécutée : L221-28 1°) et `archived` : contrat
+     * conservé au terme de son exécution (rétracté, intervention passée, ou accepté depuis plus d'un an
+     * sans rendez-vous) ; archivage intermédiaire (CNIL), hors des listes courantes.
+     */
+    private const ARCHIVED = "(q.status = 'withdrawn' OR (q.status = 'accepted' AND (a.end_datetime < NOW()
+            OR (a.id IS NULL AND q.decided_at < DATE_SUB(NOW(), INTERVAL 1 YEAR))))) AS archived";
+    private const SELECT = 'SELECT q.*, a.status AS appointment_status, ' . self::ARCHIVED . '
         FROM `quotes` q LEFT JOIN `appointments` a ON a.id = q.appointment_id';
 
     /** Statuts dans lesquels le devis n'est plus modifiable (envoyé au client ou décidé). */
@@ -37,7 +43,7 @@ class Quote
     {
         self::expireOutdated();
         return Database::fetchAll(
-            'SELECT q.*, a.start_datetime AS appointment_start
+            'SELECT q.*, a.start_datetime AS appointment_start, ' . self::ARCHIVED . '
              FROM `quotes` q LEFT JOIN `appointments` a ON a.id = q.appointment_id
              ORDER BY q.created_at DESC'
         );

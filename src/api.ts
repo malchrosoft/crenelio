@@ -220,7 +220,7 @@ export const api = {
   locateAppointment: (id: number, latitude: number, longitude: number) =>
     request<Appointment>('PUT', `/appointments/${id}/coordinates`, { latitude, longitude }),
   anonymizeAppointment: (id: number) =>
-    request<{ message: string; appointment: Appointment }>('POST', `/appointments/${id}/anonymize`),
+    request<{ result: 'deleted' | 'minimised'; appointment: Appointment | null }>('POST', `/appointments/${id}/anonymize`),
   /**
    * Reprogrammation. `check` (calendrier) : refus 409 `slot_unavailable` si le créneau n'est pas
    * proposable ; `force` : enregistrement malgré tout, sur confirmation de l'artisan.

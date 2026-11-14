@@ -115,3 +115,17 @@ Source : EUR-Lex, CELEX 32016R0679, version consolidée du 4 mai 2016 (fichier `
 > d) à des fins archivistiques dans l'intérêt public, à des fins de recherche scientifique ou historique ou à des fins statistiques conformément à l'article 89, paragraphe 1, dans la mesure où le droit visé au paragraphe 1 est susceptible de rendre impossible ou de compromettre gravement la réalisation des objectifs dudit traitement; ou
 >
 > e) à la constatation, à l'exercice ou à la défense de droits en justice.
+
+## Décret n° 2017-1416 du 28 septembre 2017 relatif à la signature électronique
+
+Source : [Légifrance, JORFTEXT000035676246](https://www.legifrance.gouv.fr/loda/id/JORFTEXT000035676246), lu le 14/11/2026 (« En vigueur au 14/11/2026 »). Texte français pris pour l'application du règlement (UE) n° 910/2014 (eIDAS), regroupé ici avec lui. Utilisé pour : niveau de signature dont la fiabilité est présumée (C. civ. 1367). *Texte reconstitué à partir d'extraits lus mot pour mot ; la ponctuation entre extraits, notée [...], est à vérifier sur le texte complet.*
+
+### Article 1
+
+> En vigueur depuis le 01 octobre 2017
+>
+> La fiabilité d'un procédé de signature électronique est présumée, jusqu'à preuve du contraire [...] lorsque ce procédé met en œuvre une signature électronique qualifiée.
+>
+> Est une signature électronique qualifiée une signature électronique avancée, conforme à l'article 26 du règlement susvisé [...] créée à l'aide d'un dispositif de création de signature électronique qualifié répondant aux exigences de l'article 29 dudit règlement [...] qui repose sur un certificat qualifié de signature électronique répondant aux exigences de l'article 28 de ce règlement.
+
+*À déposer :* règlement (UE) n° 910/2014 (eIDAS), version consolidée en vigueur, articles 3 (points 10 à 12), 25 et 26 ; décret n° 80-533 du 15 juillet 1980, article 1 (seuil de la preuve par écrit) : non récupérés le 14/11/2026.

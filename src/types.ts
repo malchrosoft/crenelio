@@ -296,6 +296,8 @@ export interface Quote {
   can_withdraw?: boolean;
   /** Statut du rendez-vous lié (lecture seule, jointure du serveur). */
   appointment_status?: string | null;
+  /** Contrat conservé au terme de son exécution (archivage intermédiaire) : hors des listes courantes. */
+  archived?: number | string | boolean;
   created_at: string;
   lines?: QuoteLine[];
 }

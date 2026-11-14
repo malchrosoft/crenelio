@@ -8,6 +8,7 @@ import { api } from '../../api';
 import { exportFileName } from '../../utils/format';
 import { AppConfig, Quote } from '../../types';
 import DataGrid from './DataGrid';
+import ToggleGroup from './ToggleGroup';
 import QuoteEditor from './QuoteEditor';
 import { QUOTE_STATUS_LABELS, euro } from './quoteRules';
 
@@ -34,6 +35,13 @@ interface QuotesGridProps {
  */
 const QuotesGrid: React.FC<QuotesGridProps> = ({ config, openId, onOpened, refreshKey, onRefresh, refreshing }) => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
+  // Contrats archivés (conservés dix ans, archivage intermédiaire) : hors de la liste courante par défaut
+  const [scope, setScope] = useState<'current' | 'archived' | 'all'>('current');
+  const isArchived = (q: Quote) => Boolean(Number(q.archived));
+  const shown = useMemo(
+    () => (scope === 'all' ? quotes : quotes.filter((q) => isArchived(q) === (scope === 'archived'))),
+    [quotes, scope],
+  );
   // `null` : fermé ; 'new' : nouveau brouillon ; sinon devis complet (avec ses lignes)
   const [editing, setEditing] = useState<Quote | 'new' | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -158,7 +166,21 @@ const QuotesGrid: React.FC<QuotesGridProps> = ({ config, openId, onOpened, refre
         onRefresh={onRefresh}
         refreshing={refreshing}
         gridId="quotes"
-        rows={quotes}
+        rows={shown}
+        totalCount={quotes.length}
+        quickFilters={
+          <ToggleGroup
+            label="Devis"
+            options={[
+              { value: 'current', label: 'En cours' },
+              { value: 'archived', label: 'Archivés' },
+              { value: 'all', label: 'Tous' },
+            ]}
+            value={scope}
+            onChange={setScope}
+          />
+        }
+        activeFilters={scope === 'current' ? [] : [{ id: 'scope', label: scope === 'archived' ? 'Archivés' : 'Tous les devis', onClear: () => setScope('current') }]}
         columnDefs={columnDefs}
         getRowId={(q) => String(q.id)}
         entityLabel={['devis', 'devis']}

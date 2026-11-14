@@ -1,6 +1,6 @@
 # Conservation et effacement des données des clients
 
-*Dernière vérification : 12/11/2026. Base légale : Code de la consommation, L213-1, D213-1 et D213-2
+*Dernière vérification : 14/11/2026. Base légale : Code de la consommation, L213-1, D213-1 et D213-2
 (conservation des contrats conclus par voie électronique) ; Code de commerce, L123-22 (pièces
 justificatives) ; règlement (UE) 2016/679 (RGPD), articles 5, 6 et 17. Textes mot pour mot :
 [textes/code-consommation.md](textes/code-consommation.md), [textes/code-commerce.md](textes/code-commerce.md),
@@ -10,11 +10,28 @@ justificatives) ; règlement (UE) 2016/679 (RGPD), articles 5, 6 et 17. Textes m
 
 | Donnée | Conservée | Puis |
 |---|---|---|
-| Rendez-vous (nom, email, téléphone, adresse, notes) | La durée réglée (écran Compte, 36 mois par défaut) après l'intervention | Anonymisée automatiquement |
-| Devis **non accepté** (brouillon, envoyé, refusé, expiré, annulé) | La même durée | Anonymisé automatiquement |
-| Devis **accepté** (contrat), même rétracté ensuite | **Dix ans** après l'intervention (ou l'accord, à défaut), avec la trace de l'accord | Anonymisé automatiquement |
+| Rendez-vous (nom, email, téléphone, adresse, notes) | La durée réglée (écran Compte, 36 mois par défaut) après l'intervention | **Supprimé** automatiquement |
+| Devis **non accepté** (brouillon, envoyé, refusé, expiré, annulé) | La même durée | **Supprimé** automatiquement |
+| Devis **accepté** (contrat), même rétracté ensuite | **Dix ans** après l'intervention (ou l'accord, à défaut), avec la trace de l'accord ; au terme de l'intervention, il est **archivé** (filtre « Archivés » de l'écran Devis) | **Supprimé** automatiquement, avec son rendez-vous |
 
-Restent toujours, sans lien avec le client : la prestation, la date, les montants et la commune.
+Pourquoi supprimer plutôt qu'« anonymiser » : une ligne gardée avec sa date, sa prestation, son montant et sa commune
+peut encore désigner le client, par exemple en la rapprochant d'une facture. Retirer le nom ne suffit pas à rendre une
+donnée anonyme : il ne faut plus pouvoir isoler une personne, relier ses données ni déduire une information à son sujet
+(groupe de l'article 29, avis 05/2014 sur les techniques d'anonymisation, p. 9 et 10). Crénelio supprime donc, au lieu
+de garder des lignes « anonymisées ».
+
+*Portée de cette source (vérifiée le 14/11/2026)* : l'avis 05/2014 est **antérieur au RGPD** (adopté en 2016, applicable
+depuis le 25 mai 2018) et ne figure pas dans la liste des documents du groupe de l'article 29 repris par le Comité
+européen de la protection des données lors de sa première séance ; il reste toutefois la référence citée par la CNIL
+dans son guide des durées de conservation (juillet 2020) et son référentiel de gestion commerciale (publié en
+janvier 2022). Le Comité a soumis à consultation des lignes directrices sur la pseudonymisation (01/2025, version
+finale non confirmée à cette date). La suppression retenue par Crénelio ne dépend pas de ces débats : une donnée
+supprimée n'a plus à être qualifiée.
+
+Pendant sa conservation, un devis accepté est en **archivage intermédiaire** au sens de la CNIL : seules les données qui
+constatent le contrat sont gardées (le téléphone du client est retiré), il sort de la liste courante des devis et ne se
+consulte que si besoin, par exemple pour un litige ou une demande du client (CNIL, guide des durées de conservation,
+juillet 2020, et référentiel « gestion des activités commerciales »).
 
 ## Pourquoi dix ans pour un devis accepté
 
@@ -37,9 +54,8 @@ cas échéant, sa déclaration de rétractation.
 Le RGPD lui donne ce droit (article 17), sauf quand la conservation est « nécessaire […] pour respecter une
 obligation légale » (article 17, paragraphe 3, b). Concrètement, avec « Effacer le client » :
 
-- **sont effacés** : ses coordonnées sur le rendez-vous, ses devis non acceptés, les adresses du journal des
-  emails ;
-- **reste intact** : tout devis **accepté**, jusqu'à la fin de ses dix ans. La fenêtre de confirmation vous
+- **sont supprimés** : le rendez-vous, ses devis non acceptés et leur journal des emails ;
+- **reste intact** : tout devis **accepté**, jusqu'à la fin de ses dix ans ; son rendez-vous est gardé, réduit à sa date. La fenêtre de confirmation vous
   indique lesquels ; dites-le au client, en citant ces textes ;
 - **rendez-vous à venir** non annulé : la confirmation vous prévient que vous ne pourrez plus joindre le
   client. Annulez d'abord le rendez-vous si l'intervention n'a plus lieu.

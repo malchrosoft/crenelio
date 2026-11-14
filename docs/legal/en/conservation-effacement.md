@@ -1,8 +1,8 @@
 # Retention and erasure of customer data
 
-*Translation of the French version dated 12/11/2026 — the French version prevails. Official texts are quoted in French.*
+*Translation of the French version dated 14/11/2026 — the French version prevails. Official texts are quoted in French.*
 
-*Last checked: 12/11/2026. Legal basis: Code de la consommation (French Consumer Code), L213-1, D213-1 and D213-2
+*Last checked: 14/11/2026. Legal basis: Code de la consommation (French Consumer Code), L213-1, D213-1 and D213-2
 (retention of contracts concluded electronically); Code de commerce (French Commercial Code), L123-22 (supporting
 documents); Regulation (EU) 2016/679 (GDPR), articles 5, 6 and 17. Texts word for word:
 [textes/code-consommation.md](../fr/textes/code-consommation.md), [textes/code-commerce.md](../fr/textes/code-commerce.md),
@@ -12,11 +12,28 @@ documents); Regulation (EU) 2016/679 (GDPR), articles 5, 6 and 17. Texts word fo
 
 | Data | Kept for | Then |
 |---|---|---|
-| Appointment (name, email, phone, address, notes) | The period you set (Account screen, 36 months by default) after the job | Automatically anonymised |
-| Quote **not accepted** (draft, sent, refused, expired, cancelled) | The same period | Automatically anonymised |
-| Quote **accepted** (contract), even if later withdrawn | **Ten years** after the job (or after the agreement, failing that), with the record of the agreement | Automatically anonymised |
+| Appointment (name, email, phone, address, notes) | The period you set (Account screen, 36 months by default) after the job | **Deleted** automatically |
+| Quote **not accepted** (draft, sent, refused, expired, cancelled) | The same period | **Deleted** automatically |
+| Quote **accepted** (contract), even if later withdrawn | **Ten years** after the job (or after the agreement, failing that), with the record of the agreement; once the job is over, it is **archived** (« Archivés » (*Archived*) filter of the « Devis » (*Quotes*) screen) | **Deleted** automatically, together with its appointment |
 
-What always remains, with no link to the customer: the service, the date, the amounts and the town.
+Why delete rather than "anonymise": a row kept with its date, service, amount and town can still identify the
+customer, for example by matching it with an invoice. Removing the name is not enough to make data anonymous: it
+must no longer be possible to single out a person, link their data or infer information about them (Article 29
+Working Party, Opinion 05/2014 on Anonymisation Techniques, pp. 9 and 10). Crénelio therefore deletes, instead of
+keeping "anonymised" rows.
+
+*Scope of this source (checked on 14/11/2026)*: Opinion 05/2014 **predates the GDPR** (adopted in 2016, applicable
+since 25 May 2018) and is not on the list of Article 29 Working Party documents endorsed by the European Data
+Protection Board at its first plenary meeting; it nevertheless remains the reference cited by the CNIL (French data
+protection authority) in its guide on retention periods (July 2020) and its reference framework for commercial
+management (published in January 2022). The Board has put guidelines on pseudonymisation out for consultation
+(01/2025, final version not confirmed at that date). The deletion chosen by Crénelio does not depend on these
+debates: deleted data no longer needs to be classified.
+
+While it is kept, an accepted quote is in **intermediate archiving** within the meaning of the CNIL: only the data
+that evidence the contract are kept (the customer's phone number is removed), it leaves the current list of quotes
+and is consulted only when needed, for example for a dispute or a request from the customer (CNIL, guide on
+retention periods, July 2020, and reference framework « gestion des activités commerciales »).
 
 ## Why ten years for an accepted quote
 
@@ -39,10 +56,9 @@ mandate) and, where applicable, their withdrawal statement.
 The GDPR gives them this right (article 17), except where retention is « nécessaire […] pour respecter une
 obligation légale » (article 17, paragraph 3, b). In practice, with « Effacer le client » (*erase the customer*):
 
-- **erased**: their contact details on the appointment, their non-accepted quotes, the addresses in the email
-  log;
-- **left intact**: any **accepted** quote, until the end of its ten years. The confirmation window tells you
-  which ones; tell the customer, citing these texts;
+- **deleted**: the appointment, their non-accepted quotes and the related email log;
+- **left intact**: any **accepted** quote, until the end of its ten years; its appointment is kept, reduced to its
+  date. The confirmation window tells you which ones; tell the customer, citing these texts;
 - **upcoming appointment** not cancelled: the confirmation warns you that you will no longer be able to contact
   the customer. Cancel the appointment first if the job is no longer taking place.
 

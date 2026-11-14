@@ -138,6 +138,13 @@ export const FIELD_HELP = {
     refs: ['Arrêté du 24 janvier 2017, art. 2'],
     doc: 'fr/devis-depannage.md',
   },
+  rgpd_retention_months: {
+    title: 'Conservation des données clients',
+    how: 'Durée, en mois après l’intervention, au terme de laquelle le rendez-vous et ses devis non acceptés sont supprimés (36 mois si vide). Un devis accepté est conservé dix ans, archivé, puis supprimé.',
+    why: 'Les données ne se gardent pas plus longtemps que nécessaire ; un contrat conclu en ligne se conserve dix ans. Supprimer, plutôt que garder une ligne « anonymisée » qui pourrait encore désigner le client.',
+    refs: ['RGPD, art. 5, 1, e et art. 17', 'Code de la consommation, art. L213-1 et D213-2', 'Code de commerce, art. L123-22'],
+    doc: 'fr/conservation-effacement.md',
+  },
   quote_allow_supply: {
     title: 'Revente de fournitures',
     how: 'N’activez que si la revente de pièces fait partie de votre activité déclarée. Sinon, utilisez les pièces achetées au nom du client (débours).',

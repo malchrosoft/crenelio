@@ -249,8 +249,11 @@ documentation (`README.md`, `DEPLOYMENT.md` **et** `DEPLOYMENT.fr.md`) doit les 
 
 ### 🛡️ RGPD (Item 5)
 - Toute **nouvelle donnée personnelle** (colonne, champ de formulaire, service tiers, cookie ou
-  stockage navigateur) doit être ajoutée à `Appointment::anonymizeWhere` (effacement et purge) **et**
-  décrite dans `src/components/PrivacyPolicy.tsx`.
+  stockage navigateur) doit être couverte par l'effacement et la purge (`Appointment::erase`,
+  `purgeOlderThan`, `purgeQuotes`, `minimiseWhere`) **et** décrite dans `src/components/PrivacyPolicy.tsx`.
+- **Fin de conservation = suppression**, jamais une ligne « anonymisée » qui garde date, prestation, montant et
+  commune (encore identifiante : groupe de l'article 29, avis 05/2014). Seuls les contrats conservés dix ans
+  restent, en archivage intermédiaire (devis `archived`, rendez-vous réduit à sa date), puis sont supprimés.
 - Aucun traceur (audience, publicité, réseau social) sans bandeau de consentement : l'absence de
   bandeau repose sur l'absence de traceurs.
 - La purge des rendez-vous expirés est déclenchée par `GET /appointments` (une fois par jour,

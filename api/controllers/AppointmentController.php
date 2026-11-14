@@ -585,8 +585,9 @@ class AppointmentController
         if (!Appointment::find($id)) {
             Response::json(['error' => 'Rendez-vous non trouvé'], 404);
         }
-        Appointment::anonymize($id);
-        Response::json(['message' => 'Données du client effacées', 'appointment' => Appointment::find($id)]);
+        // Suppression, ou réduction si un devis est conservé comme contrat (docs/legal/fr/conservation-effacement.md)
+        $result = Appointment::erase($id);
+        Response::json(['result' => $result, 'appointment' => $result === 'deleted' ? null : Appointment::find($id)]);
     }
 
     /**
@@ -624,11 +625,12 @@ class AppointmentController
             return;
         }
         $months = (int)(Config::get('rgpd_retention_months') ?: Appointment::DEFAULT_RETENTION_MONTHS);
-        $count = Appointment::purgeOlderThan(max(1, $months));
+        // Contrats échus d'abord : leur rendez-vous est alors supprimé avec les autres
         $quotes = Appointment::purgeQuotes(max(1, $months));
+        $count = Appointment::purgeOlderThan(max(1, $months));
         Config::set('rgpd_last_purge', $today);
         if ($count + $quotes > 0) {
-            error_log("[Crenelio] RGPD : $count rendez-vous et $quotes devis anonymisés (conservation $months mois, contrats dix ans)");
+            error_log("[Crenelio] RGPD : $count rendez-vous et $quotes devis supprimés (conservation $months mois, contrats dix ans)");
         }
     }
 }

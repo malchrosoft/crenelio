@@ -202,3 +202,69 @@ Source : Légifrance, Code civil (LEGITEXT000006070721), livre III, titre III «
 ### Article 1230
 
 > La résolution n'affecte ni les clauses relatives au règlement des différends, ni celles destinées à produire effet même en cas de résolution, telles les clauses de confidentialité et de non-concurrence.
+
+---
+
+*Ajout du 14/11/2026, reproduit mot pour mot depuis le fichier Légifrance déposé (Code civil, dernière modification le 29 juillet 2026, document généré le 3 novembre 2026).*
+
+Source : Légifrance, Code civil (LEGITEXT000006070721) : contrat conclu par voie électronique (1127-1, 1127-2), écrit électronique exigé pour la validité (1174), preuve par écrit (1359), écrit et signature électroniques (1365 à 1368). Utilisés pour : valeur de l'acceptation en ligne d'un devis.
+
+### Article 1127-1
+
+> Quiconque propose à titre professionnel, par voie électronique, la fourniture de biens ou la prestation de services, met à disposition les stipulations contractuelles applicables d'une manière qui permette leur conservation et leur reproduction.
+>
+> L'auteur d'une offre reste engagé par elle tant qu'elle est accessible par voie électronique de son fait.
+>
+> L'offre énonce en outre :
+>
+> 1° Les différentes étapes à suivre pour conclure le contrat par voie électronique ;
+>
+> 2° Les moyens techniques permettant au destinataire de l'offre, avant la conclusion du contrat, d'identifier d'éventuelles erreurs commises dans la saisie des données et de les corriger ;
+>
+> 3° Les langues proposées pour la conclusion du contrat au nombre desquelles doit figurer la langue française ;
+>
+> 4° Le cas échéant, les modalités d'archivage du contrat par l'auteur de l'offre et les conditions d'accès au contrat archivé ;
+>
+> 5° Les moyens de consulter par voie électronique les règles professionnelles et commerciales auxquelles l'auteur de l'offre entend, le cas échéant, se soumettre.
+
+### Article 1127-2
+
+> Le contrat n'est valablement conclu que si le destinataire de l'offre a eu la possibilité de vérifier le détail de sa commande et son prix total et de corriger d'éventuelles erreurs avant de confirmer celle-ci pour exprimer son acceptation définitive.
+>
+> L'auteur de l'offre doit accuser réception sans délai injustifié, par voie électronique, de la commande qui lui a été adressée.
+>
+> La commande, la confirmation de l'acceptation de l'offre et l'accusé de réception sont considérés comme reçus lorsque les parties auxquelles ils sont adressés peuvent y avoir accès.
+
+### Article 1174
+
+> Lorsqu'un écrit est exigé pour la validité d'un contrat, il peut être établi et conservé sous forme électronique dans les conditions prévues aux articles 1366 et 1367 et, lorsqu'un acte authentique est requis, au deuxième alinéa de l'article 1369.
+>
+> Lorsqu'est exigée une mention écrite de la main même de celui qui s'oblige, ce dernier peut l'apposer sous forme électronique si les conditions de cette apposition sont de nature à garantir qu'elle ne peut être effectuée que par lui-même.
+
+### Article 1359
+
+> L'acte juridique portant sur une somme ou une valeur excédant un montant fixé par décret doit être prouvé par écrit sous signature privée ou authentique.
+>
+> Il ne peut être prouvé outre ou contre un écrit établissant un acte juridique, même si la somme ou la valeur n'excède pas ce montant, que par un autre écrit sous signature privée ou authentique.
+>
+> Celui dont la créance excède le seuil mentionné au premier alinéa ne peut pas être dispensé de la preuve par écrit en restreignant sa demande.
+>
+> Il en est de même de celui dont la demande, même inférieure à ce montant, porte sur le solde ou sur une partie d'une créance supérieure à ce montant.
+
+### Article 1365
+
+> L'écrit consiste en une suite de lettres, de caractères, de chiffres ou de tous autres signes ou symboles dotés d'une signification intelligible, quel que soit leur support.
+
+### Article 1366
+
+> L'écrit électronique a la même force probante que l'écrit sur support papier, sous réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit établi et conservé dans des conditions de nature à en garantir l'intégrité.
+
+### Article 1367
+
+> La signature nécessaire à la perfection d'un acte juridique identifie son auteur. Elle manifeste son consentement aux obligations qui découlent de cet acte. Quand elle est apposée par un officier public, elle confère l'authenticité à l'acte.
+>
+> Lorsqu'elle est électronique, elle consiste en l'usage d'un procédé fiable d'identification garantissant son lien avec l'acte auquel elle s'attache. La fiabilité de ce procédé est présumée, jusqu'à preuve contraire, lorsque la signature électronique est créée, l'identité du signataire assurée et l'intégrité de l'acte garantie, dans des conditions fixées par décret en Conseil d'Etat.
+
+### Article 1368
+
+> A défaut de dispositions ou de conventions contraires, le juge règle les conflits de preuve par écrit en déterminant par tout moyen le titre le plus vraisemblable.

@@ -86,7 +86,7 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ config }) => {
       <h4>Durée de conservation</h4>
       <p>
         Les données d'un rendez-vous sont conservées {retention} après la date de l'intervention, puis effacées
-        automatiquement (seuls restent la prestation, la date, le montant et la commune, sans lien avec vous).
+        automatiquement : le rendez-vous et ses devis non acceptés sont supprimés.
       </p>
       <p>
         Un devis que vous avez accepté est un contrat : il est conservé, avec vos coordonnées et la trace de votre

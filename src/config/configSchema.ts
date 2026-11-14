@@ -296,7 +296,7 @@ export const CONFIG_GROUPS: ConfigGroup[] = [
         label: 'Conservation des données clients',
         type: 'number',
         unit: 'mois',
-        hint: "Après la date de l'intervention, les données du client sont effacées automatiquement (36 mois si vide). Affiché dans la politique de confidentialité.",
+        hint: "Après la date de l'intervention, le rendez-vous et ses devis non acceptés sont supprimés automatiquement (36 mois si vide) ; un devis accepté est conservé dix ans. Affiché dans la politique de confidentialité.",
       },
     ],
   },

@@ -1,8 +1,8 @@
 # Conservação e apagamento dos dados dos clientes
 
-*Tradução da versão francesa de 12/11/2026; prevalece a versão francesa. Os textos oficiais são citados em francês.*
+*Tradução da versão francesa de 14/11/2026; prevalece a versão francesa. Os textos oficiais são citados em francês.*
 
-*Última verificação: 12/11/2026. Base legal: Code de la consommation (Código do Consumo francês), L213-1, D213-1
+*Última verificação: 14/11/2026. Base legal: Code de la consommation (Código do Consumo francês), L213-1, D213-1
 e D213-2 (conservação dos contratos celebrados por via eletrónica); Code de commerce (Código Comercial francês),
 L123-22 (documentos comprovativos); Regulamento (UE) 2016/679 (RGPD), artigos 5, 6 e 17. Textos na íntegra:
 [textes/code-consommation.md](../fr/textes/code-consommation.md), [textes/code-commerce.md](../fr/textes/code-commerce.md),
@@ -12,11 +12,28 @@ L123-22 (documentos comprovativos); Regulamento (UE) 2016/679 (RGPD), artigos 5,
 
 | Dado | Conservado | Depois |
 |---|---|---|
-| Marcação (nome, email, telefone, morada, notas) | O prazo definido (ecrã Conta, 36 meses por predefinição) após a intervenção | Anonimizada automaticamente |
-| Orçamento **não aceite** (rascunho, enviado, recusado, expirado, anulado) | O mesmo prazo | Anonimizado automaticamente |
-| Orçamento **aceite** (contrato), mesmo que depois resolvido | **Dez anos** após a intervenção (ou, na falta desta, após o acordo), com o registo do acordo | Anonimizado automaticamente |
+| Marcação (nome, email, telefone, morada, notas) | O prazo definido (ecrã Conta, 36 meses por predefinição) após a intervenção | **Eliminada** automaticamente |
+| Orçamento **não aceite** (rascunho, enviado, recusado, expirado, anulado) | O mesmo prazo | **Eliminado** automaticamente |
+| Orçamento **aceite** (contrato), mesmo que depois resolvido | **Dez anos** após a intervenção (ou, na falta desta, após o acordo), com o registo do acordo; concluída a intervenção, é **arquivado** (filtro « Archivés » (*Arquivados*) do ecrã « Devis » (*Orçamentos*)) | **Eliminado** automaticamente, juntamente com a sua marcação |
 
-Ficam sempre, sem ligação ao cliente: a prestação, a data, os montantes e o município.
+Porquê eliminar em vez de « anonimizar »: uma linha conservada com a sua data, prestação, montante e município pode
+ainda identificar o cliente, por exemplo cruzando-a com uma fatura. Retirar o nome não basta para tornar um dado
+anónimo: não deve ser possível isolar uma pessoa, ligar os seus dados nem deduzir uma informação a seu respeito
+(Grupo de Trabalho do artigo 29.º, parecer 05/2014 sobre técnicas de anonimização, p. 9 e 10). Por isso o Crénelio
+elimina, em vez de conservar linhas « anonimizadas ».
+
+*Alcance desta fonte (verificado em 14/11/2026)*: o parecer 05/2014 é **anterior ao RGPD** (adotado em 2016,
+aplicável desde 25 de maio de 2018) e não consta da lista de documentos do Grupo de Trabalho do artigo 29.º
+aprovados pelo Comité Europeu para a Proteção de Dados na sua primeira reunião; continua, contudo, a ser a
+referência citada pela CNIL (autoridade francesa de proteção de dados) no seu guia sobre prazos de conservação
+(julho de 2020) e no seu referencial de gestão comercial (publicado em janeiro de 2022). O Comité submeteu a
+consulta diretrizes sobre a pseudonimização (01/2025, versão final não confirmada nessa data). A eliminação adotada
+pelo Crénelio não depende destes debates: um dado eliminado já não tem de ser qualificado.
+
+Durante a sua conservação, um orçamento aceite está em **arquivo intermédio** na aceção da CNIL: só são conservados
+os dados que comprovam o contrato (o telefone do cliente é retirado), sai da lista corrente de orçamentos e só é
+consultado se necessário, por exemplo em caso de litígio ou de pedido do cliente (CNIL, guia sobre prazos de
+conservação, julho de 2020, e referencial « gestion des activités commerciales »).
 
 ## Porquê dez anos para um orçamento aceite
 
@@ -39,10 +56,9 @@ cliente, a data e o registo do seu acordo (endereço IP), as suas respostas (pe�
 O RGPD confere-lhe este direito (artigo 17), salvo quando a conservação é « nécessaire […] pour respecter une
 obligation légale » (artigo 17, n.º 3, alínea b). Na prática, com « Effacer le client » (*apagar o cliente*):
 
-- **são apagados**: os seus contactos na marcação, os seus orçamentos não aceites, os endereços do registo de
-  emails;
-- **fica intacto**: qualquer orçamento **aceite**, até ao fim dos seus dez anos. A janela de confirmação
-  indica-lhe quais; diga-o ao cliente, citando estes textos;
+- **são eliminados**: a marcação, os seus orçamentos não aceites e o respetivo registo de emails;
+- **fica intacto**: qualquer orçamento **aceite**, até ao fim dos seus dez anos; a sua marcação é conservada,
+  reduzida à data. A janela de confirmação indica-lhe quais; diga-o ao cliente, citando estes textos;
 - **marcação futura** não anulada: a confirmação avisa-o de que deixará de poder contactar o cliente. Anule
   primeiro a marcação se a intervenção já não se realizar.
 

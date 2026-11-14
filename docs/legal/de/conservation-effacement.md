@@ -1,8 +1,8 @@
 # Aufbewahrung und Löschung von Kundendaten
 
-*Übersetzung der französischen Fassung vom 12/11/2026; maßgeblich ist die französische Fassung. Amtliche Texte werden auf Französisch zitiert.*
+*Übersetzung der französischen Fassung vom 14/11/2026; maßgeblich ist die französische Fassung. Amtliche Texte werden auf Französisch zitiert.*
 
-*Letzte Überprüfung: 12/11/2026. Rechtsgrundlage: Code de la consommation (französisches Verbrauchergesetzbuch),
+*Letzte Überprüfung: 14/11/2026. Rechtsgrundlage: Code de la consommation (französisches Verbrauchergesetzbuch),
 L213-1, D213-1 und D213-2 (Aufbewahrung elektronisch geschlossener Verträge); Code de commerce (französisches
 Handelsgesetzbuch), L123-22 (Belege); Verordnung (EU) 2016/679 (DSGVO; frz. RGPD), Artikel 5, 6 und 17. Wortlaut
 der Texte: [textes/code-consommation.md](../fr/textes/code-consommation.md),
@@ -13,11 +13,30 @@ der Texte: [textes/code-consommation.md](../fr/textes/code-consommation.md),
 
 | Daten | Aufbewahrt | Danach |
 |---|---|---|
-| Termin (Name, E-Mail, Telefon, Adresse, Notizen) | Die eingestellte Dauer (Bildschirm Konto, standardmäßig 36 Monate) nach dem Einsatz | Automatisch anonymisiert |
-| **Nicht angenommener** Kostenvoranschlag (Entwurf, versandt, abgelehnt, abgelaufen, storniert) | Dieselbe Dauer | Automatisch anonymisiert |
-| **Angenommener** Kostenvoranschlag (Vertrag), auch wenn später widerrufen | **Zehn Jahre** nach dem Einsatz (andernfalls nach der Zustimmung), mit dem Nachweis der Zustimmung | Automatisch anonymisiert |
+| Termin (Name, E-Mail, Telefon, Adresse, Notizen) | Die eingestellte Dauer (Bildschirm Konto, standardmäßig 36 Monate) nach dem Einsatz | Automatisch **gelöscht** |
+| **Nicht angenommener** Kostenvoranschlag (Entwurf, versandt, abgelehnt, abgelaufen, storniert) | Dieselbe Dauer | Automatisch **gelöscht** |
+| **Angenommener** Kostenvoranschlag (Vertrag), auch wenn später widerrufen | **Zehn Jahre** nach dem Einsatz (andernfalls nach der Zustimmung), mit dem Nachweis der Zustimmung; nach Abschluss des Einsatzes wird er **archiviert** (Filter « Archivés » (*Archiviert*) im Bildschirm « Devis » (*Kostenvoranschläge*)) | Automatisch **gelöscht**, zusammen mit seinem Termin |
 
-Stets erhalten bleiben, ohne Bezug zum Kunden: die Leistung, das Datum, die Beträge und die Gemeinde.
+Warum löschen statt „anonymisieren“: Eine Zeile, die mit Datum, Leistung, Betrag und Gemeinde aufbewahrt wird, kann
+den Kunden weiterhin bestimmbar machen, etwa durch Abgleich mit einer Rechnung. Den Namen zu entfernen reicht
+nicht, um Daten anonym zu machen: Es darf nicht mehr möglich sein, eine Person herauszugreifen, ihre Daten zu
+verknüpfen oder Informationen über sie abzuleiten (Artikel-29-Datenschutzgruppe, Stellungnahme 05/2014 zu
+Anonymisierungstechniken, S. 9 und 10). Crénelio löscht daher, statt „anonymisierte“ Zeilen aufzubewahren.
+
+*Tragweite dieser Quelle (überprüft am 14/11/2026)*: Die Stellungnahme 05/2014 ist **älter als die DSGVO**
+(verabschiedet 2016, anwendbar seit dem 25. Mai 2018) und steht nicht auf der Liste der Dokumente der
+Artikel-29-Datenschutzgruppe, die der Europäische Datenschutzausschuss in seiner ersten Sitzung übernommen hat; sie
+bleibt jedoch die Referenz, die die CNIL (französische Datenschutzbehörde) in ihrem Leitfaden zu
+Aufbewahrungsfristen (Juli 2020) und in ihrem Referenzrahmen zur kaufmännischen Verwaltung (veröffentlicht im
+Januar 2022) anführt. Der Ausschuss hat Leitlinien zur Pseudonymisierung zur Konsultation gestellt (01/2025,
+endgültige Fassung zu diesem Zeitpunkt nicht bestätigt). Die von Crénelio gewählte Löschung hängt nicht von diesen
+Debatten ab: Gelöschte Daten müssen nicht mehr eingeordnet werden.
+
+Während der Aufbewahrung befindet sich ein angenommener Kostenvoranschlag in der **Zwischenarchivierung** im Sinne
+der CNIL: Nur die Daten, die den Vertrag belegen, werden aufbewahrt (die Telefonnummer des Kunden wird entfernt);
+er verschwindet aus der laufenden Liste der Kostenvoranschläge und wird nur bei Bedarf eingesehen, etwa bei einem
+Rechtsstreit oder einer Anfrage des Kunden (CNIL, Leitfaden zu Aufbewahrungsfristen, Juli 2020, und Referenzrahmen
+« gestion des activités commerciales »).
 
 ## Warum zehn Jahre für einen angenommenen Kostenvoranschlag
 
@@ -42,10 +61,10 @@ Die DSGVO gibt ihm dieses Recht (Artikel 17), außer wenn die Aufbewahrung « n�
 obligation légale » ist (Artikel 17 Absatz 3 Buchstabe b). Konkret, mit « Effacer le client » (*Kunden
 löschen*):
 
-- **gelöscht werden**: seine Kontaktdaten im Termin, seine nicht angenommenen Kostenvoranschläge, die Adressen
-  im E-Mail-Protokoll;
-- **unverändert bleibt**: jeder **angenommene** Kostenvoranschlag bis zum Ende seiner zehn Jahre. Das
-  Bestätigungsfenster zeigt Ihnen, welche; teilen Sie es dem Kunden unter Hinweis auf diese Texte mit;
+- **gelöscht werden**: der Termin, seine nicht angenommenen Kostenvoranschläge und das zugehörige E-Mail-Protokoll;
+- **unverändert bleibt**: jeder **angenommene** Kostenvoranschlag bis zum Ende seiner zehn Jahre; sein Termin wird
+  aufbewahrt, auf das Datum reduziert. Das Bestätigungsfenster zeigt Ihnen, welche; teilen Sie es dem Kunden unter
+  Hinweis auf diese Texte mit;
 - **bevorstehender Termin**, nicht abgesagt: Die Bestätigung warnt Sie, dass Sie den Kunden nicht mehr
   erreichen können. Sagen Sie zuerst den Termin ab, wenn der Einsatz nicht mehr stattfindet.
 

@@ -1,8 +1,8 @@
 # Conservación y supresión de los datos de los clientes
 
-*Traducción de la versión francesa del 12/11/2026; prevalece la versión francesa. Los textos oficiales se citan en francés.*
+*Traducción de la versión francesa del 14/11/2026; prevalece la versión francesa. Los textos oficiales se citan en francés.*
 
-*Última verificación: 12/11/2026. Base legal: Code de la consommation (Código de Consumo francés), L213-1, D213-1
+*Última verificación: 14/11/2026. Base legal: Code de la consommation (Código de Consumo francés), L213-1, D213-1
 y D213-2 (conservación de los contratos celebrados por vía electrónica); Code de commerce (Código de Comercio
 francés), L123-22 (justificantes); Reglamento (UE) 2016/679 (RGPD), artículos 5, 6 y 17. Textos literales:
 [textes/code-consommation.md](../fr/textes/code-consommation.md), [textes/code-commerce.md](../fr/textes/code-commerce.md),
@@ -12,11 +12,28 @@ francés), L123-22 (justificantes); Reglamento (UE) 2016/679 (RGPD), artículos 
 
 | Dato | Se conserva | Después |
 |---|---|---|
-| Cita (nombre, email, teléfono, dirección, notas) | El plazo configurado (pantalla Cuenta, 36 meses por defecto) tras la intervención | Anonimizada automáticamente |
-| Presupuesto **no aceptado** (borrador, enviado, rechazado, caducado, anulado) | El mismo plazo | Anonimizado automáticamente |
-| Presupuesto **aceptado** (contrato), aunque después haya desistimiento | **Diez años** tras la intervención (o, en su defecto, tras el acuerdo), con la constancia del acuerdo | Anonimizado automáticamente |
+| Cita (nombre, email, teléfono, dirección, notas) | El plazo configurado (pantalla Cuenta, 36 meses por defecto) tras la intervención | **Suprimida** automáticamente |
+| Presupuesto **no aceptado** (borrador, enviado, rechazado, caducado, anulado) | El mismo plazo | **Suprimido** automáticamente |
+| Presupuesto **aceptado** (contrato), aunque después haya desistimiento | **Diez años** tras la intervención (o, en su defecto, tras el acuerdo), con la constancia del acuerdo; una vez concluida la intervención, queda **archivado** (filtro « Archivés » (*Archivados*) de la pantalla « Devis » (*Presupuestos*)) | **Suprimido** automáticamente, junto con su cita |
 
-Siempre quedan, sin vínculo con el cliente: la prestación, la fecha, los importes y el municipio.
+Por qué suprimir en lugar de « anonimizar »: una línea conservada con su fecha, su prestación, su importe y su
+municipio puede seguir designando al cliente, por ejemplo cotejándola con una factura. Quitar el nombre no basta
+para que un dato sea anónimo: ya no debe ser posible singularizar a una persona, vincular sus datos ni deducir
+información sobre ella (Grupo de Trabajo del artículo 29, dictamen 05/2014 sobre técnicas de anonimización, p. 9 y
+10). Por eso Crénelio suprime, en lugar de conservar líneas « anonimizadas ».
+
+*Alcance de esta fuente (verificado el 14/11/2026)*: el dictamen 05/2014 es **anterior al RGPD** (adoptado en 2016,
+aplicable desde el 25 de mayo de 2018) y no figura en la lista de documentos del Grupo de Trabajo del artículo 29
+asumidos por el Comité Europeo de Protección de Datos en su primera sesión; sigue siendo, no obstante, la
+referencia citada por la CNIL (autoridad francesa de protección de datos) en su guía de plazos de conservación
+(julio de 2020) y en su marco de referencia de gestión comercial (publicado en enero de 2022). El Comité sometió a
+consulta unas directrices sobre la seudonimización (01/2025, versión final no confirmada en esa fecha). La
+supresión adoptada por Crénelio no depende de estos debates: un dato suprimido ya no tiene que calificarse.
+
+Durante su conservación, un presupuesto aceptado está en **archivo intermedio** en el sentido de la CNIL: solo se
+conservan los datos que hacen constar el contrato (se retira el teléfono del cliente), sale de la lista habitual de
+presupuestos y solo se consulta si es necesario, por ejemplo por un litigio o una solicitud del cliente (CNIL, guía
+de plazos de conservación, julio de 2020, y marco de referencia « gestion des activités commerciales »).
 
 ## Por qué diez años para un presupuesto aceptado
 
@@ -40,10 +57,9 @@ El RGPD le otorga este derecho (artículo 17), salvo cuando la conservación es 
 une obligation légale » (artículo 17, apartado 3, b). En concreto, con « Effacer le client » (suprimir al
 cliente):
 
-- **se suprimen**: sus datos de contacto en la cita, sus presupuestos no aceptados, las direcciones del
-  registro de emails;
-- **queda intacto**: todo presupuesto **aceptado**, hasta el fin de sus diez años. La ventana de confirmación
-  le indica cuáles; dígaselo al cliente, citando estos textos;
+- **se suprimen**: la cita, sus presupuestos no aceptados y el registro de emails correspondiente;
+- **queda intacto**: todo presupuesto **aceptado**, hasta el fin de sus diez años; su cita se conserva, reducida a
+  su fecha. La ventana de confirmación le indica cuáles; dígaselo al cliente, citando estos textos;
 - **cita futura** no anulada: la confirmación le advierte de que ya no podrá contactar con el cliente. Anule
   primero la cita si la intervención ya no va a tener lugar.
 

@@ -91,6 +91,11 @@
       "how": "Jak liczony jest czas robocizny (np. „za każdy rozpoczęty kwadrans”). Przejmowane do kosztorysów i cennika witryny.",
       "why": "Informacja, którą należy przekazać klientowi przed zawarciem umowy, wraz ze stawką godzinową brutto (TTC)."
     },
+    "rgpd_retention_months": {
+      "title": "Przechowywanie danych klientów",
+      "how": "Okres, w miesiącach od interwencji, po upływie którego wizyta i jej niezaakceptowane kosztorysy są usuwane (36 miesięcy, jeśli pole jest puste). Zaakceptowany kosztorys jest przechowywany przez dziesięć lat, archiwizowany, a następnie usuwany.",
+      "why": "Danych nie przechowuje się dłużej, niż jest to konieczne; umowę zawartą online przechowuje się dziesięć lat. Usuwać, zamiast zachowywać „zanonimizowany” wiersz, który mógłby nadal wskazywać klienta."
+    },
     "quote_allow_supply": {
       "title": "Odsprzedaż materiałów",
       "how": "Proszę włączyć tylko wtedy, gdy odsprzedaż części należy do zgłoszonej działalności. W przeciwnym razie proszę korzystać z części kupionych w imieniu klienta (débours).",

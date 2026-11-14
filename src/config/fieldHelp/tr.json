@@ -91,6 +91,11 @@
       "how": "İşçilik süresinin nasıl hesaplandığı (ör. « başlanan her çeyrek saat üzerinden »). Fiyat tekliflerine ve vitrin sayfasının tarifelerine aktarılır.",
       "why": "Sözleşme kurulmadan önce, KDV dahil (TTC) saatlik ücretle birlikte müşteriye verilmesi gereken bilgi."
     },
+    "rgpd_retention_months": {
+      "title": "Müşteri verilerinin saklanması",
+      "how": "Müdahaleden sonra, randevunun ve kabul edilmemiş tekliflerinin silineceği ay cinsinden süre (boşsa 36 ay). Kabul edilmiş bir teklif on yıl saklanır, arşivlenir, ardından silinir.",
+      "why": "Veriler gerekenden uzun süre saklanmaz; çevrimiçi kurulan bir sözleşme on yıl saklanır. Müşteriyi hâlâ işaret edebilecek “anonimleştirilmiş” bir satırı tutmak yerine silmek."
+    },
     "quote_allow_supply": {
       "title": "Malzeme yeniden satışı",
       "how": "Yalnızca parça yeniden satışı beyan ettiğiniz faaliyetin bir parçasıysa etkinleştirin. Değilse müşteri adına satın alınan parçaları (débours) kullanın.",

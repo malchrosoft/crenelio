@@ -345,7 +345,10 @@ export const AdminDashboard: React.FC = () => {
     setAnonymizing(null);
     try {
       const res = await api.anonymizeAppointment(target.id);
-      setAppointments((prev) => prev.map((a) => (a.id === target.id ? { ...a, ...res.appointment } : a)));
+      // Supprimé, ou réduit si un devis est conservé comme contrat
+      setAppointments((prev) =>
+        res.appointment ? prev.map((a) => (a.id === target.id ? { ...a, ...res.appointment } : a)) : prev.filter((a) => a.id !== target.id),
+      );
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : "Erreur lors de l'effacement");
     }
@@ -817,13 +820,13 @@ export const AdminDashboard: React.FC = () => {
             </p>
           )}
           <p>
-            Le nom, l'email, le téléphone, l'adresse et les notes de <strong>{anonymizing.client_name}</strong> seront effacés,
-            ainsi que les adresses du journal des emails. Le rendez-vous reste dans le planning (prestation, date, montant,
-            commune). Cette action est irréversible : à utiliser pour une demande d'effacement.
+            Le rendez-vous de <strong>{anonymizing.client_name}</strong> et ses devis non acceptés seront supprimés, avec leur
+            journal des emails. Cette action est irréversible : à utiliser pour une demande d'effacement.
           </p>
           {keptContracts.length > 0 && (
             <p>
-              <strong>Conservé :</strong> le devis accepté {keptContracts.join(', ')}, contrat conclu, reste intact dix ans après
+              <strong>Conservé :</strong> le rendez-vous reste, réduit à sa date (sans coordonnées ni notes), car le devis accepté{' '}
+              {keptContracts.join(', ')}, contrat conclu, reste intact dix ans après
               l'intervention (C. consom. L213-1 et D213-2 ; RGPD, art. 17, 3, b), puis il est effacé automatiquement. Indiquez-le
               au client qui demande l'effacement.{' '}
               <a href="/admin?doc=fr%2Fconservation-effacement.md" target="_blank" rel="noopener">

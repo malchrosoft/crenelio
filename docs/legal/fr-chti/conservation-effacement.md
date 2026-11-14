@@ -1,8 +1,8 @@
 # Conservation et effacemint des données des clients
 
-*Version in ch'ti, pour l'plaisir, d'el fiche française du 12/11/2026 ; ch'est l'version française qui fait foi. Les textes officiels, eux, i restent in français.*
+*Version in ch'ti, pour l'plaisir, d'el fiche française du 14/11/2026 ; ch'est l'version française qui fait foi. Les textes officiels, eux, i restent in français.*
 
-*Dernière vérification : 12/11/2026. Base légale : Code de la consommation, L213-1, D213-1 et D213-2
+*Dernière vérification : 14/11/2026. Base légale : Code de la consommation, L213-1, D213-1 et D213-2
 (conservation des contrats conclus par voie électronique) ; Code de commerce, L123-22 (pièces
 justificatives) ; règlemint (UE) 2016/679 (RGPD), articles 5, 6 et 17. Textes mot pour mot :
 [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md), [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md),
@@ -12,11 +12,28 @@ justificatives) ; règlemint (UE) 2016/679 (RGPD), articles 5, 6 et 17. Textes m
 
 | Donnée | Gardée | Pis |
 |---|---|---|
-| Rindez-vous (nom, email, téléphone, adresse, notes) | L'durée réglée (écran Compte, 36 mois d'base) après l'intervintion | Anonymisée tout seu |
-| Devis **point accepté** (brouillon, invoyé, refusé, expiré, annulé) | L'même durée | Anonymisé tout seu |
-| Devis **accepté** (contrat), même rétracté après | **Dix ans** après l'intervintion (ou l'accord, sinon), avec l'trace d'l'accord | Anonymisé tout seu |
+| Rindez-vous (nom, email, téléphone, adresse, notes) | L'durée réglée (écran Compte, 36 mois d'base) après l'intervintion | **Supprimé** tout seu |
+| Devis **point accepté** (brouillon, invoyé, refusé, expiré, annulé) | L'même durée | **Supprimé** tout seu |
+| Devis **accepté** (contrat), même rétracté après | **Dix ans** après l'intervintion (ou l'accord, sinon), avec l'trace d'l'accord ; à l'fin d'l'intervintion, i est **archivé** (filtre « Archivés » d'l'écran Devis) | **Supprimé** tout seu, avec sin rindez-vous |
 
-I reste toudis, sans lien avec l'client : l'prestation, l'date, les montants et l'commune.
+Pourquoi supprimer pustôt qu'« anonymiser » : eune ligne gardée avec s'date, s'prestation, sin montant et s'commune
+al peut cor désigner l'client, par exempe in l'rapprochant d'eune facture. Ôter l'nom, cha suffit point pour rinde
+eune donnée anonyme : i faut pus pouvoir isoler eune personne, relier ses données ni déduire eune information su li
+(groupe de l'article 29, avis 05/2014 sur les techniques d'anonymisation, p. 9 et 10). Crénelio i supprime donc, au
+lieu d'garder des lignes « anonymisées ».
+
+*Portée d'ech'source (vérifiée l'14/11/2026)* : l'avis 05/2014 il est **d'avant l'RGPD** (adopté in 2016, applicabe
+d'pis l'25 mai 2018) et i n'est point dins l'liste des documints du groupe de l'article 29 repris par l'Comité
+européen de la protection des données à s'première séance ; mais i reste quand même l'référence citée par l'CNIL
+dins sin guide des durées de conservation (juillet 2020) et sin référentiel d'gestion commerciale (publié in
+janvier 2022). L'Comité il a mis à consultation des lignes directrices su l'pseudonymisation (01/2025, version
+finale point confirmée à ch'date-lo). L'suppression qu'Crénelio il a choisie al dépind point d'ches débats-lo :
+eune donnée supprimée, al a pus à être qualifiée.
+
+Pindant qu'il est gardé, un devis accepté il est in **archivage intermédiaire** au sens d'el CNIL : i n'y a qu'les
+données qui constatent l'contrat qui sont gardées (l'téléphone du client il est ôté), i sort d'el liste courante des
+devis et on n'l'consulte qu'si besoin, par exempe pour un litige ou eune demande du client (CNIL, guide des durées
+de conservation, juillet 2020, et référentiel « gestion des activités commerciales »).
 
 ## Pourquoi dix ans pour un devis accepté
 
@@ -39,9 +56,9 @@ lieu, s'déclaration d'rétractation.
 L'RGPD i li donne ch'droit-lo (article 17), sauf quand l'conservation al est « nécessaire […] pour respecter
 une obligation légale » (article 17, paragraphe 3, b). Pour d'vrai, avec « Effacer le client » :
 
-- **ch'est effacé** : ses coordonnées su l'rindez-vous, ses devis point acceptés, les adresses du journal
-  des emails ;
-- **i reste intact** : tout devis **accepté**, jusqu'à l'fin d'ses dix ans. L'fernête d'confirmation al vous
+- **ch'est supprimé** : l'rindez-vous, ses devis point acceptés et leu journal des emails ;
+- **i reste intact** : tout devis **accepté**, jusqu'à l'fin d'ses dix ans ; sin rindez-vous il est gardé, réduit
+  à s'date. L'fernête d'confirmation al vous
   dit lesquels ; dites-l au client, in citant ches textes ;
 - **rindez-vous à v'nir** point annulé : l'confirmation al vous prévient qu'vous pourrez pus joinde l'client.
   Annulez d'abord l'rindez-vous si l'intervintion al a pus lieu.
