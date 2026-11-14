@@ -25,7 +25,7 @@ Crénelio șterge, în loc să păstreze rânduri „anonimizate”.
 *Domeniul acestei surse (verificat la 14/11/2026)*: avizul 05/2014 este **anterior RGPD** (adoptat în 2016, aplicabil
 din 25 mai 2018) și nu figurează pe lista documentelor Grupului de lucru articolul 29 preluate de Comitetul european
 pentru protecția datelor la prima sa ședință; rămâne totuși referința citată de CNIL în ghidul său privind duratele
-de păstrare (iulie 2020) și în referențialul său privind gestiunea comercială (publicat în ianuarie 2022). Comitetul
+de păstrare (iulie 2020) și în referențialul său privind gestiunea comercială (deliberarea nr. 2021-131, publicată în Journal officiel din 10.04.2022). Comitetul
 a supus consultării ghiduri privind pseudonimizarea (01/2025, versiune finală neconfirmată la această dată).
 Ștergerea aleasă de Crénelio nu depinde de aceste dezbateri: datele șterse nu mai trebuie calificate.
 

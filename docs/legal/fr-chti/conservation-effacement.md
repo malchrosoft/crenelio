@@ -25,8 +25,8 @@ lieu d'garder des lignes « anonymisées ».
 *Portée d'ech'source (vérifiée l'14/11/2026)* : l'avis 05/2014 il est **d'avant l'RGPD** (adopté in 2016, applicabe
 d'pis l'25 mai 2018) et i n'est point dins l'liste des documints du groupe de l'article 29 repris par l'Comité
 européen de la protection des données à s'première séance ; mais i reste quand même l'référence citée par l'CNIL
-dins sin guide des durées de conservation (juillet 2020) et sin référentiel d'gestion commerciale (publié in
-janvier 2022). L'Comité il a mis à consultation des lignes directrices su l'pseudonymisation (01/2025, version
+dins sin guide des durées de conservation (juillet 2020) et sin référentiel d'gestion commerciale (délibération
+n° 2021-131, publiée au Journal officiel du 10/04/2022). L'Comité il a mis à consultation des lignes directrices su l'pseudonymisation (01/2025, version
 finale point confirmée à ch'date-lo). L'suppression qu'Crénelio il a choisie al dépind point d'ches débats-lo :
 eune donnée supprimée, al a pus à être qualifiée.
 

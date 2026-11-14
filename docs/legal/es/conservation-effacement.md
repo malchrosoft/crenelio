@@ -26,7 +26,7 @@ información sobre ella (Grupo de Trabajo del artículo 29, dictamen 05/2014 sob
 aplicable desde el 25 de mayo de 2018) y no figura en la lista de documentos del Grupo de Trabajo del artículo 29
 asumidos por el Comité Europeo de Protección de Datos en su primera sesión; sigue siendo, no obstante, la
 referencia citada por la CNIL (autoridad francesa de protección de datos) en su guía de plazos de conservación
-(julio de 2020) y en su marco de referencia de gestión comercial (publicado en enero de 2022). El Comité sometió a
+(julio de 2020) y en su marco de referencia de gestión comercial (deliberación n.º 2021-131, publicada en el Journal officiel del 10/04/2022). El Comité sometió a
 consulta unas directrices sobre la seudonimización (01/2025, versión final no confirmada en esa fecha). La
 supresión adoptada por Crénelio no depende de estos debates: un dato suprimido ya no tiene que calificarse.
 

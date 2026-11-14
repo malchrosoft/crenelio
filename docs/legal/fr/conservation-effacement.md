@@ -23,8 +23,8 @@ de garder des lignes « anonymisées ».
 *Portée de cette source (vérifiée le 14/11/2026)* : l'avis 05/2014 est **antérieur au RGPD** (adopté en 2016, applicable
 depuis le 25 mai 2018) et ne figure pas dans la liste des documents du groupe de l'article 29 repris par le Comité
 européen de la protection des données lors de sa première séance ; il reste toutefois la référence citée par la CNIL
-dans son guide des durées de conservation (juillet 2020) et son référentiel de gestion commerciale (publié en
-janvier 2022). Le Comité a soumis à consultation des lignes directrices sur la pseudonymisation (01/2025, version
+dans son guide des durées de conservation (juillet 2020) et son référentiel de gestion commerciale (délibération
+n° 2021-131, publiée au Journal officiel du 10/04/2022). Le Comité a soumis à consultation des lignes directrices sur la pseudonymisation (01/2025, version
 finale non confirmée à cette date). La suppression retenue par Crénelio ne dépend pas de ces débats : une donnée
 supprimée n'a plus à être qualifiée.
 

@@ -25,7 +25,7 @@ Bu nedenle Crénelio, “anonimleştirilmiş” satırlar saklamak yerine siler.
 *Bu kaynağın kapsamı (14/11/2026 tarihinde doğrulandı)*: 05/2014 sayılı görüş **GDPR'den öncedir** (2016'da kabul
 edilmiş, 25 Mayıs 2018'den beri uygulanmaktadır) ve Avrupa Veri Koruma Kurulu'nun ilk oturumunda benimsediği Madde 29
 Çalışma Grubu belgeleri listesinde yer almaz; yine de CNIL'in saklama süreleri rehberinde (Temmuz 2020) ve ticari
-yönetim referans belgesinde (Ocak 2022'de yayımlanmış) atıfta bulunduğu kaynak olmaya devam etmektedir. Kurul, takma
+yönetim referans belgesinde (2021-131 sayılı karar, 10.04.2022 tarihli Journal officiel'de yayımlanmış) atıfta bulunduğu kaynak olmaya devam etmektedir. Kurul, takma
 adlandırma (pseudonymisation) hakkındaki yönergeleri kamuoyu görüşüne sunmuştur (01/2025, nihai sürümü bu tarih
 itibarıyla doğrulanmamıştır). Crénelio'nun benimsediği silme bu tartışmalara bağlı değildir: silinmiş bir verinin
 artık nitelendirilmesi gerekmez.

@@ -24,7 +24,7 @@ avi 05/2014 asi téknik a anonimizasyon, p. 9 é 10). Kidonk Crénelio ka siprim
 *Pòté a sous-lasa (vérifyé 14/11/2026)* : avi 05/2014 **pli vyé ki RGPD** (adopté an 2016, ka aplitjé dépi
 25 mé 2018) é i pa adan lis a dokiman a gwoup a article 29 Komité éwopéyen a pwotèksyon a done (*Comité européen
 de la protection des données*) pran an premyé séyans a-y ; men i ka rété référans CNIL ka sité adan gid a-y asi tan
-a konsèvasyon (jwiyè 2020) é référansyèl a-y asi jèsyon komèsyal (pibliyé an janvyé 2022). Komité-la mété an
+a konsèvasyon (jwiyè 2020) é référansyèl a-y asi jèsyon komèsyal (délibération n° 2021-131, pibliyé an Journal officiel 10/04/2022). Komité-la mété an
 konsiltasyon dé lign dirèktris asi psédonimizasyon (*pseudonymisation*, 01/2025, vèsyon final pa konfirmé ankò a
 dat-lasa). Siprésyon Crénelio chwazi pa ka dépann dè débat-lasa : on done ki siprimé pa bizwen kalifyé ankò.
 

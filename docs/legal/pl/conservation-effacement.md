@@ -26,7 +26,7 @@ zamiast przechowywać wiersze „zanonimizowane”.
 stosowane od 25 maja 2018 r.) i nie figuruje na liście dokumentów Grupy Roboczej Art. 29 przejętych przez Europejską
 Radę Ochrony Danych na jej pierwszym posiedzeniu; pozostaje jednak punktem odniesienia przywoływanym przez CNIL w jej
 przewodniku dotyczącym okresów przechowywania (lipiec 2020) i w jej standardzie dotyczącym zarządzania handlowego
-(opublikowanym w styczniu 2022). Rada poddała konsultacjom wytyczne w sprawie pseudonimizacji (01/2025, wersja
+(uchwała nr 2021-131, opublikowana w Journal officiel z 10.04.2022). Rada poddała konsultacjom wytyczne w sprawie pseudonimizacji (01/2025, wersja
 ostateczna niepotwierdzona na ten dzień). Wybrane przez Crénelio usuwanie nie zależy od tych dyskusji: usuniętych
 danych nie trzeba już kwalifikować.
 

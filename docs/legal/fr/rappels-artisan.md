@@ -28,4 +28,9 @@
 
 - Remettre la **note / facture** (obligatoire au-delà de 25 € TTC) **avant d'être payé**.
 - Proposer les pièces remplacées ; si le client ne les garde pas, faire signer la **décharge**.
-- Conserver devis acceptés, mandats et justificatifs (durée de conservation : Item 39).
+- Conserver devis acceptés, mandats et justificatifs (voir [conservation et effacement](conservation-effacement.md)).
+
+## Données de vos clients
+
+- Tenir à jour votre **registre des traitements** et le présenter à la CNIL si elle le demande (voir
+  [registre des traitements](registre-traitements.md)).

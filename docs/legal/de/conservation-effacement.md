@@ -27,8 +27,8 @@ Anonymisierungstechniken, S. 9 und 10). Crénelio löscht daher, statt „anonym
 (verabschiedet 2016, anwendbar seit dem 25. Mai 2018) und steht nicht auf der Liste der Dokumente der
 Artikel-29-Datenschutzgruppe, die der Europäische Datenschutzausschuss in seiner ersten Sitzung übernommen hat; sie
 bleibt jedoch die Referenz, die die CNIL (französische Datenschutzbehörde) in ihrem Leitfaden zu
-Aufbewahrungsfristen (Juli 2020) und in ihrem Referenzrahmen zur kaufmännischen Verwaltung (veröffentlicht im
-Januar 2022) anführt. Der Ausschuss hat Leitlinien zur Pseudonymisierung zur Konsultation gestellt (01/2025,
+Aufbewahrungsfristen (Juli 2020) und in ihrem Referenzrahmen zur kaufmännischen Verwaltung (Beratung Nr. 2021-131,
+veröffentlicht im Journal officiel vom 10.04.2022) anführt. Der Ausschuss hat Leitlinien zur Pseudonymisierung zur Konsultation gestellt (01/2025,
 endgültige Fassung zu diesem Zeitpunkt nicht bestätigt). Die von Crénelio gewählte Löschung hängt nicht von diesen
 Debatten ab: Gelöschte Daten müssen nicht mehr eingeordnet werden.
 

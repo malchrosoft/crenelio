@@ -449,7 +449,7 @@ If using FileZilla, right-click files → **File permissions...** → set numeri
 
 ### Writable storage
 
-`api/storage/branding/`, `api/storage/zone/`, `api/storage/insurance/` (ten-year liability insurance certificate attached to quotes) and `api/storage/auth/` must be **writable by PHP** (`755`, or `775` if
+`api/storage/branding/`, `api/storage/zone/`, `api/storage/insurance/` (ten-year liability insurance certificate attached to quotes), `api/storage/holidays/` (public holidays) and `api/storage/auth/` must be **writable by PHP** (`755`, or `775` if
 saving fails). They are not versioned (each installation has its own files): create them on the
 server if your upload skipped the empty folders. The folder is never served directly
 (`api/storage/.htaccess` denies access); files go through the API.

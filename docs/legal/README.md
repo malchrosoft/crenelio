@@ -49,6 +49,7 @@ gauche ; ses citations officielles, en français, restent affichées de gauche �
 | Aide-mémoire de l'artisan : achats, justificatifs, conservation | [fr/rappels-artisan.md](fr/rappels-artisan.md) |
 | Annuler ou déplacer un rendez-vous qui a un devis : offre annulée, révocation, force majeure | [fr/annulation-devis.md](fr/annulation-devis.md) |
 | Conservation et effacement des données des clients : dix ans pour un devis accepté, RGPD | [fr/conservation-effacement.md](fr/conservation-effacement.md) |
+| Registre des traitements (RGPD, art. 30) : fiches préremplies de Crénelio à compléter, à présenter à la CNIL sur demande | [fr/registre-traitements.md](fr/registre-traitements.md) |
 | Textes officiels, mot pour mot : Code de la consommation | [fr/textes/code-consommation.md](fr/textes/code-consommation.md) |
 | Textes officiels : Code de commerce (EI, sociétés) | [fr/textes/code-commerce.md](fr/textes/code-commerce.md) |
 | Textes officiels : Code général des impôts (débours, franchise) | [fr/textes/code-general-impots.md](fr/textes/code-general-impots.md) |

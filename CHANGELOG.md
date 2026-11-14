@@ -3,6 +3,46 @@
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; numérotation
 [SemVer](https://semver.org/lang/fr/). Les versions `0.x` sont des bêtas.
 
+## [0.1.0] — 2026-11-14
+
+Deuxième bêta : devis en ligne complets, aide à la facturation, documentation juridique, recette des
+parcours. Base de données : 10 migrations depuis 0.0.1 (jointes par `npm run deploy:init`).
+
+### Pour les clients
+- Devis en ligne : page du devis, PDF et version imprimable aux couleurs de l'entreprise, acceptation ou
+  refus en ligne, réponse séparée au mandat de débours, choix sur les pièces remplacées.
+- Droit de rétractation : information précontractuelle, formulaire type joint à l'envoi du devis et
+  prérempli, rétractation en ligne (« Renoncer au contrat ici ») avec accusé de réception.
+- Tarifs affichés TTC sur la vitrine et dans la réservation, coût du devis et éléments non compris.
+- Avertissements : devis annulé par le professionnel, intervention annulée avant la réponse au devis.
+
+### Pour le professionnel (Espace Artisan)
+- Devis : lignes typées (main-d'œuvre au temps passé avec arrondi, forfait du catalogue, déplacement
+  prérempli, remise, débours, fourniture revendue), calculs dans les champs, doublons signalés,
+  conditions en listes, mentions légales réglables, garanties des constructeurs et attestation
+  décennale jointe, annulation d'un devis envoyé, filtre « En cours / Archivés ».
+- Contrat figé à l'envoi et empreinte SHA-256 à l'acceptation (contrôle « Contrat figé »).
+- Rendez-vous : modifications validées ensemble (statut, date, « Prévenir le client », motifs
+  d'annulation), devis liés listés et avertis, refus de déplacement signalé, raison précise d'un
+  créneau refusé, fond du calendrier lisible (fermé, indisponible, trajet), bouton « Actualiser ».
+- Facturation dans le logiciel du professionnel : fiche « Préparer la facture » (temps réellement
+  passé, valeurs du devis, avertissement des sept jours sans paiement selon les jours fériés), exports
+  CSV datés, export des clients au format Indy.
+- Documentation juridique (textes officiels cités mot pour mot) et aide « ? » des champs délicats, en
+  16 langues ; recherche dans la documentation.
+
+### Données personnelles
+- Fin de conservation = suppression (plus de lignes « anonymisées ») ; devis acceptés conservés dix
+  ans en archivage intermédiaire ; effacement à la demande détaillé ; politique de confidentialité
+  mise à jour.
+- Registre des traitements (RGPD, art. 30) prérempli, à compléter par le professionnel et à
+  présenter à la CNIL sur demande (documentation, en français pour l'instant).
+
+### Installation
+- Jours fériés lus sur l'API publique et gardés dans `api/storage/holidays/` (aucune tâche planifiée
+  nécessaire ; script cron facultatif `api/cron/refresh-holidays.php`).
+- Nouveaux dossiers à rendre accessibles en écriture : `api/storage/holidays/`.
+
 ## [0.0.1] — 2026-11-01
 
 Première bêta publique.

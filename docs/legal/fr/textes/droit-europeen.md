@@ -42,7 +42,7 @@ Source : [EUR-Lex, CELEX 32011L0083](https://eur-lex.europa.eu/legal-content/FR/
 
 ## Règlement (UE) 2016/679 du 27 avril 2016 (RGPD)
 
-Source : EUR-Lex, CELEX 32016R0679, version consolidée du 4 mai 2016 (fichier `CELEX_02016R0679-20160504_FR_TXT.pdf` déposé le 12/11/2026). Utilisés pour : limites de l'effacement des données d'un client dont le contrat doit être conservé (art. 17, 3, b), bases légales (art. 6, 1, b et c), durée de conservation (art. 5, 1, e). Le titre de chaque article est repris en première ligne de la citation.
+Source : EUR-Lex, CELEX 32016R0679, version consolidée du 4 mai 2016 (fichier `CELEX_02016R0679-20160504_FR_TXT.pdf` déposé le 12/11/2026). Utilisés pour : limites de l'effacement des données d'un client dont le contrat doit être conservé (art. 17, 3, b), bases légales (art. 6, 1, b et c), durée de conservation (art. 5, 1, e), registre des traitements (art. 30, source distincte indiquée). Le titre de chaque article est repris en première ligne de la citation.
 
 ### Article 5
 
@@ -115,6 +115,36 @@ Source : EUR-Lex, CELEX 32016R0679, version consolidée du 4 mai 2016 (fichier `
 > d) à des fins archivistiques dans l'intérêt public, à des fins de recherche scientifique ou historique ou à des fins statistiques conformément à l'article 89, paragraphe 1, dans la mesure où le droit visé au paragraphe 1 est susceptible de rendre impossible ou de compromettre gravement la réalisation des objectifs dudit traitement; ou
 >
 > e) à la constatation, à l'exercice ou à la défense de droits en justice.
+
+### Article 30 (paragraphes 1, 3, 4 et 5)
+
+*Reproduit le 14/11/2026 depuis le texte publié par la CNIL ([chapitre IV du RGPD](https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre4)) ; le paragraphe 2 (registre du sous-traitant) n'est pas repris.*
+
+> Registre des activités de traitement
+>
+> 1. Chaque responsable du traitement et, le cas échéant, le représentant du responsable du traitement tiennent un registre des activités de traitement effectuées sous leur responsabilité. Ce registre comporte toutes les informations suivantes:
+>
+> a) le nom et les coordonnées du responsable du traitement et, le cas échéant, du responsable conjoint du traitement, du représentant du responsable du traitement et du délégué à la protection des données;
+>
+> b) les finalités du traitement;
+>
+> c) une description des catégories de personnes concernées et des catégories de données à caractère personnel;
+>
+> d) les catégories de destinataires auxquels les données à caractère personnel ont été ou seront communiquées, y compris les destinataires dans des pays tiers ou des organisations internationales;
+>
+> e) le cas échéant, les transferts de données à caractère personnel vers un pays tiers ou à une organisation internationale, y compris l'identification de ce pays tiers ou de cette organisation internationale et, dans le cas des transferts visés à l'article 49, paragraphe 1, deuxième alinéa, les documents attestant de l'existence de garanties appropriées;
+>
+> f) dans la mesure du possible, les délais prévus pour l'effacement des différentes catégories de données;
+>
+> g) dans la mesure du possible, une description générale des mesures de sécurité techniques et organisationnelles visées à l'article 32, paragraphe 1.
+>
+> [...]
+>
+> 3. Les registres visés aux paragraphes 1 et 2 se présentent sous une forme écrite y compris la forme électronique.
+>
+> 4. Le responsable du traitement ou le sous-traitant et, le cas échéant, leur représentant mettent le registre à la disposition de l'autorité de contrôle sur demande.
+>
+> 5. Les obligations visées aux paragraphes 1 et 2 ne s'appliquent pas à une entreprise ou à une organisation comptant moins de 250 employés, sauf si le traitement qu'elles effectuent est susceptible de comporter un risque pour les droits et des libertés des personnes concernées, s'il n'est pas occasionnel ou s'il porte notamment sur les catégories particulières de données visées à l'article 9, paragraphe 1, ou sur des données à caractère personnel relatives à des condamnations pénales et à des infractions visées à l'article 10.
 
 ## Décret n° 2017-1416 du 28 septembre 2017 relatif à la signature électronique
 

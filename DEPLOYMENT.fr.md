@@ -452,7 +452,7 @@ Dans FileZilla : clic droit sur le fichier → **Droits d'accès au fichier...**
 
 ### Dossiers accessibles en écriture
 
-`api/storage/branding/`, `api/storage/zone/`, `api/storage/insurance/` (attestation d'assurance décennale jointe aux devis) et `api/storage/auth/` doivent être **accessibles en écriture par PHP**
+`api/storage/branding/`, `api/storage/zone/`, `api/storage/insurance/` (attestation d'assurance décennale jointe aux devis), `api/storage/holidays/` (jours fériés) et `api/storage/auth/` doivent être **accessibles en écriture par PHP**
 (`755`, ou `775` si l'enregistrement échoue). Ils ne sont pas versionnés, chaque installation a
 ses propres fichiers : créez-les sur le serveur si votre envoi a ignoré les dossiers vides.
 Le dossier n'est jamais servi directement (`api/storage/.htaccess` en interdit l'accès) : les

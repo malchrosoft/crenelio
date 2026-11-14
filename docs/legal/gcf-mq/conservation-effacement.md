@@ -24,7 +24,7 @@ asou téknik anonimizasyon, p. 9 épi 10). Kidonk Crénelio ka siprimé, olié g
 *Pòté sous tala (vérifyé 14/11/2026)* : avi 05/2014-la **pli vié pasé RGPD** (adopté an 2016, ka aplitjé dépi
 25 mé 2018) é i pa adan lis dokiman grip atik 29-la Komité éwopéyen pwotèksyon done (*Comité européen de la
 protection des données*) pran an premié séyans li ; men i ka rété référans CNIL ka sité adan gid li asou tan
-konsèvasyon (jwiyé 2020) épi référansyèl li asou jèsyon komèsyal (pibliyé an janvié 2022). Komité-a mété an
+konsèvasyon (jwiyé 2020) épi référansyèl li asou jèsyon komèsyal (délibération n° 2021-131, pibliyé an Journal officiel 10/04/2022). Komité-a mété an
 konsiltasyon dé lign dirèktris asou psédonimizasyon (pseudonymisation, 01/2025, vèsyon final pa konfirmé ankò jou
 tala). Siprésyon Crénelio chwazi a pa ka dépann di débat tala : an done ki siprimé pa bizwen kalifyé ankò.
 

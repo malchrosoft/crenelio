@@ -27,7 +27,7 @@ quindi elimina, invece di conservare righe « anonimizzate ».
 applicabile dal 25 maggio 2018) e non figura nell'elenco dei documenti del Gruppo di lavoro articolo 29 fatti
 propri dal Comitato europeo per la protezione dei dati nella sua prima riunione; resta tuttavia il riferimento
 citato dalla CNIL (autorità francese per la protezione dei dati) nella sua guida sulle durate di conservazione
-(luglio 2020) e nel suo quadro di riferimento sulla gestione commerciale (pubblicato nel gennaio 2022). Il Comitato
+(luglio 2020) e nel suo quadro di riferimento sulla gestione commerciale (deliberazione n. 2021-131, pubblicata nel Journal officiel del 10/04/2022). Il Comitato
 ha sottoposto a consultazione linee guida sulla pseudonimizzazione (01/2025, versione definitiva non confermata a
 tale data). L'eliminazione scelta da Crénelio non dipende da questi dibattiti: un dato eliminato non deve più
 essere qualificato.

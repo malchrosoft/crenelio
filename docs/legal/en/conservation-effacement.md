@@ -26,7 +26,7 @@ keeping "anonymised" rows.
 since 25 May 2018) and is not on the list of Article 29 Working Party documents endorsed by the European Data
 Protection Board at its first plenary meeting; it nevertheless remains the reference cited by the CNIL (French data
 protection authority) in its guide on retention periods (July 2020) and its reference framework for commercial
-management (published in January 2022). The Board has put guidelines on pseudonymisation out for consultation
+management (deliberation no. 2021-131, published in the Journal officiel of 10/04/2022). The Board has put guidelines on pseudonymisation out for consultation
 (01/2025, final version not confirmed at that date). The deletion chosen by Crénelio does not depend on these
 debates: deleted data no longer needs to be classified.
 
