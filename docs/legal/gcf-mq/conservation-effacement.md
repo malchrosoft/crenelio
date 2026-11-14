@@ -44,6 +44,26 @@ référansyèl « gestion des activités commerciales »).
   les pièces justificatives sont conservés pendant dix ans » (L123-22). Tèks tala ka vizé sirtou komèsan :
   expert-comptable ou ké di'w si i ka aplitjé pou'w.
 
+## An kontra fijé, épi prèv li
+
+Devis-la **fijé** :
+
+- **lè yo ka voyé'y**, mansyon antrepriz ou (non, idantité légal, ladrès, SIRET, asirans, médiatè, rèklamasyon…) ka
+  kopyé asou devis-la : si yo konsilté'y adan uit lanné, i ké montré sa ki té asou devis yo voyé a, menm si ou
+  chanjé ladrès ou médiatè dépi tan tala ;
+- **lè kliyan-an ka aksèpté'y**, Crénelio ka kalkilé an **anprent** (hash, SHA-256) tou sa ki ka fè kontra-a épi tras
+  lakò-a. Si yo rékalkilé'y lè yo lé, i ka montré pa ni ayen ki chanjé dépi tan tala : éditè devis-la ka di
+  « Contrat figé : oui, intact » (kontra fijé : wi, pa touché).
+
+Sa ka réponn a kondisyon ékri élèktwonik : i « a la même force probante que l'écrit sur support papier, sous
+réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit établi et conservé dans des
+conditions de nature à en garantir l'intégrité » (C. civ. 1366). Lè kliyan-an ka aksèpté an liy, sé an **siyati
+élèktwonik senp** : i valab, men yo pa ka konsidéré i fiyab pa défo, okontrè an siyati kalifyé (C. civ. 1367 ;
+décret n° 2017-1416, art. 1) ; si ni an litij, sé ou ki pou prouvé idantifikasyon-an épi entégrité-a, sé pou sa
+devis-la fijé. Devis yo aksèpté avan 14/11/2026 pa fijé.
+
+Chak devis ka di kliyan-an osi ki jan yo ka gadé'y épi ki jan i pé wè'y (C. civ. 1127-1, 4°).
+
 Devis-la yo gadé ka kenbé sa ki ka montré kontra-a : lign épi pri ou, idantité épi ladrès kliyan-an, dat épi tras
 lakò'y (ladrès IP), répons li (pyès ki ranplasé, manda débours) é, si ni, déklarasyon rétractation li.
 

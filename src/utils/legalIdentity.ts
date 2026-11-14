@@ -24,3 +24,10 @@ export function companyAddress(config: AppConfig): string {
     [config.premises_address, `${config.premises_postal_code ?? ''} ${config.premises_city ?? ''}`.trim()].filter(Boolean).join(', ')
   );
 }
+
+/**
+ * Modalités d'archivage et d'accès au contrat, à annoncer dans l'offre conclue par voie électronique
+ * (C. civ. 1127-1, 4° ; C. consom. L213-1). Identique à `LegalTexts::contractArchiving`.
+ */
+export const contractArchiving = (config: AppConfig) =>
+  `Conservation du contrat : une fois accepté, ce devis est conservé par ${config.company_name || 'le professionnel'} pendant dix ans à compter de l'intervention, et vous pouvez le consulter à tout moment depuis son lien ou en le demandant (Code civil, article 1127-1 ; Code de la consommation, article L213-1).`;

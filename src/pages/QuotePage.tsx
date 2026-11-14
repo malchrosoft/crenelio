@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -7,7 +7,7 @@ import { api } from '../api';
 import { AppConfig, Quote } from '../types';
 import PoweredBy from '../components/PoweredBy';
 import BrandMark from '../components/BrandMark';
-import { companyAddress, legalIdentity } from '../utils/legalIdentity';
+import { companyAddress, legalIdentity, contractArchiving } from '../utils/legalIdentity';
 import { attestationUrl, BUILDER_GUARANTEES } from '../utils/builderGuarantees';
 import { ONLINE_FORM_NOTICE, withdrawalNotice, WithdrawalNotice } from '../utils/withdrawalNotice';
 import { LINE_KIND_LABELS, QUOTE_STATUS_LABELS, euro, lineAmount } from '../components/admin/quoteRules';
@@ -27,9 +27,11 @@ const dateTime = (value: string | null) =>
  * contrat ici » → « Confirmer la rétractation », obligatoire depuis le 19 juin 2026).
  * Cadre légal : docs/legal/ ; la réponse n'est jamais prise automatiquement (lien ouvert par un robot).
  */
-const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
+const QuotePage: React.FC<QuotePageProps> = ({ config: liveConfig }) => {
   const { token = '' } = useParams<{ token: string }>();
   const [quote, setQuote] = useState<Quote | null>(null);
+  // Mentions de l'entreprise figées à l'envoi du devis : il se présente tel qu'il a été envoyé et accepté
+  const config = useMemo(() => ({ ...liveConfig, ...(quote?.frozen_config ?? {}) }), [liveConfig, quote]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   // Réponses du client
@@ -330,6 +332,7 @@ const QuotePage: React.FC<QuotePageProps> = ({ config }) => {
       )}
 
       {config.legal_complaints && <p className="form-hint quote-page__mediator">Réclamations : {config.legal_complaints}</p>}
+      <p className="form-hint quote-page__mediator">{contractArchiving(config)}</p>
       {config.legal_mediator && (
         <p className="form-hint quote-page__mediator">
           Médiation de la consommation : en cas de litige, vous pouvez recourir gratuitement au médiateur {config.legal_mediator}.

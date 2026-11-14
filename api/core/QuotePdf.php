@@ -147,6 +147,7 @@ class QuotePdf
             sprintf('Devis valable jusqu\'au %s (%d jours) · %s', self::day((string)$quote['valid_until']), (int)$quote['validity_days'],
                 $quote['quote_price'] === null ? 'Devis gratuit' : 'Devis payant : ' . self::money((float)$quote['quote_price'])),
             !empty($config['legal_complaints']) ? 'Réclamations : ' . $config['legal_complaints'] : '',
+            LegalTexts::contractArchiving($config),
             !empty($config['legal_mediator']) ? 'Médiation de la consommation : ' . $config['legal_mediator'] : '',
         ]) as $text) {
             self::small($pdf, $text);

@@ -48,6 +48,26 @@ commerciales »).
   « les documents comptables et les pièces justificatives sont conservés pendant dix ans » (L123-22). Ten
   przepis dotyczy przede wszystkim kupców (*commerçants*): Twój biegły księgowy powie Ci, czy ma zastosowanie w Twojej sytuacji.
 
+## Umowa utrwalona i jej dowód
+
+Kosztorys jest **utrwalony** (*figé*):
+
+- **przy wysłaniu** dane Twojej firmy (nazwa, tożsamość prawna, adres, SIRET, ubezpieczenie, mediator,
+  reklamacje…) są kopiowane do kosztorysu: jeśli zostanie on otwarty za osiem lat, pokaże dane, które widniały na
+  wysłanym kosztorysie, nawet jeśli w międzyczasie zmieniłeś adres lub mediatora;
+- **przy akceptacji** Crénelio oblicza **odcisk** (hash, SHA-256) wszystkiego, co stanowi umowę, oraz śladu akceptacji.
+  Obliczony ponownie na żądanie, pokazuje, że od tego czasu nic się nie zmieniło: edytor kosztorysu wyświetla
+  « Contrat figé : oui, intact » (Umowa utrwalona: tak, nienaruszona).
+
+Spełnia to warunki dokumentu elektronicznego: « a la même force probante que l'écrit sur support papier,
+sous réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit établi et conservé dans des
+conditions de nature à en garantir l'intégrité » (C. civ. 1366). Akceptacja online jest **zwykłym podpisem
+elektronicznym**: ważnym, ale jego wiarygodność nie jest domniemana, w przeciwieństwie do podpisu kwalifikowanego
+(C. civ. 1367; décret n° 2017-1416, art. 1); w razie sporu to Ty musisz udowodnić identyfikację i integralność,
+stąd to utrwalenie. Kosztorysy zaakceptowane przed 14/11/2026 nie są utrwalone.
+
+Każdy kosztorys informuje też klienta o tych zasadach przechowywania i dostępu (C. civ. 1127-1, 4°).
+
 Przechowywany kosztorys obejmuje to, co stwierdza umowę: Twoje pozycje i ceny, tożsamość i adres klienta,
 datę i ślad jego akceptacji (adres IP), jego odpowiedzi (wymienione części, pełnomocnictwo *débours*) oraz,
 w stosownym przypadku, jego oświadczenie o odstąpieniu.

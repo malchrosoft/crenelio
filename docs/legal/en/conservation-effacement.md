@@ -47,6 +47,26 @@ retention periods, July 2020, and reference framework « gestion des activités 
   is aimed first at traders (*commerçants*): your chartered accountant will tell you whether it applies to your
   situation.
 
+## A locked contract, and its proof
+
+The quote is **locked**:
+
+- **when it is sent**, your business details (name, legal identity, address, SIRET, insurance, mediator,
+  complaints…) are copied onto the quote: if it is consulted in eight years' time, it shows those that appeared on
+  the quote sent, even if you have changed address or mediator in the meantime;
+- **when it is accepted**, Crénelio computes a **fingerprint** (hash, SHA-256) of everything that makes up the contract
+  and of the record of the agreement. Recomputed on request, it shows that nothing has changed since: the quote
+  editor shows « Contrat figé : oui, intact » (*Contract locked: yes, intact*).
+
+This meets the conditions for electronic writing (*écrit électronique*), which « a la même force probante que
+l'écrit sur support papier, sous réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit
+établi et conservé dans des conditions de nature à en garantir l'intégrité » (C. civ. 1366). Online acceptance is a
+**simple electronic signature**: valid, but its reliability is not presumed, unlike a qualified signature
+(C. civ. 1367; décret n° 2017-1416, art. 1); in a dispute, it is up to you to prove identification and integrity,
+hence this locking. Quotes accepted before 14/11/2026 are not locked.
+
+Each quote also informs the customer of these retention and access arrangements (C. civ. 1127-1, 4°).
+
 The retained quote includes what evidences the contract: your lines and prices, the customer's identity and
 address, the date and record of their agreement (IP address), their answers (replaced parts, disbursement
 mandate) and, where applicable, their withdrawal statement.

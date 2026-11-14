@@ -213,6 +213,10 @@ CREATE TABLE `quotes` (
     -- Devis envoyé annulé par le professionnel avant toute réponse (rétractation de l'offre, C. civ. 1115 et 1116)
     `cancelled_at`    DATETIME        NULL,
     `cancel_reason`   VARCHAR(255)    NULL,
+    -- Figement du contrat : mentions de l'entreprise copiées à l'envoi (le devis se présente ensuite tel qu'il a
+    -- été envoyé), empreinte SHA-256 du contrat calculée à l'acceptation (intégrité de l'écrit, C. civ. 1366)
+    `frozen_config`   TEXT            NULL,
+    `contract_hash`   CHAR(64)        NULL,
     `created_at`      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `fk_quote_appointment` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`id`) ON DELETE SET NULL

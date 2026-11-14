@@ -1122,6 +1122,18 @@ const QuoteDecision: React.FC<{ quote: Quote }> = ({ quote }) => (
         </dd>
       </>
     )}
+    {quote.contract_intact !== undefined && quote.status !== 'draft' && quote.status !== 'sent' && (
+      <>
+        <dt>Contrat figé</dt>
+        <dd>
+          {quote.contract_intact === null
+            ? 'Non : accepté avant le figement des contrats (14/11/2026), ou non accepté.'
+            : quote.contract_intact
+              ? `Oui, intact (empreinte SHA-256 ${String(quote.contract_hash).slice(0, 16)}…).`
+              : 'Empreinte différente : le contrat a été modifié depuis son acceptation.'}
+        </dd>
+      </>
+    )}
     {quote.status === 'cancelled' && (
       <>
         <dt>Annulé le</dt>

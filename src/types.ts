@@ -294,6 +294,11 @@ export interface Quote {
   token?: string | null;
   /** Page publique : rétractation en ligne encore possible. */
   can_withdraw?: boolean;
+  /** Mentions de l'entreprise figées à l'envoi (le devis se présente tel qu'il a été envoyé), null si non figé. */
+  frozen_config?: Partial<AppConfig> | null;
+  /** Empreinte SHA-256 du contrat accepté, et son contrôle (Espace Artisan ; null : pas d'empreinte). */
+  contract_hash?: string | null;
+  contract_intact?: boolean | null;
   /** Statut du rendez-vous lié (lecture seule, jointure du serveur). */
   appointment_status?: string | null;
   /** Contrat conservé au terme de son exécution (archivage intermédiaire) : hors des listes courantes. */

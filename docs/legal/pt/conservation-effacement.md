@@ -47,6 +47,26 @@ conservação, julho de 2020, e referencial « gestion des activités commercial
   « les documents comptables et les pièces justificatives sont conservés pendant dix ans » (L123-22). Este
   texto visa antes de mais os comerciantes: o seu contabilista dir-lhe-á se se aplica à sua situação.
 
+## Um contrato bloqueado, e a sua prova
+
+O orçamento fica **bloqueado**:
+
+- **no envio**, os dados da sua empresa (nome, identidade legal, morada, SIRET, seguro, mediador,
+  reclamações…) são copiados para o orçamento: se for consultado daqui a oito anos, apresenta os que constavam do
+  orçamento enviado, mesmo que tenha mudado de morada ou de mediador entretanto;
+- **na aceitação**, o Crénelio calcula uma **impressão digital** (hash, SHA-256) de tudo o que constitui o contrato e
+  do registo do acordo. Recalculada a pedido, mostra que nada mudou desde então: o editor do orçamento indica
+  « Contrat figé : oui, intact » (*Contrato bloqueado: sim, intacto*).
+
+Isto responde às condições do escrito eletrónico (*écrit électronique*), que « a la même force probante que
+l'écrit sur support papier, sous réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit
+établi et conservé dans des conditions de nature à en garantir l'intégrité » (C. civ. 1366). A aceitação online é
+uma **assinatura eletrónica simples**: válida, mas a sua fiabilidade não se presume, ao contrário de uma
+assinatura qualificada (C. civ. 1367; décret n° 2017-1416, art. 1); em caso de litígio, cabe-lhe a si provar a
+identificação e a integridade, daí este bloqueio. Os orçamentos aceites antes de 14/11/2026 não estão bloqueados.
+
+Cada orçamento informa também o cliente destas modalidades de conservação e de acesso (C. civ. 1127-1, 4°).
+
 O orçamento conservado inclui o que comprova o contrato: as suas linhas e preços, a identidade e a morada do
 cliente, a data e o registo do seu acordo (endereço IP), as suas respostas (peças substituídas, mandato de
 *débours*) e, se for o caso, a sua declaração de livre resolução.

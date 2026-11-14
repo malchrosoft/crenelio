@@ -50,6 +50,15 @@ class LegalTexts
         ]));
     }
 
+    /**
+     * Modalités d'archivage et d'accès au contrat, à annoncer dans l'offre conclue par voie électronique
+     * (C. civ. 1127-1, 4° ; C. consom. L213-1). Identique à `contractArchiving` (src/utils/legalIdentity.ts).
+     */
+    public static function contractArchiving(array $config): string
+    {
+        return sprintf("Conservation du contrat : une fois accepté, ce devis est conservé par %s pendant dix ans à compter de l'intervention, et vous pouvez le consulter à tout moment depuis son lien ou en le demandant (Code civil, article 1127-1 ; Code de la consommation, article L213-1).", (string)(($config['company_name'] ?? '') ?: 'le professionnel'));
+    }
+
     /** Garanties des constructeurs (C. civ. 1792 à 1792-7), cf. `builderGuarantees.ts`. */
     public static function builderGuarantees(): array
     {

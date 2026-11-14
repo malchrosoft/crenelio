@@ -47,6 +47,27 @@ de plazos de conservación, julio de 2020, y marco de referencia « gestion des 
   que « les documents comptables et les pièces justificatives sont conservés pendant dix ans » (L123-22). Este
   texto se dirige ante todo a los comerciantes: su asesor contable le dirá si se aplica a su situación.
 
+## Un contrato bloqueado, y su prueba
+
+El presupuesto queda **bloqueado**:
+
+- **al enviarlo**, los datos de su empresa (nombre, identidad legal, dirección, SIRET, seguro, mediador,
+  reclamaciones…) se copian en el presupuesto: si se consulta dentro de ocho años, muestra los que figuraban en el
+  presupuesto enviado, aunque usted haya cambiado de dirección o de mediador entretanto;
+- **al aceptarlo**, Crénelio calcula una **huella** (hash, SHA-256) de todo lo que constituye el contrato y de la
+  constancia del acuerdo. Recalculada a petición, demuestra que nada ha cambiado desde entonces: el editor del
+  presupuesto indica « Contrat figé : oui, intact » (*Contrato bloqueado: sí, intacto*).
+
+Esto cumple las condiciones del escrito electrónico (*écrit électronique*), que « a la même force probante que
+l'écrit sur support papier, sous réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit
+établi et conservé dans des conditions de nature à en garantir l'intégrité » (C. civ. 1366). La aceptación en línea
+es una **firma electrónica simple**: válida, pero su fiabilidad no se presume, a diferencia de una firma
+cualificada (C. civ. 1367; décret n° 2017-1416, art. 1); en caso de litigio, le corresponde a usted probar la
+identificación y la integridad, de ahí este bloqueo. Los presupuestos aceptados antes del 14/11/2026 no están
+bloqueados.
+
+Cada presupuesto informa también al cliente de estas modalidades de conservación y de acceso (C. civ. 1127-1, 4°).
+
 El presupuesto conservado comprende lo que hace constar el contrato: sus líneas y precios, la identidad y la
 dirección del cliente, la fecha y la constancia de su acuerdo (dirección IP), sus respuestas (piezas
 sustituidas, mandato de gastos suplidos) y, en su caso, su declaración de desistimiento.

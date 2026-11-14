@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -6,7 +6,7 @@ import { ArrowLeftIcon, DownloadSimpleIcon, PrinterIcon } from '@phosphor-icons/
 import { api } from '../api';
 import { AppConfig, Quote, QuoteLine } from '../types';
 import { LINE_KIND_LABELS, euro, lineAmount } from '../components/admin/quoteRules';
-import { companyAddress, legalIdentity } from '../utils/legalIdentity';
+import { companyAddress, legalIdentity, contractArchiving } from '../utils/legalIdentity';
 import { attestationUrl, BUILDER_GUARANTEES } from '../utils/builderGuarantees';
 import { ONLINE_FORM_NOTICE, withdrawalNotice } from '../utils/withdrawalNotice';
 
@@ -32,10 +32,12 @@ const moment = (value: string | null) => (value ? format(parseISO(value.replace(
  * accord), mandat de débours (à signer par les deux parties) et formulaire type de rétractation.
  * Enregistrables en PDF par le navigateur (aucune bibliothèque côté serveur). Cadre : docs/legal/.
  */
-const QuotePrintPage: React.FC<QuotePrintPageProps> = ({ config }) => {
+const QuotePrintPage: React.FC<QuotePrintPageProps> = ({ config: liveConfig }) => {
   const { token = '' } = useParams<{ token: string }>();
   const [params, setParams] = useSearchParams();
   const [quote, setQuote] = useState<Quote | null>(null);
+  // Mentions de l'entreprise figées à l'envoi du devis : il se présente tel qu'il a été envoyé et accepté
+  const config = useMemo(() => ({ ...liveConfig, ...(quote?.frozen_config ?? {}) }), [liveConfig, quote]);
   const [error, setError] = useState<string | null>(null);
   // Ouverte dans un nouvel onglet (Espace Artisan) : rien à quoi revenir, il suffit de fermer l'onglet.
   // Évalué à l'ouverture : changer de document ne crée pas d'historique (`replace`)
@@ -283,6 +285,7 @@ const QuoteSheet: React.FC<{ quote: Quote; config: AppConfig; token: string }> =
           {quote.quote_price === null ? 'Devis gratuit' : `Devis payant : ${euro(quote.quote_price)}`}
         </p>
         {config.legal_complaints && <p className="quote-print__mention">Réclamations : {config.legal_complaints}</p>}
+        <p className="quote-print__mention">{contractArchiving(config)}</p>
         {config.legal_mediator && <p className="quote-print__mention">Médiation de la consommation : {config.legal_mediator}</p>}
       </Section>
 

@@ -25,7 +25,11 @@ class QuoteController
     /** GET /quotes/:id */
     public function show(array $params): void
     {
-        Response::json(self::findOr404((int)($params['id'] ?? 0)));
+        $quote = self::findOr404((int)($params['id'] ?? 0));
+        // Intégrité du contrat accepté (empreinte recalculée), mentions figées lisibles
+        $quote['contract_intact'] = Quote::contractIntact($quote);
+        $quote['frozen_config'] = json_decode((string)($quote['frozen_config'] ?? ''), true);
+        Response::json($quote);
     }
 
     /**
@@ -108,7 +112,7 @@ class QuoteController
             Response::json(['error' => 'Devis déjà envoyé.'], 409);
         }
         $quote = Quote::find((int)$quote['id']);
-        $quote['notifications'] = QuoteNotifier::sendQuote($quote, Config::getAll());
+        $quote['notifications'] = QuoteNotifier::sendQuote($quote, Quote::documentConfig($quote));
         Response::json($quote);
     }
 
@@ -124,7 +128,7 @@ class QuoteController
             Response::json(['error' => "Seul un devis envoyé et sans réponse du client peut être annulé. Un devis accepté ne peut être révoqué qu'avec l'accord du client (C. civ. 1193)."], 409);
         }
         $quote = Quote::find((int)$quote['id']);
-        $quote['notifications'] = ($body['notify'] ?? true) !== false ? QuoteNotifier::sendCancellation($quote, Config::getAll()) : [];
+        $quote['notifications'] = ($body['notify'] ?? true) !== false ? QuoteNotifier::sendCancellation($quote, Quote::documentConfig($quote)) : [];
         Response::json($quote);
     }
 
@@ -173,7 +177,8 @@ class QuoteController
         if (!$available) {
             Response::json(['error' => 'Document indisponible.'], 404);
         }
-        $config = Config::getAll();
+        // Mentions de l'entreprise figées à l'envoi : le document est celui qui a été envoyé et accepté
+        $config = Quote::documentConfig($quote);
         [$pdf, $name] = match ($document) {
             'devis'       => [QuotePdf::quote($quote, $config), 'devis'],
             'mandat'      => [QuotePdf::mandate($quote, $config), 'mandat-debours'],
@@ -203,6 +208,8 @@ class QuoteController
         }
         unset($quote['decision_ip'], $quote['mandate_ip'], $quote['withdrawal_ip'], $quote['appointment_id'], $quote['token']);
         $quote['can_withdraw'] = Quote::canWithdraw($quote);
+        // Mentions de l'entreprise figées à l'envoi : la page présente le devis tel qu'il a été envoyé
+        $quote['frozen_config'] = json_decode((string)($quote['frozen_config'] ?? ''), true);
         Response::json($quote);
     }
 
@@ -258,7 +265,7 @@ class QuoteController
         $quote = Quote::find((int)$quote['id']);
         Response::json([
             'status'        => $quote['status'],
-            'notifications' => QuoteNotifier::sendDecision($quote, Config::getAll()),
+            'notifications' => QuoteNotifier::sendDecision($quote, Quote::documentConfig($quote)),
         ]);
     }
 
@@ -297,7 +304,7 @@ class QuoteController
         Response::json([
             'status'        => 'withdrawn',
             'withdrawn_at'  => $quote['withdrawn_at'],
-            'notifications' => QuoteNotifier::sendWithdrawal($quote, Config::getAll()),
+            'notifications' => QuoteNotifier::sendWithdrawal($quote, Quote::documentConfig($quote)),
         ]);
     }
 

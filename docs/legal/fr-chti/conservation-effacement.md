@@ -47,6 +47,26 @@ de conservation, juillet 2020, et référentiel « gestion des activités commer
   qu'« les documents comptables et les pièces justificatives sont conservés pendant dix ans » (L123-22). Ch'
   texte-lo i vise d'abord les commerçants : vo expert-comptabe i vous dira s'i s'applique à vous.
 
+## Un contrat figé, et s'preuve
+
+L'devis il est **figé** :
+
+- **à l'invoi**, les mintions d'vo intreprise (nom, identité légale, adresse, SIRET, assurance, médiateur,
+  réclamations…) sont copiées su l'devis : si on l'consulte dins huit ans, i montre cheulles qu'étoient su l'devis
+  invoyé, même si vous avez canjé d'adresse ou d'médiateur intre-temps ;
+- **à l'acceptation**, Crénelio i calcule eune **impreinte** (hash, SHA-256) d'tout ch'qui fait l'contrat et d'l'trace
+  d'l'accord. Recalculée quand on veut, al montre qu'rien n'a bougé d'pis : l'éditeur du devis i marque
+  « Contrat figé : oui, intact ».
+
+Cha répond aux conditions d'l'écrit électronique : i « a la même force probante que l'écrit sur support papier,
+sous réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit établi et conservé dans des
+conditions de nature à en garantir l'intégrité » (C. civ. 1366). L'acceptation in ligne, ch'est eune **signature
+électronique simpe** : valabe, mais s'fiabilité al est point présumée, contrairemint à eune signature
+qualifiée (C. civ. 1367 ; décret n° 2017-1416, art. 1) ; s'i y a un litige, ch'est à vous d'prouver
+l'identification et l'intégrité, d'où ch'figemint. Les devis acceptés avant l'14/11/2026 i sont point figés.
+
+Chaque devis i annonce aussi au client ches modalités d'conservation et d'accès (C. civ. 1127-1, 4°).
+
 L'devis gardé i comprind ch'qui constate l'contrat : vos lignes et vos prix, l'identité et l'adresse du client,
 l'date et l'trace d'sin accord (adresse IP), ses réponses (pièces replacées, mandat d'débours) et, si y a
 lieu, s'déclaration d'rétractation.

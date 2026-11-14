@@ -50,6 +50,27 @@ guida sulle durate di conservazione, luglio 2020, e quadro di riferimento « ges
   (L123-22). Questo testo riguarda anzitutto i commercianti: il vostro commercialista vi dirà se si applica alla
   vostra situazione.
 
+## Un contratto bloccato, e la sua prova
+
+Il preventivo è **bloccato**:
+
+- **all'invio**, i dati della vostra impresa (nome, identità legale, indirizzo, SIRET, assicurazione, mediatore,
+  reclami…) sono copiati sul preventivo: se viene consultato fra otto anni, presenta quelli che figuravano sul
+  preventivo inviato, anche se nel frattempo avete cambiato indirizzo o mediatore;
+- **all'accettazione**, Crénelio calcola un'**impronta** (hash, SHA-256) di tutto ciò che costituisce il contratto e
+  della traccia dell'accordo. Ricalcolata su richiesta, dimostra che da allora nulla è cambiato: l'editor del
+  preventivo indica « Contrat figé : oui, intact » (*Contratto bloccato: sì, intatto*).
+
+Ciò risponde alle condizioni dello scritto elettronico (*écrit électronique*), che « a la même force probante que
+l'écrit sur support papier, sous réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit
+établi et conservé dans des conditions de nature à en garantir l'intégrité » (C. civ. 1366). L'accettazione online
+è una **firma elettronica semplice**: valida, ma la sua affidabilità non è presunta, a differenza di una firma
+qualificata (C. civ. 1367; décret n° 2017-1416, art. 1); in caso di controversia, spetta a voi provare
+l'identificazione e l'integrità, da cui questo blocco. I preventivi accettati prima del 14/11/2026 non sono
+bloccati.
+
+Ogni preventivo comunica inoltre al cliente queste modalità di conservazione e di accesso (C. civ. 1127-1, 4°).
+
 Il preventivo conservato comprende ciò che attesta il contratto: le vostre righe e i prezzi, l'identità e
 l'indirizzo del cliente, la data e la traccia del suo accordo (indirizzo IP), le sue risposte (pezzi
 sostituiti, mandato per le spese anticipate) e, se del caso, la sua dichiarazione di recesso.

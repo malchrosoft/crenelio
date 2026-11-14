@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -19,9 +19,11 @@ const moment = (value: string | null) =>
  * la fonctionnalité de rétractation (L221-21, D221-5 : « confirmer la rétractation », accusé de
  * réception). Après validation, la déclaration se télécharge en PDF.
  */
-const QuoteWithdrawalPage: React.FC<{ config: AppConfig }> = ({ config }) => {
+const QuoteWithdrawalPage: React.FC<{ config: AppConfig }> = ({ config: liveConfig }) => {
   const { token = '' } = useParams<{ token: string }>();
   const [quote, setQuote] = useState<Quote | null>(null);
+  // Mentions de l'entreprise figées à l'envoi du devis : il se présente tel qu'il a été envoyé et accepté
+  const config = useMemo(() => ({ ...liveConfig, ...(quote?.frozen_config ?? {}) }), [liveConfig, quote]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [name, setName] = useState('');

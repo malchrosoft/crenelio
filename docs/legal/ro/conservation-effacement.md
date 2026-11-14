@@ -46,6 +46,26 @@ ghidul privind duratele de păstrare, iulie 2020, și referențialul « gestion 
   « les documents comptables et les pièces justificatives sont conservés pendant dix ans » (L123-22). Acest
   text îi vizează în primul rând pe comercianți: expertul contabil vă va spune dacă se aplică situației dumneavoastră.
 
+## Un contract fixat și dovada sa
+
+Devizul este **fixat** (*figé*):
+
+- **la trimitere**, mențiunile întreprinderii dumneavoastră (denumire, identitate legală, adresă, SIRET, asigurare,
+  mediator, reclamații…) sunt copiate pe deviz: dacă este consultat peste opt ani, el prezintă mențiunile care
+  figurau pe devizul trimis, chiar dacă între timp v-ați schimbat adresa sau mediatorul;
+- **la acceptare**, Crénelio calculează o **amprentă** (hash, SHA-256) a tot ce constituie contractul și a urmei
+  acordului. Recalculată la cerere, ea arată că nimic nu s-a schimbat de atunci: editorul devizului afișează
+  « Contrat figé : oui, intact » (Contract fixat: da, intact).
+
+Aceasta răspunde condițiilor înscrisului electronic: acesta « a la même force probante que l'écrit sur support papier,
+sous réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit établi et conservé dans des
+conditions de nature à en garantir l'intégrité » (C. civ. 1366). Acceptarea online este o
+**semnătură electronică simplă**: valabilă, dar fiabilitatea ei nu este prezumată, spre deosebire de o semnătură
+calificată (C. civ. 1367; décret n° 2017-1416, art. 1); în caz de litigiu, dumneavoastră trebuie să dovediți
+identificarea și integritatea, de aici această fixare. Devizele acceptate înainte de 14/11/2026 nu sunt fixate.
+
+Fiecare deviz anunță totodată clientului aceste modalități de păstrare și de acces (C. civ. 1127-1, 4°).
+
 Devizul păstrat cuprinde ce constată contractul: rândurile și prețurile dumneavoastră, identitatea și adresa clientului,
 data și urma acordului său (adresa IP), răspunsurile sale (piese înlocuite, mandat de *débours*) și, dacă
 este cazul, declarația sa de retragere.

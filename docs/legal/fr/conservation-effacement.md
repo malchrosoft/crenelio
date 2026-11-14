@@ -45,6 +45,26 @@ juillet 2020, et référentiel « gestion des activités commerciales »).
   « les documents comptables et les pièces justificatives sont conservés pendant dix ans » (L123-22). Ce
   texte vise d'abord les commerçants : votre expert-comptable vous dira s'il s'applique à votre situation.
 
+## Un contrat figé, et sa preuve
+
+Le devis est **figé** :
+
+- **à l'envoi**, les mentions de votre entreprise (nom, identité légale, adresse, SIRET, assurance, médiateur,
+  réclamations…) sont copiées sur le devis : s'il est consulté dans huit ans, il présente celles qui figuraient sur
+  le devis envoyé, même si vous avez changé d'adresse ou de médiateur entre-temps ;
+- **à l'acceptation**, Crénelio calcule une **empreinte** (SHA-256) de tout ce qui constitue le contrat et de la
+  trace de l'accord. Recalculée à la demande, elle montre que rien n'a changé depuis : l'éditeur du devis indique
+  « Contrat figé : oui, intact ».
+
+Cela répond aux conditions de l'écrit électronique : il « a la même force probante que l'écrit sur support papier,
+sous réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit établi et conservé dans des
+conditions de nature à en garantir l'intégrité » (C. civ. 1366). L'acceptation en ligne est une **signature
+électronique simple** : valable, mais sa fiabilité n'est pas présumée, contrairement à une signature qualifiée
+(C. civ. 1367 ; décret n° 2017-1416, art. 1) ; en cas de litige, c'est à vous de prouver l'identification et
+l'intégrité, d'où ce figement. Les devis acceptés avant le 14/11/2026 ne sont pas figés.
+
+Chaque devis annonce aussi au client ces modalités de conservation et d'accès (C. civ. 1127-1, 4°).
+
 Le devis conservé comprend ce qui constate le contrat : vos lignes et prix, l'identité et l'adresse du client,
 la date et la trace de son accord (adresse IP), ses réponses (pièces remplacées, mandat de débours) et, le
 cas échéant, sa déclaration de rétractation.

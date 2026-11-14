@@ -44,6 +44,26 @@ sèlman si ni bizwen, pa egzanp pou on litij oben on dimann a kliyan-la (CNIL, g
   les pièces justificatives sont conservés pendant dix ans » (L123-22). Tèks-lasa ka vizé sitou komèrsan :
   *expert-comptable* a-w ké di-w si i ka aplitjé pou-w.
 
+## On kontra fijé, é prèv a-y
+
+*Devis*-la **fijé** :
+
+- **lè yo ka voyé-y**, mansyon a antrepriz a-w (non, idantité légal, adrès, SIRET, asirans, médyatè, réklamasyon…)
+  ka kopyé asi *devis*-la : si yo konsilté-y adan uit lanné, i ké montré sa ki té asi *devis*-la yo voyé, menm si
+  ou chanjé adrès oben médyatè dépi lè-la ;
+- **lè kliyan-la ka asèpté-y**, Crénelio ka kalkilé on **anprent** (hash, SHA-256) a tousa ki ka fè kontra-la é a tras a
+  akò-la. Si yo rékalkilé-y lè yo vlé, i ka montré pa ni anyen ki chanjé dépi lè-la : éditè a *devis*-la ka di
+  « Contrat figé : oui, intact » (kontra fijé : wi, pa touché).
+
+Sa ka réponn a kondisyon a ékri élèktwonik : i « a la même force probante que l'écrit sur support papier, sous
+réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit établi et conservé dans des
+conditions de nature à en garantir l'intégrité » (C. civ. 1366). Lè kliyan-la ka asèpté an liy, sé on **siyati
+élèktwonik senp** : i valab, men yo pa ka konsidéré i fiyab pa défo, okontrè a on siyati kalifyé (C. civ. 1367 ;
+décret n° 2017-1416, art. 1) ; si ni on litij, sé ou ki pou prouvé idantifikasyon-la é entégrité-la, sé pou sa
+*devis*-la fijé. *Devis* yo asèpté avan 14/11/2026 pa fijé.
+
+Chak *devis* ka di kliyan-la osi ki jan yo ka kenbé-y é ki jan i pé vwè-y (C. civ. 1127-1, 4°).
+
 *Devis*-la yo kenbé ka gadé sa ki ka montré kontra-la : lign é pri a-w, idantité é adrès a kliyan-la, dat é tras
 a akò a-y (adrès IP), répons a-y (pyès ranplasé, manda a *débours*) é, si ni, déklarasyon *rétractation* a-y.
 

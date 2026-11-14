@@ -320,9 +320,10 @@ class Quote
             $rank = $last ? (int)substr($last['number'], strrpos($last['number'], '-') + 1) + 1 : 1;
             Database::execute(
                 "UPDATE `quotes` SET status = 'sent', number = ?, token = ?, sent_at = NOW(),
-                    valid_until = DATE_ADD(CURDATE(), INTERVAL validity_days DAY)
+                    valid_until = DATE_ADD(CURDATE(), INTERVAL validity_days DAY), frozen_config = ?
                  WHERE id = ?",
-                [sprintf('%s-%s-%04d', $prefix, $year, $rank), bin2hex(random_bytes(32)), $id]
+                [sprintf('%s-%s-%04d', $prefix, $year, $rank), bin2hex(random_bytes(32)),
+                    json_encode(self::frozenConfigNow(), JSON_UNESCAPED_UNICODE), $id]
             );
             $pdo->commit();
             return true;
@@ -345,7 +346,7 @@ class Quote
     {
         $ip = $_SERVER['REMOTE_ADDR'] ?? null;
         $deadline = $accepted ? self::withdrawalDeadline(new DateTimeImmutable('today')) : null;
-        return Database::execute(
+        $done = Database::execute(
             "UPDATE `quotes` SET status = ?, decided_at = NOW(), decision_ip = ?, keep_parts = ?,
                 debours_mandate = ?, mandate_decided_at = IF(? IS NULL, NULL, NOW()), mandate_ip = IF(? IS NULL, NULL, ?),
                 early_execution = ?, refusal_reason = ?,
@@ -357,6 +358,66 @@ class Quote
                 (int)$earlyExecution, $reason, $deadline, $id,
             ]
         ) > 0;
+        // Contrat conclu : empreinte de son contenu, pour en prouver l'intégrité (C. civ. 1366)
+        if ($done && $accepted && ($quote = self::find($id)) && !empty($quote['frozen_config'])) {
+            Database::execute('UPDATE `quotes` SET contract_hash = ? WHERE id = ?', [self::contractHash($quote), $id]);
+        }
+        return $done;
+    }
+
+    /** Réglages de l'entreprise repris sur les documents du devis : figés à l'envoi (`frozen_config`). */
+    private const FROZEN_KEYS = [
+        'company_name', 'pro_name', 'pro_phone', 'pro_email', 'premises_address', 'premises_postal_code',
+        'premises_city', 'service_area', 'quote_vat_exemption',
+    ];
+
+    /** Mentions de l'entreprise en vigueur (`FROZEN_KEYS` et `legal_*`), copiées sur le devis à son envoi. */
+    public static function frozenConfigNow(): array
+    {
+        return array_filter(
+            Config::getAll(),
+            fn($value, $key) => in_array($key, self::FROZEN_KEYS, true) || str_starts_with((string)$key, 'legal_'),
+            ARRAY_FILTER_USE_BOTH
+        );
+    }
+
+    /**
+     * Réglages pour présenter un devis : ceux du moment, remplacés par les mentions figées à son envoi (le
+     * devis se présente tel qu'il a été envoyé et accepté, même si l'entreprise a changé d'adresse ou de
+     * médiateur depuis). Devis non figé (antérieur au 14/11/2026, brouillon) : réglages du moment.
+     */
+    public static function documentConfig(array $quote): array
+    {
+        $frozen = json_decode((string)($quote['frozen_config'] ?? ''), true);
+        return is_array($frozen) ? array_merge(Config::getAll(), $frozen) : Config::getAll();
+    }
+
+    /**
+     * Empreinte SHA-256 du contrat : ce qui le constitue (parties, lignes, prix, conditions, mentions figées de
+     * l'entreprise) et la trace de l'accord (date, adresse IP, réponses). Exclus : le téléphone du client (retiré
+     * en archivage) et les événements postérieurs (remise des pièces, rétractation).
+     */
+    public static function contractHash(array $quote): string
+    {
+        $fields = [
+            'number', 'client_name', 'client_email', 'client_company', 'client_siren', 'address', 'postal_code', 'city',
+            'title', 'notes', 'vat_mode', 'validity_days', 'quote_price', 'urgent', 'builder_works', 'sale',
+            'debours_budget', 'execution_terms', 'payment_terms', 'time_counting', 'sent_at', 'valid_until',
+            'total_ht', 'total_vat', 'total_debours', 'total_ttc', 'decided_at', 'decision_ip', 'keep_parts',
+            'debours_mandate', 'mandate_decided_at', 'mandate_ip', 'early_execution', 'frozen_config',
+        ];
+        $content = array_map(fn($field) => $quote[$field] ?? null, array_combine($fields, $fields));
+        $content['lines'] = array_map(
+            fn($line) => array_map('strval', array_intersect_key($line, array_flip(['kind', 'label', 'quantity', 'unit', 'unit_price', 'vat_rate']))),
+            $quote['lines'] ?? []
+        );
+        return hash('sha256', json_encode(array_map(fn($v) => is_array($v) || $v === null ? $v : (string)$v, $content), JSON_UNESCAPED_UNICODE));
+    }
+
+    /** Contrat figé intact ? null s'il n'a pas d'empreinte (non accepté, ou accepté avant le figement). */
+    public static function contractIntact(array $quote): ?bool
+    {
+        return empty($quote['contract_hash']) ? null : hash_equals((string)$quote['contract_hash'], self::contractHash($quote));
     }
 
     /**

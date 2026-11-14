@@ -51,6 +51,30 @@ Rechtsstreit oder einer Anfrage des Kunden (CNIL, Leitfaden zu Aufbewahrungsfris
   Dieser Text richtet sich zunächst an Kaufleute (*commerçants*): Ihr Steuerberater sagt Ihnen, ob er für Ihre
   Situation gilt.
 
+## Ein festgeschriebener Vertrag und sein Nachweis
+
+Der Kostenvoranschlag wird **festgeschrieben**:
+
+- **beim Versand** werden die Angaben Ihres Unternehmens (Name, rechtliche Identität, Adresse, SIRET,
+  Versicherung, Schlichtungsstelle, Beschwerden…) in den Kostenvoranschlag übernommen: Wird er in acht Jahren
+  eingesehen, zeigt er die Angaben des versandten Kostenvoranschlags, auch wenn Sie inzwischen Adresse oder
+  Schlichtungsstelle gewechselt haben;
+- **bei der Annahme** berechnet Crénelio einen **Fingerabdruck** (Hash, SHA-256) von allem, was den Vertrag ausmacht,
+  und vom Nachweis der Zustimmung. Auf Anforderung neu berechnet, zeigt er, dass sich seitdem nichts geändert hat:
+  Der Editor des Kostenvoranschlags zeigt « Contrat figé : oui, intact » (*Vertrag festgeschrieben: ja,
+  unverändert*).
+
+Damit sind die Voraussetzungen des elektronischen Schriftstücks (*écrit électronique*) erfüllt, die « a la même force
+probante que l'écrit sur support papier, sous réserve que puisse être dûment identifiée la personne dont il émane
+et qu'il soit établi et conservé dans des conditions de nature à en garantir l'intégrité » (C. civ. 1366). Die
+Online-Annahme ist eine **einfache elektronische Signatur**: gültig, ihre Zuverlässigkeit wird aber nicht
+vermutet, anders als bei einer qualifizierten Signatur (C. civ. 1367; décret n° 2017-1416, art. 1); im Streitfall
+müssen Sie die Identifizierung und die Unversehrtheit beweisen, daher diese Festschreibung. Vor dem 14/11/2026
+angenommene Kostenvoranschläge sind nicht festgeschrieben.
+
+Jeder Kostenvoranschlag teilt dem Kunden zudem diese Modalitäten der Aufbewahrung und des Zugangs mit
+(C. civ. 1127-1, 4°).
+
 Der aufbewahrte Kostenvoranschlag umfasst, was den Vertrag belegt: Ihre Positionen und Preise, Identität und
 Adresse des Kunden, Datum und Nachweis seiner Zustimmung (IP-Adresse), seine Antworten (ausgetauschte Teile,
 Vollmacht für durchlaufende Posten) und gegebenenfalls seine Widerrufserklärung.

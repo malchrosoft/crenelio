@@ -47,6 +47,26 @@ belgesi).
   « les documents comptables et les pièces justificatives sont conservés pendant dix ans » hükmünü öngörür (L123-22). Bu
   metin öncelikle tacirleri hedefler: durumunuza uygulanıp uygulanmadığını mali müşaviriniz söyleyecektir.
 
+## Sabitlenmiş sözleşme ve kanıtı
+
+Teklif **sabitlenir** (*figé*):
+
+- **gönderimde**, işletmenizin bilgileri (ad, yasal kimlik, adres, SIRET, sigorta, arabulucu, şikâyetler…) teklife
+  kopyalanır: teklif sekiz yıl sonra görüntülenirse, bu arada adresinizi veya arabulucunuzu değiştirmiş olsanız bile
+  gönderilen teklifte yer alan bilgileri gösterir;
+- **kabulde**, Crénelio sözleşmeyi oluşturan her şeyin ve kabulün izinin bir **parmak izini** (hash, SHA-256) hesaplar.
+  İstendiğinde yeniden hesaplanan bu parmak izi, o zamandan beri hiçbir şeyin değişmediğini gösterir: teklif
+  düzenleyicisi « Contrat figé : oui, intact » (Sözleşme sabitlendi: evet, bozulmamış) ibaresini gösterir.
+
+Bu, elektronik yazılı belgenin koşullarını karşılar: elektronik belge « a la même force probante que l'écrit sur support papier,
+sous réserve que puisse être dûment identifiée la personne dont il émane et qu'il soit établi et conservé dans des
+conditions de nature à en garantir l'intégrité » (C. civ. 1366). Çevrimiçi kabul **basit
+bir elektronik imzadır**: geçerlidir, ancak nitelikli imzanın aksine güvenilirliği karine olarak kabul edilmez
+(C. civ. 1367; décret n° 2017-1416, art. 1); bir uyuşmazlıkta kimlik tespitini ve bütünlüğü kanıtlamak size düşer,
+bu sabitlemenin nedeni de budur. 14/11/2026'dan önce kabul edilmiş teklifler sabitlenmemiştir.
+
+Her teklif, müşteriye bu saklama ve erişim koşullarını da bildirir (C. civ. 1127-1, 4°).
+
 Saklanan teklif, sözleşmeyi belgeleyen her şeyi içerir: kalemleriniz ve fiyatlarınız, müşterinin kimliği ve adresi,
 kabulünün tarihi ve izi (IP adresi), yanıtları (değiştirilen parçalar, *débours* vekâleti) ve gerekiyorsa
 cayma beyanı.

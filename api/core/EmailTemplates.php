@@ -699,6 +699,8 @@ class EmailTemplates
             $outro .= ' Le formulaire type de rétractation (PDF remplissable) est également joint.';
         }
         $outro .= $guarantees;
+        // Modalités d'archivage et d'accès au contrat (C. civ. 1127-1, 4°)
+        $outro .= ' ' . self::escape(LegalTexts::contractArchiving($config));
         $url = self::quoteUrl($quote);
 
         return [
