@@ -5,7 +5,8 @@
  * Interrogé par `npm run deploy:init` pour savoir si le serveur est déjà installé :
  * - `database` : `ok`, `empty` (base joignable mais socle non importé) ou `error` (connexion impossible) ;
  * - `installed` : base joignable et socle importé (`config` présente) ;
- * - `schema_version` : dernière migration appliquée (clé `config.schema_version`), null si inconnue.
+ * - `schema_version` : dernière migration appliquée (clé `config.schema_version`), null si inconnue ;
+ * - `version` : version de Crénelio déployée (`version.txt` écrit par le build), null sans bundle compilé.
  * - `storage` : `ok`, ou `error` si un dossier de `api/storage/` manque ou n'est pas accessible en écriture
  *   (`storage_unwritable` les nomme : clé de session, logo, zone, attestation, jours fériés en dépendent).
  * Aucun détail d'erreur, de version PHP ni d'identifiant n'est renvoyé.
@@ -46,8 +47,12 @@ class HealthController
             fn(string $dir) => !is_dir(__DIR__ . '/../storage/' . $dir) || !is_writable(__DIR__ . '/../storage/' . $dir)
         ));
 
+        $versionFile = __DIR__ . '/../public/assets/version.txt';
+        $version = is_readable($versionFile) ? trim((string) file_get_contents($versionFile)) : '';
+
         Response::json([
             'app'                => 'crenelio',
+            'version'            => $version !== '' ? $version : null,
             'installed'          => $database === 'ok',
             'database'           => $database,
             'schema_version'     => $schemaVersion,

@@ -430,6 +430,7 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
   - Premier déploiement : `api/.env` (droits 600) et squelette `api/storage/` (jamais leur contenu) ; mise à jour : ni `.env` ni `storage/`.
   - Testé : premier déploiement (site injoignable), mise à jour contre l'API locale avec une version de schéma antérieure (une migration jointe), absence de mot de passe dans les réponses mémorisées.
 - **Premier déploiement réel (15/11/2026, version 0.1.0, offre Starter) et correctifs 0.1.1 :** hôte de base mal recopié (`getaddrinfo`, lu dans le journal d'erreurs) ; email professionnel fictif du socle qui envoyait le code de connexion à une boîte inexistante → socle sans identité de démonstration ; `/api/health` contrôle les dossiers `api/storage/` (`storage`, `storage_unwritable`) ; gestionnaire d'erreurs global (journal `[Crenelio]`, réponse JSON) ; guides de diagnostic d'après le journal.
+- **Version et nouveautés (0.1.2) :** `/api/health` donne la version déployée (`version.txt` écrit par le build) ; `INSTRUCTIONS.md` de `deploy:init` indique la version et reprend les sections du `CHANGELOG.md` depuis celle du serveur ; l'écran Documentation ouvre le journal des versions (bouton « Version »).
 
 ### 28. Paquet d'Installation Téléchargeable (Release Prête à Déployer)
 - **Objectif :** installer Crénelio sans cloner le dépôt ni compiler : un artisan (ou son prestataire) télécharge un paquet prêt à déployer.

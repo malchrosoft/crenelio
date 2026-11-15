@@ -23,7 +23,9 @@ npm run deploy:init
 3. **Update** (Crénelio answers): the package contains **neither `api/.env` nor `api/storage/`**,
    and only the SQL migrations newer than the server version (`schema_version`) are included.
 4. It builds (`npm run deploy:build`) and creates `deploy/<date>-…/`: `www/` to upload as is,
-   `sql/` to apply in phpMyAdmin, and `INSTRUCTIONS.md`, the step-by-step procedure (in French).
+   `sql/` to apply in phpMyAdmin, and `INSTRUCTIONS.md`, the step-by-step procedure (in French),
+   with the deployed version and the `CHANGELOG.md` entries since the server version (`version` field
+   of `/api/health`, available since 0.1.2).
 
 Answers are remembered in `.deploy/answers.json` for next time, **without any password**.
 `deploy/` and `.deploy/` are ignored by Git; delete the package once uploaded (it contains
@@ -132,8 +134,9 @@ mysql -h your-db-name.mysql.db -u your-db-user -p your-db-name < sql/seed_init.s
 
 `schema.sql` always describes the latest structure. On a database created with an earlier
 version, apply the idempotent scripts of `sql/migrations/` instead, in date order (they can be
-re-run safely). The latest one, `2026-10-21_item18_exception_requests.sql`, adds out-of-zone
-requests validated by the artisan.
+re-run safely): only those later than the database's `schema_version` (shown by `/api/health`)
+are needed, and `npm run deploy:init` lists them. A database created from `schema.sql` and
+`seed_init.sql` needs no migration: it is already up to date.
 
 ---
 
@@ -496,7 +499,8 @@ depending on where `api/` lives), language PHP, monthly or yearly. The script on
 
 ```bash
 # Installation state: "database": "ok" and "storage": "ok" expected
-# ("storage_unwritable" names the api/storage/ folders that are missing or not writable)
+# ("storage_unwritable" names the api/storage/ folders that are missing or not writable;
+# "version" gives the deployed Crénelio version)
 curl https://your-domain.com/api/health
 
 # Public configuration

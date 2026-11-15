@@ -23,7 +23,9 @@ npm run deploy:init
 3. **Mise à jour** (Crénelio répond) : le paquet ne contient **ni `api/.env` ni `api/storage/`**,
    et seules les migrations SQL postérieures à la version du serveur (`schema_version`) sont jointes.
 4. Il compile (`npm run deploy:build`) et crée `deploy/<date>-…/` : `www/` à envoyer tel quel,
-   `sql/` à appliquer dans phpMyAdmin, et `INSTRUCTIONS.md`, la marche à suivre pas à pas.
+   `sql/` à appliquer dans phpMyAdmin, et `INSTRUCTIONS.md`, la marche à suivre pas à pas, avec la
+   version déployée et les nouveautés du `CHANGELOG.md` depuis la version du serveur (champ `version`
+   de `/api/health`, présent depuis 0.1.2).
 
 Les réponses sont mémorisées dans `.deploy/answers.json` pour la fois suivante, **sans aucun mot
 de passe**. `deploy/` et `.deploy/` sont ignorés par Git ; supprimez le paquet une fois envoyé
@@ -132,8 +134,9 @@ mysql -h nom-de-votre-base.mysql.db -u utilisateur -p nom-de-votre-base < sql/se
 
 `schema.sql` décrit toujours la structure la plus récente. Sur une base créée avec une version
 antérieure, appliquez plutôt les scripts idempotents de `sql/migrations/`, dans l'ordre des dates
-(ils peuvent être relancés sans risque). Le plus récent, `2026-10-21_item18_exception_requests.sql`,
-ajoute les demandes hors zone validées par l'artisan.
+(ils peuvent être relancés sans risque) : seuls ceux postérieurs à la `schema_version` de la base
+(affichée par `/api/health`) sont nécessaires, et `npm run deploy:init` les liste. Une base créée par
+`schema.sql` et `seed_init.sql` n'a besoin d'aucune migration : elle est déjà à jour.
 
 ---
 
@@ -501,7 +504,8 @@ fois par mois ou par an. Le script ne s'exécute qu'en ligne de commande.
 
 ```bash
 # État de l'installation : "database": "ok" et "storage": "ok" attendus
-# ("storage_unwritable" nomme les dossiers de api/storage/ absents ou non accessibles en écriture)
+# ("storage_unwritable" nomme les dossiers de api/storage/ absents ou non accessibles en écriture ;
+# "version" donne la version de Crénelio déployée)
 curl https://votre-domaine.com/api/health
 
 # Configuration publique

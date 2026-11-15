@@ -199,7 +199,7 @@ consultable depuis l'Espace Artisan (bouton « Emails » d'un rendez-vous) et re
 ### Configuration & Authentification
 | Méthode | Route | Description |
 |---|---|---|
-| `GET` | `/api/health` | État d'installation, public et sans secret (`installed`, `database`, `schema_version`) — lu par `npm run deploy:init` |
+| `GET` | `/api/health` | État d'installation, public et sans secret (`installed`, `version`, `database`, `schema_version`, `storage`) — lu par `npm run deploy:init` |
 | `GET` | `/api/config` | Configuration publique (nom pro, coordonnées, centrage carte) |
 | `GET` | `/api/admin/config` | Configuration complète (espace Artisan) |
 | `PUT` | `/api/admin/config` | Mise à jour des réglages artisan |

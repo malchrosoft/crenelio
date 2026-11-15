@@ -3,6 +3,16 @@
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; numérotation
 [SemVer](https://semver.org/lang/fr/). Les versions `0.x` sont des bêtas.
 
+## [Non publié]
+
+### Installation
+- `INSTRUCTIONS.md` (`npm run deploy:init`) indique la version déployée et reprend les nouveautés du
+  journal depuis la version installée ; `/api/health` donne la version (`version`).
+- Guides de déploiement : une base créée par `schema.sql` n'a besoin d'aucune migration.
+
+### Pour le professionnel (Espace Artisan)
+- Documentation : bouton « Version » qui ouvre le journal des versions.
+
 ## [0.1.1] — 2026-11-15
 
 Correctifs issus du premier déploiement réel. Base de données : aucune migration.

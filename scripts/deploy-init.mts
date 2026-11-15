@@ -4,6 +4,7 @@
 // - Interroge https://<site>/api/health : premier déploiement ou mise à jour ?
 // - Premier déploiement : questions (base, emails…) puis api/.env généré dans le paquet.
 // - Mise à jour : code seul (jamais de .env ni de api/storage/), migrations SQL en attente listées.
+// - INSTRUCTIONS.md : version déployée et nouveautés du CHANGELOG depuis la version du serveur.
 // Node pur, sans dépendance : Windows, macOS et Linux.
 // Usage : npm run deploy:init
 // =====================================================
@@ -18,6 +19,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 // Réponses mémorisées pour le déploiement suivant (sans aucun mot de passe), hors Git
 const answersFile = join(root, '.deploy', 'answers.json');
 const migrationsDir = join(root, 'sql', 'migrations');
+const { version } = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as { version: string };
 
 const rl = createInterface({ input: process.stdin, output: process.stdout });
 
@@ -45,6 +47,8 @@ interface HealthState {
   installed: boolean;
   database: 'ok' | 'empty' | 'error';
   schema_version: string | null;
+  /** Absent avant 0.1.2. */
+  version?: string | null;
   /** Absents avant 0.1.1. */
   storage?: 'ok' | 'error';
   storage_unwritable?: string[];
@@ -150,6 +154,31 @@ function pendingMigrations(schemaVersion: string | null | undefined): string[] {
     .filter((name) => !schemaVersion || name.replace(/\.sql$/, '') > schemaVersion);
 }
 
+/** Compare deux versions x.y.z : négatif, nul ou positif. */
+function compareVersions(a: string, b: string): number {
+  const pa = a.split('.').map(Number);
+  const pb = b.split('.').map(Number);
+  for (let i = 0; i < 3; i++) if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) - (pb[i] ?? 0);
+  return 0;
+}
+
+/**
+ * Sections du CHANGELOG à lire pour ce déploiement : celles postérieures à la version du serveur
+ * (jusqu'à celle déployée), ou seulement celle déployée si la version du serveur est inconnue.
+ */
+function changelogSince(serverVersion: string | null | undefined): string {
+  const sections = readFileSync(join(root, 'CHANGELOG.md'), 'utf8').split(/\n(?=## \[)/).slice(1);
+  return sections
+    .filter((section) => {
+      const v = /^## \[([^\]]+)\]/.exec(section)?.[1];
+      if (!v || compareVersions(v, version) > 0) return false;
+      return serverVersion ? compareVersions(v, serverVersion) > 0 : v === version;
+    })
+    // Titres de version descendus d'un niveau sous « Nouveautés »
+    .map((section) => section.trim().replace(/^(#+) /gm, '#$1 '))
+    .join('\n\n');
+}
+
 // -----------------------------------------------------------------
 // Paquet
 // -----------------------------------------------------------------
@@ -218,7 +247,7 @@ function instructions({
       'Dans phpMyAdmin, onglet *SQL* : importez `sql/schema.sql`, puis `sql/seed_init.sql`. **Jamais sur une base qui contient déjà des tables.**',
       `Vérifiez que ${STORAGE_DIRS.map((d) => `\`api/storage/${d}/\``).join(', ')} existent sur le serveur (un client FTP peut ignorer les dossiers vides) et sont accessibles en écriture par PHP (755, ou 775 si besoin).`,
       'Activez HTTPS (certificat SSL gratuit OVHcloud) et DKIM pour le domaine.',
-      `Contrôlez ${siteUrl}/api/health : \`"installed": true\` et \`"storage": "ok"\`. Si \`"database": "error"\`, le journal d'erreurs de l'hébergement (*Statistiques et logs*) donne la cause : hôte inconnu (\`getaddrinfo\`), identifiants refusés (\`Access denied\`).`,
+      `Contrôlez ${siteUrl}/api/health : \`"installed": true\`, \`"version": "${version}"\` et \`"storage": "ok"\`. Si \`"database": "error"\`, le journal d'erreurs de l'hébergement (*Statistiques et logs*) donne la cause : hôte inconnu (\`getaddrinfo\`), identifiants refusés (\`Access denied\`).`,
       `Connectez-vous à ${siteUrl}/admin avec \`admin123\` : choisissez votre mot de passe (imposé), puis renseignez votre email professionnel dans l'écran *Compte* (validé par un code reçu sur cette adresse : l'envoi d'emails est ainsi vérifié **avant toute déconnexion**). Remplissez enfin les écrans *Entreprise* et *Vitrine*.`
     );
   } else {
@@ -228,17 +257,25 @@ function instructions({
         ? `Dans phpMyAdmin, onglet *SQL*, appliquez dans l'ordre : ${migrations.map((m: string) => `\`sql/${m}\``).join(', ')} (idempotentes : les rejouer est sans risque).`
         : 'Aucune migration SQL à appliquer.',
       "Envoyez **le contenu de `www/`** par-dessus le site (FTP/SFTP). Il ne contient ni `api/.env` ni `api/storage/` : la configuration et les fichiers de l'artisan sont préservés.",
-      `Contrôlez ${siteUrl}/api/health${migrations.length ? ` : \`schema_version\` doit valoir \`${migrations[migrations.length - 1].replace(/\.sql$/, '')}\`` : ''}.`
+      `Contrôlez ${siteUrl}/api/health : \`"version": "${version}"\`${migrations.length ? `, \`schema_version\` doit valoir \`${migrations[migrations.length - 1].replace(/\.sql$/, '')}\`` : ''} et \`"storage": "ok"\`.`
     );
   }
-  return `# Déploiement Crénelio — ${mode === 'initial' ? 'premier déploiement' : 'mise à jour'}
+  const serverVersion = mode === 'update' ? state?.version : null;
+  const news = changelogSince(serverVersion);
+  return `# Déploiement Crénelio ${version} — ${mode === 'initial' ? 'premier déploiement' : 'mise à jour'}
 
 Site : ${siteUrl}
-État constaté : ${state ? `installé (base : ${state.database}, schéma : ${state.schema_version ?? 'inconnu'})` : 'site injoignable ou non installé'}
+État constaté : ${state ? `installé (version : ${state.version ?? 'antérieure à 0.1.2'}, base : ${state.database}, schéma : ${state.schema_version ?? 'inconnu'})` : 'site injoignable ou non installé'}
 ${hasEnv ? '\n⚠️ `www/api/.env` contient les mots de passe : ne le partagez pas, supprimez ce dossier après envoi.\n' : ''}
 ${steps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
 
 Détails : DEPLOYMENT.fr.md (ou DEPLOYMENT.md).
+
+## Nouveautés${serverVersion ? ` depuis la version ${serverVersion}` : ` de la version ${version}`}
+
+${news || '_Aucune entrée dans CHANGELOG.md._'}
+
+Journal complet : CHANGELOG.md, ou *Aide → Documentation → Journal des versions* dans l'espace Artisan.
 `;
 }
 
@@ -262,7 +299,7 @@ async function main() {
   const state = await serverState(siteUrl);
   let mode: Mode;
   if (state?.database === 'ok') {
-    console.log(`  ✅ Crénelio est installé (schéma : ${state.schema_version ?? 'inconnu'}) : paquet de mise à jour.`);
+    console.log(`  ✅ Crénelio ${state.version ?? '(version antérieure à 0.1.2)'} est installé (schéma : ${state.schema_version ?? 'inconnu'}) : paquet de mise à jour vers ${version}.`);
     if (state.storage === 'error') {
       console.log(`  ⚠️  Dossiers absents ou non accessibles en écriture sur le serveur : ${(state.storage_unwritable ?? []).map((d) => `api/storage/${d}/`).join(', ')}.`);
     }

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { marked } from 'marked';
-import { ArrowLeftIcon, BookOpenTextIcon, MagnifyingGlassIcon, TranslateIcon, XIcon } from '@phosphor-icons/react';
+import { ArrowLeftIcon, BookOpenTextIcon, ClockCounterClockwiseIcon, MagnifyingGlassIcon, TranslateIcon, XIcon } from '@phosphor-icons/react';
 import { DocsSearchResult, fold, queryTerms, searchDocs } from '../../utils/docsSearch';
 import { DEFAULT_LANGUAGE, LANGUAGES, languageOf, useLanguagePreference } from '../../i18n/languages';
 
@@ -13,15 +13,22 @@ import { DEFAULT_LANGUAGE, LANGUAGES, languageOf, useLanguagePreference } from '
  * sommaire). L'écran raisonne sur le chemin français (« canonique ») et affiche la traduction de la
  * langue choisie si elle existe, sinon le français ; les textes officiels (`fr/textes/`) restent en
  * français. Langue par défaut : préférence de l'écran Compte ; sélecteur pour changer en lecture.
+ *
+ * Le journal des versions (`CHANGELOG.md` du dépôt, en français) s'y ajoute sous `CHANGELOG.md`.
  */
-const FILES = import.meta.glob('../../../docs/legal/**/*.md', { query: '?raw', import: 'default' }) as Record<
-  string,
-  () => Promise<string>
->;
-
 const ROOT = '../../../docs/legal/';
 /** Chemin d'une fiche relatif à `docs/legal/` (ex. `fr/debours.md`) ; l'index est `README.md`. */
 export const DOCS_INDEX = 'README.md';
+/** Journal des versions, hors de `docs/legal/`. */
+const CHANGELOG = 'CHANGELOG.md';
+
+const FILES = {
+  ...(import.meta.glob('../../../docs/legal/**/*.md', { query: '?raw', import: 'default' }) as Record<string, () => Promise<string>>),
+  [ROOT + CHANGELOG]: () => import('../../../CHANGELOG.md?raw').then((m) => m.default),
+};
+
+/** Chemin affiché d'une fiche, depuis la racine du dépôt. */
+const repoPath = (path: string) => (path === CHANGELOG ? path : `docs/legal/${path}`);
 
 const TRANSLATIONS = LANGUAGES.map((l) => l.code).filter((code) => code !== DEFAULT_LANGUAGE);
 const translationOf = (path: string) => (TRANSLATIONS.includes(path.split('/')[0]) ? path.split('/')[0] : null);
@@ -253,7 +260,13 @@ const DocsViewer: React.FC<DocsViewerProps> = ({ initialPath }) => {
             Sommaire
           </button>
         )}
-        <span className="docs-viewer__path">docs/legal/{shown}</span>
+        {path !== CHANGELOG && (
+          <button type="button" className="btn btn-secondary admin-btn-sm" title="Journal des versions" onClick={() => open(CHANGELOG)}>
+            <ClockCounterClockwiseIcon size={14} weight="bold" aria-hidden="true" />
+            Version {__APP_VERSION__}
+          </button>
+        )}
+        <span className="docs-viewer__path">{repoPath(shown)}</span>
         {DOC_LANGUAGES.length > 1 && (
           <label className="docs-viewer__language" title="Langue de la documentation">
             <TranslateIcon size={18} weight="fill" aria-hidden="true" />
@@ -299,7 +312,7 @@ const DocsViewer: React.FC<DocsViewerProps> = ({ initialPath }) => {
                 <button type="button" className="docs-viewer__result" onClick={() => openResult(result)}>
                   <span className="docs-viewer__result-title">{result.title}</span>
                   <span className="docs-viewer__result-meta">
-                    docs/legal/{localize(result.path, lang)} · {result.count} occurrence{result.count > 1 ? 's' : ''}
+                    {repoPath(localize(result.path, lang))} · {result.count} occurrence{result.count > 1 ? 's' : ''}
                   </span>
                   <span className="docs-viewer__result-excerpt">
                     {result.excerpt.map((part, i) => (part.match ? <mark key={i}>{part.text}</mark> : <React.Fragment key={i}>{part.text}</React.Fragment>))}
@@ -313,7 +326,7 @@ const DocsViewer: React.FC<DocsViewerProps> = ({ initialPath }) => {
         <p>Chargement…</p>
       ) : (
         <>
-          {shownLang !== lang && !path.startsWith('fr/textes/') && (
+          {shownLang !== lang && !path.startsWith('fr/textes/') && path !== CHANGELOG && (
             <p className="docs-viewer__fallback">Cette fiche n'est pas encore traduite : version française.</p>
           )}
           {/* Contenu Markdown du dépôt (fiches versionnées), jamais une saisie utilisateur */}
