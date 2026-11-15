@@ -14,7 +14,7 @@ interface PrivacyNoticeProps {
  */
 const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ config }) => {
   const [open, setOpen] = useState(false);
-  const controller = config.company_name || config.pro_name || "l'artisan";
+  const controller = config.company_name || config.pro_name || 'le professionnel';
 
   return (
     <>

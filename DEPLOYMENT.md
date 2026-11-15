@@ -198,7 +198,7 @@ MAIL_FROM=contact@your-domain.com
 MAIL_FROM_NAME=Your Company Name
 ```
 
-**Check sending** from the Pro area: *Configuration* tab, "Envoi des emails" panel,
+**Check sending** from the Pro area: *Compte* screen, "Envoi des emails" panel,
 "Envoyer un email de test" button (to the professional email, or to a tester's address;
 5 sends per 10 minutes). Do it **before** signing out for the
 first time: a new device's sign-in code goes out the same way.
@@ -414,17 +414,17 @@ The Pro area is protected server-side: a session in an `HttpOnly` cookie, then, 
 device, a **6-digit code sent to the professional email** (valid 15 minutes, 3 attempts). The device
 is then remembered for **10 days**.
 
-- **Prerequisites:** the professional email (*Configuration* tab) and outgoing email (`SMTP_*` and
+- **Prerequisites:** the professional email (*Compte* screen) and outgoing email (`SMTP_*` and
   `MAIL_FROM` in `api/.env`). Without them, the password alone protects the Pro area and a banner
   says so after sign-in. Test sending an email **before** signing out.
 - **`admin123` password: change enforced.** On first sign-in, the Pro area only shows the
   "Choisissez votre mot de passe" screen (12 characters minimum, common passwords refused); the
-  server refuses any other action until it is changed. Afterwards: *Configuration* →
+  server refuses any other action until it is changed. Afterwards: *Compte* screen →
   *Mot de passe*. Each change signs out every other session, forgets remembered devices and sends
   a confirmation email.
 - **Forgotten password:** link on the sign-in screen; a code valid for 30 minutes goes to the
   professional email.
-- **Professional email:** *Configuration* → *Coordonnées* → *Modifier*. The new address is only
+- **Professional email:** empty after installation; *Compte* screen. The new address is only
   kept once the code it receives is entered; the previous address is notified.
 - **Fallback, when email cannot be sent:** in phpMyAdmin, `config` table, replace the
   `admin_password_hash` value with the one shipped in `sql/seed_init.sql`
@@ -456,7 +456,7 @@ server if your upload skipped the empty folders. The folder is never served dire
 
 ### Logo & favicon
 
-The Pro area (Configuration → Company identity) writes the logo and favicon to
+The Pro area (*Entreprise* screen, "Identité de l'entreprise" panel) writes the logo and favicon to
 `api/storage/branding/`. Files can also be dropped there by FTP under their usual names — the
 first one present wins:
 
@@ -495,6 +495,10 @@ depending on where `api/` lives), language PHP, monthly or yearly. The script on
 ### Test the API
 
 ```bash
+# Installation state: "database": "ok" and "storage": "ok" expected
+# ("storage_unwritable" names the api/storage/ folders that are missing or not writable)
+curl https://your-domain.com/api/health
+
 # Public configuration
 curl https://your-domain.com/api/config
 
@@ -532,7 +536,11 @@ OVH provides free Let's Encrypt SSL certificates:
 
 ### "Database connection failed"
 
-- Verify `DB_HOST` is set to your OVH MySQL host (e.g., `your-db-name.mysql.db`), not `localhost`
+- `/api/health` answers `"database": "error"`: the exact cause is in the hosting error log
+  (OVHcloud control panel → *Statistics and logs*, lines `DB connection error` or `Contrôle d'installation`):
+  `getaddrinfo … failed` = unknown host (typo, or database not activated yet); `Access denied` =
+  user or password refused; `Unknown database` = database name
+- Verify `DB_HOST` is the "Server name" shown by OVHcloud (e.g., `your-db-name.mysql.db`), **pasted, not retyped**, not `localhost`
 - Check that the database name, username, and password are correct in `config.php` or `.env`
 - Ensure the database is created and active in the OVH control panel
 
@@ -540,6 +548,10 @@ OVH provides free Let's Encrypt SSL certificates:
 
 - Check the `.ovhconfig` file — ensure PHP version is valid (e.g., `8.2`)
 - Verify all PHP files were uploaded correctly (no truncation)
+- Every PHP error is written to the hosting error log, prefixed with `[Crenelio]`
+  (the API then answers "Erreur interne du serveur" as JSON)
+- `/api/health` reports `"storage": "error"`: create, or make writable, the folders listed in
+  `storage_unwritable` (step 6)
 - Temporarily set `APP_ENV=development` in config to see error details
 
 ### API returns 404

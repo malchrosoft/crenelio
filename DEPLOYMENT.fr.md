@@ -198,7 +198,7 @@ MAIL_FROM=contact@votre-domaine.com
 MAIL_FROM_NAME=Nom de votre entreprise
 ```
 
-**Vérifiez l'envoi** depuis l'espace Artisan : onglet *Configuration*, encart « Envoi des emails »,
+**Vérifiez l'envoi** depuis l'espace Artisan : écran *Compte*, encart « Envoi des emails »,
 bouton « Envoyer un email de test » (vers l'email professionnel, ou vers l'adresse d'un testeur ;
 5 envois par tranche de 10 minutes). Faites-le **avant** de vous
 déconnecter la première fois : le code de connexion d'un nouvel appareil part par le même chemin.
@@ -417,17 +417,17 @@ L'espace Artisan est protégé côté serveur : session dans un cookie `HttpOnly
 inconnu, un **code à 6 chiffres envoyé à l'email professionnel** (valable 15 minutes, 3 essais).
 L'appareil est ensuite reconnu pendant **10 jours**.
 
-- **Prérequis :** l'email professionnel (onglet *Configuration*) et l'envoi d'emails (`SMTP_*` et
+- **Prérequis :** l'email professionnel (écran *Compte*) et l'envoi d'emails (`SMTP_*` et
   `MAIL_FROM` dans `api/.env`). Sans eux, le mot de passe seul protège l'espace Artisan et un bandeau
   l'indique après connexion. Testez l'envoi d'un email **avant** de vous déconnecter.
 - **Mot de passe `admin123` : changement imposé.** À la première connexion, l'espace Artisan n'affiche
   que l'écran « Choisissez votre mot de passe » (12 caractères minimum, mots de passe courants
   refusés) ; le serveur refuse toute autre action tant qu'il n'est pas changé. Ensuite :
-  *Configuration* → *Mot de passe*. Chaque changement ferme les autres sessions, oublie les
+  écran *Compte* → *Mot de passe*. Chaque changement ferme les autres sessions, oublie les
   appareils reconnus et envoie un email de confirmation.
 - **Mot de passe oublié :** lien sur l'écran de connexion ; un code valable 30 minutes part à
   l'email professionnel.
-- **Email professionnel :** *Configuration* → *Coordonnées* → *Modifier*. La nouvelle adresse n'est
+- **Email professionnel :** vide à l'installation ; écran *Compte*. La nouvelle adresse n'est
   retenue qu'après saisie du code qu'elle reçoit ; l'ancienne est prévenue.
 - **Secours, sans envoi d'emails possible :** dans phpMyAdmin, table `config`, remplacez la valeur
   de `admin_password_hash` par celle livrée dans `sql/seed_init.sql`
@@ -460,7 +460,7 @@ fichiers passent par l'API.
 
 ### Logo et favicon
 
-L'espace Artisan (Configuration → Identité de l'entreprise) enregistre le logo et le favicon dans
+L'espace Artisan (écran *Entreprise*, encart « Identité de l'entreprise ») enregistre le logo et le favicon dans
 `api/storage/branding/`. On peut aussi les y déposer par FTP sous leurs noms usuels — le premier
 présent est utilisé :
 
@@ -500,6 +500,10 @@ fois par mois ou par an. Le script ne s'exécute qu'en ligne de commande.
 ### Tester l'API
 
 ```bash
+# État de l'installation : "database": "ok" et "storage": "ok" attendus
+# ("storage_unwritable" nomme les dossiers de api/storage/ absents ou non accessibles en écriture)
+curl https://votre-domaine.com/api/health
+
 # Configuration publique
 curl https://votre-domaine.com/api/config
 
@@ -537,7 +541,11 @@ OVH fournit gratuitement des certificats SSL Let's Encrypt :
 
 ### « Database connection failed »
 
-- Vérifiez que `DB_HOST` pointe vers l'hôte MySQL OVH (par ex. `nom-de-votre-base.mysql.db`), et non `localhost`
+- `/api/health` répond `"database": "error"` : la cause exacte est dans le journal d'erreurs de l'hébergement
+  (espace client OVHcloud → *Statistiques et logs*, lignes `DB connection error` ou `Contrôle d'installation`) :
+  `getaddrinfo … failed` = hôte inconnu (faute de frappe ou base pas encore activée) ; `Access denied` =
+  utilisateur ou mot de passe refusé ; `Unknown database` = nom de la base
+- Vérifiez que `DB_HOST` est le « Nom du serveur » affiché par OVHcloud (par ex. `nom-de-votre-base.mysql.db`), **copié sans le retaper**, et non `localhost`
 - Vérifiez le nom de la base, l'utilisateur et le mot de passe dans `config.php` ou `.env`
 - Vérifiez que la base est créée et active dans l'espace client OVH
 
@@ -545,6 +553,10 @@ OVH fournit gratuitement des certificats SSL Let's Encrypt :
 
 - Vérifiez `.ovhconfig` : la version de PHP doit être valide (par ex. `8.2`)
 - Vérifiez que tous les fichiers PHP ont été envoyés entièrement
+- Toute erreur PHP est inscrite dans le journal d'erreurs de l'hébergement, préfixée par `[Crenelio]`
+  (l'API répond alors « Erreur interne du serveur » en JSON)
+- `/api/health` signale `"storage": "error"` : créez ou rendez accessibles en écriture les dossiers
+  cités par `storage_unwritable` (étape 6)
 - Passez temporairement `APP_ENV=development` pour afficher le détail des erreurs
 
 ### L'API renvoie 404

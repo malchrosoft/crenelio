@@ -116,5 +116,12 @@ UPDATE `appointments` SET `latitude` = 48.800987, `longitude` = 2.263813 WHERE `
 UPDATE `appointments` SET `latitude` = 48.800895, `longitude` = 2.260827 WHERE `cancel_token` = 'token_test_marc_002';
 UPDATE `appointments` SET `latitude` = 48.801191, `longitude` = 2.265053 WHERE `cancel_token` = 'token_test_sophie_003';
 
--- Email professionnel de démonstration (capturé par Mailpit en local ; vide dans le socle)
-UPDATE `config` SET `config_value` = 'contact@crenelio.local' WHERE `config_key` = 'pro_email';
+-- Identité de démonstration (vide dans le socle ; email capturé par Mailpit en local)
+UPDATE `config` SET `config_value` = CASE `config_key`
+    WHEN 'company_name' THEN 'Crénelio Dépannage & Services'
+    WHEN 'pro_name'     THEN 'Alexandre Martin'
+    WHEN 'pro_email'    THEN 'contact@crenelio.local'
+    WHEN 'pro_phone'    THEN '06 12 34 56 78'
+    WHEN 'service_area' THEN 'Clamart et communes limitrophes (rayon 15 km)'
+END
+WHERE `config_key` IN ('company_name', 'pro_name', 'pro_email', 'pro_phone', 'service_area');

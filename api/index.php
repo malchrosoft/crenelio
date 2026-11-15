@@ -23,6 +23,26 @@ require_once __DIR__ . '/config/config.php';
 // Load core classes
 require_once __DIR__ . '/core/Response.php';
 
+// Toute erreur non interceptée : journalisée, et une réponse JSON lisible au lieu d'une page 500 vide
+set_exception_handler(function (Throwable $e): void {
+    error_log('[Crenelio] Erreur non interceptée : ' . $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')');
+    if (!headers_sent()) {
+        Response::json(['error' => "Erreur interne du serveur (détail dans le journal d'erreurs de l'hébergement)"], 500);
+    }
+});
+register_shutdown_function(function (): void {
+    $error = error_get_last();
+    if (!$error || !in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        return;
+    }
+    error_log('[Crenelio] Erreur fatale : ' . $error['message'] . ' (' . basename($error['file']) . ':' . $error['line'] . ')');
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => "Erreur interne du serveur (détail dans le journal d'erreurs de l'hébergement)"], JSON_UNESCAPED_UNICODE);
+    }
+});
+
 // Handle CORS preflight
 Response::handlePreflight();
 

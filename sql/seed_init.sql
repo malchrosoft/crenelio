@@ -7,13 +7,13 @@ SET NAMES utf8mb4;
 
 -- 1. Paramétrage clé-valeur de base
 INSERT INTO `config` (`config_key`, `config_value`) VALUES
-('company_name',        'Crénelio Dépannage & Services'),
-('pro_name',            'Alexandre Martin'),
+('company_name',        ''),   -- Identité vide : renseignée dans l'espace Artisan (écran Entreprise)
+('pro_name',            ''),
 -- Vide : renseigné et vérifié dans l'espace Artisan (écran Compte). Une adresse fictive activerait la
 -- double authentification vers une boîte inexistante et bloquerait la première connexion.
 ('pro_email',           ''),
-('pro_phone',           '06 12 34 56 78'),
-('service_area',        'Clamart et communes limitrophes (rayon 15 km)'),
+('pro_phone',           ''),
+('service_area',        ''),
 ('slot_step_minutes',   '30'),   -- Graduation des créneaux affichés (30 min)
 ('buffer_minutes',      '30'),   -- Temps de battement / trajet entre interventions
 ('min_notice_hours',    '12'),   -- Réservation au moins 12h à l'avance

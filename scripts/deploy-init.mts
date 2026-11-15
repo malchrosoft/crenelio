@@ -45,7 +45,13 @@ interface HealthState {
   installed: boolean;
   database: 'ok' | 'empty' | 'error';
   schema_version: string | null;
+  /** Absents avant 0.1.1. */
+  storage?: 'ok' | 'error';
+  storage_unwritable?: string[];
 }
+
+/** Dossiers de `api/storage/` accessibles en écriture par PHP (cf. HealthController::STORAGE_DIRS). */
+const STORAGE_DIRS = ['auth', 'branding', 'zone', 'insurance', 'holidays'];
 
 type Mode = 'initial' | 'update';
 
@@ -210,10 +216,10 @@ function instructions({
       "Dans l'espace client OVHcloud, créez la base de données si ce n'est pas fait (offre Starter : une seule base).",
       'Envoyez **tout le contenu de `www/`** dans le dossier racine attribué au domaine (onglet *Multisite* : `www/` pour un site unique, ou le dossier du sous-domaine), en FTP/SFTP, fichiers cachés compris : `.htaccess`, `.ovhconfig`, `api/.env`. Le site doit être à la racine du domaine ou du sous-domaine, jamais dans un sous-chemin.',
       'Dans phpMyAdmin, onglet *SQL* : importez `sql/schema.sql`, puis `sql/seed_init.sql`. **Jamais sur une base qui contient déjà des tables.**',
-      'Rendez `api/storage/branding/`, `api/storage/zone/` et `api/storage/auth/` accessibles en écriture par PHP (755, ou 775 si besoin).',
+      `Vérifiez que ${STORAGE_DIRS.map((d) => `\`api/storage/${d}/\``).join(', ')} existent sur le serveur (un client FTP peut ignorer les dossiers vides) et sont accessibles en écriture par PHP (755, ou 775 si besoin).`,
       'Activez HTTPS (certificat SSL gratuit OVHcloud) et DKIM pour le domaine.',
-      `Contrôlez ${siteUrl}/api/health : \`"installed": true\`.`,
-      `Connectez-vous à ${siteUrl}/admin avec \`admin123\` : choisissez votre mot de passe (imposé), puis *Configuration* → *Envoi des emails* → **Envoyer un email de test avant toute déconnexion**.`
+      `Contrôlez ${siteUrl}/api/health : \`"installed": true\` et \`"storage": "ok"\`. Si \`"database": "error"\`, le journal d'erreurs de l'hébergement (*Statistiques et logs*) donne la cause : hôte inconnu (\`getaddrinfo\`), identifiants refusés (\`Access denied\`).`,
+      `Connectez-vous à ${siteUrl}/admin avec \`admin123\` : choisissez votre mot de passe (imposé), puis renseignez votre email professionnel dans l'écran *Compte* (validé par un code reçu sur cette adresse : l'envoi d'emails est ainsi vérifié **avant toute déconnexion**). Remplissez enfin les écrans *Entreprise* et *Vitrine*.`
     );
   } else {
     steps.push(
@@ -257,6 +263,9 @@ async function main() {
   let mode: Mode;
   if (state?.database === 'ok') {
     console.log(`  ✅ Crénelio est installé (schéma : ${state.schema_version ?? 'inconnu'}) : paquet de mise à jour.`);
+    if (state.storage === 'error') {
+      console.log(`  ⚠️  Dossiers absents ou non accessibles en écriture sur le serveur : ${(state.storage_unwritable ?? []).map((d) => `api/storage/${d}/`).join(', ')}.`);
+    }
     mode = 'update';
   } else if (state) {
     console.log(`  ⚠️  Crénelio répond mais la base est ${state.database === 'empty' ? 'vide' : 'injoignable'}.`);
@@ -273,6 +282,7 @@ async function main() {
   if (mode === 'initial') {
     const domain = new URL(siteUrl).hostname.replace(/^www\./, '');
     console.log('\nBase de données (espace client OVHcloud → Web Cloud → Hébergements → Bases de données)');
+    console.log('  Recopiez les valeurs affichées (« Nom du serveur », ex. xxxxxx.mysql.db) sans les retaper : une faute rend la base injoignable.');
     answers.dbHost = await ask('  Serveur', { def: saved.dbHost, check: required });
     answers.dbPort = await ask('  Port', { def: saved.dbPort ?? '3306', check: (v) => (/^\d+$/.test(v) ? null : 'Nombre attendu') });
     answers.dbName = await ask('  Nom de la base', { def: saved.dbName, check: required });

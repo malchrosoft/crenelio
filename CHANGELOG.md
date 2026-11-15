@@ -3,6 +3,29 @@
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; numérotation
 [SemVer](https://semver.org/lang/fr/). Les versions `0.x` sont des bêtas.
 
+## [0.1.1] — 2026-11-15
+
+Correctifs issus du premier déploiement réel. Base de données : aucune migration.
+
+### Installation
+- Le socle (`seed_init.sql`) n'installe plus d'identité de démonstration : email professionnel, nom,
+  téléphone et zone sont vides. L'email fictif activait la double authentification vers une boîte
+  inexistante et bloquait la première connexion. Site déjà installé avec l'email fictif : dans
+  phpMyAdmin, `UPDATE config SET config_value = '' WHERE config_key = 'pro_email';`.
+- `/api/health` signale les dossiers de `api/storage/` absents ou non accessibles en écriture
+  (`storage`, `storage_unwritable`) ; `npm run deploy:init` l'affiche.
+- Toute erreur PHP non interceptée est inscrite au journal d'erreurs (préfixe `[Crenelio]`) et
+  l'API répond en JSON au lieu d'une page 500 vide.
+- `deploy:init` : rappel de recopier le nom du serveur de base sans le retaper, liste complète des
+  dossiers à créer, premières étapes à jour (email professionnel dans l'écran *Compte*).
+- Guides de déploiement : diagnostic d'après le journal d'erreurs, noms d'écrans à jour.
+
+### Documentation
+- Registre des traitements traduit dans les 15 langues de la documentation.
+
+### Public
+- Notice de confidentialité : « le professionnel » au lieu de « l'artisan » si aucun nom n'est saisi.
+
 ## [0.1.0] — 2026-11-14
 
 Deuxième bêta : devis en ligne complets, aide à la facturation, documentation juridique, recette des
