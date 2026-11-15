@@ -628,6 +628,11 @@ Ce document répertorie le backlog fonctionnel, technique et design à implémen
 - **Travaux :** audit (contrastes du thème : `src/utils/theme.ts` doit refuser ou corriger une couleur primaire illisible ; focus visible ; libellés des champs ; ordre de tabulation ; annonces des erreurs ; fenêtres `modal-*` avec piège du focus ; calendrier et grilles AG Grid / FullCalendar au clavier ; carte avec alternative textuelle) ; tests au lecteur d'écran (VoiceOver, NVDA) ; contrôle automatique (axe) dans la recette.
 - **Prérequis :** aucun ; à mener avant les Items 30 et 44 (animations) ou avec eux.
 
+### 46. Version Installée sur le Tableau de Bord
+- **Demandé le 15/11/2026.** Le tableau de bord (Item 35) indique sur quelle version de Crénelio tourne le site (`__APP_VERSION__`, déjà affichée par le bouton « Version » de l'écran Documentation), avec un lien vers le journal des versions.
+- **Piste :** signaler qu'une version plus récente est publiée (GitHub Releases), sans service tiers imposé ni requête sortante sans accord (RGPD, confidentialité de l'installation) ; à cadrer avec l'Item 29.
+- **Prérequis :** Item 35 ✅.
+
 ## 📊 Matrice d'Ordonnancement & Suivi du Backlog
 
 Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légale, blocage de la mise en ligne) puis **le gain** (usage quotidien de l'artisan, effort).
@@ -650,6 +655,7 @@ Ordre fixé le 28/10/2026 selon **la criticité** (sécurité, obligation légal
 | — | **Item 43** | **Fichier clients (fiche, recherche, historique pour le pro et le client)** | Espace Artisan / Données | ⏳ *À faire* | Items 5 et 22 | 🟡 Retrouver un client et son historique ; à concevoir avec le RGPD |
 | — | **Item 44** | **Diaporama de la vitrine (10 photos) & photo d'arrière-plan des prestations** | Vitrine / Personnalisation | ⏳ *À faire* | Items 3 et 6 ✅ | ⚪ Mise en valeur du professionnel |
 | — | **Item 45** | **Accessibilité numérique (RGAA 4.1 / WCAG 2.1 AA, déclaration d'accessibilité)** | Qualité / Conformité | ⏳ *À faire* | — | 🟡 Obligatoire hors microentreprises (à confirmer dans le texte) ; utile à tous |
+| — | **Item 46** | **Version installée sur le tableau de bord (lien vers le journal des versions)** | Espace Artisan / Maintenance | ⏳ *À faire* | Item 35 ✅ | ⚪ Savoir quelle version tourne avant une mise à jour ou un échange d'assistance |
 | — | **Item 38** | Menu de l'espace Artisan par catégories, configuration répartie en écrans (Entreprise, Vitrine, Thème, Compte ; créneaux sous Horaires) | Espace Artisan / Navigation | ✅ **Terminé** | — | — |
 | — | **Item 35** | Tableau de bord (jours en cartes, carte du jour numérotée, positions des rendez-vous enregistrées) | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |
 | — | **Item 21** | Liste des interventions AG Grid Community (tri, filtres, sélection, export CSV, disposition enregistrée) ; composant `DataGrid` commun, pleine hauteur desktop/tablette, fenêtre de rendez-vous partagée avec le calendrier, avertissements regroupés dans le header, indisponibilités en grille (sous-onglet de « Horaires ») | Espace Artisan / Exploitation | ✅ **Terminé** | — | — |
