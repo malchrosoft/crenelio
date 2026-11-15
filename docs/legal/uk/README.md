@@ -50,6 +50,7 @@
 | Пам'ятка фахівця: закупівлі, підтвердні документи, зберігання | [rappels-artisan.md](rappels-artisan.md) |
 | Скасування чи перенесення візиту, до якого є кошторис: скасована оферта, розірвання за згодою, непереборна сила | [annulation-devis.md](annulation-devis.md) |
 | Зберігання та видалення даних клієнтів: десять років для прийнятого кошторису, GDPR | [conservation-effacement.md](conservation-effacement.md) |
+| Реєстр операцій з обробки (GDPR, ст. 30): попередньо заповнені картки Crénelio, які треба доповнити й пред'явити CNIL на запит | [registre-traitements.md](registre-traitements.md) |
 | Офіційні тексти дослівно: Code de la consommation | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Офіційні тексти: Code de commerce (EI, товариства) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Офіційні тексти: Code général des impôts (*débours*, звільнення від ПДВ) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

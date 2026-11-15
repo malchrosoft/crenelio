@@ -1,6 +1,6 @@
 # Pens-bèt pwofesyonèl-la : devis, pyès, prèv
 
-*Tradiksyon vèsyon fransé fich-la di 01/11/2026 ; sé vèsyon fransé-a ki ka fè fwa. Tèks ofisyèl-la sité an fransé.*
+*Tradiksyon vèsyon fransé fich-la di 14/11/2026 ; sé vèsyon fransé-a ki ka fè fwa. Tèks ofisyèl-la sité an fransé.*
 
 *Dènié vérifikasyon : 01/11/2026. Rézimé fich [devis-depannage](devis-depannage.md),
 [retractation](retractation.md), [debours](debours.md) épi [note-facture](note-facture.md).*
@@ -30,4 +30,9 @@
 
 - Bay ***note*** / *facture*-la (faktiw) (obligatwa pasé 25 € TTC) **avan yo péyé'w**.
 - Pwopozé kliyan-an pyès ki ranplasé-a ; si i pa ka gadé yo, fè'y siyé ***décharge***-la (papié ki ka di i pa lé yo).
-- Gadé devis ki aksèpté, mandat épi prèv (konbien tan pou gadé yo : Item 39).
+- Gadé devis ki aksèpté, mandat épi prèv (gadé [konsèvasyon épi éfasman](conservation-effacement.md)).
+
+## Done kliyan ou
+
+- Kenbé **rèjis tretman** ou a jou épi montré'y ba CNIL si i mandé'y (gadé
+  [rèjis tretman](registre-traitements.md)).

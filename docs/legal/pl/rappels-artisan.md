@@ -1,6 +1,6 @@
 # Ściągawka profesjonalisty: kosztorysy, części, dowody
 
-*Tłumaczenie wersji francuskiej z 01/11/2026; wiążąca jest wersja francuska. Teksty urzędowe cytowane są po francusku.*
+*Tłumaczenie wersji francuskiej z 14/11/2026; wiążąca jest wersja francuska. Teksty urzędowe cytowane są po francusku.*
 
 *Ostatnia weryfikacja: 01/11/2026. Synteza kart [devis-depannage](devis-depannage.md),
 [retractation](retractation.md), [debours](debours.md) i [note-facture](note-facture.md).*
@@ -30,4 +30,9 @@
 
 - Przekazać **rachunek / fakturę** (*note / facture*, obowiązkowy powyżej 25 € TTC) **przed otrzymaniem zapłaty**.
 - Zaproponować wymienione części; jeśli klient ich nie zatrzymuje, uzyskać podpis pod **zwolnieniem** (*décharge*).
-- Przechowywać zaakceptowane kosztorysy, pełnomocnictwa i dowody (okres przechowywania: Item 39).
+- Przechowywać zaakceptowane kosztorysy, pełnomocnictwa i dowody (zob. [przechowywanie i usuwanie](conservation-effacement.md)).
+
+## Dane Twoich klientów
+
+- Prowadzić na bieżąco **rejestr czynności przetwarzania** i przedstawić go CNIL, jeśli tego zażąda (zob.
+  [rejestr czynności przetwarzania](registre-traitements.md)).

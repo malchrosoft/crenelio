@@ -1,6 +1,6 @@
 # Merkhilfe für den Fachbetrieb: Kostenvoranschläge, Teile, Belege
 
-*Übersetzung der französischen Fassung vom 01/11/2026; maßgeblich ist die französische Fassung. Amtliche Texte werden auf Französisch zitiert.*
+*Übersetzung der französischen Fassung vom 14/11/2026; maßgeblich ist die französische Fassung. Amtliche Texte werden auf Französisch zitiert.*
 
 *Letzte Überprüfung: 01/11/2026. Zusammenfassung der Merkblätter [devis-depannage](devis-depannage.md),
 [retractation](retractation.md), [debours](debours.md) und [note-facture](note-facture.md).*
@@ -30,4 +30,9 @@
 
 - Die **Rechnung** (*note / facture*, Pflicht ab 25 € inkl. MwSt.) **vor der Bezahlung** übergeben.
 - Die ausgetauschten Teile anbieten; behält der Kunde sie nicht, die **Verzichtserklärung** (*décharge*) unterschreiben lassen.
-- Angenommene Kostenvoranschläge, Aufträge und Belege aufbewahren (Aufbewahrungsdauer: Item 39).
+- Angenommene Kostenvoranschläge, Aufträge und Belege aufbewahren (siehe [Aufbewahrung und Löschung](conservation-effacement.md)).
+
+## Daten Ihrer Kunden
+
+- Ihr **Verzeichnis der Verarbeitungstätigkeiten** aktuell halten und es der CNIL auf Anfrage vorlegen (siehe
+  [Verzeichnis der Verarbeitungstätigkeiten](registre-traitements.md)).

@@ -1,6 +1,6 @@
 # Aid-mémwa a pwofésyonèl-la : *devis*, pyès, jistifikatif
 
-*Tradiksyon a vèsyon fransé a fich-la daté 01/11/2026 ; sé vèsyon fransé-la ki ka fè lwa. Tèks ofisyèl yo sité an fransé.*
+*Tradiksyon a vèsyon fransé a fich-la daté 14/11/2026 ; sé vèsyon fransé-la ki ka fè lwa. Tèks ofisyèl yo sité an fransé.*
 
 *Dènyé vérifikasyon : 01/11/2026. Rézimé a fich [devis-depannage](devis-depannage.md),
 [retractation](retractation.md), [debours](debours.md) é [note-facture](note-facture.md).*
@@ -32,4 +32,9 @@
 
 - Ba kliyan-la ***note* / fakti**-la (obligatwa pasé 25 € TTC) **avan yo péyé-w**.
 - Pwopozé pyès yo ranplasé ; si kliyan-la pa ka gadé yo, fè-y siyé ***décharge***-la.
-- Gadé *devis* asèpté, *mandat* é jistifikatif (konbyen tan pou gadé yo : Item 39).
+- Gadé *devis* asèpté, *mandat* é jistifikatif (gadé [konsèvasyon é éfasman](conservation-effacement.md)).
+
+## Done a kliyan a-w
+
+- Kenbé **rèjis a tretman** a-w a jou é montré-y ba CNIL si i mandé-y (gadé
+  [rèjis a tretman](registre-traitements.md)).

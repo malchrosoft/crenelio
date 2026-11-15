@@ -51,6 +51,7 @@ Arabisch (`ar/`) wird von rechts nach links geschrieben; seine amtlichen Zitate,
 | Merkhilfe für den Fachbetrieb: Einkäufe, Belege, Aufbewahrung | [rappels-artisan.md](rappels-artisan.md) |
 | Termin mit Kostenvoranschlag absagen oder verschieben: zurückgezogenes Angebot, Aufhebung, höhere Gewalt | [annulation-devis.md](annulation-devis.md) |
 | Aufbewahrung und Löschung von Kundendaten: zehn Jahre für einen angenommenen Kostenvoranschlag, DSGVO | [conservation-effacement.md](conservation-effacement.md) |
+| Verzeichnis der Verarbeitungstätigkeiten (DSGVO, Art. 30): vorausgefüllte Blätter von Crénelio zum Ergänzen, der CNIL auf Anfrage vorzulegen | [registre-traitements.md](registre-traitements.md) |
 | Amtliche Texte, wörtlich: Code de la consommation | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Amtliche Texte: Code de commerce (EI, Gesellschaften) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Amtliche Texte: Code général des impôts (durchlaufende Posten, Kleinunternehmerregelung) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

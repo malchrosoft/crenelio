@@ -1,6 +1,6 @@
 # Aide-mémoire d'l'artisan : devis, pièces, justificatifs
 
-*Version in ch'ti, pour l'plaisir, d'el fiche française du 01/11/2026 ; ch'est l'version française qui fait foi. Les textes officiels, eux, i restent in français.*
+*Version in ch'ti, pour l'plaisir, d'el fiche française du 14/11/2026 ; ch'est l'version française qui fait foi. Les textes officiels, eux, i restent in français.*
 
 *Dernière vérification : 01/11/2026. Résumé des fiches [devis-depannage](devis-depannage.md),
 [retractation](retractation.md), [debours](debours.md) et [note-facture](note-facture.md).*
@@ -30,4 +30,9 @@
 
 - Donner l'**note / facture** (obligatoire au-delà d'25 € TTC) **avant d'ête payé**.
 - Proposer les pièces remplacées ; si l'client i n'les garde point, faire signer l'**décharge**.
-- Garder les devis acceptés, mandats et justificatifs (durée d'conservation : Item 39).
+- Garder les devis acceptés, mandats et justificatifs (vir [conservation et effacemint](conservation-effacement.md)).
+
+## Les données d'vos clients
+
+- Tenir à jour vo **registe des traitemints** et l'montrer à l'CNIL si al le d'mande (vir
+  [registe des traitemints](registre-traitements.md)).

@@ -50,6 +50,7 @@ traslada a sus traducciones (o se señalan como desactualizadas). El árabe (`ar
 | Recordatorio del profesional: compras, justificantes, conservación | [rappels-artisan.md](rappels-artisan.md) |
 | Anular o cambiar de fecha una cita que tiene presupuesto: oferta anulada, revocación, fuerza mayor | [annulation-devis.md](annulation-devis.md) |
 | Conservación y supresión de los datos de los clientes: diez años para un presupuesto aceptado, RGPD | [conservation-effacement.md](conservation-effacement.md) |
+| Registro de las actividades de tratamiento (RGPD, art. 30): fichas de Crénelio prerrellenadas para completar, que se presentan a la CNIL si lo solicita | [registre-traitements.md](registre-traitements.md) |
 | Textos oficiales, palabra por palabra: Code de la consommation (Código de Consumo francés) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Textos oficiales: Code de commerce (Código de Comercio francés) (EI, sociedades) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Textos oficiales: Code général des impôts (Código General Tributario francés) (gastos suplidos, franquicia) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

@@ -52,6 +52,7 @@
 | Արհեստավորի հուշաթերթ՝ գնումներ, հիմնավորող փաստաթղթեր, պահպանում | [rappels-artisan.md](rappels-artisan.md) |
 | Նախահաշիվ ունեցող այցի չեղարկում կամ տեղափոխում՝ չեղարկված առաջարկ, համաձայնությամբ լուծում, անհաղթահարելի ուժ | [annulation-devis.md](annulation-devis.md) |
 | Հաճախորդների տվյալների պահպանում և ջնջում՝ ընդունված նախահաշվի համար տասը տարի, GDPR | [conservation-effacement.md](conservation-effacement.md) |
+| Մշակման ռեեստր (GDPR, հոդված 30)՝ Crénelio-ի նախապես լրացված քարտեր՝ լրացնելու համար, ներկայացվում են CNIL-ին նրա պահանջով | [registre-traitements.md](registre-traitements.md) |
 | Պաշտոնական տեքստեր, բառացի՝ Code de la consommation (Սպառողների իրավունքների օրենսգիրք) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Պաշտոնական տեքստեր՝ Code de commerce (Առևտրային օրենսգիրք) (EI, ընկերություններ) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Պաշտոնական տեքստեր՝ Code général des impôts (Հարկերի ընդհանուր օրենսգիրք) (*débours*, ԱԱՀ-ից ազատում) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

@@ -1,6 +1,6 @@
 # Profesyonelin hatırlatma notu: teklifler, parçalar, belgeler
 
-*01/11/2026 tarihli Fransızca sürümün çevirisidir; Fransızca sürüm esastır. Resmî metinler Fransızca olarak alıntılanmıştır.*
+*14/11/2026 tarihli Fransızca sürümün çevirisidir; Fransızca sürüm esastır. Resmî metinler Fransızca olarak alıntılanmıştır.*
 
 *Son kontrol: 01/11/2026. [devis-depannage](devis-depannage.md), [retractation](retractation.md),
 [debours](debours.md) ve [note-facture](note-facture.md) fişlerinin özeti.*
@@ -31,4 +31,9 @@
 
 - **Hizmet notunu / faturayı** (25 € KDV dahil tutarın üzerinde zorunlu) **ödeme almadan önce** verin.
 - Değiştirilen parçaları önerin; müşteri saklamazsa **ibraname** (*décharge*) imzalatın.
-- Kabul edilen teklifleri, vekâletleri ve belgeleri saklayın (saklama süresi: Item 39).
+- Kabul edilen teklifleri, vekâletleri ve belgeleri saklayın (bkz. [saklama ve silme](conservation-effacement.md)).
+
+## Müşterilerinizin verileri
+
+- **İşleme faaliyetleri kaydınızı** güncel tutun ve CNIL talep ederse ona sunun (bkz.
+  [işleme faaliyetleri kaydı](registre-traitements.md)).

@@ -50,6 +50,7 @@ transpune în traducerile sale (sau acestea sunt semnalate ca rămase în urmă)
 | Memento al profesionistului: achiziții, documente justificative, păstrare | [rappels-artisan.md](rappels-artisan.md) |
 | Anularea sau mutarea unei programări care are un deviz: ofertă anulată, revocare prin acord, forță majoră | [annulation-devis.md](annulation-devis.md) |
 | Păstrarea și ștergerea datelor clienților: zece ani pentru un deviz acceptat, RGPD | [conservation-effacement.md](conservation-effacement.md) |
+| Registrul activităților de prelucrare (RGPD, art. 30): fișele precompletate ale Crénelio, de completat, de prezentat CNIL la cerere | [registre-traitements.md](registre-traitements.md) |
 | Texte oficiale, cuvânt cu cuvânt: Code de la consommation (Codul francez al consumului) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Texte oficiale: Code de commerce (Codul comercial francez; EI, societăți) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Texte oficiale: Code général des impôts (Codul general fiscal; *débours*, scutire) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

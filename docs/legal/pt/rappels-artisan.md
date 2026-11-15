@@ -1,6 +1,6 @@
 # Lembrete do profissional: orçamentos, peças, comprovativos
 
-*Tradução da versão francesa de 01/11/2026; prevalece a versão francesa. Os textos oficiais são citados em francês.*
+*Tradução da versão francesa de 14/11/2026; prevalece a versão francesa. Os textos oficiais são citados em francês.*
 
 *Última verificação: 01/11/2026. Síntese das fichas [devis-depannage](devis-depannage.md),
 [retractation](retractation.md), [debours](debours.md) e [note-facture](note-facture.md).*
@@ -30,4 +30,9 @@
 
 - Entregar a **nota / fatura** (obrigatória acima de 25 € com IVA) **antes de ser pago**.
 - Propor as peças substituídas; se o cliente não ficar com elas, fazê-lo assinar a **declaração de desoneração** (*décharge*).
-- Conservar orçamentos aceites, mandatos e comprovativos (prazo de conservação: Item 39).
+- Conservar orçamentos aceites, mandatos e comprovativos (ver [conservação e apagamento](conservation-effacement.md)).
+
+## Dados dos seus clientes
+
+- Manter atualizado o seu **registo das atividades de tratamento** e apresentá-lo à CNIL se esta o pedir (ver
+  [registo das atividades de tratamento](registre-traitements.md)).

@@ -1,6 +1,6 @@
 # Memento al profesionistului: devize, piese, documente justificative
 
-*Traducere a versiunii franceze din 01/11/2026; versiunea franceză este cea care face fidă. Textele oficiale sunt citate în franceză.*
+*Traducere a versiunii franceze din 14/11/2026; versiunea franceză este cea care face fidă. Textele oficiale sunt citate în franceză.*
 
 *Ultima verificare: 01/11/2026. Sinteză a fișelor [devis-depannage](devis-depannage.md),
 [retractation](retractation.md), [debours](debours.md) și [note-facture](note-facture.md).*
@@ -30,4 +30,9 @@
 
 - Remiteți **nota / factura** (obligatorie peste 25 € TTC) **înainte de a fi plătit**.
 - Propuneți piesele înlocuite; dacă clientul nu le păstrează, cereți-i să semneze **descărcarea** (*décharge*).
-- Păstrați devizele acceptate, mandatele și documentele justificative (durata de păstrare: Item 39).
+- Păstrați devizele acceptate, mandatele și documentele justificative (vezi [păstrarea și ștergerea](conservation-effacement.md)).
+
+## Datele clienților dumneavoastră
+
+- Țineți la zi **registrul activităților de prelucrare** și prezentați-l CNIL dacă vi-l cere (vezi
+  [registrul activităților de prelucrare](registre-traitements.md)).

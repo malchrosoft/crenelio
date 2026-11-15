@@ -1,6 +1,6 @@
 # Recordatorio del profesional (*aide-mémoire de l'artisan*): presupuestos, piezas, justificantes
 
-*Traducción de la versión francesa del 01/11/2026; prevalece la versión francesa. Los textos oficiales se citan en francés.*
+*Traducción de la versión francesa del 14/11/2026; prevalece la versión francesa. Los textos oficiales se citan en francés.*
 
 *Última verificación: 01/11/2026. Síntesis de las fichas [devis-depannage](devis-depannage.md),
 [retractation](retractation.md), [debours](debours.md) y [note-facture](note-facture.md).*
@@ -30,4 +30,9 @@
 
 - Entregar la **nota / factura** (*note / facture*, obligatoria por encima de 25 € IVA incluido (*TTC*)) **antes de cobrar**.
 - Ofrecer las piezas sustituidas; si el cliente no las conserva, hacer firmar el **descargo** (*décharge*).
-- Conservar presupuestos aceptados, mandatos y justificantes (plazo de conservación: Item 39).
+- Conservar presupuestos aceptados, mandatos y justificantes (ver [conservación y supresión](conservation-effacement.md)).
+
+## Datos de sus clientes
+
+- Mantener al día su **registro de las actividades de tratamiento** y presentarlo a la CNIL si lo solicita (ver
+  [registro de las actividades de tratamiento](registre-traitements.md)).

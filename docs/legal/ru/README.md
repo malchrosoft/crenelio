@@ -50,6 +50,7 @@ Item 40: файлы Markdown, по одной папке на язык (`fr/` и
 | Памятка профессионала: закупки, подтверждающие документы, хранение | [rappels-artisan.md](rappels-artisan.md) |
 | Отмена или перенос визита, к которому есть смета: отозванная оферта, расторжение по соглашению, непреодолимая сила | [annulation-devis.md](annulation-devis.md) |
 | Хранение и удаление данных клиентов: десять лет для принятой сметы, GDPR | [conservation-effacement.md](conservation-effacement.md) |
+| Реестр операций по обработке (GDPR, ст. 30): предзаполненные карточки Crénelio, которые нужно дополнить и предъявить CNIL по запросу | [registre-traitements.md](registre-traitements.md) |
 | Официальные тексты дословно: Code de la consommation (Кодекс о защите прав потребителей) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Официальные тексты: Code de commerce (Торговый кодекс; EI, общества) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Официальные тексты: Code général des impôts (Общий налоговый кодекс; *débours*, освобождение от НДС) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

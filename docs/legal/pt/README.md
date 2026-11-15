@@ -50,6 +50,7 @@ transposta para as suas traduções (ou estas são assinaladas como desatualizad
 | Lembrete do profissional: compras, comprovativos, conservação | [rappels-artisan.md](rappels-artisan.md) |
 | Anular ou mudar a data de uma marcação que tem orçamento: oferta anulada, revogação, força maior | [annulation-devis.md](annulation-devis.md) |
 | Conservação e apagamento dos dados dos clientes: dez anos para um orçamento aceite, RGPD | [conservation-effacement.md](conservation-effacement.md) |
+| Registo das atividades de tratamento (RGPD, art. 30): fichas pré-preenchidas do Crénelio a completar, a apresentar à CNIL a pedido | [registre-traitements.md](registre-traitements.md) |
 | Textos oficiais, palavra por palavra: Code de la consommation (Código do Consumo) | [fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Textos oficiais: Code de commerce (Código Comercial; EI, sociedades) | [fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Textos oficiais: Code général des impôts (Código Geral dos Impostos; *débours*, isenção) | [fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

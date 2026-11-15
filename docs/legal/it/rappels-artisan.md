@@ -1,6 +1,6 @@
 # Promemoria del professionista: preventivi, pezzi, giustificativi
 
-*Traduzione della versione francese del 01/11/2026; fa fede la versione francese. I testi ufficiali sono citati in francese.*
+*Traduzione della versione francese del 14/11/2026; fa fede la versione francese. I testi ufficiali sono citati in francese.*
 
 *Ultima verifica: 01/11/2026. Sintesi delle schede [devis-depannage](devis-depannage.md),
 [retractation](retractation.md), [debours](debours.md) e [note-facture](note-facture.md).*
@@ -30,4 +30,9 @@
 
 - Consegnare la **nota / fattura** (obbligatoria oltre 25 € IVA inclusa) **prima di essere pagati**.
 - Proporre i pezzi sostituiti; se il cliente non li tiene, fargli firmare la **liberatoria** (*décharge*).
-- Conservare preventivi accettati, mandati e giustificativi (durata di conservazione: Item 39).
+- Conservare preventivi accettati, mandati e giustificativi (vedere [conservazione e cancellazione](conservation-effacement.md)).
+
+## Dati dei vostri clienti
+
+- Tenere aggiornato il vostro **registro delle attività di trattamento** e presentarlo alla CNIL se lo richiede
+  (vedere [registro delle attività di trattamento](registre-traitements.md)).

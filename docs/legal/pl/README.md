@@ -50,6 +50,7 @@ przenosi się do jej tłumaczeń (albo oznacza je jako nieaktualne). Arabski (`a
 | Ściągawka profesjonalisty: zakupy, dowody, przechowywanie | [rappels-artisan.md](rappels-artisan.md) |
 | Odwołanie lub przesunięcie wizyty, do której jest kosztorys: anulowana oferta, rozwiązanie za porozumieniem, siła wyższa | [annulation-devis.md](annulation-devis.md) |
 | Przechowywanie i usuwanie danych klientów: dziesięć lat dla zaakceptowanego kosztorysu, RODO | [conservation-effacement.md](conservation-effacement.md) |
+| Rejestr czynności przetwarzania (RODO, art. 30): wstępnie wypełnione karty Crénelio do uzupełnienia, do przedstawienia CNIL na żądanie | [registre-traitements.md](registre-traitements.md) |
 | Teksty urzędowe, słowo w słowo: Code de la consommation | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Teksty urzędowe: Code de commerce (EI, spółki) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Teksty urzędowe: Code général des impôts (*débours*, zwolnienie podmiotowe) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

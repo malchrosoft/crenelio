@@ -49,6 +49,7 @@ ou ajouté isi ka parèt la, lyen ant fich yo ka rété rélatif.
 | Aid-mémwa a pwofésyonèl-la : acha, jistifikatif, konsèvasyon | [rappels-artisan.md](rappels-artisan.md) |
 | Anilé oben déplasé on randévou ki ni on *devis* : òf anilé, *révocation*, *force majeure* | [annulation-devis.md](annulation-devis.md) |
 | Konsèvasyon é éfasman a done a kliyan yo : dis lanné pou on *devis* asèpté, RGPD | [conservation-effacement.md](conservation-effacement.md) |
+| Rèjis a tretman (RGPD, art. 30) : fich Crénelio ja ranpli, pou konplété, pou montré CNIL si i mandé-y | [registre-traitements.md](registre-traitements.md) |
 | Tèks ofisyèl, mo pou mo : Code de la consommation | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Tèks ofisyèl : Code de commerce (EI, sosyété) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Tèks ofisyèl : Code général des impôts (débours, franchise) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

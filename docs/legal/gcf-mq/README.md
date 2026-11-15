@@ -50,6 +50,7 @@ tradiksyon'y (ou siyalé kon an rita). Arab (`ar/`) ka ékri adwat agoch ; sitas
 | Pens-bèt pwofesyonèl-la : achat, prèv, kijan gadé papié | [rappels-artisan.md](rappels-artisan.md) |
 | Anilé ou déplasé an randévou ki ni an devis : òf anilé, révocation, force majeure | [annulation-devis.md](annulation-devis.md) |
 | Konsèvasyon épi éfasman done kliyan-an : dis lanné pou an devis aksèpté, RGPD | [conservation-effacement.md](conservation-effacement.md) |
+| Rèjis tretman (RGPD, atik 30) : fich Crénelio ki ja ranpli, pou konplété, pou montré CNIL si i mandé'y | [registre-traitements.md](registre-traitements.md) |
 | Tèks ofisyèl, mo pou mo : Code de la consommation | [fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Tèks ofisyèl : Code de commerce (EI, sosyété) | [fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Tèks ofisyèl : Code général des impôts (débours, franchise) | [fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

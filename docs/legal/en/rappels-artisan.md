@@ -1,6 +1,6 @@
 # Tradesperson's checklist: quotes, parts, supporting documents
 
-*Translation of the French version dated 01/11/2026 — the French version prevails. Official texts are quoted in French.*
+*Translation of the French version dated 14/11/2026 — the French version prevails. Official texts are quoted in French.*
 
 *Last check: 01/11/2026. Summary of the sheets [devis-depannage](devis-depannage.md),
 [retractation](retractation.md), [debours](debours.md) and [note-facture](note-facture.md).*
@@ -30,4 +30,9 @@
 
 - Give the **note / invoice** (mandatory above €25 incl. VAT) **before being paid**.
 - Offer the replaced parts; if the customer does not keep them, have them sign the **release** (*décharge*).
-- Keep accepted quotes, mandates and supporting documents (retention period: Item 39).
+- Keep accepted quotes, mandates and supporting documents (see [retention and erasure](conservation-effacement.md)).
+
+## Your customers' data
+
+- Keep your **record of processing activities** up to date and show it to the CNIL if it asks for it (see
+  [record of processing activities](registre-traitements.md)).

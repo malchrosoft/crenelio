@@ -51,6 +51,7 @@ r'tard). L'arabe (`ar/`) i s'écrit d'droite à gauche ; ses citations officiell
 | Aide-mémoire d'l'artisan : acats, justificatifs, conservation | [rappels-artisan.md](rappels-artisan.md) |
 | Annuler ou déplacer un rindez-vous qu'il a un devis : offre annulée, révocation, force majeure | [annulation-devis.md](annulation-devis.md) |
 | Conservation et effacemint des données des clients : dix ans pour un devis accepté, RGPD | [conservation-effacement.md](conservation-effacement.md) |
+| Registe des traitemints (RGPD, art. 30) : fiches d'Crénelio déjà rimplies, à compléter, à montrer à l'CNIL si al le d'mande | [registre-traitements.md](registre-traitements.md) |
 | Textes officiels, mot pour mot : Code de la consommation | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Textes officiels : Code de commerce (EI, sociétés) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Textes officiels : Code général des impôts (débours, franchise) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

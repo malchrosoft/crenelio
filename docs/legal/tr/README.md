@@ -48,6 +48,7 @@ aktarılır (ya da çeviriler geride kaldı diye işaretlenir). Arapça (`ar/`) 
 | Profesyonelin hatırlatma notu: satın almalar, belgeler, saklama | [rappels-artisan.md](rappels-artisan.md) |
 | Teklifi olan bir randevuyu iptal etmek veya ertelemek: iptal edilen icap, karşılıklı anlaşmayla sona erdirme, mücbir sebep | [annulation-devis.md](annulation-devis.md) |
 | Müşteri verilerinin saklanması ve silinmesi: kabul edilen teklif için on yıl, GDPR | [conservation-effacement.md](conservation-effacement.md) |
+| İşleme faaliyetleri kaydı (GDPR, madde 30): Crénelio'nun önceden doldurulmuş, tamamlanacak ve talep hâlinde CNIL'e sunulacak kartları | [registre-traitements.md](registre-traitements.md) |
 | Resmî metinler, kelimesi kelimesine: Code de la consommation (Tüketici Kanunu) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Resmî metinler: Code de commerce (Ticaret Kanunu) (EI, şirketler) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Resmî metinler: Code général des impôts (Genel Vergi Kanunu) (*débours*, muafiyet) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

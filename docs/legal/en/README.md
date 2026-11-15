@@ -50,6 +50,7 @@ to its translations (or they are flagged as out of date). Arabic (`ar/`) is writ
 | Tradesperson's checklist: purchases, supporting documents, retention | [rappels-artisan.md](rappels-artisan.md) |
 | Cancelling or moving an appointment that has a quote: cancelled offer, revocation, force majeure | [annulation-devis.md](annulation-devis.md) |
 | Retention and erasure of customer data: ten years for an accepted quote, GDPR | [conservation-effacement.md](conservation-effacement.md) |
+| Record of processing activities (GDPR, art. 30): Crénelio's pre-filled sheets to complete, to be shown to the CNIL on request | [registre-traitements.md](registre-traitements.md) |
 | Official texts, word for word: Code de la consommation (French Consumer Code) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | Official texts: Code de commerce (French Commercial Code) (EI, companies) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | Official texts: Code général des impôts (French General Tax Code) (disbursements, VAT exemption threshold) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |

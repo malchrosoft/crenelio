@@ -50,6 +50,7 @@
 | مذكرة المهني: المشتريات، المستندات المثبتة، الحفظ | [rappels-artisan.md](rappels-artisan.md) |
 | إلغاء موعد له عرض أسعار أو تغيير موعده: العرض الملغى، الفسخ بالتراضي، القوة القاهرة | [annulation-devis.md](annulation-devis.md) |
 | حفظ بيانات الزبائن ومحوها: عشر سنوات لعرض الأسعار المقبول، اللائحة العامة لحماية البيانات (RGPD) | [conservation-effacement.md](conservation-effacement.md) |
+| سجل المعالجات (RGPD، المادة 30): بطاقات Crénelio المعبأة مسبقا لاستكمالها، تُعرض على CNIL عند طلبها | [registre-traitements.md](registre-traitements.md) |
 | النصوص الرسمية حرفيا: Code de la consommation (قانون الاستهلاك) | [../fr/textes/code-consommation.md](../fr/textes/code-consommation.md) |
 | النصوص الرسمية: Code de commerce (مدونة التجارة) (EI، الشركات) | [../fr/textes/code-commerce.md](../fr/textes/code-commerce.md) |
 | النصوص الرسمية: Code général des impôts (المدونة العامة للضرائب) (*débours*، الإعفاء) | [../fr/textes/code-general-impots.md](../fr/textes/code-general-impots.md) |
