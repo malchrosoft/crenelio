@@ -9,7 +9,9 @@ SET NAMES utf8mb4;
 INSERT INTO `config` (`config_key`, `config_value`) VALUES
 ('company_name',        'Crénelio Dépannage & Services'),
 ('pro_name',            'Alexandre Martin'),
-('pro_email',           'contact@crenelio.local'),
+-- Vide : renseigné et vérifié dans l'espace Artisan (écran Compte). Une adresse fictive activerait la
+-- double authentification vers une boîte inexistante et bloquerait la première connexion.
+('pro_email',           ''),
 ('pro_phone',           '06 12 34 56 78'),
 ('service_area',        'Clamart et communes limitrophes (rayon 15 km)'),
 ('slot_step_minutes',   '30'),   -- Graduation des créneaux affichés (30 min)

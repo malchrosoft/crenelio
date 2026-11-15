@@ -115,3 +115,6 @@ INSERT INTO `appointments` (
 UPDATE `appointments` SET `latitude` = 48.800987, `longitude` = 2.263813 WHERE `cancel_token` = 'token_test_claire_001';
 UPDATE `appointments` SET `latitude` = 48.800895, `longitude` = 2.260827 WHERE `cancel_token` = 'token_test_marc_002';
 UPDATE `appointments` SET `latitude` = 48.801191, `longitude` = 2.265053 WHERE `cancel_token` = 'token_test_sophie_003';
+
+-- Email professionnel de démonstration (capturé par Mailpit en local ; vide dans le socle)
+UPDATE `config` SET `config_value` = 'contact@crenelio.local' WHERE `config_key` = 'pro_email';
